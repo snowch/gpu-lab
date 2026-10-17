@@ -24,9 +24,9 @@
       <nav class="course-nav" aria-label="Course navigation">
         <a class="current" aria-current="page" href="#overview">Course overview</a>
         <a href="./lessons/memory.html">01 Reading a tensor</a>
-        <a href="./lessons/scheduling.html">02 Keeping the GPU busy</a><a href="./lessons/divergence.html">03 Taking different paths</a><a href="./lessons/shared-memory.html">04 Sharing work</a><a href="#curriculum">Course roadmap</a>
+        <a href="./lessons/scheduling.html">02 Keeping the GPU busy</a><a href="./lessons/divergence.html">03 Taking different paths</a><a href="./lessons/shared-memory.html">04 Sharing work</a><a href="./lessons/matmul.html">05 Reusing data</a><a href="./lessons/tensor-cores.html">06 Using tensor cores</a><a href="./lessons/attention.html">07 Attention fusion</a><a href="./lessons/inference.html">08 Inference performance</a><a href="#curriculum">Course roadmap</a>
       </nav>
-      <div class="sidebar-bottom"><span class="status-label">FOUR LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
+      <div class="sidebar-bottom"><span class="status-label">EIGHT LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
     </aside>
     <main id="main">
       <section id="overview" class="intro">
@@ -37,16 +37,16 @@
         <div class="intro-meta"><span>Predict → inspect → experiment</span><span>Some Python and tensor familiarity</span></div>
       </section>
       <section id="curriculum" class="section-space">
-        <p class="eyebrow">THE COURSE AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">Four interactive drafts are available. Start with Reading a tensor, then follow scheduling, divergent paths and shared-memory banks. Modules 05–08 are planned.</p>
+        <p class="eyebrow">THE COURSE AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">All eight labs are available as interactive drafts. Start with Reading a tensor, then follow the course through matrix multiplication, precision, attention and inference. Lab 04 also includes a reduction and synchronisation workshop.</p>
         <div class="roadmap">
           <a href="./lessons/memory.html"><span class="module-no">01</span><div><h3>Reading a tensor</h3><p>Warps, addresses, coalescing, and a first CUDA kernel.</p></div><span class="tag live">Try the draft</span></a>
           <a href="./lessons/scheduling.html"><span class="module-no">02</span><div><h3>Keeping the GPU busy</h3><p>Resident warps, a model scheduler, and latency hiding.</p></div><span class="tag live">Try the draft</span></a>
           <a href="./lessons/divergence.html"><span class="module-no">03</span><div><h3>Taking different paths</h3><p>Active lanes, branch divergence, and masked tensor operations.</p></div><span class="tag live">Try the draft</span></a>
           <a href="./lessons/shared-memory.html"><span class="module-no">04</span><div><h3>Sharing work within a block</h3><p>Shared-memory banks, broadcasts, padding, and block barriers.</p></div><span class="tag live">Try the draft</span></a>
-          <div><span class="module-no">05</span><div><h3>Reusing data in matrix multiplication</h3><p>Naive and tiled matmul, register budgets, and arithmetic intensity.</p></div><span class="tag">Planned</span></div>
-          <div><span class="module-no">06</span><div><h3>Using tensor cores</h3><p>Matrix instructions, precision, accumulation, and numerical error.</p></div><span class="tag">Planned</span></div>
-          <div><span class="module-no">07</span><div><h3>Moving less data in attention</h3><p>Softmax, fusion, and avoiding large intermediate tensors.</p></div><span class="tag">Planned</span></div>
-          <div><span class="module-no">08</span><div><h3>Explaining inference performance</h3><p>Prefill, decode, KV caches, batching, and measured bottlenecks.</p></div><span class="tag">Planned</span></div>
+          <a href="./lessons/matmul.html"><span class="module-no">05</span><div><h3>Reusing data in matrix multiplication</h3><p>Naive and tiled matmul, register budgets, and arithmetic intensity.</p></div><span class="tag live">Try the draft</span></a>
+          <a href="./lessons/tensor-cores.html"><span class="module-no">06</span><div><h3>Using tensor cores</h3><p>Matrix instructions, precision, accumulation, and numerical error.</p></div><span class="tag live">Try the draft</span></a>
+          <a href="./lessons/attention.html"><span class="module-no">07</span><div><h3>Moving less data in attention</h3><p>Softmax, fusion, and avoiding large intermediate tensors.</p></div><span class="tag live">Try the draft</span></a>
+          <a href="./lessons/inference.html"><span class="module-no">08</span><div><h3>Explaining inference performance</h3><p>Prefill, decode, KV-cache budgets, batching, and measurement comparison.</p></div><span class="tag live">Try the draft</span></a>
         </div>
       </section>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>

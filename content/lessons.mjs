@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import { remainingLessons } from './remaining-lessons.mjs';
 // Original lesson text. Models, not this content, supply all prediction answers.
 export const lessons = [
   {
@@ -107,12 +108,13 @@ output[lane] = tile[lane][0];`,
       'Choose every other word and reduce the active lanes to sixteen. Can this subset avoid the conflict that appears with a full warp?',
     ],
     takeaway: `<p>Bank conflicts depend on both the bank and the word address. A count of requests per bank would incorrectly penalise broadcasts. Padding changes the row pitch, which changes the bank mapping for column reads.</p>
-      <p>Padding uses extra shared memory. That can affect how many blocks fit on an SM, connecting this layout choice to residency in Lab 02. The next extension of this module will apply barriers and shared memory to a reduction; this draft models reads and bank conflicts only.</p>`,
+      <p>Padding uses extra shared memory. That can affect how many blocks fit on an SM, connecting this layout choice to residency in Lab 02. <a href="reduction.html">Continue to the reduction workshop</a> to apply block barriers to a computed tree and inspect an unsafe interleaving. The bank model on this page covers reads only.</p>`,
     limits: 'We model one warp instruction reading aligned FP32 words through 32 banks of four-byte width, one distinct word per bank per round, with read broadcast. Rounds express conflict multiplicity, not measured cycles. Global-memory traffic, shared-memory writes, barriers, races, allocation limits, 64-bit accesses and matrix-specific load instructions are not simulated.',
     source: 'https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-and-memory-banks',
     sourceLabel: 'CUDA Best Practices Guide: shared memory and memory banks',
   },
 ];
+lessons.push(...remainingLessons);
 
 const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 export function renderLesson(lesson, index) {
@@ -123,7 +125,7 @@ export function renderLesson(lesson, index) {
 <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="${lesson.subtitle}"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,">
 <title>${lesson.title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css">
-<script type="module" src="../src/lesson.mjs"></script></head>
+<script type="module" src="../src/${lesson.engine === 'ai' ? 'ai-lesson' : 'lesson'}.mjs"></script></head>
 <body data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
 <header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
 <div class="layout"><aside class="sidebar"><p class="eyebrow">HOW GPUS RUN AI</p><p class="sidebar-title">Under the hood.</p>

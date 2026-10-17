@@ -50,7 +50,7 @@ def check_lessons(browser, base_url, root, errors):
                     expect(page.locator('#step-detail')).to_contain_text('1 banks serve 32 lanes')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{slug}: horizontal overflow'
                 page.screenshot(path=str(root / f'test-results/{slug}-{width}-{theme}.png'), full_page=True)
-                page.get_by_role('link', name='Next lesson →' if slug != 'shared-memory' else 'Return to roadmap →').click()
+                page.get_by_role('link', name='Next lesson →').click()
                 expect(page.locator('h1')).to_be_visible()
             context.close()
             print(f'PASS: three new lessons, {width}px, {theme}; predictions, trace, masks, banks, navigation')

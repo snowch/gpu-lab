@@ -41,3 +41,17 @@ for case_name in contiguous column misaligned tail multiblock; do
   grep -q "Verified ${args[2]} output values" "$run_dir/run.log"
   printf 'PASS: %s (stride %s, offset %s, n %s)\n' "$case_name" "${args[@]}"
 done
+
+nvcc -O2 --cudart shared -gencode arch=compute_70,code=compute_70 \
+  "$course_root/examples/ai-kernels.cu" -o "$output_root/ai-kernels"
+# Keep binary and working directory at distinct paths.
+run_dir="$output_root/ai-kernel-run"
+mkdir -p "$run_dir"
+cp "$sim_root"/configs/tested-cfgs/SM7_QV100/* "$run_dir/"
+(
+  cd "$run_dir"
+  PTX_SIM_MODE_FUNC=1 timeout 180 "$output_root/ai-kernels" > run.log 2>&1
+) || { cat "$run_dir/run.log"; exit 1; }
+grep -q 'GPGPU-Sim' "$run_dir/run.log"
+grep -q 'Verified naive matmul, tiled matmul and block reduction.' "$run_dir/run.log"
+echo 'PASS: naive matmul, tiled matmul and block reduction'

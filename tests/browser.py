@@ -8,6 +8,7 @@ from urllib.request import urlopen
 
 from playwright.sync_api import sync_playwright, expect
 from new_lessons import check_lessons
+from remaining_lessons import check_remaining
 
 ROOT = Path(__file__).resolve().parents[1]
 PORT = 5178
@@ -119,6 +120,7 @@ try:
         expect(page.locator("h1")).to_have_text("Reading a tensor")
         context.close()
         check_lessons(browser, URL, ROOT, errors)
+        check_remaining(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

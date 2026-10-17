@@ -89,3 +89,85 @@ load readiness, ready-only issue and no idle slot with a ready warp. Divergence 
 for every pattern, active count and negative-path choice. Bank tests cover every supported stride
 and active count, plus broadcasts, verifying complete lane service and one word per bank per round.
 Browser checks drive every lesson at desktop and phone sizes in light and dark themes.
+
+## Reduction workshop (Lab 04B)
+
+Four or eight threads write inputs 1..N into shared words marked initially unwritten. The safe
+schedule records each write, an initial block barrier, then snapshot-based tree stages at distances
+N/2, N/4, ..., 1. Snapshot reads model the ordering established between stages. The unsafe
+schedule lets thread zero read its first partner before that partner writes. This is a diagnostic
+interleaving: the model reports the unwritten read and assigns no numeric output to the racy
+program. It is not a general exploration of interleavings or CUDA undefined behaviour.
+
+## Tiled matmul (Lab 05)
+
+Square integer-valued A/B matrices have dimension 4 or 8; tile dimension T is 1, 2 or 4. Each
+trace event loads one A tile and B tile for one output tile and one K phase. It records source
+coordinates and updated output-tile values. All final outputs are computed, not illustrative data.
+The explicit input load count is 2N³/T. FP32 traffic adds N² output stores; FLOPs use 2N³.
+No cache reuse is assumed. T=1 represents the naive algorithm and allocates no shared tiles.
+
+The separate resource estimate assumes 1,024 registers, eight warp slots and eight maximum
+blocks per teaching SM. T² threads each compute one output; registers/thread is selected.
+Each small block occupies one warp slot, even with fewer than 32 active threads. Non-naive
+blocks allocate 2T²×4 shared bytes. Residency is the minimum of block, register, shared-memory
+and warp-slot bounds. No hardware allocation granularity, spills, pipelines or timing is claimed.
+
+## Precision and matrix operations (Lab 06)
+
+The conceptual matrix shape is 16×16×16; every A row is identical and B is all ones. The
+numeric trace follows C[0,0]. Inputs enter as FP32, convert to FP16/BF16/FP32 using nearest-even
+rounding (including subnormals), then accumulate sequentially into FP32. Every output matches
+that dot product by construction. The reference uses the original FP32 inputs with the same
+accumulation order. This exposes input conversion, not actual hardware MMA accumulation order.
+One WMMA API call expresses 4,096 scalar FMAs; it is not necessarily one hardware instruction.
+
+## Attention (Lab 07)
+
+Deterministic Q/K/V have length 8, 16 or 32, width four. Full dense unmasked attention uses
+scores QKᵀ/√d. A stable reference subtracts row maxima before exponentiation. The online
+implementation computes all queries in key tiles, recording query zero. For each tile:
+
+```
+m_new = max(m_old, max(tile_scores))
+alpha = exp(m_old - m_new)
+p = exp(tile_scores - m_new)
+l_new = alpha*l_old + sum(p)
+acc_new = alpha*acc_old + p*V_tile
+output = acc/l
+```
+
+The reference and recurrence use JavaScript double precision. Accounting assumes four-byte
+storage. Materialised score and probability matrices each have N² writes and N² reads: 16N²
+bytes for these intermediates. Online mode writes none of those full-matrix intermediates.
+Its single-query algorithmic scratch budget is tile+d+2 floats. Q/K/V, output, tile rereads and
+the simulator's own arrays/traces are outside that scratch metric. It is not total HBM traffic
+or an exact allocation for a production FlashAttention kernel.
+
+## Inference budget (Lab 08)
+
+The synthetic decoder assumes L=32 layers, hidden H=4096, KV width W=1024 and two-byte values.
+P is independently selected as 1 or 7 billion dense-weight parameters. Batch is B; context or
+prompt length is S. One invocation reads 2P weight bytes with ideal batch reuse.
+
+- Cache capacity: 2LBSW×2 bytes.
+- Decode: read that cache, write 2LBW×2 new bytes; FLOPs ≈ 2PB + 4LBSH.
+- Prefill: write the full prompt cache; FLOPs ≈ 2PBS + 4LBS²H for full square attention.
+- Memory lower bound: counted bytes / selected decimal GB/s.
+- Compute lower bound: counted FLOPs / selected TFLOP/s.
+- Invocation lower bound: maximum of those times under ideal overlap.
+
+These are deliberately incomplete analytical budgets, not a real named model's full shape.
+Activations, communication, intermediates, sparsity and overheads are omitted. Full-square
+prefill does not exploit causal triangular savings. Optional measured milliseconds are user
+input; no measurement is bundled or fabricated. A value below the bound signals inconsistent
+assumptions or scope. Bound/time is a comparison ratio, not a measured hardware utilisation.
+
+## Verification of Labs 04B–08
+
+Matmul is checked against independent scalar dot products and analytical traffic counts across
+all teaching resource choices. Precision tests cover ties, normal/subnormal boundaries, overflow
+and exact controls. Online attention is compared with stable materialised attention for every
+supported size/tile/score-scale pair. Budget tests check dimensions, batch/cache scaling and
+rate changes. Reduction tests check safe sums and unwritten hazard reads. Browser tests cover
+predictions, reset, keyboard stepping, model edge cases, mobile layout and navigation.

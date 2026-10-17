@@ -20,6 +20,10 @@ Each compares every output against a CPU reference. The job requires the simulat
 and the example's success marker; merely exiting without error is insufficient. Logs, the
 configuration, compiler version and simulator commit are uploaded as an Actions artifact.
 
+The same workflow also compiles `examples/ai-kernels.cu` and runs naive matmul, shared-memory
+tiled matmul and barrier-based tree reduction against CPU references. Tensor-core and attention
+lesson snippets are illustrative; this job does not compile or validate those snippets.
+
 This is **functional validation**, with `PTX_SIM_MODE_FUNC=1`. It does not validate timing or
 prove the browser's sector count against GPGPU-Sim counters. It does check that a compiled
 CUDA kernel computes the expected values in another implementation of CUDA execution.

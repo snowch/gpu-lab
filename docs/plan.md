@@ -25,11 +25,11 @@ different. Each lab records what its model leaves out.
 | 01 Reading a tensor | One warp, FP32 addresses and 32-byte sectors | Compare row/column reads and alignment | Working draft |
 | 02 Keeping the GPU busy | One teaching SM with ready/waiting resident warps | Change load latency and resident count; step the scheduler | Working draft |
 | 03 Taking different paths | Lane masks for branches and tail elements | Compare uniform and mixed branch conditions | Working draft |
-| 04 Sharing work | Shared-memory banks, broadcasts, padding; barrier explanation | Compare bank mappings and broadcasts | Working draft; reduction/race simulator planned |
-| 05 Reusing data | Naive then tiled matrix multiply, registers, shared memory | Count reuse; fit tiles to resource constraints | Planned |
-| 06 Using tensor cores | Matrix instructions and explicitly chosen numeric formats | Compare precision and accumulation error | Planned |
-| 07 Moving less data | Softmax, attention and fused intermediates | Count reads/writes with and without materialisation | Planned |
-| 08 Explaining inference | Prefill, decode, KV-cache bytes, batching | Predict bottlenecks and compare with measured profiles | Planned |
+| 04 Sharing work | Banks, broadcasts, padding; tree reduction with barrier and unsafe interleaving | Compare bank mappings; diagnose an unwritten read | Working draft, including 04B workshop |
+| 05 Reusing data | Computed naive/tiled products and teaching resource budgets | Count reuse; fit tiles to shared/register limits | Working draft |
+| 06 Using tensor cores | WMMA concepts, FP16/BF16 rounding, FP32 accumulation | Inspect input conversion and cancellation | Working draft |
+| 07 Moving less data | Stable materialised and online tiled attention | Trace normalisation; count intermediate traffic | Working draft |
+| 08 Explaining inference | Prefill/decode, KV bytes, batching and roofline bounds | Predict dominant bounds; optionally compare a measurement | Working draft |
 
 ## Implementation choices
 
@@ -43,9 +43,11 @@ selection and fixed load latency. It models no particular GPU. The three new pag
 renderer and experiment controls to avoid duplicating the shell. Integrating the external learning
 platform remains a separate decision; this implementation keeps the prototype dependency-free.
 
-Next: extend module 04 with a reduction and an explicit interleaving model for barriers/races,
-then build naive and tiled matmul. Resource-limited occupancy and block placement also remain
-extensions of module 02. Keep those limits visible rather than presenting them as implemented.
+All eight main labs and the reduction workshop now have computed experiments. Resource-limited
+residency is introduced through explicit budgets in Lab 05. The introduction remains a separate
+landing page; every lab has its own URL. This is a complete first teaching pass, not a complete
+GPU simulator. Future extensions can add block placement, compiler-produced listings, real
+hardware measurements and production-kernel implementations without claiming those exist today.
 
 Before the CUDA path becomes a graded track, compile and run every example on a named GPU
 and toolkit version; record outputs and compare simulator claims with appropriate profiler
