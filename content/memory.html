@@ -1,0 +1,87 @@
+<!doctype html>
+<!-- Copyright © 2026 Christopher Snow. -->
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore how a GPU warp reads tensor memory. Predict sector counts and inspect addresses.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <title>Reading a tensor · GPU Lab</title>
+  <link rel="stylesheet" href="../src/style.css">
+  <link rel="stylesheet" href="../src/lessons.css">
+  <script type="module" src="../src/app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to lesson</a>
+  <header class="topbar">
+    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Course navigation">
+      <p class="eyebrow">HOW GPUS RUN AI</p>
+      <p class="sidebar-title">Under the hood.</p>
+      <nav class="lesson-nav" aria-label="Course lessons">
+        <a href="../index.html">Course overview</a>
+        <a class="current" aria-current="page" href="memory.html"><span>01</span> Reading a tensor <span class="dot" aria-hidden="true"></span></a>
+        <a href="scheduling.html">02 Keeping the GPU busy</a><a href="divergence.html">03 Taking different paths</a><a href="shared-memory.html">04 Sharing work</a><a href="../index.html#curriculum">Course roadmap</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-label">FOUR LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
+    </aside>
+    <main id="main">
+      <section class="intro">
+        <p class="eyebrow">LAB 01 / MEMORY ACCESS</p>
+        <h1>Reading a tensor</h1>
+        <p class="lead">Follow a warp’s addresses from tensor elements to memory sectors.</p>
+        <p class="prerequisite"><strong>Before you start:</strong> Some familiarity with arrays and tensor shapes. No CUDA experience or GPU is needed.</p>
+      </section>
+      <section id="lab">
+        <div class="section-heading"><div><h2>Same values. Different addresses.</h2></div><span class="tag">Interactive draft</span></div>
+        <div class="prose">
+          <p>Imagine reading one feature from each row of a tensor. A GPU runs many copies of a small program, called a <strong>kernel</strong>. Each copy is a <strong>thread</strong>. NVIDIA GPUs organise threads into groups of 32 called <strong>warps</strong>.</p>
+          <p>Here, one warp reads 32 values. Each thread reads one 32-bit floating-point value (FP32), which occupies four bytes. Its position within the warp is its <strong>lane</strong>, numbered 0 to 31.</p>
+          <p>Memory requests from a warp can be combined into aligned regions. This model groups addresses into <strong>32-byte sectors</strong>: bytes 0–31, then 32–63, and so on. This grouping is called <strong>coalescing</strong>. Your task is to see how the addresses determine the sectors touched.</p>
+        </div>
+        <noscript><p class="notice">The lesson text is available without JavaScript. Enable JavaScript to use the simulator.</p></noscript>
+        <div class="lab-panel" id="simulator">
+          <div class="panel-top"><span class="eyebrow">ONE WARP · ONE LOAD INSTRUCTION</span><span class="model-badge">Address model</span></div>
+          <div class="controls">
+            <label>Stride <span>elements between lanes</span><select id="stride"><option value="1">1 · neighbouring values</option><option value="2">2 · every other value</option><option value="4">4 · every fourth value</option><option value="8">8 · one value per row of 8</option><option value="16">16 · one value per row of 16</option><option value="32">32 · one value per row of 32</option></select></label>
+            <label>Start offset <span>elements from aligned base</span><select id="offset"><option value="0">0 elements</option><option value="1">1 element</option><option value="2">2 elements</option><option value="4">4 elements</option><option value="7">7 elements</option><option value="8">8 elements</option></select></label>
+            <label>Active lanes <span>the first N lanes read</span><select id="active"><option value="32">32 · full warp</option><option value="16">16 lanes</option><option value="8">8 lanes</option><option value="1">1 lane</option></select></label>
+          </div>
+          <div class="presets" aria-label="Experiment presets"><span>Try a pattern</span><button data-preset="contiguous">Contiguous</button><button data-preset="column">Tensor column</button><button data-preset="misaligned">Shift by one</button></div>
+          <form id="prediction" class="prediction">
+            <label for="guess"><strong>Predict first.</strong> How many sectors will this load touch?</label>
+            <div><input id="guess" type="number" min="1" max="32" step="1" required placeholder="1–32" aria-label="Predicted number of sectors"><button class="primary" type="submit">Check prediction</button><button id="inspect" type="button">Inspect without guessing</button></div>
+          </form>
+          <p id="feedback" class="feedback" role="status" aria-live="polite">Choose a pattern, then predict or inspect.</p>
+          <div class="figure-label"><h3>The warp</h3><span>Choose a lane to follow its address</span></div>
+          <div id="lanes" class="lanes" aria-label="Warp lanes"></div>
+          <p id="lane-detail" class="lane-detail" aria-live="polite"></p>
+          <div id="results" hidden>
+            <div class="metrics"><div><span>Sectors touched</span><strong id="sector-count"></strong></div><div><span>Bytes requested</span><strong id="useful-bytes"></strong></div><div><span>Bytes in touched sectors</span><strong id="covered-bytes"></strong></div><div><span>Sector utilisation</span><strong id="utilisation"></strong></div></div>
+            <div class="figure-label"><h3>Memory sectors</h3><span>Each small cell is one four-byte value</span></div>
+            <p class="figure-note">Filled cells are requested values; outlined cells share their sector. The selected lane’s value has a bright border. Rows show only touched sectors; address gaps are omitted.</p>
+            <div id="sectors" class="sectors" aria-label="Touched memory sectors"></div>
+            <p id="explanation" class="explanation"></p>
+          </div>
+          <details class="model-note"><summary>What this model tells you</summary><p>We count distinct aligned 32-byte sectors touched by one warp’s global-memory load, with four-byte aligned FP32 values and a sector-aligned base pointer. This matches the coalescing accounting described for devices of compute capability 6.0 or newer in NVIDIA’s CUDA Best Practices Guide.</p><p>These counts are not DRAM transactions or elapsed time. Caches, reuse between warps, stores, instruction issue, and memory-controller behaviour are outside this model. A sector diagram does not show execution order. More sectors can increase memory traffic; it does not imply a proportional slowdown.</p><a href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#coalesced-access-to-global-memory">Read NVIDIA’s coalescing guide ↗</a></details>
+        </div>
+      </section>
+      <section id="cuda" class="two-col section-space">
+        <div><p class="eyebrow">CONNECT THE MODEL TO CODE</p><h2>A small CUDA kernel.</h2><p>CUDA lets you write the program each GPU thread runs. This kernel copies selected input values into consecutive output positions. Change stride or offset above and the input indexing below changes with it.</p><p>Threads are also grouped into <strong>blocks</strong>. Here, <code>threadIdx.x</code> is a thread’s index in its block; <code>blockIdx.x</code> identifies the block; <code>blockDim.x</code> is its thread count. Together they calculate <code>i</code>, the output index.</p><p>The simulator shows the input load for the first warp of the first block. Its active-lane control corresponds to a bound <code>n</code> smaller than a warp. The output store is not counted.</p></div>
+        <div class="code-panel"><div class="code-title"><span>gather.cu · illustrative source</span><button id="copy" type="button">Copy</button></div><pre><code id="kernel"></code></pre><div class="code-footer"><span id="copy-status" role="status">The browser models addresses; it does not compile CUDA.</span><a href="../examples/gather.cu" download>Download runnable example ↓</a></div></div>
+      </section>
+      <section id="challenge" class="challenge section-space">
+        <p class="eyebrow">TRY IT YOURSELF</p><h2>Make a prediction you can explain.</h2>
+        <ol><li>Choose <strong>Tensor column</strong>. Think of a row-major tensor with eight features per row. The warp reads the same feature from successive rows. Predict the sector count, then check it.</li><li>Switch to <strong>Contiguous</strong>. Now it reads neighbouring features. Compare requested bytes and sector coverage. Which changed?</li><li>Choose <strong>Shift by one</strong>. Explain what happens at the two ends of the address range.</li><li>Set <strong>8 active lanes</strong>, stride 1, and offset 0. Predict what changes if you move the offset to 1.</li></ol>
+        <details><summary>Explain the result in your own words, then compare</summary><p>Each sector holds eight FP32 values. Neighbouring lanes can use different values in the same sector. With a stride of eight elements, each lane reaches a different sector. Shifting a consecutive range by one element can make it cross an extra sector boundary.</p><p>In an AI workload, changing how threads map onto tensor dimensions can change this access pattern. A transpose or a different tensor layout may help one operation and add costs elsewhere. Count the work across the whole operation before choosing a layout.</p></details>
+      </section>
+      <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><a href="scheduling.html">Next lesson →</a></nav>
+      <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -12,7 +12,7 @@ Course URL: <https://snowch.github.io/gpu-lab/>
 
 Four working drafts connect AI operations to small, inspectable models:
 
-1. [Reading a tensor](https://snowch.github.io/gpu-lab/#lab): addresses, stride, alignment and coalescing.
+1. [Reading a tensor](https://snowch.github.io/gpu-lab/lessons/memory.html): addresses, stride, alignment and coalescing.
 2. [Keeping the GPU busy](https://snowch.github.io/gpu-lab/lessons/scheduling.html): ready/waiting warps and latency hiding.
 3. [Taking different paths](https://snowch.github.io/gpu-lab/lessons/divergence.html): branch masks and useful lane slots.
 4. [Sharing work within a block](https://snowch.github.io/gpu-lab/lessons/shared-memory.html): shared-memory banks, broadcasts and padding.
@@ -70,7 +70,8 @@ The initial implementation has not been validated on GPU hardware.
 - `src/architecture.mjs`: scheduling, divergent paths and shared-memory bank models.
 - `content/lessons.mjs`: lesson prose and a shared static page renderer used during the build.
 - `src/lesson.mjs`, `src/theme.mjs`: shared experiment controls and theme persistence.
-- `src/app.mjs`, `src/style.css`, `index.html`: accessible static lesson and views.
+- `index.html`: course introduction and roadmap.
+- `content/memory.html`, `src/app.mjs`, `src/style.css`: Lab 01 and its interactive views.
 - `tests/`: model invariants, boundary cases, browser interactions and responsive layout.
 - `examples/`: optional runnable CUDA exercises.
 - `docs/`: curriculum, model scope, sources and development rules.
