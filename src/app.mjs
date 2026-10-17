@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import './theme.mjs';
 import { simulateLoad, kernelSource } from './model.mjs';
 const $ = id => document.getElementById(id);
 let selectedLane = 0;
@@ -88,16 +89,5 @@ $('inspect').addEventListener('click', () => { revealed = true; render(); setTex
 $('copy').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText($('kernel').textContent); setText('copy-status', 'Kernel copied.'); }
   catch { setText('copy-status', 'Clipboard unavailable. Select the code to copy it.'); }
-});
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  setText('theme', theme === 'dark' ? 'Light theme' : 'Dark theme');
-}
-let savedTheme;
-try { savedTheme = localStorage.getItem('gpu-lab-theme'); } catch { /* Storage is optional. */ }
-applyTheme(savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-$('theme').addEventListener('click', () => {
-  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  applyTheme(theme); try { localStorage.setItem('gpu-lab-theme', theme); } catch { /* Storage is optional. */ }
 });
 render();

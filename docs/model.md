@@ -39,3 +39,53 @@ Tests pin aligned and misaligned loads, strided patterns, inactive lanes, invali
 generated indexing. An independent byte-level oracle checks every supported combination
 (32 strides × 32 offsets × 32 active counts). Browser tests exercise predictions, resets,
 lane selection, themes, responsive layout and the project Pages base path.
+
+## Scheduling model (Lab 02)
+
+`scheduleWarps` accepts 1–8 resident warps and integer load latency 1–16. Every warp starts
+at instruction zero in cycle zero. The instruction stream is `LD,MUL,ST,LD,MUL,ST`.
+One ready warp issues per cycle. A round-robin search begins after the last selected warp;
+waiting and completed warps are skipped. A load at cycle t sets readiness to t+latency.
+MUL and ST set readiness to t+1. The trace records state before issue and the selected warp.
+The run ends at the end of the final store's issue cycle, with no store-drain delay.
+
+An idle cycle occurs exactly when no unfinished warp is ready. Total work is six instructions
+per warp, so changing warp count changes work. Issue-slot utilisation is issued instructions
+divided by elapsed model cycles; it is not occupancy. Warps are already resident; there is no
+block placement, bandwidth contention, cache, register budget or resource-limited occupancy.
+No contemporary SM is claimed to have these timing or issue-width parameters.
+
+## Divergence model (Lab 03)
+
+`branchWarp` gives each lane input +2 or -2 from an explicit sign pattern. Only the first
+N lanes participate. Positive lanes multiply by two; negative lanes either negate only,
+or negate, multiply by two and add one. The model issues positive-path operations first,
+then negative-path operations, skipping paths with empty masks. Each event records its mask.
+Outputs are scalar-reference values; no loads, stores, condition checks or branch instructions
+are counted. Each issued operation has 32 lane slots. Utilisation is participating lane
+operations divided by all those slots, so inactive tail lanes also reduce utilisation.
+
+This is an explicit path model, not compiled PTX or SASS. The compiler may predicate, fuse,
+fold or otherwise change operations. The fixed path order makes the teaching trace readable
+and is not a CUDA guarantee. Independent thread scheduling and reconvergence are omitted.
+
+## Shared-memory bank model (Lab 04)
+
+`sharedBanks` models one aligned FP32 read per active lane, with 32 banks and four-byte words.
+In strided mode, word index is lane*stride (stride 1–33). In broadcast mode all lanes read
+word zero. Bank index is word modulo 32. Each round services one distinct word per bank,
+with all lanes requesting that word served together. Words within a bank are ordered by first
+requesting lane for display, not as a hardware ordering claim. Rounds equal the maximum
+number of distinct words requested from any one bank.
+
+No writes, barriers, races, 64-bit words, matrix-specific instructions or execution timing are
+simulated. The CUDA fragment uses a padded tile and a block barrier; the bank figure describes
+only its final column read. The fragment's tile-population loop is outside the figure's scope.
+
+## Additional verification
+
+Scheduler invariants cover every accepted warp-count/latency pair: complete instruction streams,
+load readiness, ready-only issue and no idle slot with a ready warp. Divergence masks are checked
+for every pattern, active count and negative-path choice. Bank tests cover every supported stride
+and active count, plus broadcasts, verifying complete lane service and one word per bank per round.
+Browser checks drive every lesson at desktop and phone sizes in light and dark themes.

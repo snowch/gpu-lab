@@ -26,9 +26,9 @@
         <a class="current" href="#lab"><span>01</span> Reading a tensor <span class="dot" aria-hidden="true"></span></a>
         <a href="#cuda">↳ The CUDA connection</a>
         <a href="#challenge">↳ Try it yourself</a>
-        <a href="#curriculum">Course roadmap</a>
+        <a href="./lessons/scheduling.html">02 Keeping the GPU busy</a><a href="./lessons/divergence.html">03 Taking different paths</a><a href="./lessons/shared-memory.html">04 Sharing work</a><a href="#curriculum">Course roadmap</a>
       </nav>
-      <div class="sidebar-bottom"><span class="status-label">FIRST LAB · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
+      <div class="sidebar-bottom"><span class="status-label">FOUR LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
     </aside>
     <main id="main">
       <section id="overview" class="intro">
@@ -81,12 +81,12 @@
         <details><summary>Explain the result in your own words, then compare</summary><p>Each sector holds eight FP32 values. Neighbouring lanes can use different values in the same sector. With a stride of eight elements, each lane reaches a different sector. Shifting a consecutive range by one element can make it cross an extra sector boundary.</p><p>In an AI workload, changing how threads map onto tensor dimensions can change this access pattern. A transpose or a different tensor layout may help one operation and add costs elsewhere. Count the work across the whole operation before choosing a layout.</p></details>
       </section>
       <section id="curriculum" class="section-space">
-        <p class="eyebrow">THE COURSE AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">The memory lab above is the first working draft. The remaining modules are planned; their simulators and lessons are not yet implemented.</p>
+        <p class="eyebrow">THE COURSE AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">Four interactive drafts are available. Start with memory access above, then follow scheduling, divergent paths and shared-memory banks. Modules 05–08 are planned.</p>
         <div class="roadmap">
           <a href="#lab"><span class="module-no">01</span><div><h3>Reading a tensor</h3><p>Warps, addresses, coalescing, and a first CUDA kernel.</p></div><span class="tag live">Try the draft</span></a>
-          <div><span class="module-no">02</span><div><h3>Keeping the GPU busy</h3><p>Blocks, streaming multiprocessors, latency hiding, and occupancy.</p></div><span class="tag">Planned</span></div>
-          <div><span class="module-no">03</span><div><h3>Taking different paths</h3><p>Active lanes, branch divergence, and masked tensor operations.</p></div><span class="tag">Planned</span></div>
-          <div><span class="module-no">04</span><div><h3>Sharing work within a block</h3><p>Reductions, shared memory, bank conflicts, and synchronisation.</p></div><span class="tag">Planned</span></div>
+          <a href="./lessons/scheduling.html"><span class="module-no">02</span><div><h3>Keeping the GPU busy</h3><p>Resident warps, a model scheduler, and latency hiding.</p></div><span class="tag live">Try the draft</span></a>
+          <a href="./lessons/divergence.html"><span class="module-no">03</span><div><h3>Taking different paths</h3><p>Active lanes, branch divergence, and masked tensor operations.</p></div><span class="tag live">Try the draft</span></a>
+          <a href="./lessons/shared-memory.html"><span class="module-no">04</span><div><h3>Sharing work within a block</h3><p>Shared-memory banks, broadcasts, padding, and block barriers.</p></div><span class="tag live">Try the draft</span></a>
           <div><span class="module-no">05</span><div><h3>Reusing data in matrix multiplication</h3><p>Naive and tiled matmul, register budgets, and arithmetic intensity.</p></div><span class="tag">Planned</span></div>
           <div><span class="module-no">06</span><div><h3>Using tensor cores</h3><p>Matrix instructions, precision, accumulation, and numerical error.</p></div><span class="tag">Planned</span></div>
           <div><span class="module-no">07</span><div><h3>Moving less data in attention</h3><p>Softmax, fusion, and avoiding large intermediate tensors.</p></div><span class="tag">Planned</span></div>

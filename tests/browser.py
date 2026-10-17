@@ -7,6 +7,7 @@ import time
 from urllib.request import urlopen
 
 from playwright.sync_api import sync_playwright, expect
+from new_lessons import check_lessons
 
 ROOT = Path(__file__).resolve().parents[1]
 PORT = 5178
@@ -94,6 +95,7 @@ try:
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")
         expect(page.locator(".roadmap h3")).to_have_count(8)
         context.close()
+        check_lessons(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

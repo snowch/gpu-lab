@@ -10,12 +10,19 @@ Course URL: <https://snowch.github.io/gpu-lab/>
 
 ## Current scope
 
-The first working draft explores one warp's global-memory load: change stride, alignment,
-and active lanes; predict the sector count; inspect the computed addresses; connect them to
-CUDA indexing. The page contains an eight-module roadmap. Only the first lab is implemented.
+Four working drafts connect AI operations to small, inspectable models:
 
-The simulator is an address-set model, not a CUDA interpreter or a timing simulator.
-It counts aligned 32-byte sectors; it does not predict DRAM traffic, elapsed time, or speedups.
+1. [Reading a tensor](https://snowch.github.io/gpu-lab/#lab): addresses, stride, alignment and coalescing.
+2. [Keeping the GPU busy](https://snowch.github.io/gpu-lab/lessons/scheduling.html): ready/waiting warps and latency hiding.
+3. [Taking different paths](https://snowch.github.io/gpu-lab/lessons/divergence.html): branch masks and useful lane slots.
+4. [Sharing work within a block](https://snowch.github.io/gpu-lab/lessons/shared-memory.html): shared-memory banks, broadcasts and padding.
+
+Each has predictions, a computed view, CUDA connections and exercises. Labs 02–04 have
+step/replay controls. The roadmap's remaining four modules are planned. Module 04's reduction
+and race-detection experiments are also still planned; its current interactive model covers reads.
+
+The teaching models do not interpret CUDA. Their counts and toy scheduling cycles do not
+predict physical DRAM traffic, measured elapsed time, or speedups on a particular GPU.
 See [the model contract](docs/model.md) and [course plan](docs/plan.md).
 
 ## Develop
@@ -26,6 +33,8 @@ Node.js 22 or newer. The application and model tests have no package dependencie
 npm run dev      # http://localhost:5173/gpu-lab/
 npm run check    # model tests and static build
 ```
+
+`npm run dev` builds once before serving. Re-run `npm run build` after changing lesson content.
 
 Browser checks run against the built site at `/gpu-lab/`, at desktop and phone sizes, in both themes:
 
@@ -58,6 +67,9 @@ The initial implementation has not been validated on GPU hardware.
 ## Repository layout
 
 - `src/model.mjs`: pure address model; all figure values derive from its result.
+- `src/architecture.mjs`: scheduling, divergent paths and shared-memory bank models.
+- `content/lessons.mjs`: lesson prose and a shared static page renderer used during the build.
+- `src/lesson.mjs`, `src/theme.mjs`: shared experiment controls and theme persistence.
 - `src/app.mjs`, `src/style.css`, `index.html`: accessible static lesson and views.
 - `tests/`: model invariants, boundary cases, browser interactions and responsive layout.
 - `examples/`: optional runnable CUDA exercises.
