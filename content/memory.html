@@ -10,6 +10,7 @@
   <title>Reading a tensor · GPU Lab</title>
   <link rel="stylesheet" href="../src/style.css">
   <link rel="stylesheet" href="../src/lessons.css">
+  <link rel="stylesheet" href="../src/tensor-layout.css">
   <script type="module" src="../src/app.mjs"></script>
 </head>
 <body>
@@ -55,7 +56,16 @@ print(column.stride())       # (8,)
 packed_column = column.contiguous()
 print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a href="../examples/tensor-layout.py" download>Download the self-checking PyTorch example ↓</a></div></div>
         <div class="prose">
-          <p>A tensor’s <strong>shape</strong> gives its dimensions. Its <strong>strides</strong> say how many stored elements you move when an index increases by one. Here, advancing one row moves eight elements; advancing one column moves one. Strides are in elements, so multiply by four to get byte distances for this FP32 tensor.</p>
+          <p>The <strong>shape</strong>, (32, 8), means 32 rows and eight columns. The two <strong>strides</strong>, (8, 1), describe how far each index step moves through storage. Follow the same step in both views below.</p>
+        </div>
+        <figure class="tensor-visual" aria-labelledby="tensor-visual-title">
+          <h3 id="tensor-visual-title">One index step, two views</h3>
+          <p class="tensor-caption">Dashed border = start. Solid filled border = destination. The underlined storage cells lie between them.</p>
+          <div class="tensor-visual-controls"><label>Starting row<select id="tensor-origin-row"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="30">30</option></select></label><label>Starting column<select id="tensor-origin-col"><option value="0">0</option><option value="2">2</option><option value="5">5</option><option value="6">6</option></select></label><button type="button" data-index-step="row" aria-pressed="true">Row index +1 ↓</button><button type="button" data-index-step="column" aria-pressed="false">Column index +1 →</button></div>
+          <div id="tensor-diagram"><!-- TENSOR_LAYOUT_FIGURE --></div>
+          <figcaption class="tensor-caption">Strides count elements. Each FP32 element occupies four bytes, so the row step is eight × four bytes and the column step is one × four bytes. This figure shows x’s original contiguous storage.</figcaption>
+        </figure>
+        <div class="prose">
           <p>Both slices are <strong>views</strong>: they share x’s storage. Reading the first row visits neighbouring elements. Reading the first column visits every eighth element. <code>contiguous()</code> copies this strided column into packed storage; that copy also takes work and memory.</p>
           <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
           <p>This CPU example needs no GPU. The same shape and stride reasoning applies to the corresponding CUDA tensor. PyTorch can choose its own kernels, thread mapping and copies; slicing alone does not launch the particular load modelled here.</p>

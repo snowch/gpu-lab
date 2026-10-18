@@ -1,0 +1,23 @@
+/* Copyright © 2026 Christopher Snow. */
+.tensor-visual { margin:24px 0; border:1px solid var(--line); border-radius:8px; padding:22px; background:var(--panel); }
+.tensor-visual h3 { margin-bottom:10px; }
+.tensor-visual-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:end; margin:16px 0 24px; }
+.tensor-visual-controls label { font-size:12px; }
+.tensor-visual-controls select { display:block; min-width:80px; }
+.tensor-visual-controls button[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+.tensor-diagrams { display:grid; grid-template-columns:1fr 1.25fr; gap:26px; align-items:start; }
+.tensor-diagrams>div { min-width:0; }
+.tensor-caption,.tensor-axis { font-size:12px; color:var(--muted); }
+.tensor-grid { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:3px; }
+.tensor-cell { padding:8px 1px; text-align:center; font:12px/1.5 ui-monospace,monospace; border:1px solid var(--line); background:var(--soft); border-radius:3px; }
+.storage-strip { display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); gap:3px; margin-top:25px; }
+.storage-cell { text-align:center; border:1px solid var(--line); background:var(--soft); border-radius:3px; padding:9px 0; min-width:0; }
+.storage-cell strong { font:600 12px/1.8 ui-monospace,monospace; display:block; }
+.storage-cell>span { display:block; font:10px/1.8 ui-monospace,monospace; color:var(--muted); }
+.tensor-visual .origin { border:2px dashed var(--accent); }
+.tensor-visual .destination { background:var(--accent-soft); border:2px solid var(--accent); color:var(--accent); }
+.tensor-visual .crossed { border-bottom:3px solid var(--accent); }
+.stride-arrow { margin:16px 0; color:var(--accent); font:14px/1.8 ui-monospace,monospace; text-align:center; }
+.tensor-summary { padding:16px; margin:18px 0 0; border-radius:4px; background:var(--soft); font-size:13px; }
+@media(max-width:1100px) { .tensor-diagrams { grid-template-columns:1fr; } }
+@media(max-width:760px) { .tensor-visual { padding:14px; } .storage-strip { gap:2px; } .storage-cell strong { font-size:11px; } .storage-cell>span { font-size:9px; } }

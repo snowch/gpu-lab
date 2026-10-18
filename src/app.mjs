@@ -1,5 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
+import './tensor-layout-view.mjs';
 import { simulateLoad, kernelSource } from './model.mjs';
 const $ = id => document.getElementById(id);
 let selectedLane = 0;
