@@ -8,3 +8,5 @@ function render(){
 for(const button of document.querySelectorAll('[data-index-step]'))button.addEventListener('click',()=>{direction=button.dataset.indexStep;render();});
 for(const id of ['tensor-origin-row','tensor-origin-col'])document.getElementById(id).addEventListener('change',render);
 render();
+for(const control of document.querySelectorAll('.tensor-visual-controls button,.tensor-visual-controls select'))control.disabled=false;
+document.getElementById('tensor-diagram').dataset.ready='true';

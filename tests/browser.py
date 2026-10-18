@@ -53,6 +53,7 @@ try:
                 expect(page).to_have_url(URL + "lessons/memory.html")
                 expect(page.locator("h1")).to_have_text("Reading a tensor")
                 expect(page.locator("#curriculum")).to_have_count(0)
+                expect(page.locator("#tensor-diagram")).to_have_attribute("data-ready", "true")
                 expect(page.locator("#tensor-step-summary")).to_contain_text("8 elements × 4 bytes = 32 bytes")
                 expect(page.locator(".tensor-cell.destination")).to_have_text("8")
                 page.get_by_role("button", name="Column index +1 →").click()
