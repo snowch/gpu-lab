@@ -5,7 +5,7 @@ import { lessons, renderLesson } from '../content/lessons.mjs';
 import { buildOffline } from './offline.mjs';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
-for (const path of ['index.html', 'src', 'examples']) {
+for (const path of ['index.html', 'src', 'examples', 'assets', 'manifest.webmanifest']) {
   await cp(path, `dist/${path}`, { recursive: true });
 }
 await mkdir('dist/lessons', { recursive: true });

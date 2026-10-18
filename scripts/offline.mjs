@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import { createHash } from 'node:crypto';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { installMarkup } from './install.mjs';
 
 async function filesUnder(directory, prefix = '') {
   const files = [];
@@ -17,7 +18,7 @@ export async function buildOffline(directory) {
   for (const path of files.filter(path => path.endsWith('.html'))) {
     const base = '../'.repeat(path.split('/').length - 1) || './';
     const html = await readFile(`${directory}/${path}`, 'utf8');
-    await writeFile(`${directory}/${path}`, html
+    await writeFile(`${directory}/${path}`, installMarkup(html, base)
       .replace('<footer>', '<p id="offline-status" class="offline-status" role="status" hidden></p><footer>')
       .replace('</head>', `<script type="module" src="${base}src/offline.mjs"></script></head>`));
   }

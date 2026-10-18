@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "GPU Lab",
+  "short_name": "GPU Lab",
+  "description": "Hands-on GPU architecture lessons for AI practitioners. Learn and experiment offline.",
+  "lang": "en-GB",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#122824",
+  "theme_color": "#122824",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

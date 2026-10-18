@@ -2,5 +2,6 @@ node_modules/
 dist/
 test-results/
 *.png
+!assets/*.png
 vendor/
 __pycache__/

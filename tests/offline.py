@@ -41,7 +41,8 @@ class CourseHandler(BaseHTTPRequestHandler):
         if path == '/index.html':
             body = body.replace(b'<html ', b'<html data-test-release="' + self.revision.encode() + b'" ')
         types = {'.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript',
-                 '.css': 'text/css', '.cu': 'text/plain', '.py': 'text/plain'}
+                 '.css': 'text/css', '.cu': 'text/plain', '.py': 'text/plain',
+                 '.webmanifest': 'application/manifest+json', '.svg': 'image/svg+xml', '.png': 'image/png'}
         self.send_response(200)
         self.send_header('Content-Type', types.get(file.suffix, 'application/octet-stream'))
         self.send_header('Cache-Control', 'no-store')
@@ -70,6 +71,43 @@ def update(page, outcome):
     page.wait_for_function('(state) => window.installOutcome === state', arg=outcome)
 
 
+def check_install(page, context, url):
+    # Check the browser's actual manifest parsing and installability diagnostics.
+    session = context.new_cdp_session(page)
+    manifest = session.send('Page.getAppManifest')
+    assert manifest['url'] == url + 'manifest.webmanifest', manifest
+    assert not manifest['errors'], manifest
+    errors = session.send('Page.getInstallabilityErrors')['installabilityErrors']
+    # Isolated Playwright contexts are incognito; test the same diagnostics in a
+    # normal persistent profile below, where installation is allowed.
+    assert not [error for error in errors if error['errorId'] != 'in-incognito'], errors
+    session.detach()
+    page.locator('#install').click()
+    expect(page.get_by_role('dialog')).to_be_visible()
+    page.keyboard.press('Escape')
+    expect(page.get_by_role('dialog')).not_to_be_visible()
+    expect(page.locator('#install')).to_be_focused()
+    # Simulate browser events to test our UI without accepting an OS install.
+    page.evaluate('''() => {
+      const event = new Event('beforeinstallprompt', {cancelable: true});
+      window.promptCalls = 0;
+      event.prompt = async () => { window.promptCalls += 1; };
+      event.userChoice = Promise.resolve({outcome: 'dismissed'});
+      dispatchEvent(event);
+      if (!event.defaultPrevented) throw new Error('Install prompt was not deferred');
+    }''')
+    page.locator('#install').click()
+    page.locator('#install-confirm').click()
+    expect(page.locator('#install-message')).to_contain_text('Installation cancelled')
+    assert page.evaluate('window.promptCalls') == 1
+    expect(page.locator('#install-confirm')).to_be_hidden()
+    expect(page.locator('#install-instructions')).to_be_visible()
+    page.evaluate("dispatchEvent(new Event('appinstalled'))")
+    expect(page.locator('#install')).to_be_hidden()
+    expect(page.locator('#install-message')).to_contain_text('GPU Lab is installed')
+    page.locator('#install-close').click()
+
+
 server = ThreadingHTTPServer(('127.0.0.1', 0), CourseHandler)
 thread = Thread(target=server.serve_forever, daemon=True)
 thread.start()
@@ -89,6 +127,7 @@ try:
             # A direct visit to the last lab must save the introduction and every other lab.
             page.goto(url + 'lessons/inference.html')
             ready(page)
+            check_install(page, context, url)
             keys = page.evaluate('caches.keys()')
             assert len(keys) == 1 and keys[0].endswith('-one'), keys
             old_cache = keys[0]
@@ -96,6 +135,18 @@ try:
             page.evaluate("caches.open('another-app:keep')")
             context.set_offline(True)
             expect(page.locator('#offline-status')).to_contain_text('Working offline')
+            # Install metadata and every icon must remain available without network.
+            assert page.evaluate('''async base => {
+              const manifest = await (await fetch(base + 'manifest.webmanifest')).json();
+              if (manifest.display !== 'standalone' || new URL(manifest.start_url, base).href !== base) return false;
+              for (const icon of [...manifest.icons, {src:'assets/apple-touch-icon.png',sizes:'180x180'}]) {
+                const blob = await (await fetch(new URL(icon.src, base))).blob();
+                const bitmap = await createImageBitmap(blob);
+                if (`${bitmap.width}x${bitmap.height}` !== icon.sizes) return false;
+                bitmap.close();
+              }
+              return (await fetch(base + 'assets/icon.svg')).ok;
+            }''', url)
             for slug in LESSONS:
                 response = page.goto(url + f'lessons/{slug}.html?offline-test=1#simulator')
                 assert response.ok and response.from_service_worker
@@ -206,6 +257,9 @@ try:
             page = context.new_page()
             page.goto(url)
             ready(page)
+            session = context.new_cdp_session(page)
+            assert not session.send('Page.getInstallabilityErrors')['installabilityErrors']
+            session.detach()
             context.close()
             context = playwright.chromium.launch_persistent_context(profile, **options)
             context.set_offline(True)

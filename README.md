@@ -37,6 +37,11 @@ positions, alongside the existing experiment views.
 
 ## Use offline
 
+Choose **Install** in the course header to add GPU Lab to your apps with its own GPU-chip
+icon and standalone window. Chrome and Edge offer a native install prompt when available;
+the dialog also explains Safari’s Add to Dock / Add to Home Screen options. Installed apps
+use the same offline course. Installation and shortcut placement are controlled by your browser.
+
 Open any course page while connected and wait for **Available offline** near the footer.
 The browser saves every lesson, simulator, diagram and downloadable CUDA/PyTorch example,
 including lessons you have not opened. You can then reopen the same course URL without a
