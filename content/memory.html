@@ -36,6 +36,32 @@
         <p class="lead">Follow a warp’s addresses from tensor elements to memory sectors.</p>
         <p class="prerequisite"><strong>Before you start:</strong> Some familiarity with arrays and tensor shapes. No CUDA experience or GPU is needed.</p>
       </section>
+      <section id="pytorch" class="section-space">
+        <p class="eyebrow">START WITH A PYTORCH TENSOR</p>
+        <h2>Rows and columns share storage.</h2>
+        <div class="prose">
+          <p>Imagine a batch of 32 examples with eight features each. Create a tensor whose values make their positions easy to follow:</p>
+        </div>
+        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>import torch
+
+x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
+row = x[0, :]       # features of example 0: 0, 1, ..., 7
+column = x[:, 0]   # feature 0 of each example: 0, 8, ..., 248
+
+print(x.shape, x.stride())   # shape [32, 8], strides (8, 1)
+print(row.stride())          # (1,)
+print(column.stride())       # (8,)
+
+packed_column = column.contiguous()
+print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a href="../examples/tensor-layout.py" download>Download the self-checking PyTorch example ↓</a></div></div>
+        <div class="prose">
+          <p>A tensor’s <strong>shape</strong> gives its dimensions. Its <strong>strides</strong> say how many stored elements you move when an index increases by one. Here, advancing one row moves eight elements; advancing one column moves one. Strides are in elements, so multiply by four to get byte distances for this FP32 tensor.</p>
+          <p>Both slices are <strong>views</strong>: they share x’s storage. Reading the first row visits neighbouring elements. Reading the first column visits every eighth element. <code>contiguous()</code> copies this strided column into packed storage; that copy also takes work and memory.</p>
+          <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
+          <p>This CPU example needs no GPU. The same shape and stride reasoning applies to the corresponding CUDA tensor. PyTorch can choose its own kernels, thread mapping and copies; slicing alone does not launch the particular load modelled here.</p>
+        </div>
+        <div class="presets"><button type="button" data-tensor-pattern="row">Model x[0, :] · first row</button><button type="button" data-tensor-pattern="column">Model x[:, 0] · first column</button></div>
+      </section>
       <section id="lab">
         <div class="section-heading"><div><h2>Same values. Different addresses.</h2></div><span class="tag">Interactive draft</span></div>
         <div class="prose">

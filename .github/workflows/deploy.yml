@@ -39,9 +39,20 @@ jobs:
         with:
           path: dist
 
+  pytorch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU PyTorch for the optional example
+        run: pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+      - run: python examples/tensor-layout.py
+
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: check
+    needs: [check, pytorch]
     runs-on: ubuntu-latest
     permissions:
       pages: write

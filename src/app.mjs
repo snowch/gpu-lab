@@ -69,6 +69,17 @@ function resetExperiment() {
   render();
 }
 for (const id of ['stride', 'offset', 'active']) $(id).addEventListener('change', resetExperiment);
+for (const button of document.querySelectorAll('[data-tensor-pattern]')) {
+  button.addEventListener('click', () => {
+    const row = button.dataset.tensorPattern === 'row';
+    $('stride').value = row ? '1' : '8';
+    $('offset').value = '0';
+    $('active').value = row ? '8' : '32';
+    resetExperiment();
+    $('simulator').scrollIntoView({ block: 'start', behavior: 'instant' });
+    $('guess').focus({ preventScroll: true });
+  });
+}
 for (const button of document.querySelectorAll('[data-preset]')) {
   button.addEventListener('click', () => {
     $('stride').value = button.dataset.preset === 'column' ? '8' : '1';

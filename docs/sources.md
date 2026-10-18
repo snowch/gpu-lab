@@ -2,6 +2,13 @@
 
 Copyright © 2026 Christopher Snow.
 
+Lab 01's PyTorch bridge uses the documented [tensor stride](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.stride.html),
+[tensor view](https://docs.pytorch.org/docs/stable/tensor_view.html), and
+[contiguous](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.contiguous.html) semantics.
+Its self-checking optional script is `examples/tensor-layout.py`. PyTorch is not a browser or
+course-build dependency. Browser checks verify that row and column buttons select the correct
+stride and active-lane counts; they do not execute PyTorch or assert its kernel mapping.
+
 The teaching model is based on NVIDIA's documented coalescing rules. These are primary
 references for the implemented lab, not evidence that this browser model reproduces a whole GPU.
 
