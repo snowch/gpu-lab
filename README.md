@@ -35,6 +35,20 @@ See [the model contract](docs/model.md) and [course plan](docs/plan.md).
 dependency, sequence or data-flow diagram. Those diagrams are linked to model state and trace
 positions, alongside the existing experiment views.
 
+## Use offline
+
+Open any course page while connected and wait for **Available offline** near the footer.
+The browser saves every lesson, simulator, diagram and downloadable CUDA/PyTorch example,
+including lessons you have not opened. You can then reopen the same course URL without a
+connection. External documentation and GitHub links still need the internet; running the
+downloaded examples requires their usual local tools.
+
+Updates download when you return online. When **Update saved** appears, close all GPU Lab
+tabs and reopen the course to use the new version. Open experiments keep their current
+version. If an update cannot download completely, the previous saved version keeps working.
+Clearing site data or browser storage eviction removes the offline copy; revisit online to
+save it again. Service workers require HTTPS (or localhost) and browser storage support.
+
 ## Develop
 
 Node.js 22 or newer. The application and model tests have no package dependencies.
@@ -52,10 +66,18 @@ Browser checks run against the built site at `/gpu-lab/`, at desktop and phone s
 python -m pip install -r tests/requirements.txt
 python -m playwright install chromium
 python tests/browser.py
+python tests/offline.py
 ```
 
-CI runs both commands before deploying `dist/` from `main` through GitHub Pages Actions.
+CI runs the model/build and both browser suites before deploying `dist/` from `main` through GitHub Pages Actions.
 Pull requests run checks without deployment. All application assets use relative paths.
+
+The build generates `dist/sw.js` with a content fingerprint and complete file list. The
+service worker saves one complete version and serves it from a cache scoped to the site's
+base URL. The offline browser suite checks root and `/gpu-lab/` hosting, all labs without
+network access, downloads, failed installs, and updates across multiple tabs. During local
+development, close course tabs after rebuilding to activate an update, or unregister the
+worker in browser developer tools while iterating.
 
 A separate workflow compiles and runs small CUDA examples in GPGPU-Sim on a CPU runner.
 It validates outputs against a CPU reference and saves logs; it does not yet compare timing

@@ -28,6 +28,7 @@ jobs:
       - run: pip install -r tests/requirements.txt
       - run: python -m playwright install --with-deps chromium
       - run: python tests/browser.py
+      - run: python tests/offline.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

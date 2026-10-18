@@ -2,6 +2,7 @@
 import { cp, mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import { renderTensorStep,renderTensorSlice } from '../src/tensor-layout.mjs';
 import { lessons, renderLesson } from '../content/lessons.mjs';
+import { buildOffline } from './offline.mjs';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 for (const path of ['index.html', 'src', 'examples']) {
@@ -12,4 +13,5 @@ await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html
 for (const [index, lesson] of lessons.entries()) {
   await writeFile(`dist/lessons/${lesson.slug}.html`, renderLesson(lesson, index));
 }
-console.log('Built static course in dist/ (all asset paths are relative).');
+await buildOffline('dist');
+console.log('Built static course in dist/ with complete offline caching (all asset paths are relative).');
