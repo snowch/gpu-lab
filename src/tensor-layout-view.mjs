@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {renderTensorStep} from './tensor-layout.mjs';
+import {renderTensorStep,renderTensorSlice} from './tensor-layout.mjs';
 let direction='row';
 function render(){
   document.getElementById('tensor-diagram').innerHTML=renderTensorStep({row:Number(document.getElementById('tensor-origin-row').value),col:Number(document.getElementById('tensor-origin-col').value),direction});
@@ -10,3 +10,8 @@ for(const id of ['tensor-origin-row','tensor-origin-col'])document.getElementByI
 render();
 for(const control of document.querySelectorAll('.tensor-visual-controls button,.tensor-visual-controls select'))control.disabled=false;
 document.getElementById('tensor-diagram').dataset.ready='true';
+const sliceMode=document.getElementById('tensor-slice-mode');
+const renderSlice=()=>{document.getElementById('tensor-slice-diagram').innerHTML=renderTensorSlice(sliceMode.value);};
+sliceMode.addEventListener('change',renderSlice);
+renderSlice();sliceMode.disabled=false;
+document.getElementById('tensor-slice-diagram').dataset.ready='true';

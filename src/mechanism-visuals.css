@@ -1,0 +1,75 @@
+/* Copyright © 2026 Christopher Snow. */
+.mechanism-visual { grid-column:1/-1; min-width:0; margin:0 0 22px; padding:18px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+.mechanism-visual h3 { font-size:16px; margin:0 0 12px; }
+.mechanism-visual h4 { font-size:13px; margin:18px 0 10px; }
+.visual-caption { font-size:12px; line-height:1.7; color:var(--muted); margin:12px 0 16px; }
+.flow-row { display:flex; align-items:center; gap:8px; margin:14px 0; min-width:0; }
+.flow-box { flex:1; min-width:0; padding:12px; border:1px solid var(--line); border-radius:5px; background:var(--panel); overflow-wrap:anywhere; text-align:center; }
+.flow-box strong { display:block; font-size:12px; }
+.flow-box>span { display:block; margin-top:8px; font:12px/1.7 ui-monospace,monospace; }
+.flow-arrow,.down-arrow { color:var(--accent); text-align:center; font-size:18px; }
+.down-arrow { display:block; padding:8px; font-size:13px; }
+.active-route { border:2px solid var(--accent)!important; }
+.hazard-box { border:2px dashed var(--accent); }
+.visual-scroll { max-width:100%; overflow-x:auto; border:1px solid var(--line); border-radius:4px; padding:4px; }
+.swim-grid { display:grid; gap:0; }
+.swim-label { display:flex; align-items:center; font-size:11px; font-weight:650; padding:6px; position:sticky; left:0; z-index:1; background:var(--panel); border-bottom:1px solid var(--line); }
+.swim-cell { display:flex; justify-content:center; align-items:center; min-height:34px; font:10px ui-monospace,monospace; border:1px solid var(--line); background:var(--panel); }
+.swim-cell.issuing { background:var(--accent-soft); color:var(--accent); font-weight:700; }
+.swim-cell.waiting { background:repeating-linear-gradient(135deg,var(--soft),var(--soft) 4px,var(--panel) 4px,var(--panel) 8px); }
+.swim-cell.current { outline:2px solid var(--accent); outline-offset:-2px; }
+.branch-graph { max-width:700px; margin:auto; }
+.branch-split,.branch-columns,.attention-comparison { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.branch-split { text-align:center; font-size:12px; padding:14px; color:var(--accent); }
+.branch-columns { margin-bottom:20px; }
+.branch-route,.attention-route { padding:12px; border:1px solid var(--line); border-radius:6px; min-width:0; }
+.branch-route h4,.attention-route h4 { margin-top:0; }
+.request-paths { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.request-paths .flow-box { padding:8px; }
+.word-queue,.resident-blocks { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.word-queue .flow-box,.resident-blocks .flow-box { padding:9px; }
+.reduction-tree { position:relative; width:100%; overflow:hidden; }
+.reduction-tree svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.reduction-tree line { stroke:var(--muted); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.tree-node { position:absolute; transform:translate(-50%,-50%); width:36px; text-align:center; background:var(--panel); border:1px solid var(--line); border-radius:4px; }
+.tree-node small { display:block; font-size:10px; color:var(--muted); }
+.tree-node strong { display:block; font:13px/1.6 ui-monospace,monospace; }
+.tree-node.active-level { border:2px solid var(--accent); background:var(--accent-soft); }
+.resource-row { margin:16px 0; }
+.resource-row>strong { font-size:12px; }
+.resource-pool { height:26px; background:var(--soft); border:1px solid var(--line); border-radius:4px; display:flex; overflow:hidden; margin-top:6px; }
+.resource-pool>span { height:100%; background:var(--accent); box-shadow:inset -2px 0 0 var(--panel); }
+.format-row { margin:16px 0; }
+.format-row>strong { display:block; font-size:12px; }
+.format-row>small { font-size:11px; color:var(--muted); }
+.format-bar { height:24px; display:flex; margin:6px 0; border:1px solid var(--line); }
+.sign-bits { background:var(--ink); }
+.exponent-bits { background:repeating-linear-gradient(135deg,var(--accent),var(--accent) 3px,var(--panel) 3px,var(--panel) 5px); }
+.fraction-bits { background:var(--accent-soft); }
+.bit-legend { display:flex; gap:18px; font-size:12px; flex-wrap:wrap; }
+.rounding-ruler { padding:18px 8px; }
+.ruler-ends { display:flex; justify-content:space-between; font:12px ui-monospace,monospace; gap:12px; }
+.ruler-track { border-top:3px solid var(--accent); position:relative; margin:22px 0 18px; }
+.input-marker { position:absolute; top:-22px; transform:translateX(-50%); color:var(--ink); }
+.rounding-ruler p { font-size:13px; }
+.attention-route { text-align:center; }
+.attention-route>p { margin:14px 0 0; font-size:12px; }
+.matrix-footprint { width:120px; height:120px; display:flex; align-items:center; justify-content:center; margin:18px auto; background-color:var(--accent-soft); background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:calc(100% / var(--grid)) calc(100% / var(--grid)); border:1px solid var(--accent); font:600 13px/1.7 ui-monospace,monospace; text-shadow:0 0 4px var(--panel); }
+.loop-arrow { padding:18px 8px; color:var(--accent); font-size:12px; border:1px dashed var(--accent); margin:14px 0; }
+.sequence-lane { border:1px solid var(--line); border-radius:4px; padding:12px; margin:10px 0; }
+.sequence-lane>strong { font-size:12px; }
+.token-group { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; font-size:12px; }
+.token { padding:8px; border:1px solid var(--line); border-radius:3px; background:var(--soft); font:11px ui-monospace,monospace; }
+.new-token { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+@media(max-width:1100px) { .request-paths { grid-template-columns:1fr; } }
+@media(max-width:760px) {
+  .mechanism-visual { padding:12px; }
+  .flow-row { flex-direction:column; align-items:stretch; }
+  .flow-arrow { transform:rotate(90deg); }
+  .word-queue,.resident-blocks { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .branch-columns,.attention-comparison { grid-template-columns:1fr; }
+  .branch-split { display:none; }
+  .tree-node { width:27px; }
+  .tree-node small { font-size:9px; }
+  .tree-node strong { font-size:12px; }
+}

@@ -32,7 +32,8 @@ export function tiledMatmul({ n = 8, tile = 2, sharedBudget = 512, registers = 1
   const registersPerBlock=tile*tile*registers;
   const residentBlocks=Math.min(8,Math.floor(1024/registersPerBlock),sharedBytes ? Math.floor(sharedBudget/sharedBytes) : 8);
   return {a,b,output,trace,n,tile,inputLoads,naiveLoads:2*n*n*n,bytes,flops,
-    intensity:flops/bytes,sharedBytes,registersPerBlock,residentBlocks,occupancy:residentBlocks/8};
+    intensity:flops/bytes,sharedBytes,registersPerBlock,residentBlocks,occupancy:residentBlocks/8,
+    resourceCapacity:{registers:1024,shared:sharedBudget,warps:8}};
 }
 
 function evenRound(value) {
@@ -82,13 +83,14 @@ export function attention({ n=8, tile=2, mode='online', scale=1 }={}) {
   for(let query=0;query<n;query++) {
     let m=-Infinity,l=0,acc=Array(d).fill(0);
     for(let start=0;start<n;start+=tile) {
+      const previous={m,l,acc:[...acc]};
       const block=scores[query].slice(start,start+tile);
       const nextMax=Math.max(m,...block),rescale=Math.exp(m-nextMax);
       const weights=block.map(x=>Math.exp(x-nextMax));
       l=l*rescale+weights.reduce((a,b)=>a+b,0);
       acc=acc.map((x,j)=>x*rescale+weights.reduce((s,w,t)=>s+w*v[start+t][j],0));
       m=nextMax;
-      if(query===0) onlineTrace.push({label:`Query 0, keys ${start}–${start+tile-1}`,start,block,m,l,rescale,output:acc.map(x=>x/l)});
+      if(query===0) onlineTrace.push({label:`Query 0, keys ${start}–${start+tile-1}`,start,block,m,l,rescale,previous,acc:[...acc],weights:[...weights],tileDenominator:weights.reduce((a,b)=>a+b,0),tileNumerator0:weights.reduce((s,w,t)=>s+w*v[start+t][0],0),output:acc.map(x=>x/l)});
     }
     online.push(acc.map(x=>x/l));
   }
@@ -98,6 +100,7 @@ export function attention({ n=8, tile=2, mode='online', scale=1 }={}) {
     {label:'Read probabilities, multiply by V',values:reference[0],description:'The final query-0 output vector.'},
   ];
   return {n,d,tile,mode,scores,probabilities,reference,output:mode==='online'?online:reference,trace,
+    intermediateComparison:{materialisedWrites:2*n*n,materialisedBytes:4*n*n*4,onlineWrites:0,onlineBytes:0},
     intermediateWrites:mode==='online'?0:2*n*n,
     intermediateBytes:mode==='online'?0:4*n*n*4,
     scratchFloats:mode==='online'?tile+d+2:2*n*n,
@@ -125,20 +128,24 @@ export function inferenceBudget({phase='decode',batch=1,sequence=512,parameters=
     {label:'Compute bound',flops,ms:computeMs},
     {label:'Take the larger bound',ms:boundMs},
   ];
-  return {trace,phase,tokens,weightBytes,kvCacheBytes,kvReadBytes,kvWriteBytes,flops,bytes,memoryMs,computeMs,boundMs,bottleneck,
+  return {trace,phase,batch,sequence,layers,hidden,kvWidth,tokens,weightBytes,kvCacheBytes,kvReadBytes,kvWriteBytes,flops,bytes,memoryMs,computeMs,boundMs,bottleneck,
+    cacheTokensBefore:phase==='decode'?sequence:0,cacheTokensAfter:phase==='decode'?sequence+1:sequence,
     measuredMs,measurementRatio:measuredMs?boundMs/measuredMs:null};
 }
 
 export function reduceBlock({size=8,synchronised=true}={}) {
   choice('size',size,[4,8]);if(typeof synchronised!=='boolean')throw new TypeError('synchronised must be boolean.');
   const inputs=Array.from({length:size},(_,i)=>i+1),shared=Array(size).fill(null),trace=[];
-  const record=(label,hazard=false,reads=[])=>trace.push({label,hazard,reads,shared:[...shared]});
+  const levels=[inputs.map((value,index)=>({value,index,threads:[index]}))];
+  const record=(label,hazard=false,reads=[])=>trace.push({label,hazard,reads,shared:[...shared],level:levels.length-1});
   if(synchronised) {
     for(let lane=0;lane<size;lane++){shared[lane]=inputs[lane];record(`Thread ${lane} writes input ${inputs[lane]}`);}
     record('All threads pass the initial barrier');
     for(let stride=size/2;stride>=1;stride/=2){
       const before=[...shared];
       for(let lane=0;lane<stride;lane++)shared[lane]=before[lane]+before[lane+stride];
+      const previous=levels.at(-1);
+      levels.push(Array.from({length:stride},(_,i)=>({index:i,value:shared[i],threads:[...previous[i].threads,...previous[i+stride].threads]})));
       record(`Add partners at distance ${stride}; then block barrier`,false,Array.from({length:stride},(_,i)=>i+stride));
     }
   }else{
@@ -147,5 +154,5 @@ export function reduceBlock({size=8,synchronised=true}={}) {
     for(let lane=1;lane<size;lane++){shared[lane]=inputs[lane];record(`Thread ${lane} writes too late for the earlier read`);}
   }
   const hazard=trace.some(event=>event.hazard);
-  return {inputs,trace,size,hazard,expected:inputs.reduce((a,b)=>a+b,0),result:hazard?null:shared[0]};
+  return {inputs,trace,levels,size,hazard,expected:inputs.reduce((a,b)=>a+b,0),result:hazard?null:shared[0]};
 }

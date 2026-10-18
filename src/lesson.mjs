@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
 import { scheduleWarps, branchWarp, sharedBanks } from './architecture.mjs';
+import { mechanismVisual } from './mechanism-visuals.mjs';
 const $ = id => document.getElementById(id);
 const kind = document.body.dataset.lesson;
 const num = id => Number($(id).value);
@@ -44,6 +45,7 @@ function render() {
   const current = result.trace[cursor];
   const figure = $('figure'); figure.replaceChildren();
   figure.className = `architecture-figure ${kind}`;
+  figure.insertAdjacentHTML('beforeend',mechanismVisual(kind,result,current));
   if (kind === 'scheduling') {
     $('step-detail').textContent = `Cycle ${current.cycle}: ${current.selected === null ? 'idle; no unfinished warp is ready.' : `warp ${current.selected} issues ${current.instruction}.`}`;
     for (let id = 0; id < current.before.length; id++) {

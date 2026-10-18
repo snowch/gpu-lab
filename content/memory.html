@@ -67,6 +67,9 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
         </figure>
         <div class="prose">
           <p>Both slices are <strong>views</strong>: they share x’s storage. Reading the first row visits neighbouring elements. Reading the first column visits every eighth element. <code>contiguous()</code> copies this strided column into packed storage; that copy also takes work and memory.</p>
+        </div>
+        <figure class="tensor-visual" aria-labelledby="tensor-slice-title"><h3 id="tensor-slice-title">A view keeps the original offsets; a packed copy changes them</h3><label>Compare storage<select id="tensor-slice-mode" disabled><option value="column">Column view · shared storage</option><option value="row">Row view · shared storage</option><option value="packed">Packed column · copied storage</option></select></label><div id="tensor-slice-diagram"><!-- TENSOR_SLICE_FIGURE --></div></figure>
+        <div class="prose">
           <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
           <p>This CPU example needs no GPU. The same shape and stride reasoning applies to the corresponding CUDA tensor. PyTorch can choose its own kernels, thread mapping and copies; slicing alone does not launch the particular load modelled here.</p>
         </div>
@@ -76,7 +79,7 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
         <div class="section-heading"><div><h2>Same values. Different addresses.</h2></div><span class="tag">Interactive draft</span></div>
         <div class="prose">
           <p>Imagine reading one feature from each row of a tensor. A GPU runs many copies of a small program, called a <strong>kernel</strong>. Each copy is a <strong>thread</strong>. NVIDIA GPUs organise threads into groups of 32 called <strong>warps</strong>.</p>
-          <p>Here, one warp reads 32 values. Each thread reads one 32-bit floating-point value (FP32), which occupies four bytes. Its position within the warp is its <strong>lane</strong>, numbered 0 to 31.</p>
+          <p>With all lanes active, one warp reads 32 values. Each active thread reads one 32-bit floating-point value (FP32), which occupies four bytes. Its position within the warp is its <strong>lane</strong>, numbered 0 to 31.</p>
           <p>Memory requests from a warp can be combined into aligned regions. This model groups addresses into <strong>32-byte sectors</strong>: bytes 0–31, then 32–63, and so on. This grouping is called <strong>coalescing</strong>. Your task is to see how the addresses determine the sectors touched.</p>
         </div>
         <noscript><p class="notice">The lesson text is available without JavaScript. Enable JavaScript to use the simulator.</p></noscript>

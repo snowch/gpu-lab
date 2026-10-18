@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
 import {tiledMatmul,precisionMatmul,attention,inferenceBudget,reduceBlock} from './ai-models.mjs';
+import {mechanismVisual} from './mechanism-visuals.mjs';
 const $=id=>document.getElementById(id),kind=document.body.dataset.lesson;
 const number=id=>Number($(id).value);
 const format=x=>typeof x==='number' ? !Number.isFinite(x)?String(x):x!==0&&(Math.abs(x)<0.0001||Math.abs(x)>=1e7)?x.toExponential(5):x.toLocaleString('en-GB',{maximumFractionDigits:6}):String(x);
@@ -35,6 +36,7 @@ function matrix(parent,title,values,selected=[]){
 }
 function draw(){
   const figure=$('figure'),step=result.trace[cursor];figure.replaceChildren();figure.className=`architecture-figure ai-figure ${kind}`;
+  figure.insertAdjacentHTML('beforeend',mechanismVisual(kind,result,step));
   $('step-detail').textContent=step.label;
   if(kind==='matmul'){
     const group=element('div','','matrix-group');

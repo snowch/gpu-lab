@@ -15,6 +15,7 @@ def check_lessons(browser, base_url, root, errors):
                 page.locator('#guess').fill(guess)
                 page.get_by_role('button', name='Check prediction').click()
                 expect(page.locator('#feedback')).to_contain_text('Your prediction matches')
+                expect(page.locator(f'[data-visual="{slug}"]')).to_be_visible()
                 before = page.locator('#step-detail').inner_text()
                 page.locator('#next').click()
                 assert page.locator('#step-detail').inner_text() != before
@@ -28,6 +29,7 @@ def check_lessons(browser, base_url, root, errors):
                     page.get_by_role('button', name='Check prediction').click()
                     expect(page.locator('#feedback')).to_contain_text('matches: 0')
                     expect(page.locator('.warp-card')).to_have_count(8)
+                    expect(page.locator('.swim-label')).to_have_count(9)
                 elif slug == 'divergence':
                     page.locator('#pattern').select_option('halves')
                     page.locator('#activeLanes').select_option('16')
@@ -47,6 +49,7 @@ def check_lessons(browser, base_url, root, errors):
                     page.locator('#bankPattern').select_option('broadcast')
                     page.locator('#inspect').click()
                     expect(page.locator('.bank-card.selected')).to_have_count(1)
+                    expect(page.locator('.word-queue')).to_contain_text('32 readers')
                     expect(page.locator('#step-detail')).to_contain_text('1 banks serve 32 lanes')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{slug}: horizontal overflow'
                 page.screenshot(path=str(root / f'test-results/{slug}-{width}-{theme}.png'), full_page=True)

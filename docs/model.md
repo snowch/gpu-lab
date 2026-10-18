@@ -171,3 +171,19 @@ and exact controls. Online attention is compared with stable materialised attent
 supported size/tile/score-scale pair. Budget tests check dimensions, batch/cache scaling and
 rate changes. Reduction tests check safe sums and unwritten hazard reads. Browser tests cover
 predictions, reset, keyboard stepping, model edge cases, mobile layout and navigation.
+
+## Linked mechanism diagrams
+
+`mechanism-visuals.mjs` renders explanatory layouts from those same results and trace events.
+Scheduling uses pre-issue status across cycles; branching uses actual non-empty masks; bank
+queues deduplicate requested words. Reduction nodes record their input contribution sets;
+their sums and edges follow the tree stages, not a hand-drawn animation. Resources show the
+selected teaching capacities and allocations. Format bars use the defined sign/exponent/fraction
+budgets, with a local rounding interval for an inexact selected input.
+
+Attention trace metadata retains the previous denominator/accumulator, rescale and tile terms,
+so the visual recurrence shows actual operands. Inference records phase-dependent cache lengths
+before and after the invocation. View/copy diagrams derive original and destination offsets from
+the first lesson's contiguous tensor layout. The two foundational tensor diagrams are rendered
+at build time for a readable JavaScript-disabled fallback. Experiment-dependent diagrams remain
+behind prediction/inspection. See `visual-review.md` for the page-by-page review and limits.

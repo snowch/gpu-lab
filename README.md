@@ -31,6 +31,10 @@ The teaching models do not interpret CUDA. Their counts and toy scheduling cycle
 predict physical DRAM traffic, measured elapsed time, or speedups on a particular GPU.
 See [the model contract](docs/model.md) and [course plan](docs/plan.md).
 
+[The visual review](docs/visual-review.md) records where each lesson needed a layout,
+dependency, sequence or data-flow diagram. Those diagrams are linked to model state and trace
+positions, alongside the existing experiment views.
+
 ## Develop
 
 Node.js 22 or newer. The application and model tests have no package dependencies.
