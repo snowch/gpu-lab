@@ -31,3 +31,31 @@
 @media(max-width:1100px) { .tensor-diagrams { grid-template-columns:1fr; } }
 @media(max-width:1100px) { .slice-diagram { grid-template-columns:1fr; } }
 @media(max-width:760px) { .tensor-visual { padding:14px; } .storage-strip { gap:2px; } .storage-cell strong { font-size:11px; } .storage-cell>span { font-size:9px; } }
+
+/* Static worked examples (always visible, no JS required) */
+.stride-example, .view-copy-comparison, .sector-comparison { margin:20px 0; padding:18px; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+.stride-example h4, .view-copy-comparison h4, .sector-comparison h4 { font-size:14px; margin:0 0 12px; }
+.stride-diagrams { display:grid; grid-template-columns:1fr 1.25fr; gap:20px; align-items:start; }
+.stride-diagrams>div { min-width:0; }
+.stride-subtitle { font-size:12px; font-weight:650; margin:0 0 8px; }
+.stride-grid { margin-bottom:6px; }
+.stride-strip { margin-top:8px; }
+.stride-summary, .sector-comparison .stride-summary { padding:12px 14px; margin:14px 0 0; border-radius:4px; background:var(--soft); font-size:13px; line-height:1.7; }
+.stride-example .origin { border:2px dashed var(--accent); }
+.stride-example .destination, .view-copy-comparison .destination { background:var(--accent-soft); border:2px solid var(--accent); color:var(--accent); }
+.stride-example .crossed { border-bottom:3px solid var(--accent); }
+.view-copy-diagrams { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:start; }
+.view-copy-panel { min-width:0; }
+.view-copy-panel .slice-slots { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.sector-compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+.sector-compare-panel { min-width:0; padding:12px; border:1px solid var(--line); border-radius:6px; background:var(--bg); }
+.sector-mini-strip { display:flex; flex-wrap:wrap; gap:4px; margin:10px 0; }
+.sector-mini { min-width:0; }
+.sector-mini-label { display:block; font:9px ui-monospace,monospace; color:var(--muted); margin-bottom:2px; }
+.sector-mini-words { display:flex; gap:1px; }
+.sector-mini-word { font:8px/1 ui-monospace,monospace; padding:3px 1px; border:1px solid var(--line); border-radius:2px; background:var(--soft); color:var(--muted); min-width:14px; text-align:center; }
+.sector-mini-word.used { background:var(--accent-soft); color:var(--accent); border-color:var(--accent-soft); }
+.sector-result { font-size:12px; margin:8px 0 0; }
+.sector-result strong { color:var(--accent); }
+@media(max-width:1100px) { .stride-diagrams { grid-template-columns:1fr; } .view-copy-diagrams { grid-template-columns:1fr; } .sector-compare-grid { grid-template-columns:1fr; } }
+@media(max-width:760px) { .stride-example, .view-copy-comparison, .sector-comparison { padding:12px; } .sector-mini-word { font-size:7px; min-width:12px; } }

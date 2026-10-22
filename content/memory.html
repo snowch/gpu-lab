@@ -43,7 +43,30 @@
         <div class="prose">
           <p>Imagine a batch of 32 examples with eight features each. Create a tensor whose values make their positions easy to follow:</p>
         </div>
-        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>import torch
+        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
+print(x.shape, x.stride())   # shape [32, 8], strides (8, 1)</code></pre></div>
+        <div class="prose">
+          <p>The <strong>shape</strong>, (32, 8), means 32 rows and eight columns. The two <strong>strides</strong>, (8, 1), describe how far each index step moves through storage: moving down one row adds 8 elements; moving right one column adds 1 element. Each FP32 element occupies four bytes.</p>
+          <p>In this <code>arange</code> example the values happen to equal their storage offsets. In a general tensor the values and the offsets are different things; here they match so the diagrams are easy to read.</p>
+        </div>
+        <!-- STRIDE_EXAMPLE_COLUMN -->
+        <!-- STRIDE_EXAMPLE_ROW -->
+        <div class="prose">
+          <p>Both slices below are <strong>views</strong>: they share x’s storage. Reading the first row visits neighbouring elements. Reading the first column visits every eighth element. <code>contiguous()</code> copies this strided column into packed storage; that copy also takes work and memory.</p>
+        </div>
+        <!-- VIEW_COPY_COMPARISON -->
+        <details class="more-settings"><summary>More settings: explore other starting positions</summary>
+        <figure class="tensor-visual" aria-labelledby="tensor-visual-title">
+          <h3 id="tensor-visual-title">One index step, two views</h3>
+          <p class="tensor-caption">Dashed border = start. Solid filled border = destination. The underlined storage cells lie between them.</p>
+          <div class="tensor-visual-controls"><label>Starting row<select disabled id="tensor-origin-row"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="30">30</option></select></label><label>Starting column<select disabled id="tensor-origin-col"><option value="0">0</option><option value="2">2</option><option value="5">5</option><option value="6">6</option></select></label><button disabled type="button" data-index-step="row" aria-pressed="true">Row index +1 ↓</button><button disabled type="button" data-index-step="column" aria-pressed="false">Column index +1 →</button></div>
+          <div id="tensor-diagram"><!-- TENSOR_LAYOUT_FIGURE --></div>
+          <figcaption class="tensor-caption">Strides count elements. Each FP32 element occupies four bytes, so the row step is eight × four bytes and the column step is one × four bytes. This figure shows x’s original contiguous storage.</figcaption>
+        </figure>
+        <figure class="tensor-visual" aria-labelledby="tensor-slice-title"><h3 id="tensor-slice-title">A view keeps the original offsets; a packed copy changes them</h3><label>Compare storage<select id="tensor-slice-mode" disabled><option value="column">Column view · shared storage</option><option value="row">Row view · shared storage</option><option value="packed">Packed column · copied storage</option></select></label><div id="tensor-slice-diagram"><!-- TENSOR_SLICE_FIGURE --></div></figure>
+        </details>
+        <details class="more-settings"><summary>Full runnable example</summary>
+        <div class="code-panel"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>import torch
 
 x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
 row = x[0, :]       # features of example 0: 0, 1, ..., 7
@@ -55,20 +78,7 @@ print(column.stride())       # (8,)
 
 packed_column = column.contiguous()
 print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a href="../examples/tensor-layout.py" download>Download the self-checking PyTorch example ↓</a></div></div>
-        <div class="prose">
-          <p>The <strong>shape</strong>, (32, 8), means 32 rows and eight columns. The two <strong>strides</strong>, (8, 1), describe how far each index step moves through storage. Follow the same step in both views below.</p>
-        </div>
-        <figure class="tensor-visual" aria-labelledby="tensor-visual-title">
-          <h3 id="tensor-visual-title">One index step, two views</h3>
-          <p class="tensor-caption">Dashed border = start. Solid filled border = destination. The underlined storage cells lie between them.</p>
-          <div class="tensor-visual-controls"><label>Starting row<select disabled id="tensor-origin-row"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="30">30</option></select></label><label>Starting column<select disabled id="tensor-origin-col"><option value="0">0</option><option value="2">2</option><option value="5">5</option><option value="6">6</option></select></label><button disabled type="button" data-index-step="row" aria-pressed="true">Row index +1 ↓</button><button disabled type="button" data-index-step="column" aria-pressed="false">Column index +1 →</button></div>
-          <div id="tensor-diagram"><!-- TENSOR_LAYOUT_FIGURE --></div>
-          <figcaption class="tensor-caption">Strides count elements. Each FP32 element occupies four bytes, so the row step is eight × four bytes and the column step is one × four bytes. This figure shows x’s original contiguous storage.</figcaption>
-        </figure>
-        <div class="prose">
-          <p>Both slices are <strong>views</strong>: they share x’s storage. Reading the first row visits neighbouring elements. Reading the first column visits every eighth element. <code>contiguous()</code> copies this strided column into packed storage; that copy also takes work and memory.</p>
-        </div>
-        <figure class="tensor-visual" aria-labelledby="tensor-slice-title"><h3 id="tensor-slice-title">A view keeps the original offsets; a packed copy changes them</h3><label>Compare storage<select id="tensor-slice-mode" disabled><option value="column">Column view · shared storage</option><option value="row">Row view · shared storage</option><option value="packed">Packed column · copied storage</option></select></label><div id="tensor-slice-diagram"><!-- TENSOR_SLICE_FIGURE --></div></figure>
+        </details>
         <div class="prose">
           <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
           <p>This CPU example needs no GPU. The same shape and stride reasoning applies to the corresponding CUDA tensor. PyTorch can choose its own kernels, thread mapping and copies; slicing alone does not launch the particular load modelled here.</p>
@@ -80,9 +90,13 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
         <div class="prose">
           <p>Imagine reading one feature from each row of a tensor. A GPU runs many copies of a small program, called a <strong>kernel</strong>. Each copy is a <strong>thread</strong>. NVIDIA GPUs organise threads into groups of 32 called <strong>warps</strong>.</p>
           <p>With all lanes active, one warp reads 32 values. Each active thread reads one 32-bit floating-point value (FP32), which occupies four bytes. Its position within the warp is its <strong>lane</strong>, numbered 0 to 31.</p>
-          <p>Memory requests from a warp can be combined into aligned regions. This model groups addresses into <strong>32-byte sectors</strong>: bytes 0–31, then 32–63, and so on. This grouping is called <strong>coalescing</strong>. Your task is to see how the addresses determine the sectors touched.</p>
+          <p>Memory requests from a warp can be combined into aligned regions. This model groups addresses into <strong>32-byte sectors</strong>: bytes 0–31, then 32–63, and so on. This grouping is called <strong>coalescing</strong>.</p>
         </div>
-        <noscript><p class="notice">The lesson text is available without JavaScript. Enable JavaScript to use the simulator.</p></noscript>
+        <!-- SECTOR_COMPARISON -->
+        <div class="prose">
+          <p>The comparison above shows the key result: <strong>reading 32 adjacent values touches 4 sectors; reading every 8th value touches 32 sectors</strong>, even though both request the same 128 bytes of useful data. Use the experiment below to explore how stride, offset, and active lanes change the sector count.</p>
+        </div>
+        <noscript><p class="notice">The lesson text and worked examples are available without JavaScript. Enable JavaScript to use the simulator.</p></noscript>
         <div class="lab-panel" id="simulator">
           <div class="panel-top"><span class="eyebrow">ONE WARP · ONE LOAD INSTRUCTION</span><span class="model-badge">Address model</span></div>
           <div class="controls">
