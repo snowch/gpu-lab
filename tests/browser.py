@@ -53,6 +53,15 @@ try:
                 expect(page).to_have_url(URL + "lessons/memory.html")
                 expect(page.locator("h1")).to_have_text("Reading a tensor")
                 expect(page.locator("#curriculum")).to_have_count(0)
+                # Storage means RAM/VRAM, and its mapping to a grid is visible before stride controls.
+                expect(page.locator("#pytorch h2")).to_have_text("Where does a tensor keep its numbers?")
+                expect(page.locator("#pytorch .prose").first).to_contain_text("system RAM")
+                expect(page.locator("#pytorch .prose").first).to_contain_text("SSD or disk")
+                expect(page.locator(".storage-primer")).to_be_visible()
+                expect(page.locator(".storage-primer-grid .storage-primer-value")).to_have_count(8)
+                expect(page.locator(".storage-primer-memory .storage-primer-value")).to_have_count(8)
+                expect(page.locator(".storage-primer-memory")).to_contain_text("28 B")
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Storage primer overflows"
                 # Worked examples must be visible before any interaction.
                 expect(page.locator(".stride-example")).to_have_count(2)
                 expect(page.locator('.stride-example[data-direction="column"]')).to_be_visible()
@@ -156,6 +165,14 @@ try:
                 context.close()
                 print(f"PASS: {width}px, {theme} theme; prediction, reset, lane selection, CUDA, no overflow")
 
+        # Target the narrower phone width without changing the full browser regression matrix.
+        narrow = browser.new_context(viewport={"width": 360, "height": 800})
+        narrow_page = narrow.new_page()
+        narrow_page.goto(URL + "lessons/memory.html")
+        expect(narrow_page.locator(".storage-primer")).to_be_visible()
+        assert narrow_page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "360px storage primer overflows"
+        narrow.close()
+
         context = browser.new_context(java_script_enabled=False)
         page = context.new_page()
         page.goto(URL)
@@ -165,6 +182,8 @@ try:
         expect(page.locator("noscript .notice")).to_be_visible()
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")
         expect(page.locator("h1")).to_have_text("Reading a tensor")
+        expect(page.locator(".storage-primer")).to_be_visible()
+        expect(page.locator(".storage-primer-memory .storage-primer-value")).to_have_count(8)
         expect(page.locator(".stride-example")).to_have_count(2)
         expect(page.locator(".view-copy-comparison")).to_be_visible()
         expect(page.locator(".sector-comparison")).to_be_visible()

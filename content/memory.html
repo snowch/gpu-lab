@@ -39,15 +39,57 @@
       </section>
       <section id="pytorch" class="section-space">
         <p class="eyebrow">START WITH A PYTORCH TENSOR</p>
-        <h2>Rows and columns share storage.</h2>
+        <h2>Where does a tensor keep its numbers?</h2>
         <div class="prose">
-          <p>Imagine a batch of 32 examples with eight features each. Create a tensor whose values make their positions easy to follow:</p>
+          <p>PyTorch calls the memory holding a tensor’s numbers its <strong>storage</strong>. A tensor on the CPU normally uses system RAM; a CUDA tensor (on an NVIDIA GPU) normally uses GPU memory, also called VRAM. Here, <strong>storage means memory, not a saved file on an SSD or disk</strong>.</p>
+          <p>We often draw a tensor as a grid. In a <strong>contiguous, row-major</strong> tensor, its values occupy neighbouring positions in memory: all the values of the first row, then the second row, and so on. Each number in this example is FP32 (32-bit floating point), occupying four bytes.</p>
         </div>
-        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
-print(x.shape, x.stride())   # shape [32, 8], strides (8, 1)</code></pre></div>
+        <figure class="storage-primer" aria-labelledby="storage-primer-title">
+          <h3 id="storage-primer-title">One tensor: a grid and its memory layout</h3>
+          <div class="storage-primer-layout">
+            <div>
+              <p class="storage-primer-subtitle">Drawn as 2 rows × 4 columns</p>
+              <div class="storage-primer-grid" role="img" aria-label="Tensor grid: row 0 has values 0, 1, 2, 3; row 1 has 4, 5, 6, 7.">
+              <span class="storage-primer-row-label">Row 0</span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">0</strong></span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">1</strong></span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">2</strong></span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">3</strong></span>
+              <span class="storage-primer-row-label">Row 1</span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">4</strong></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">5</strong></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">6</strong></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">7</strong></span>
+              </div>
+            </div>
+            <div>
+              <p class="storage-primer-subtitle">The same 8 values in memory order</p>
+              <div class="storage-primer-memory" role="img" aria-label="Values 0 through 7 occupy successive memory positions: values 0 to 3 are the first row, 4 to 7 the second. Their byte offsets are 0, 4, 8, 12, 16, 20, 24, 28.">
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">0</strong><small>0 B</small></span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">1</strong><small>4 B</small></span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">2</strong><small>8 B</small></span>
+              <span class="storage-primer-cell row-zero"><strong class="storage-primer-value">3</strong><small>12 B</small></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">4</strong><small>16 B</small></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">5</strong><small>20 B</small></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">6</strong><small>24 B</small></span>
+              <span class="storage-primer-cell row-one"><strong class="storage-primer-value">7</strong><small>28 B</small></span>
+              </div>
+              <p class="storage-primer-note">First 4 positions: row 0 · Next 4: row 1. Small labels are byte offsets from the start of storage, not RAM addresses.</p>
+            </div>
+          </div>
+          <figcaption class="storage-primer-caption">These are <strong>two pictures of the same eight values</strong>, not two copies of them.</figcaption>
+        </figure>
         <div class="prose">
-          <p>The <strong>shape</strong>, (32, 8), means 32 rows and eight columns. The two <strong>strides</strong>, (8, 1), describe how far each index step moves through storage: moving down one row adds 8 elements; moving right one column adds 1 element. Each FP32 element occupies four bytes.</p>
-          <p>In this <code>arange</code> example the values happen to equal their storage offsets. In a general tensor the values and the offsets are different things; here they match so the diagrams are easy to read.</p>
+          <p>The <strong>shape</strong> tells PyTorch how to interpret those values as a grid: here it is <code>(2, 4)</code>. The <strong>strides</strong> tell it how many <em>element positions</em> to move when an index changes. Strides <code>(4, 1)</code> mean that moving down one row advances four elements (16 bytes), while moving right one column advances one element (4 bytes).</p>
+          <p>Now imagine a batch of 32 examples with eight features each. We can make a larger tensor whose values are easy to follow:</p>
+        </div>
+        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>import torch
+
+x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
+print(x.shape, x.stride())   # shape (32, 8), strides (8, 1)</code></pre></div>
+        <div class="prose">
+          <p>This tensor has <strong>shape (32, 8)</strong>: 32 rows and eight columns. Its <strong>strides (8, 1)</strong> mean a move down one row advances 8 elements (32 bytes), and a move right one column advances 1 element (4 bytes).</p>
+          <p>With <code>arange</code>, the values happen to match their <strong>element offsets</strong> (positions counted from the beginning of storage). This is a convenient coincidence, not a general property of tensors. <strong>Byte offsets</strong> are those positions multiplied by four; actual memory addresses are different and are not shown.</p>
         </div>
         <!-- STRIDE_EXAMPLE_COLUMN -->
         <!-- STRIDE_EXAMPLE_ROW -->
