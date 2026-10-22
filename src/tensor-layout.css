@@ -59,3 +59,27 @@
 .sector-result strong { color:var(--accent); }
 @media(max-width:1100px) { .stride-diagrams { grid-template-columns:1fr; } .view-copy-diagrams { grid-template-columns:1fr; } .sector-compare-grid { grid-template-columns:1fr; } }
 @media(max-width:760px) { .stride-example, .view-copy-comparison, .sector-comparison { padding:12px; } .sector-mini-word { font-size:7px; min-width:12px; } }
+
+/* Introductory RAM layout: one static teaching figure, readable without JavaScript. */
+.storage-primer { margin:20px 0; padding:18px; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+.storage-primer h3 { font-size:15px; margin:0 0 14px; }
+.storage-primer-layout { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:18px; align-items:start; }
+.storage-primer-layout>div { min-width:0; }
+.storage-primer-subtitle { font-size:12px; font-weight:650; margin:0 0 10px; }
+.storage-primer-grid { display:grid; grid-template-columns:48px repeat(4,minmax(0,1fr)); gap:4px; }
+.storage-primer-row-label { font-size:12px; align-self:center; }
+.storage-primer-memory { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:3px; }
+.storage-primer-cell { display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0; min-height:40px; gap:2px; padding:4px 1px; border:1px solid var(--line); border-radius:4px; background:var(--soft); }
+.storage-primer-cell.row-one { background:var(--accent-soft); }
+.storage-primer-cell strong { font:600 13px/1.3 ui-monospace,monospace; }
+.storage-primer-cell small { color:var(--muted); font:10px/1.3 ui-monospace,monospace; white-space:nowrap; }
+.storage-primer-note { color:var(--muted); font-size:12px; margin:9px 0 0; }
+.storage-primer-caption { padding-top:12px; margin-top:16px; border-top:1px solid var(--line); font-size:13px; }
+@media(max-width:760px) {
+  .storage-primer { padding:12px; }
+  .storage-primer-layout { grid-template-columns:minmax(0,1fr); gap:20px; }
+  .storage-primer-memory { gap:2px; }
+  .storage-primer-cell { min-height:38px; }
+  .storage-primer-cell strong { font-size:12px; }
+  .storage-primer-cell small { font-size:9px; }
+}
