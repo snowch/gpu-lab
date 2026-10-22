@@ -13,6 +13,10 @@ def check_lessons(browser, base_url, root, errors):
                 expect(page.locator('html')).to_have_attribute('data-theme', theme)
                 expect(page.locator('#results')).to_be_hidden()
                 expect(page.locator('.worked-example')).to_be_visible()
+                expect(page.locator('.concepts')).to_be_visible()
+                assert page.locator('.concepts dt').count() >= 2, slug
+                assert page.locator('section.concepts').evaluate('(node) => !!node.closest("section.prose")')
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{slug} concepts overflow'
                 page.locator('#guess').fill(guess)
                 page.get_by_role('button', name='Check prediction').click()
                 expect(page.locator('#feedback')).to_contain_text('Your prediction matches')

@@ -20,6 +20,10 @@ def check_remaining(browser, base_url, root, errors):
                 expect(page.locator('html')).to_have_attribute('data-theme', theme)
                 # Worked example is visible before any interaction.
                 expect(page.locator('.worked-example')).to_be_visible()
+                expect(page.locator('.concepts')).to_be_visible()
+                assert page.locator('.concepts dt').count() >= 2, slug
+                assert page.locator('section.concepts').evaluate('(node) => !!node.closest("section.prose")')
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{slug} concepts overflow'
                 if slug in NAMED_CHOICES:
                     page.locator(f'input[name="guess"][value="0"]').check()
                 else:

@@ -1,15 +1,15 @@
 // Copyright © 2026 Christopher Snow.
 import { remainingLessons } from './remaining-lessons.mjs';
 import { renderWorkedExample } from '../src/worked-examples.mjs';
+import { renderConcepts } from '../src/concepts.mjs';
+import { conceptsByLesson } from './concept-definitions.mjs';
 // Original lesson text. Models, not this content, supply all prediction answers.
 export const lessons = [
   {
     slug: 'scheduling', number: '02', title: 'Keeping the GPU busy', workedExample: 'scheduling',
     subtitle: 'A waiting warp need not mean an idle GPU.',
     prerequisite: 'Lab 01: threads, warps, and memory loads. You can read a short array-indexing expression.',
-    intro: `<p>Scaling a tensor means reading values, multiplying them, and writing the results. Arithmetic cannot use a value before its load returns. While one warp waits, the GPU can issue an instruction from another warp whose inputs are ready.</p>
-      <p>A <strong>streaming multiprocessor (SM)</strong> is a GPU unit that runs thread blocks. A block stays on one SM for its lifetime. Several blocks can reside there if resources allow. Their warps can remain <strong>resident</strong>, with their execution state available, while a scheduler chooses a ready warp.</p>
-      <p><strong>Latency</strong> is the delay before a result becomes available. <strong>Latency hiding</strong> means using that waiting time for other work. The load itself still takes just as long.</p>`,
+    intro: `<p>Scaling a tensor means reading values, multiplying them, and writing the results. Arithmetic cannot use a value before its load returns. While one warp waits, the GPU can issue an instruction from another ready warp.</p><!-- NEW_CONCEPTS --><p>A thread block stays on one SM for its lifetime. Several blocks can fit on one SM when resources allow. Their warps remain <strong>resident</strong> with execution state available, and the scheduler chooses one that is ready.</p>`,
     setup: `<p>Our teaching SM has one issue slot per cycle: it can start one warp instruction. Each warp performs <code>LD → MUL → ST</code> twice. LD loads values, MUL multiplies them, and ST stores the results. All warps are resident from the start.</p>
       <p>A load issued at cycle <code>t</code> can be used at cycle <code>t + latency</code>. MUL and ST each occupy one issue slot without further waits. The scheduler searches ready warps in round-robin order, starting after the warp it last chose. An idle cycle occurs only when no unfinished warp is ready.</p>`,
     controls: `<label>Resident warps<select id="warps"><option value="1">1 warp</option><option value="2">2 warps</option><option value="4">4 warps</option><option value="8">8 warps</option></select></label>
@@ -42,9 +42,7 @@ scale<<<(n + 127) / 128, 128>>>(x, y, n);`,
     slug: 'divergence', number: '03', title: 'Taking different paths', workedExample: 'divergence',
     subtitle: 'One condition can produce two active-lane masks.',
     prerequisite: 'Labs 01–02: a warp contains lanes, and instructions can issue with only some lanes active.',
-    intro: `<p>Suppose a preprocessing step treats positive and negative tensor values differently. Threads in the same warp may disagree on the condition. When they follow different control-flow paths, the warp has <strong>branch divergence</strong>.</p>
-      <p>An <strong>active-lane mask</strong> identifies the lanes participating in an instruction. A lane excluded from that mask does no work for that instruction. It is not removed from the warp: it can participate in a later instruction.</p>
-      <p>This lab uses an explicit two-path model. It issues the positive path with its mask, then the negative path with its mask. It skips any path with no participating lanes. After both paths finish, the active lanes can continue together.</p>`,
+    intro: `<p>Suppose a preprocessing step treats positive and negative tensor values differently. Some threads in one warp take the positive path while others take the negative path.</p><!-- NEW_CONCEPTS --><p>A lane excluded from an instruction's mask does no work for that instruction, but can participate in a later one. This model executes the positive path with its mask, then the negative path with its mask, skipping paths with no active lanes. Afterward, participating lanes continue together.</p>`,
     setup: `<p>Each positive lane multiplies its value by two. A negative lane either just negates its value, or negates it, multiplies it by two, and adds one. The inputs are +2 and −2 so you can check each output.</p>
       <p>We count only those path operations. The condition, loads, stores and control-flow instructions are excluded. One issued operation has 32 possible lane slots; only its mask's lanes perform useful work. Changing the number of negative-path operations changes the calculation as well as the work.</p>`,
     controls: `<label>Input signs<select id="pattern"><option value="positive">All positive</option><option value="negative">All negative</option><option value="alternating" selected>Alternating signs</option><option value="halves">First half positive</option><option value="one-negative">Only lane 0 negative</option></select></label>
@@ -82,9 +80,7 @@ if (i < n) {
     slug: 'shared-memory', number: '04', title: 'Sharing work within a block', workedExample: 'shared-memory',
     subtitle: 'A small change in layout can change bank conflicts.',
     prerequisite: 'Labs 01–03: byte addresses, warps, blocks, and active lanes. This lab introduces shared memory.',
-    intro: `<p>A tiled tensor operation can load values once and reuse them across threads in a block. CUDA's <strong>shared memory</strong> is storage accessible to threads in that block. The programmer chooses what to place there and when threads may read it.</p>
-      <p>Shared memory is divided into <strong>banks</strong> that can serve different addresses in parallel. This model has 32 banks. Successive four-byte words map to successive banks, wrapping back to bank zero. For a word index <code>w</code>, the bank is <code>w % 32</code>, where <code>%</code> means remainder.</p>
-      <p>Different words requested from the same bank need separate service rounds here: a <strong>bank conflict</strong>. Multiple lanes reading the same word can receive a <strong>broadcast</strong> in one round. This read exception does not make simultaneous writes safe.</p>`,
+    intro: `<p>A tiled tensor operation can load data once and reuse it across threads in the same block. The layout of that reusable data matters.</p><!-- NEW_CONCEPTS --><p>This model uses 32 banks. Successive four-byte words map to successive banks, wrapping around at bank zero. For word index <code>w</code>, the bank is <code>w % 32</code>, where <code>%</code> means remainder.</p><p>These bank rules describe reads; broadcasting a word does not make simultaneous writes safe.</p>`,
     setup: `<p>Imagine a square tile with 32 rows and 32 useful columns. Threads read one column, so successive lanes are separated by the row pitch: the number of allocated words per row. A pitch of 33 adds one unused padding word to each row.</p>
       <p>Each round serves at most one distinct word from each bank. Banks work in parallel; the busiest bank determines the number of rounds. Try a row read, a column read, a padded column, and a broadcast.</p>`,
     controls: `<label>Access pattern<select id="bankPattern"><option value="row">Row · stride 1</option><option value="column" selected>Column · stride 32</option><option value="padded">Padded column · stride 33</option><option value="stride2">Every other word · stride 2</option><option value="broadcast">Same word · broadcast</option></select></label>
@@ -121,6 +117,9 @@ const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').rep
 
 export function renderLesson(lesson, index) {
   const workedExample = lesson.workedExample ? renderWorkedExample(lesson.workedExample) : '';
+  const terms = conceptsByLesson[lesson.slug] || [];
+  if (terms.length && !lesson.intro.includes('<!-- NEW_CONCEPTS -->')) throw new Error('Missing new-concepts marker for ' + lesson.slug);
+  const intro = lesson.intro.replace('<!-- NEW_CONCEPTS -->', renderConcepts({id:lesson.slug,terms}));
   const previous = index ? `${lessons[index - 1].slug}.html` : 'memory.html';
   const next = index + 1 < lessons.length ? `${lessons[index + 1].slug}.html` : '../index.html#curriculum';
   return `<!doctype html>
@@ -135,7 +134,7 @@ export function renderLesson(lesson, index) {
 <nav class="lesson-nav" aria-label="Course lessons"><a href="../index.html">Course overview</a><a href="memory.html">01 Reading a tensor</a>${lessons.map(l => `<a href="${l.slug}.html" ${l.slug === lesson.slug ? 'class="current" aria-current="page"' : ''}>${l.number} ${l.title}</a>`).join('')}<a href="../index.html#curriculum">Course roadmap</a></nav>
 <div class="sidebar-bottom"><span class="status-label">INTERACTIVE DRAFT</span><p>Computed models.<br>No GPU required.</p></div></aside>
 <main id="main"><section class="intro"><p class="eyebrow">LAB ${lesson.number} / GPU ARCHITECTURE</p><h1>${lesson.title}</h1><p class="lead">${lesson.subtitle}</p><p class="prerequisite"><strong>Before you start:</strong> ${lesson.prerequisite}</p></section>
-<section class="prose"><h2>The mechanism</h2>${lesson.intro}</section>
+<section class="prose"><h2>The mechanism</h2>${intro}</section>
 ${workedExample ? `<section class="section-space"><h2>Worked example</h2>${workedExample}</section>` : ''}
 <section class="section-space"><h2>Experiment: try changing it</h2><div class="prose">${lesson.setup}</div>
 <noscript><p class="notice">Enable JavaScript to use the simulator. The lesson and exercises remain readable.</p></noscript>

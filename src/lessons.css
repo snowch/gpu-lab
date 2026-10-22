@@ -60,3 +60,25 @@ button:disabled { opacity:.45; cursor:default; }
   .ai-figure.attention .matrix-grid { grid-template-columns:repeat(4,minmax(0,1fr))!important; }
   .sidebar { overflow:visible; }
 }
+
+
+/* Small, semantic first-use vocabulary notes. No extra interactive states. */
+.concepts { max-width:760px; margin:20px 0 26px; padding:18px 20px; border:1px solid var(--line); border-radius:9px; background:var(--panel); }
+.concepts-heading { display:flex; align-items:center; gap:9px; margin:0 0 12px; color:var(--ink); font-size:14px; font-weight:700; }
+.concepts-icon { color:var(--muted); font-size:18px; font-weight:400; line-height:1; }
+.concepts-list { margin:0; }
+.concepts-entry { display:grid; grid-template-columns:minmax(90px,120px) minmax(0,1fr); gap:12px; align-items:baseline; padding:9px 0; border-top:1px solid var(--line); }
+.concepts-entry dt { font-size:14px; font-weight:700; }
+.concepts-entry dd { margin:0; font-size:14px; line-height:1.55; }
+.concepts-warp { margin:15px 0 0; padding-top:14px; border-top:1px solid var(--line); }
+.concepts-warp figcaption { font-size:13px; margin:0 0 10px; }
+.concepts-warp-grid { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:4px; max-width:500px; }
+.concepts-lane { min-width:0; text-align:center; padding:5px 0; border:1px solid var(--line); border-radius:3px; background:var(--soft); font:12px/1.4 ui-monospace,monospace; }
+.concepts-warp p { color:var(--muted); font-size:12px; line-height:1.6; margin:10px 0 0; }
+@media (max-width:760px) {
+  .concepts { padding:13px; margin:16px 0 22px; }
+  .concepts-entry { grid-template-columns:minmax(0,1fr); gap:2px; padding:10px 0; }
+  .concepts-entry dt, .concepts-entry dd { font-size:14px; }
+  .concepts-warp-grid { gap:3px; }
+  .concepts-lane { padding:5px 0; }
+}

@@ -2,6 +2,7 @@
 import { cp, mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import { renderTensorStep,renderTensorSlice,renderStrideExample,viewCopyComparison,sectorComparison } from '../src/tensor-layout.mjs';
 import { lessons, renderLesson } from '../content/lessons.mjs';
+import { renderConcepts, warpConcepts } from '../src/concepts.mjs';
 import { buildOffline } from './offline.mjs';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
@@ -12,6 +13,7 @@ await mkdir('dist/lessons', { recursive: true });
 await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html','utf8'))
   .replace('<!-- TENSOR_LAYOUT_FIGURE -->',renderTensorStep())
   .replace('<!-- TENSOR_SLICE_FIGURE -->',renderTensorSlice())
+  .replace('<!-- WARP_CONCEPTS -->',renderConcepts({id:'memory',terms:warpConcepts,warpDiagram:true}))
   .replace('<!-- STRIDE_EXAMPLE_COLUMN -->',renderStrideExample('column'))
   .replace('<!-- STRIDE_EXAMPLE_ROW -->',renderStrideExample('row'))
   .replace('<!-- VIEW_COPY_COMPARISON -->',viewCopyComparison())
