@@ -151,12 +151,12 @@ try:
                 response = page.goto(url + f'lessons/{slug}.html?offline-test=1#simulator')
                 assert response.ok and response.from_service_worker
                 ready(page)
-                page.locator('#inspect').click()
+                page.locator('#show-result').click()
                 expect(page.locator('#results')).to_be_visible()
                 if slug == 'memory':
                     expect(page.locator('#sector-count')).to_have_text('4')
                     page.get_by_role('button', name='Tensor column', exact=True).click()
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     expect(page.locator('#sector-count')).to_have_text('32')
                 else:
                     before = page.locator('#step-detail').inner_text()
@@ -183,7 +183,7 @@ try:
             expect(page.locator('.roadmap h3')).to_have_count(8)
             expect(page.locator('html')).to_have_attribute('data-test-release', 'one')
             page.get_by_role('link', name='Start Lab 01: Reading a tensor →').click()
-            page.locator('#inspect').click()
+            page.locator('#show-result').click()
             expect(page.locator('#sector-count')).to_have_text('4')
             print(f'PASS: {prefix}, {width}px; all unvisited labs, controls, reload, tab reopen and downloads offline')
 
@@ -246,7 +246,7 @@ try:
         context = browser.new_context(service_workers='block')
         page = context.new_page()
         page.goto(url + 'lessons/memory.html')
-        page.locator('#inspect').click()
+        page.locator('#show-result').click()
         expect(page.locator('#sector-count')).to_have_text('4')
         context.close()
         browser.close()
@@ -266,7 +266,7 @@ try:
             page = context.new_page()
             page.goto(url + 'lessons/memory.html')
             ready(page)
-            page.locator('#inspect').click()
+            page.locator('#show-result').click()
             expect(page.locator('#sector-count')).to_have_text('4')
             expect(page.locator('#offline-status')).to_contain_text('Working offline')
             context.close()

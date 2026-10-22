@@ -70,7 +70,7 @@ function render() {
   renderSelection();
 }
 function resetExperiment() {
-  revealed = false; $('guess').value = '';
+  revealed = false; const g = $('guess'); if (g) g.value = '';
   setText('feedback', 'Pattern changed. Make a new prediction, then inspect the addresses.');
   setText('copy-status', 'The browser models addresses; it does not compile CUDA.');
   render();
@@ -103,7 +103,8 @@ $('prediction').addEventListener('submit', event => {
     ? `Your prediction matches: ${result.sectors.length} sectors. Follow a lane below to explain why.`
     : `You predicted ${guess}; the model touches ${result.sectors.length} sectors. Inspect the grouped addresses below and compare them with your reasoning.`);
 });
-$('inspect').addEventListener('click', () => { revealed = true; render(); setText('feedback', 'Addresses grouped. Select a lane to follow its value into memory.'); });
+const showResultBtn = $('show-result') || $('inspect');
+showResultBtn.addEventListener('click', () => { revealed = true; render(); setText('feedback', 'Addresses grouped. Select a lane to follow its value into memory.'); });
 $('copy').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText($('kernel').textContent); setText('copy-status', 'Kernel copied.'); }
   catch { setText('copy-status', 'Clipboard unavailable. Select the code to copy it.'); }

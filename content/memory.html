@@ -98,7 +98,7 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
         </div>
         <noscript><p class="notice">The lesson text and worked examples are available without JavaScript. Enable JavaScript to use the simulator.</p></noscript>
         <div class="lab-panel" id="simulator">
-          <div class="panel-top"><span class="eyebrow">ONE WARP · ONE LOAD INSTRUCTION</span><span class="model-badge">Address model</span></div>
+          <div class="panel-top"><span class="eyebrow">EXPERIMENT · ONE WARP · ONE LOAD</span><span class="model-badge">Address model</span></div>
           <div class="controls">
             <label>Stride <span>elements between lanes</span><select id="stride"><option value="1">1 · neighbouring values</option><option value="2">2 · every other value</option><option value="4">4 · every fourth value</option><option value="8">8 · one value per row of 8</option><option value="16">16 · one value per row of 16</option><option value="32">32 · one value per row of 32</option></select></label>
             <label>Start offset <span>elements from aligned base</span><select id="offset"><option value="0">0 elements</option><option value="1">1 element</option><option value="2">2 elements</option><option value="4">4 elements</option><option value="7">7 elements</option><option value="8">8 elements</option></select></label>
@@ -106,10 +106,10 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
           </div>
           <div class="presets" aria-label="Experiment presets"><span>Try a pattern</span><button data-preset="contiguous">Contiguous</button><button data-preset="column">Tensor column</button><button data-preset="misaligned">Shift by one</button></div>
           <form id="prediction" class="prediction">
-            <label for="guess"><strong>Predict first.</strong> How many sectors will this load touch?</label>
-            <div><input id="guess" type="number" min="1" max="32" step="1" required placeholder="1–32" aria-label="Predicted number of sectors"><button class="primary" type="submit">Check prediction</button><button id="inspect" type="button">Inspect without guessing</button></div>
+            <label for="guess"><strong>Make a prediction.</strong> How many sectors will this load touch?</label>
+            <div><input id="guess" type="number" min="1" max="32" step="1" required placeholder="1–32" aria-label="Predicted number of sectors"><button class="primary" type="submit">Check prediction</button><button id="show-result" type="button">Show result without guessing</button></div>
           </form>
-          <p id="feedback" class="feedback" role="status" aria-live="polite">Choose a pattern, then predict or inspect.</p>
+          <p id="feedback" class="feedback" role="status" aria-live="polite">Choose a pattern, then predict or show the result.</p>
           <div class="figure-label"><h3>The warp</h3><span>Choose a lane to follow its address</span></div>
           <div id="lanes" class="lanes" aria-label="Warp lanes"></div>
           <p id="lane-detail" class="lane-detail" aria-live="polite"></p>

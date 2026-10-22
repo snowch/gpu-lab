@@ -94,16 +94,22 @@ function render() {
 }
 for (const select of $('controls').querySelectorAll('select')) {
   select.addEventListener('change', () => {
-    revealed = false; cursor = 0; $('guess').value = ''; compute(); render();
+    revealed = false; cursor = 0; const g = $('guess'); if (g) g.value = ''; document.querySelectorAll('input[name="guess"]').forEach(r => r.checked = false); compute(); render();
     $('feedback').textContent = 'Configuration changed. Make a new prediction, then inspect.';
   });
 }
+const readGuess = () => {
+  const radio = document.querySelector('input[name="guess"]:checked');
+  return radio ? Number(radio.value) : num('guess');
+};
 $('prediction').addEventListener('submit', event => {
   event.preventDefault(); if (!$('prediction').reportValidity()) return;
   revealed = true; cursor = 0; render();
-  $('feedback').textContent = num('guess') === answer() ? `Your prediction matches: ${answer()}. Step through the trace to explain why.` : `You predicted ${num('guess')}; the model gives ${answer()}. Follow the trace and compare with your reasoning.`;
+  const guess = readGuess();
+  $('feedback').textContent = guess === answer() ? `Your prediction matches: ${answer()}. Step through the trace to explain why.` : `You predicted ${guess}; the model gives ${answer()}. Follow the trace and compare with your reasoning.`;
 });
-$('inspect').addEventListener('click', () => { revealed = true; cursor = 0; render(); $('feedback').textContent = 'Computed trace ready. Use Next step to follow the model.'; });
+const showResultBtn = $('show-result') || $('inspect');
+if (showResultBtn) showResultBtn.addEventListener('click', () => { revealed = true; cursor = 0; render(); $('feedback').textContent = 'Computed trace ready. Use Next step to follow the model.'; });
 $('back').addEventListener('click', () => { cursor = Math.max(0, cursor - 1); render(); });
 $('next').addEventListener('click', () => { cursor = Math.min(result.trace.length - 1, cursor + 1); render(); });
 $('restart').addEventListener('click', () => { cursor = 0; render(); });

@@ -99,12 +99,14 @@ function render(){
   $('trace').replaceChildren(...indices.map(i=>{const b=element('button',`${i+1}: ${result.trace[i].label}`,i===cursor?'selected':'');b.type='button';b.dataset.step=i;b.setAttribute('aria-pressed',String(i===cursor));b.addEventListener('click',()=>{cursor=i;render();$('trace').querySelector(`[data-step="${i}"]`).focus({preventScroll:true});});return b;}));
 }
 for(const control of $('controls').querySelectorAll('select,input'))control.addEventListener('change',()=>{
-  revealed=false;cursor=0;$('guess').value='';$('results').hidden=true;
+  revealed=false;cursor=0;const g=$('guess');if(g)g.value='';document.querySelectorAll('input[name="guess"]').forEach(r=>r.checked=false);$('results').hidden=true;
   try{compute();render();$('feedback').textContent='Configuration changed. Make a new prediction, then inspect.';}catch(error){$('feedback').textContent=error.message;}
 });
 function reveal(){try{compute();cursor=0;revealed=true;render();return true;}catch(error){$('feedback').textContent=error.message;return false;}}
-$('prediction').addEventListener('submit',event=>{event.preventDefault();if(!$('prediction').reportValidity()||!reveal())return;$('feedback').textContent=number('guess')===answer()?`Your prediction matches: ${answer()}. Follow the computed trace to explain why.`:`You predicted ${number('guess')}; the model gives ${answer()}. Inspect the trace and compare your reasoning.`;});
-$('inspect').addEventListener('click',()=>{if(reveal())$('feedback').textContent='Computed results ready. Step through the experiment.';});
+const readGuess=()=>{const radio=document.querySelector('input[name="guess"]:checked');return radio?Number(radio.value):number('guess');};
+$('prediction').addEventListener('submit',event=>{event.preventDefault();if(!$('prediction').reportValidity()||!reveal())return;const guess=readGuess();$('feedback').textContent=guess===answer()?`Your prediction matches: ${answer()}. Follow the computed trace to explain why.`:`You predicted ${guess}; the model gives ${answer()}. Inspect the trace and compare your reasoning.`;});
+const showBtn=$('show-result')||$('inspect');
+if(showBtn)showBtn.addEventListener('click',()=>{if(reveal())$('feedback').textContent='Computed results ready. Step through the experiment.';});
 $('next').addEventListener('click',()=>{cursor=Math.min(result.trace.length-1,cursor+1);render();});
 $('back').addEventListener('click',()=>{cursor=Math.max(0,cursor-1);render();});
 $('restart').addEventListener('click',()=>{cursor=0;render();});
