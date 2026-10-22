@@ -130,9 +130,12 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
       <section id="lab">
         <div class="section-heading"><div><h2>Same values. Different addresses.</h2></div><span class="tag">Interactive draft</span></div>
         <div class="prose">
-          <p>Imagine reading one feature from each row of a tensor. A GPU runs many copies of a small program, called a <strong>kernel</strong>. Each copy is a <strong>thread</strong>. NVIDIA GPUs organise threads into groups of 32 called <strong>warps</strong>.</p>
-          <p>With all lanes active, one warp reads 32 values. Each active thread reads one 32-bit floating-point value (FP32), which occupies four bytes. Its position within the warp is its <strong>lane</strong>, numbered 0 to 31.</p>
-          <p>Memory requests from a warp can be combined into aligned regions. This model groups addresses into <strong>32-byte sectors</strong>: bytes 0–31, then 32–63, and so on. This grouping is called <strong>coalescing</strong>.</p>
+          <p>Imagine reading one feature from each row of a tensor. The GPU can give a different row to each participating thread.</p>
+        </div>
+        <!-- WARP_CONCEPTS -->
+        <div class="prose">
+          <p>Each of the 32 threads in a warp can read a different row. When every lane participates, the warp requests 32 values together. Each value here is a 32-bit floating-point number (FP32) occupying four bytes.</p>
+          <p>The GPU can combine nearby memory requests. Our teaching model groups addresses into aligned <strong>32-byte sectors</strong>: bytes 0–31, then 32–63, and so on. Combining nearby requests into fewer memory transactions is called <strong>coalescing</strong>.</p>
         </div>
         <!-- SECTOR_COMPARISON -->
         <div class="prose">
