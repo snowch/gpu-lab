@@ -66,6 +66,7 @@ try:
                 expect(page.locator(".sector-comparison")).to_contain_text("32 sectors")
                 # Advanced controls are progressively disclosed.
                 expect(page.locator("details.more-settings")).to_have_count(2)
+                page.locator("details.more-settings summary").first.click()
                 expect(page.locator("#tensor-diagram")).to_have_attribute("data-ready", "true")
                 expect(page.locator("#tensor-step-summary")).to_contain_text("8 elements × 4 bytes = 32 bytes")
                 expect(page.locator("#tensor-diagram .tensor-cell.destination")).to_have_text("8")
@@ -164,6 +165,9 @@ try:
         expect(page.locator("noscript .notice")).to_be_visible()
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")
         expect(page.locator("h1")).to_have_text("Reading a tensor")
+        expect(page.locator(".stride-example")).to_have_count(2)
+        expect(page.locator(".view-copy-comparison")).to_be_visible()
+        expect(page.locator(".sector-comparison")).to_be_visible()
         expect(page.locator("#tensor-diagram .tensor-cell")).to_have_count(32)
         expect(page.locator("#tensor-slice-diagram .tensor-cell")).to_have_count(32)
         expect(page.locator("#tensor-step-summary")).to_contain_text("8 elements × 4 bytes = 32 bytes")

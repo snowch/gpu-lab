@@ -2,6 +2,12 @@
 import './theme.mjs';
 import './tensor-layout-view.mjs';
 import { simulateLoad, kernelSource } from './model.mjs';
+
+for (const details of document.querySelectorAll('details.more-settings')) {
+  details.addEventListener('toggle', () => {
+    if (details.open) details.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
+}
 const $ = id => document.getElementById(id);
 let selectedLane = 0;
 let revealed = false;
