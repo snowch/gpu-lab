@@ -48,6 +48,17 @@ try:
                 expect(page.locator(".roadmap h3")).to_have_count(8)
                 expect(page.locator("html")).to_have_attribute("data-theme", theme)
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Introduction overflows"
+                page.get_by_role("link", name="Start here: Meet the GPU →").click()
+                layers = page.locator(".architecture-layer")
+                expect(layers).to_have_count(3)
+                expect(layers.nth(0)).to_have_attribute("open", "")
+                for layer in [layers.nth(1), layers.nth(2)]:
+                    layer.locator("summary").focus()
+                    page.keyboard.press("Enter")
+                    expect(layer).to_have_attribute("open", "")
+                expect(page.locator(".architecture-sm")).to_be_visible()
+                expect(page.locator(".architecture-work")).to_be_visible()
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Expanded architecture map overflows"
                 page.screenshot(path=str(ROOT / f"test-results/intro-{width}-{theme}.png"), full_page=True)
                 page.get_by_role("link", name="Start Lab 01: Reading a tensor →").click()
                 expect(page).to_have_url(URL + "lessons/memory.html")
@@ -184,6 +195,8 @@ try:
         page.goto(URL)
         expect(page.locator(".roadmap h3")).to_have_count(8)
         expect(page.locator("#simulator")).to_have_count(0)
+        page.locator(".architecture-layer").nth(2).locator("summary").click()
+        expect(page.locator(".architecture-work")).to_be_visible()
         page.get_by_role("link", name="Start Lab 01: Reading a tensor →").click()
         expect(page.locator("noscript .notice")).to_be_visible()
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")

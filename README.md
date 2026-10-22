@@ -10,6 +10,10 @@ Course URL: <https://snowch.github.io/gpu-lab/>
 
 ## Current scope
 
+Start with [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu), a short visual map of
+CPU/GPU memory, SMs and how blocks and warps execute work. Its three expandable layers
+work offline and without JavaScript.
+
 All eight labs are available as working drafts, with a reduction workshop extending Lab 04:
 
 1. [Reading a tensor](https://snowch.github.io/gpu-lab/lessons/memory.html): addresses, stride, alignment and coalescing.
