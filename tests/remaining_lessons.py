@@ -1,7 +1,8 @@
 # Copyright © 2026 Christopher Snow.
 from playwright.sync_api import expect
 
-SLUGS = [('reduction', '0'), ('matmul', '512'), ('tensor-cores', '8'), ('attention', '0'), ('inference', '0')]
+SLUGS = [('reduction', None), ('matmul', '512'), ('tensor-cores', '8'), ('attention', '0'), ('inference', None)]
+NAMED_CHOICES = {'reduction': 'All reads are safe', 'inference': 'Memory-limited'}
 
 def metric(page, label):
     return page.locator(f'[data-metric="{label}"] strong')
@@ -17,7 +18,12 @@ def check_remaining(browser, base_url, root, errors):
                 page.goto(base_url + 'lessons/' + slug + '.html')
                 expect(page.locator('#results')).to_be_hidden()
                 expect(page.locator('html')).to_have_attribute('data-theme', theme)
-                page.locator('#guess').fill(guess)
+                # Worked example is visible before any interaction.
+                expect(page.locator('.worked-example')).to_be_visible()
+                if slug in NAMED_CHOICES:
+                    page.locator(f'input[name="guess"][value="0"]').check()
+                else:
+                    page.locator('#guess').fill(guess)
                 page.get_by_role('button', name='Check prediction').click()
                 expect(page.locator('#feedback')).to_contain_text('Your prediction matches')
                 expect(page.locator(f'[data-visual="{slug}"]')).to_be_visible()
@@ -34,7 +40,7 @@ def check_remaining(browser, base_url, root, errors):
                 if slug == 'reduction':
                     page.locator('#ordering').select_option('unsafe')
                     expect(page.locator('#results')).to_be_hidden()
-                    page.locator('#guess').fill('1')
+                    page.locator('input[name="guess"][value="1"]').check()
                     page.get_by_role('button', name='Check prediction').click()
                     expect(page.locator('#feedback')).to_contain_text('matches: 1')
                     expect(metric(page, 'Computed sum')).to_have_text('Undefined')
@@ -42,6 +48,7 @@ def check_remaining(browser, base_url, root, errors):
                     expect(page.locator('.hazard-note')).to_be_visible()
                 elif slug == 'matmul':
                     page.locator('#tile').select_option('4')
+                    page.locator('details.more-settings summary').click()
                     page.locator('#registers').select_option('64')
                     page.locator('#sharedBudget').select_option('128')
                     page.locator('#guess').fill('0')
@@ -54,14 +61,14 @@ def check_remaining(browser, base_url, root, errors):
                 elif slug == 'tensor-cores':
                     expect(page.locator('.format-row')).to_have_count(3)
                     page.locator('#format').select_option('fp32')
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     expect(metric(page, 'Absolute difference')).to_have_text('0')
                     page.locator('#pattern').select_option('small')
                     page.locator('#format').select_option('fp16')
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     expect(metric(page, 'Selected result C[0,0]')).to_have_text('0')
                     page.locator('#format').select_option('bf16')
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     assert float(metric(page, 'Selected result C[0,0]').inner_text().replace(',', '')) > 0
                 elif slug == 'attention':
                     page.locator('#mode').select_option('materialised')
@@ -72,19 +79,20 @@ def check_remaining(browser, base_url, root, errors):
                     expect(page.locator('.attention-comparison .matrix-footprint')).to_have_count(2)
                     page.locator('#mode').select_option('online')
                     page.locator('#scale').select_option('1000')
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     assert float(metric(page, 'Max reference difference').inner_text().replace(',', '')) < 1e-12
                 else:
                     page.locator('#phase').select_option('prefill')
                     page.locator('#batch').select_option('16')
+                    page.locator('details.more-settings summary').click()
                     page.locator('#sequence').select_option('2048')
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     expect(metric(page, 'Dominant bound')).to_have_text('compute')
                     expect(page.locator('.sequence-lane')).to_have_count(4)
                     expect(page.locator('[data-visual="inference"]')).to_contain_text('2,048 cached tokens per sequence')
                     page.locator('#measuredMs').fill('0.01')
                     page.locator('#measuredMs').press('Tab')
-                    page.locator('#inspect').click()
+                    page.locator('#show-result').click()
                     expect(page.locator('#explanation')).to_contain_text('below the model bound')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{slug}: horizontal overflow'
                 page.screenshot(path=str(root / f'test-results/{slug}-{width}-{theme}.png'), full_page=True)
@@ -97,6 +105,7 @@ def check_remaining(browser, base_url, root, errors):
     for slug, _ in SLUGS:
         page.goto(base_url + 'lessons/' + slug + '.html')
         expect(page.locator('noscript .notice')).to_be_visible()
+        expect(page.locator('.worked-example')).to_be_visible()
         expect(page.locator('.challenge li')).to_have_count(4)
         expect(page.locator('.lesson-nav a[aria-current="page"]')).to_have_count(1)
     context.close()

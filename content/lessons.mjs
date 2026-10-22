@@ -1,9 +1,10 @@
 // Copyright © 2026 Christopher Snow.
 import { remainingLessons } from './remaining-lessons.mjs';
+import { renderWorkedExample } from '../src/worked-examples.mjs';
 // Original lesson text. Models, not this content, supply all prediction answers.
 export const lessons = [
   {
-    slug: 'scheduling', number: '02', title: 'Keeping the GPU busy',
+    slug: 'scheduling', number: '02', title: 'Keeping the GPU busy', workedExample: 'scheduling',
     subtitle: 'A waiting warp need not mean an idle GPU.',
     prerequisite: 'Lab 01: threads, warps, and memory loads. You can read a short array-indexing expression.',
     intro: `<p>Scaling a tensor means reading values, multiplying them, and writing the results. Arithmetic cannot use a value before its load returns. While one warp waits, the GPU can issue an instruction from another warp whose inputs are ready.</p>
@@ -38,7 +39,7 @@ scale<<<(n + 127) / 128, 128>>>(x, y, n);`,
     sourceLabel: 'CUDA Programming Guide: hardware multithreading',
   },
   {
-    slug: 'divergence', number: '03', title: 'Taking different paths',
+    slug: 'divergence', number: '03', title: 'Taking different paths', workedExample: 'divergence',
     subtitle: 'One condition can produce two active-lane masks.',
     prerequisite: 'Labs 01–02: a warp contains lanes, and instructions can issue with only some lanes active.',
     intro: `<p>Suppose a preprocessing step treats positive and negative tensor values differently. Threads in the same warp may disagree on the condition. When they follow different control-flow paths, the warp has <strong>branch divergence</strong>.</p>
@@ -78,7 +79,7 @@ if (i < n) {
     sourceLabel: 'CUDA Best Practices Guide: branching and divergence',
   },
   {
-    slug: 'shared-memory', number: '04', title: 'Sharing work within a block',
+    slug: 'shared-memory', number: '04', title: 'Sharing work within a block', workedExample: 'shared-memory',
     subtitle: 'A small change in layout can change bank conflicts.',
     prerequisite: 'Labs 01–03: byte addresses, warps, blocks, and active lanes. This lab introduces shared memory.',
     intro: `<p>A tiled tensor operation can load values once and reuse them across threads in a block. CUDA's <strong>shared memory</strong> is storage accessible to threads in that block. The programmer chooses what to place there and when threads may read it.</p>
@@ -117,14 +118,16 @@ output[lane] = tile[lane][0];`,
 lessons.push(...remainingLessons);
 
 const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
 export function renderLesson(lesson, index) {
+  const workedExample = lesson.workedExample ? renderWorkedExample(lesson.workedExample) : '';
   const previous = index ? `${lessons[index - 1].slug}.html` : 'memory.html';
   const next = index + 1 < lessons.length ? `${lessons[index + 1].slug}.html` : '../index.html#curriculum';
   return `<!doctype html>
 <!-- Copyright © 2026 Christopher Snow. -->
 <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="${lesson.subtitle}"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,">
-<title>${lesson.title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css"><link rel="stylesheet" href="../src/mechanism-visuals.css">
+<title>${lesson.title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css"><link rel="stylesheet" href="../src/mechanism-visuals.css"><link rel="stylesheet" href="../src/worked-examples.css">
 <script type="module" src="../src/${lesson.engine === 'ai' ? 'ai-lesson' : 'lesson'}.mjs"></script></head>
 <body data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
 <header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
@@ -133,11 +136,13 @@ export function renderLesson(lesson, index) {
 <div class="sidebar-bottom"><span class="status-label">INTERACTIVE DRAFT</span><p>Computed models.<br>No GPU required.</p></div></aside>
 <main id="main"><section class="intro"><p class="eyebrow">LAB ${lesson.number} / GPU ARCHITECTURE</p><h1>${lesson.title}</h1><p class="lead">${lesson.subtitle}</p><p class="prerequisite"><strong>Before you start:</strong> ${lesson.prerequisite}</p></section>
 <section class="prose"><h2>The mechanism</h2>${lesson.intro}</section>
-<section class="section-space"><h2>The experiment</h2><div class="prose">${lesson.setup}</div>
+${workedExample ? `<section class="section-space"><h2>Worked example</h2>${workedExample}</section>` : ''}
+<section class="section-space"><h2>Experiment: try changing it</h2><div class="prose">${lesson.setup}</div>
 <noscript><p class="notice">Enable JavaScript to use the simulator. The lesson and exercises remain readable.</p></noscript>
-<div class="lab-panel"><div class="panel-top"><span class="eyebrow">PREDICT → INSPECT → STEP</span><span class="model-badge">Teaching model</span></div>
+<div class="lab-panel"><div class="panel-top"><span class="eyebrow">PREDICT → SHOW → STEP</span><span class="model-badge">Teaching model</span></div>
 <div class="controls" id="controls">${lesson.controls}</div>
-<form id="prediction" class="prediction"><label for="guess"><strong>Predict first.</strong> ${lesson.prediction}</label><div><input id="guess" type="number" min="0" max="${lesson.maxGuess}" required step="1" aria-label="Your prediction"><button class="primary" type="submit">Check prediction</button><button id="inspect" type="button">Inspect without guessing</button></div></form>
+${lesson.advancedControls ? `<details class="more-settings"><summary>More settings</summary><div class="controls">${lesson.advancedControls}</div></details>` : ''}
+${lesson.namedChoices ? `<form id="prediction" class="prediction"><fieldset class="named-choices"><legend><strong>Make a prediction.</strong> ${lesson.prediction}</legend>${lesson.namedChoices.map((c,i)=>`<label class="named-choice"><input type="radio" name="guess" value="${c.value}"${i===0?' required':''}><span>${c.label}</span></label>`).join('')}</fieldset><div><button class="primary" type="submit">Check prediction</button><button id="show-result" type="button">Show result without guessing</button></div></form>` : `<form id="prediction" class="prediction"><label for="guess"><strong>Make a prediction.</strong> ${lesson.prediction}</label><div><input id="guess" type="number" min="0" max="${lesson.maxGuess}" required step="1" aria-label="Your prediction"><button class="primary" type="submit">Check prediction</button><button id="show-result" type="button">Show result without guessing</button></div></form>`}
 <p id="feedback" class="feedback" role="status">Choose a configuration, then predict or inspect.</p>
 <div id="results" hidden><div id="metrics" class="metrics"></div>
 <div class="figure-label"><h3>${lesson.figureTitle}</h3></div><p class="figure-note">${lesson.figureHint}</p>
