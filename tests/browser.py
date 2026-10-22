@@ -69,10 +69,7 @@ try:
                 expect(page.locator("#lab .concepts-warp")).to_contain_text("not a separate hardware group")
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "New concepts overflows"
                 # Worked examples must be visible before any interaction.
-                expect(page.locator("#lab .concepts")).to_be_visible()
-        expect(page.locator("#lab .concepts dt")).to_have_count(4)
-        expect(page.locator("#lab .concepts-lane")).to_have_count(32)
-        expect(page.locator(".stride-example")).to_have_count(2)
+                expect(page.locator(".stride-example")).to_have_count(2)
                 expect(page.locator('.stride-example[data-direction="column"]')).to_be_visible()
                 expect(page.locator('.stride-example[data-direction="row"]')).to_be_visible()
                 expect(page.locator('.stride-example[data-direction="column"] .stride-summary')).to_contain_text("+4 bytes")
@@ -193,6 +190,9 @@ try:
         expect(page.locator("h1")).to_have_text("Reading a tensor")
         expect(page.locator(".storage-primer")).to_be_visible()
         expect(page.locator(".storage-primer-memory .storage-primer-value")).to_have_count(8)
+        expect(page.locator("#lab .concepts")).to_be_visible()
+        expect(page.locator("#lab .concepts dt")).to_have_count(4)
+        expect(page.locator("#lab .concepts-lane")).to_have_count(32)
         expect(page.locator(".stride-example")).to_have_count(2)
         expect(page.locator(".view-copy-comparison")).to_be_visible()
         expect(page.locator(".sector-comparison")).to_be_visible()
