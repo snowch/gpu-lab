@@ -63,9 +63,7 @@ try:
                 expect(page.locator(".storage-primer-memory")).to_contain_text("28 B")
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Storage primer overflows"
                 # Worked examples must be visible before any interaction.
-                expect(page.locator(".storage-primer")).to_be_visible()
-        expect(page.locator(".storage-primer-memory .storage-primer-value")).to_have_count(8)
-        expect(page.locator(".stride-example")).to_have_count(2)
+                expect(page.locator(".stride-example")).to_have_count(2)
                 expect(page.locator('.stride-example[data-direction="column"]')).to_be_visible()
                 expect(page.locator('.stride-example[data-direction="row"]')).to_be_visible()
                 expect(page.locator('.stride-example[data-direction="column"] .stride-summary')).to_contain_text("+4 bytes")
@@ -184,6 +182,8 @@ try:
         expect(page.locator("noscript .notice")).to_be_visible()
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")
         expect(page.locator("h1")).to_have_text("Reading a tensor")
+        expect(page.locator(".storage-primer")).to_be_visible()
+        expect(page.locator(".storage-primer-memory .storage-primer-value")).to_have_count(8)
         expect(page.locator(".stride-example")).to_have_count(2)
         expect(page.locator(".view-copy-comparison")).to_be_visible()
         expect(page.locator(".sector-comparison")).to_be_visible()
