@@ -31,13 +31,15 @@ try {
   }).trim().split('\n');
   const date = new Date(committedAt).toISOString().slice(0, 10);
   if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('Invalid commit hash');
-  versionMarkup = `<span class="build-info">Commit <a href="https://github.com/snowch/gpu-lab/commit/${sha}" aria-label="View commit ${sha.slice(0, 7)}">${sha.slice(0, 7)}</a> · <time datetime="${date}">${date}</time></span>`;
+  versionMarkup = `<span class="build-info" data-commit="${sha}">Commit <a href="https://github.com/snowch/gpu-lab/commit/${sha}" aria-label="View commit ${sha.slice(0, 7)}">${sha.slice(0, 7)}</a> · <time datetime="${date}">${date}</time><span class="version-status" role="status">Latest version unchecked</span></span>`;
 } catch {
   // Source archives may have no Git metadata; keep them buildable without inventing a version.
 }
 for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter(name => name.endsWith('.html')).map(name => `dist/lessons/${name}`)]) {
   const html = await readFile(path, 'utf8');
-  await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
+  const base = path === 'dist/index.html' ? './' : '../';
+  await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`)
+    .replace('</head>', `<script type="module" src="${base}src/version.mjs"></script></head>`));
 }
 await buildOffline('dist');
 console.log('Built static course in dist/ with complete offline caching (all asset paths are relative).');

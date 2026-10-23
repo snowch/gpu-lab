@@ -1,3 +1,4 @@
+from version_check import mock_version, check_version
 # Copyright © 2026 Christopher Snow.
 from playwright.sync_api import expect
 
@@ -5,6 +6,7 @@ def check_lessons(browser, base_url, root, errors):
     for width in [1440, 360]:
         for theme in ['light', 'dark']:
             context = browser.new_context(viewport={'width': width, 'height': 1000}, color_scheme=theme)
+            mock_version(context)
             page = context.new_page()
             page.on('pageerror', lambda error: errors.append(str(error)))
             page.on('console', lambda message: errors.append(message.text) if message.type == 'error' else None)
@@ -63,6 +65,7 @@ def check_lessons(browser, base_url, root, errors):
             context.close()
             print(f'PASS: three new lessons, {width}px, {theme}; predictions, trace, masks, banks, navigation')
     context = browser.new_context(java_script_enabled=False)
+    mock_version(context)
     page = context.new_page()
     for slug in ['scheduling', 'divergence', 'shared-memory']:
         page.goto(base_url + 'lessons/' + slug + '.html')
