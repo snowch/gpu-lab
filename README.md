@@ -52,9 +52,13 @@ including lessons you have not opened. You can then reopen the same course URL w
 connection. External documentation and GitHub links still need the internet; running the
 downloaded examples requires their usual local tools.
 
-Updates download when you return online. When **Update saved** appears, close all GPU Lab
-tabs and reopen the course to use the new version. Open experiments keep their current
-version. If an update cannot download completely, the previous saved version keeps working.
+Updates download when you return online. When **An update is ready** appears, choose
+**Update and reload** to activate the downloaded version and reload all open GPU Lab tabs
+and app windows. This resets their experiments. The saved update can also be applied offline.
+Choose **Later** to keep working; **Update ready…** lets you return to the update controls.
+Otherwise, the update activates naturally after all GPU Lab tabs and app windows close.
+Open experiments keep their current version until you choose to update or close them.
+If an update cannot download completely, the previous saved version keeps working.
 Clearing site data or browser storage eviction removes the offline copy; revisit online to
 save it again. Service workers require HTTPS (or localhost) and browser storage support.
 

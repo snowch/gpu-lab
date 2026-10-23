@@ -19,7 +19,15 @@ export async function buildOffline(directory) {
     const base = '../'.repeat(path.split('/').length - 1) || './';
     const html = await readFile(`${directory}/${path}`, 'utf8');
     await writeFile(`${directory}/${path}`, installMarkup(html, base)
-      .replace('<footer>', '<p id="offline-status" class="offline-status" role="status" hidden></p><footer>')
+      .replace('<footer>', `<p id="offline-status" class="offline-status" role="status" hidden></p>
+<section id="offline-update" class="offline-update" aria-label="Course update" hidden>
+  <div id="update-prompt">
+    <p><strong>An update is ready.</strong> Updating will reload all open GPU Lab tabs and app windows and reset their experiments.</p>
+    <div class="update-actions"><button id="apply-update" class="primary" type="button">Update and reload</button><button id="defer-update" type="button">Later</button></div>
+  </div>
+  <button id="show-update" type="button" hidden>Update ready…</button>
+  <p id="update-error" role="status" hidden></p>
+</section><footer>`)
       .replace('</head>', `<script type="module" src="${base}src/offline.mjs"></script></head>`));
   }
   const template = await readFile(new URL('./service-worker.js', import.meta.url), 'utf8');
