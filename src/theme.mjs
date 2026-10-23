@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import './course-nav.mjs';
 const control = document.getElementById('theme');
 function apply(theme) {
   document.documentElement.dataset.theme = theme;
