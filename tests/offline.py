@@ -127,6 +127,7 @@ try:
             # A direct visit to the last lab must save the introduction and every other lab.
             page.goto(url + 'lessons/inference.html')
             ready(page)
+            expect(page.locator('#offline-update')).to_be_hidden()
             check_install(page, context, url)
             keys = page.evaluate('caches.keys()')
             assert len(keys) == 1 and keys[0].endswith('-one'), keys
@@ -194,6 +195,7 @@ try:
             update(page, 'redundant')
             assert page.evaluate('caches.keys()') == [old_cache, 'another-app:keep']
             expect(page.locator('#offline-status')).not_to_contain_text('Update saved')
+            expect(page.locator('#offline-update')).to_be_hidden()
             context.set_offline(True)
             page.reload()
             expect(page.locator('html')).to_have_attribute('data-test-release', 'one')
@@ -227,9 +229,52 @@ try:
             expect(observer.locator('html')).to_have_attribute('data-test-release', 'two')
             ready(observer)
             expect(observer.locator('#offline-status')).not_to_contain_text('Update saved')
+
+            # A learner can defer an update, reopen its controls, then explicitly
+            # reload every course window together without closing the browser.
+            context.set_offline(False)
+            second = context.new_page()
+            second.goto(url + 'lessons/memory.html?exercise=1#simulator')
+            ready(second)
+            second.locator('#show-result').click()
+            expect(second.locator('#results')).to_be_visible()
+            second.evaluate('window.beforeUpdate = true')
+            unrelated = context.new_page()
+            unrelated.goto(url + 'unrelated.html')
+            unrelated.evaluate('window.keepThisPage = true')
+            CourseHandler.revision = 'three'
+            update(observer, 'installed')
+            expect(observer.locator('#update-prompt')).to_be_visible()
+            expect(observer.locator('#update-prompt')).to_contain_text('reset their experiments')
+            expect(second.locator('#update-prompt')).to_be_visible()
+            assert observer.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            observer.locator('#defer-update').click()
+            expect(observer.locator('#update-prompt')).to_be_hidden()
+            expect(observer.locator('#show-update')).to_be_visible()
+            expect(observer.locator('html')).to_have_attribute('data-test-release', 'two')
+            expect(second.locator('#results')).to_be_visible()
+            observer.locator('#show-update').click()
+            expect(observer.locator('#apply-update')).to_be_focused()
+            # The entire update is saved, so the phone can apply it while offline.
+            if prefix == '/gpu-lab/':
+                context.set_offline(True)
+            observer.locator('#apply-update').click()
+            expect(observer.locator('html')).to_have_attribute('data-test-release', 'three')
+            second.wait_for_function('window.beforeUpdate === undefined')
+            ready(observer)
+            ready(second)
+            expect(second).to_have_url(url + 'lessons/memory.html?exercise=1#simulator')
+            expect(second.locator('#results')).to_be_hidden()
+            expect(observer.locator('#offline-update')).to_be_hidden()
+            expect(second.locator('#offline-update')).to_be_hidden()
+            assert unrelated.evaluate('window.keepThisPage') is True
+            keys = observer.evaluate('caches.keys()')
+            assert 'another-app:keep' in keys
+            assert len([key for key in keys if key.startswith('gpu-lab:')]) == 1
+            assert any(key.endswith('-three') for key in keys)
             assert not errors, errors
             context.close()
-            print(f'PASS: {prefix}; failed update recovery, waiting across two tabs, activation and scoped cache cleanup')
+            print(f'PASS: {prefix}; failed update recovery, natural activation, Later, manual multi-tab reload, scoped cache cleanup')
 
         # Failed first installation is reported without preventing normal online use.
         CourseHandler.revision = 'broken'
