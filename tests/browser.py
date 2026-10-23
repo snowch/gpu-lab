@@ -1,3 +1,4 @@
+from version_check import mock_version, check_version
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
 import os
@@ -39,6 +40,7 @@ try:
         for width in [1440, 390]:
             for theme in ["light", "dark"]:
                 context = browser.new_context(viewport={"width": width, "height": 1000}, color_scheme=theme)
+                mock_version(context)
                 page = context.new_page()
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.on("console", lambda message: errors.append(message.text) if message.type == "error" else None)
@@ -184,6 +186,7 @@ try:
 
         # Target the narrower phone width without changing the full browser regression matrix.
         narrow = browser.new_context(viewport={"width": 360, "height": 800})
+        mock_version(narrow)
         narrow_page = narrow.new_page()
         narrow_page.goto(URL + "lessons/memory.html")
         expect(narrow_page.locator(".storage-primer")).to_be_visible()
@@ -191,6 +194,7 @@ try:
         narrow.close()
 
         context = browser.new_context(java_script_enabled=False)
+        mock_version(context)
         page = context.new_page()
         page.goto(URL)
         expect(page.locator(".roadmap h3")).to_have_count(8)
@@ -215,6 +219,7 @@ try:
         context.close()
         check_lessons(browser, URL, ROOT, errors)
         check_remaining(browser, URL, ROOT, errors)
+        check_version(browser, URL)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

@@ -82,6 +82,13 @@ CI runs the model/build and both browser suites before deploying `dist/` from `m
 Pull requests run checks without deployment. All application assets use relative paths.
 
 The build generates `dist/sw.js` with a content fingerprint and complete file list. The
+footer on every page includes the checked-out Git commit (linked to GitHub) and its
+commit date in UTC, so the version remains visible offline and without JavaScript.
+When online, a live GitHub check adds **✓ Latest** only when the full commit matches
+the current `main` branch. A mismatch is labelled “Different from latest on main”.
+Offline browsing, failed checks and JavaScript-disabled browsing leave the latest
+version unverified. The check runs on page load, reconnect and return to a visible tab.
+Source archives without Git metadata display “Version information unavailable”. The
 service worker saves one complete version and serves it from a cache scoped to the site's
 base URL. The offline browser suite checks root and `/gpu-lab/` hosting, all labs without
 network access, downloads, failed installs, and updates across multiple tabs. During local
