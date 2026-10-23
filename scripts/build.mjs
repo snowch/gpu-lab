@@ -5,11 +5,15 @@ import { renderTensorStep,renderTensorSlice,renderStrideExample,viewCopyComparis
 import { lessons, renderLesson } from '../content/lessons.mjs';
 import { renderConcepts, warpConcepts } from '../src/concepts.mjs';
 import { buildOffline } from './offline.mjs';
+import { renderSmOverview, renderWorkMap } from '../src/overview-visuals.mjs';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 for (const path of ['index.html', 'src', 'examples', 'assets', 'manifest.webmanifest']) {
   await cp(path, `dist/${path}`, { recursive: true });
 }
+await writeFile('dist/index.html', (await readFile('index.html', 'utf8'))
+  .replace('<!-- SM_OVERVIEW -->', renderSmOverview())
+  .replace('<!-- WORK_MAP -->', renderWorkMap()));
 await mkdir('dist/lessons', { recursive: true });
 await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html','utf8'))
   .replace('<!-- TENSOR_LAYOUT_FIGURE -->',renderTensorStep())

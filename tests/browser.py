@@ -1,5 +1,6 @@
 from version_check import mock_version, check_version
 from navigation import check_navigation
+from overview import check_overview
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
 import os
@@ -222,6 +223,7 @@ try:
         check_remaining(browser, URL, ROOT, errors)
         check_version(browser, URL)
         check_navigation(browser, URL, ROOT, errors)
+        check_overview(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")
