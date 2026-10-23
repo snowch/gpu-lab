@@ -28,5 +28,7 @@
 .install-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
 @media(max-width:760px) { .top-actions>a { display:none; } .top-actions { gap:8px; } }
 .sidebar { overflow-y:auto; }
+footer { flex-wrap:wrap; }
+.build-info { color:var(--muted); }
 @media(max-width:760px) { .course-nav a:nth-child(3),.course-nav a:nth-child(4) { display:flex; } }
 @media(max-width:760px) { .sidebar { overflow:visible; } }
