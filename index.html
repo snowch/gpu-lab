@@ -43,6 +43,7 @@
         <p class="eyebrow">START HERE · ABOUT FIVE MINUTES</p>
         <h2 id="meet-gpu-title">Meet the GPU</h2>
         <p>A PyTorch operation such as <code>y = x + 1</code> looks simple. When <code>x</code> is a CUDA tensor, PyTorch arranges for GPU work to read its values, add one, and write the result. Here is the machine that executes that work.</p>
+        <p>A <strong>thread</strong> is one instance of a GPU program. Many threads can execute the same program on different tensor elements.</p>
         <p>Open each layer to look inside. This map follows the NVIDIA CUDA architecture used in the labs.</p>
         <details class="architecture-layer" open>
           <summary>1. The system: where tensors live</summary>
@@ -62,14 +63,14 @@
             <div class="architecture-box"><strong>GPU</strong>
               <div class="architecture-sms"><span>SM</span><span>SM</span><span>SM</span><span>…</span></div>
               <p>Many streaming multiprocessors (SMs)</p>
-              <div class="architecture-connection"><span aria-hidden="true">↕</span><span>Read and write data through a cache hierarchy</span></div>
+              <div class="architecture-connection"><span aria-hidden="true">↕</span><span>Read and write data through caches, which keep some data close to the execution units for reuse</span></div>
               <div class="architecture-memory"><strong>GPU memory / VRAM</strong><span>Accessible by all SMs</span></div>
             </div>
             <div class="architecture-box architecture-sm"><strong>A closer look at one SM</strong>
               <dl>
                 <div><dt>Execution units</dt><dd>Perform arithmetic and other instructions.</dd></div>
                 <div><dt>Registers</dt><dd>Hold working values for individual threads.</dd></div>
-                <div><dt>Shared memory</dt><dd>A workspace for threads in the same block to share data.</dd></div>
+                <div><dt>Shared memory</dt><dd>A workspace for a <strong>thread block</strong>: a group of threads that runs on one SM and can cooperate by sharing data.</dd></div>
                 <div><dt>Tensor cores</dt><dd>Specialised units for supported matrix operations on GPUs that have them.</dd></div>
               </dl>
             </div>
@@ -83,7 +84,7 @@
             <ol class="architecture-work">
               <li><strong>Kernel launch → a grid of thread blocks</strong><span>A kernel is a GPU function. A launch specifies blocks of threads to execute it.</span></li>
               <li><strong>Each block → one SM</strong><span>A block stays on one SM for its lifetime. Several blocks can reside on the same SM when resources allow.</span></li>
-              <li><strong>Threads within a block → warps</strong><span>NVIDIA GPUs group threads into warps of 32. An SM schedules instructions for ready warps; an instruction can have only some lanes active.</span></li>
+              <li><strong>Threads within a block → warps</strong><span>NVIDIA GPUs group threads into warps of 32. Each thread has a position in its warp, called a lane. An SM schedules instructions for ready warps; an instruction can have only some lanes active.</span></li>
             </ol>
             <figcaption>A thread is a unit of program execution, not a dedicated physical core. A tensor's rows do not automatically correspond to blocks or warps; the kernel determines the mapping.</figcaption>
           </figure>
