@@ -84,7 +84,7 @@
             <ol class="architecture-work">
               <li><strong>Kernel launch → a grid of thread blocks</strong><span>A kernel is a GPU function. A launch specifies blocks of threads to execute it.</span></li>
               <li><strong>Each block → one SM</strong><span>A block stays on one SM for its lifetime. Several blocks can reside on the same SM when resources allow.</span></li>
-              <li><strong>Threads within a block → warps</strong><span>NVIDIA GPUs group threads into warps of 32. Each thread has a position in its warp, called a lane. An SM schedules instructions for ready warps; an instruction can have only some lanes active.</span></li>
+              <li><strong>Threads within a block → warps</strong><span>Within each block, NVIDIA GPUs organise threads into groups of 32 called warps. Each thread’s position within its warp is called a lane. The SM chooses a warp whose next instruction can run. Some instructions involve only some of that warp’s threads.</span></li>
             </ol>
             <figcaption>A thread is a unit of program execution, not a dedicated physical core. A tensor's rows do not automatically correspond to blocks or warps; the kernel determines the mapping.</figcaption>
           </figure>
