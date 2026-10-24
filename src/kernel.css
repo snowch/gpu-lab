@@ -35,3 +35,14 @@ button:disabled { cursor:default; opacity:.55; }
  .kernel-checks th,.kernel-checks td { padding:10px 4px; font-size:12px; }
  .kernel-checks button { font-size:11px; }
 }
+#invocation-map fieldset { margin:12px 0; padding:12px; border:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px; min-width:0; }
+#invocation-map button { font-size:12px; padding:8px; min-height:44px; }
+#invocation-map [aria-pressed="true"] { outline:2px solid var(--accent); background:var(--accent-soft); }
+#invocation-map [data-mapping="duplicate"], #invocation-map [data-mapping="invalid"] { border-style:dashed; font-weight:700; }
+#challenge-active label { display:block; margin-top:16px; }
+#challenge-active select, #challenge-choice { width:100%; white-space:normal; margin:12px 0; }
+#challenge-prediction { width:100px; margin:12px 8px 12px 0; }
+.kernel-task + .kernel-task { margin-top:20px; }
+#invocation-map fieldset { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); }
+#invocation-map button { min-width:0; white-space:normal; overflow-wrap:anywhere; padding:8px 3px; }
+@media(max-width:1100px) { #invocation-map fieldset { grid-template-columns:repeat(4,minmax(0,1fr)); } }

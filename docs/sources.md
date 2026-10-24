@@ -76,3 +76,8 @@ GPU validation or performance measurement is claimed by this revision.
 WebGPU in Chromium 145 (Playwright 1.58) with its SwiftShader fallback adapter.
 The 2026-10-24 local run passed 72 model/WebGPU combinations and the end-to-end repair
 flow. This is software-adapter validation, not a physical GPU benchmark or CUDA test.
+
+The extended challenge implementation checks 432 model/WebGPU combinations across
+workgroup sizes 8, 16, 32 and 64, scalar and vector operations, guarded/unguarded
+accesses and six input lengths. Validation uses the same Chromium SwiftShader
+software adapter; physical GPU validation remains outstanding.

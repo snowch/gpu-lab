@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import { simulateKernel, wgslSource, checkOutput, WORKGROUP_SIZE } from './kernel-model.mjs';
+import { simulateKernel, wgslSource, checkOutput, workgroupSize, secondInput } from './kernel-model.mjs';
 
 // No fallback computes WebGPU output on the CPU. Unsupported adapters are reported.
 export async function runWebGPU(program, inputs) {
@@ -25,7 +25,7 @@ export async function runWebGPU(program, inputs) {
         results.push({ blocked: true, passed: false, message: `Not dispatched: ${model.hazards[0]}` });
         continue;
       }
-      if (!input.length) { results.push({ output: [], ...checkOutput(input, []) }); continue; }
+      if (!input.length) { results.push({ output: [], ...checkOutput(input, [], program) }); continue; }
       const size = input.length * 4;
       const buffers = [];
       const create = (length, usage) => { const buffer = device.createBuffer({ size: length, usage }); buffers.push(buffer); return buffer; };
@@ -40,17 +40,22 @@ export async function runWebGPU(program, inputs) {
         const parameters = new ArrayBuffer(16), view = new DataView(parameters);
         view.setUint32(0, input.length, true); view.setFloat32(4, 2, true);
         device.queue.writeBuffer(params, 0, parameters);
-        const bind = device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries: [x, y, params].map((buffer, binding) => ({ binding, resource: { buffer } })) });
+        const boundBuffers = [x, y, params];
+        if (program.operation === 'vector-add') {
+          const b = create(size, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+          device.queue.writeBuffer(b, 0, secondInput(input.length)); boundBuffers.push(b);
+        }
+        const bind = device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries: boundBuffers.flatMap((buffer, binding) => binding === 2 && !program.guard && program.operation === 'vector-add' ? [] : [{ binding, resource: { buffer } }]) });
         const encoder = device.createCommandEncoder();
         const pass = encoder.beginComputePass();
         pass.setPipeline(pipeline); pass.setBindGroup(0, bind);
-        pass.dispatchWorkgroups(Math.ceil(input.length / WORKGROUP_SIZE)); pass.end();
+        pass.dispatchWorkgroups(Math.ceil(input.length / workgroupSize(program))); pass.end();
         encoder.copyBufferToBuffer(y, 0, readback, 0, size);
         device.queue.submit([encoder.finish()]);
         await readback.mapAsync(GPUMapMode.READ);
         const output = Array.from(new Float32Array(readback.getMappedRange()));
         readback.unmap();
-        results.push({ output, ...checkOutput(input, output) });
+        results.push({ output, ...checkOutput(input, output, program) });
       } finally { buffers.forEach(buffer => buffer.destroy()); }
     }
     const validation = await device.popErrorScope();
