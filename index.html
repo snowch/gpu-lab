@@ -24,8 +24,8 @@
       <p class="sidebar-title">Under the hood.</p>
       <nav class="course-nav" aria-label="Course navigation">
         <a class="current" aria-current="page" href="#overview">Course overview</a>
-        <a href="#meet-gpu">Start here: Meet the GPU</a>
-        <a href="./lessons/kernel.html">Prototype: Repair a kernel</a>
+        <a href="#meet-gpu">Meet the GPU</a>
+        <a href="./lessons/hello.html">Start here: Hello, GPU</a><a href="./lessons/kernel.html">Repair a kernel</a>
         <a href="./lessons/memory.html">01 Reading a tensor</a>
         <a href="./lessons/scheduling.html">02 Keeping the GPU busy</a><a href="./lessons/divergence.html">03 Taking different paths</a><a href="./lessons/shared-memory.html">04 Sharing work</a><a href="./lessons/matmul.html">05 Reusing data</a><a href="./lessons/tensor-cores.html">06 Using tensor cores</a><a href="./lessons/attention.html">07 Attention fusion</a><a href="./lessons/inference.html">08 Inference performance</a><a href="#curriculum">Course roadmap</a>
       </nav>
@@ -36,13 +36,14 @@
         <p class="eyebrow">GPU ARCHITECTURE FOR AI PRACTITIONERS</p>
         <h1>Follow the data.<br>Understand the GPU.</h1>
         <p class="lead">You know what a tensor operation does. Find out how threads execute it, where its data moves, and what makes it wait.</p>
-        <p><a class="start-course" href="#meet-gpu">Start here: Meet the GPU →</a></p>
+        <p><a class="start-course" href="./lessons/hello.html">Start here: Hello, GPU →</a></p>
+        <p><a href="#meet-gpu">Meet the GPU →</a></p>
         <p><a href="./lessons/memory.html">Already familiar? Go to Lab 01 →</a></p>
-        <p><a href="./lessons/kernel.html">Try the hands-on prototype: repair a kernel →</a></p>
+        <p><a href="./lessons/kernel.html">Continue to kernel repair →</a></p>
         <div class="intro-meta"><span>Predict → inspect → experiment</span><span>Some Python and tensor familiarity</span></div>
       </section>
       <section id="meet-gpu" class="section-space architecture-overview" aria-labelledby="meet-gpu-title">
-        <p class="eyebrow">START HERE · ABOUT FIVE MINUTES</p>
+        <p class="eyebrow">ARCHITECTURE OVERVIEW · ABOUT FIVE MINUTES</p>
         <h2 id="meet-gpu-title">Meet the GPU</h2>
         <p>A PyTorch operation such as <code>y = x + 1</code> looks simple. When <code>x</code> is a CUDA tensor, PyTorch arranges for GPU work to read its values, add one, and write the result. Here is the machine that executes that work.</p>
         <p>A <strong>thread</strong> is one instance of a GPU program. Many threads can execute the same program on different tensor elements.</p>

@@ -147,3 +147,9 @@ and online-attention pseudocode in the lessons are illustrations rather than exe
 Inspired by the model-driven learning approach in [Digital Design](https://github.com/snowch/digital-design)
 and [Assembly Lab](https://github.com/snowch/assembly-lab). This small standalone prototype does
 not yet integrate `snowch/learning-platform`; migration is a separate curriculum/platform decision.
+
+
+Start with **Hello, GPU** (`lessons/hello.html`): run a working kernel, edit a number,
+then discover invocation IDs, input arrays and bounds checks. It uses one Run button
+and labels WebGPU execution or browser-model fallback. **Repair a kernel** follows
+this introduction; the eight architecture labs remain available independently.

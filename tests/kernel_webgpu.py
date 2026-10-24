@@ -7,6 +7,7 @@ import time
 from urllib.request import urlopen
 from playwright.sync_api import sync_playwright, expect
 from version_check import mock_version
+from hello import hello_flow
 
 ROOT = Path(__file__).resolve().parents[1]
 URL = 'http://127.0.0.1:5188/gpu-lab/'
@@ -68,10 +69,12 @@ try:
         page.locator('#run-gpu').click()
         expect(page.locator('#kernel-status')).to_contain_text('WebGPU: 2 of 3', timeout=30000)
         expect(page.locator('#kernel-cases')).to_contain_text('Not dispatched')
+        context.set_offline(False)
+        hello_flow(page, URL, "WebGPU")
         assert not errors, errors
         context.close()
         browser.close()
-        print('PASS: actual WGSL compilation/dispatch/read-back on SwiftShader; 432 model/WebGPU cases and unsafe-dispatch prevention')
+        print('PASS: actual WGSL compilation/dispatch/read-back on SwiftShader; 432 model/WebGPU cases, Hello GPU progression and unsafe-dispatch prevention')
 finally:
     server.terminate()
     server.wait(timeout=5)

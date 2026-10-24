@@ -18,13 +18,20 @@ prediction; run the model; change one variable; explain the difference; connect 
 Every visual value comes from model state. Counts and timing estimates must be visibly
 different. Each lab records what its model leaves out.
 
+## First run: Hello, GPU
+
+The main course entry is now `lessons/hello.html`: four small working programs before
+kernel repair. Learners write a constant, see invocation IDs, scale input values, and
+handle a partial workgroup. Each step presents real WGSL with a highlighted editable
+body, a single Run action and output. There are no prediction forms, grading controls,
+launch settings or backend choices in this introduction. The repair prototype follows.
+
 ## Architecture introduction
 
 Before Lab 01, the course overview offers **Meet the GPU**, a five-minute map with
 three progressively disclosed layers: CPU/GPU memory, SM internals, and kernel/block/warp
 mapping. It introduces terms without requiring learners to memorise them. The map describes
-NVIDIA CUDA relationships rather than a simulated chip or performance measurement. Lab 01
-remains the first hands-on experiment. Native disclosure controls keep the map available
+NVIDIA CUDA relationships rather than a simulated chip or performance measurement. Hello, GPU provides the first hands-on experience; Lab 01 follows the introductory exercises. Native disclosure controls keep the map available
 without JavaScript and in the offline course.
 
 ## Hands-on prototype
