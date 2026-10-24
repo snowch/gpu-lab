@@ -16,10 +16,10 @@ function model(){return simulateIntro(stage,factor(),stage===3?$('hello-guard').
 function code(){
   let value;try{value=factor();}catch{return;}
   $('hello-operation').textContent='y = x * '+value;
-  if($('hello-line')) $('hello-line').textContent=stage===3&&$('hello-guard').checked?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
+  if($('hello-line')) $('hello-line').textContent=stage===2||stage===3&&$('hello-guard').checked?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
   if(stage===4){
     $('hello-full').textContent=kernelSource(value);
-    $('hello-python').textContent='import torch\nx = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], device="cuda")\ny = x * '+value;
+    $('hello-python').textContent='y = x * '+value;
   }
 }
 function inspect(t){

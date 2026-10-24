@@ -128,7 +128,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 assert assets is None, assets
                 page.locator('#hello-factor-1').fill('7'); page.locator('#hello-run-1').click()
                 page.locator('#hello-map-1 button[data-thread="2"]').click()
-                expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28]')
+                expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')
                 second=context.new_page(); second.goto(url+'lessons/memory.html?keep=1#simulator')
                 second.locator('#stride').select_option('8'); second.locator('#show-result').click()
                 second.locator('#lanes button').nth(5).click()
@@ -182,7 +182,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
                 expect(page.locator('#hello-factor-1')).to_have_value('7')
-                expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28]')
+                expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')
                 expect(page.locator('#hello-map-1 button[data-thread="2"]')).to_have_attribute('aria-pressed','true')
                 expect(second).to_have_url(url+'lessons/memory.html?keep=1#simulator')
                 expect(second.locator('#stride')).to_have_value('8');expect(second.locator('#sector-count')).to_have_text('32')

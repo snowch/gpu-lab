@@ -21,11 +21,13 @@ different. Each lab records what its model leaves out.
 ## First run: Hello, GPU
 
 The main course entry is `lessons/hello.html`: five concept-first sections on one continuous page before repair.
-Start from a familiar PyTorch scaling expression and a computed input → thread → output
-picture. Learners change the multiplier and run. Then introduce array indices, block
+Open with a complete three-line PyTorch scaling example, explain the CUDA device choice,
+and show its five inputs and computed results before introducing threads. Reuse those same
+five values in every input → thread → output picture. Learners change the multiplier and run. Then introduce array indices, block
 grouping and bounds checks, each with a selectable visual before its CUDA expression.
 Each section repeats the visual and retains its own controls and results. There are no
-Next/Previous controls or automatic scroll jumps. Only the final section contains a complete kernel, Python orchestration and the CUDA download.
+Next/Previous controls or automatic scroll jumps. Only the final section contains a complete kernel and the CUDA download. It refers back
+to the opening Python operation rather than repeating its setup.
 The first screen has no function declaration, pointers, launch counts or code editor.
 A short browser-simulation label links to limitations in an optional disclosure.
 

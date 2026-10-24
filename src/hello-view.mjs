@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {steps,simulateIntro,lineFor,kernelSource} from './hello-model.mjs';
+import {steps,simulateIntro,lineFor,kernelSource,pythonSource} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   const groups=stage>=2?Array.from({length:state.blocks},(_,i)=>i):[null];
@@ -10,14 +10,24 @@ export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   }).join('')}</div></div>`).join('');
 }
 export function renderIntroSections() {
-  return steps.map((step,stage)=>{
+  const start=simulateIntro(0,2);
+  return `<section class="hello-start" aria-labelledby="hello-start-title">
+    <h2 id="hello-start-title">Start with a PyTorch operation</h2>
+    <pre class="hello-start-code"><code>${escape(pythonSource())}</code></pre>
+    <p><code>import torch</code> loads PyTorch. A tensor holds a collection of numbers; here <code>x</code> holds five inputs. <code>device="cuda"</code> places them on an NVIDIA GPU, and <code>y = x * 2</code> multiplies each number by two to produce <code>y</code>.</p>
+    <dl class="hello-start-values">
+      <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
+      <div><dt>Result <code>y</code></dt><dd><code>[${start.output.join(', ')}]</code></dd></div>
+    </dl>
+    <p class="hello-note">The code above requires PyTorch and an NVIDIA GPU. The examples below simulate its calculation in your browser; they do not run PyTorch or GPU code.</p>
+    <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
+  </section>`+steps.map((step,stage)=>{
     const state=simulateIntro(stage,2);
     const pre=(id,code)=>`<pre id="${id}-${stage}">${escape(code)}</pre>`;
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
       <p class="hello-concept">${step.concept}</p>
-      ${stage===0?'<p>In PyTorch, <code>x</code> holds the inputs and <code>y</code> the results.</p>':''}
       <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
       <p>${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
@@ -30,13 +40,14 @@ export function renderIntroSections() {
       ${stage>0&&stage<4?`<div class="hello-cuda-section">
         <h3>The same idea in CUDA</h3>
         <p>This code runs inside a GPU function. <code>input</code> and <code>output</code> are arrays; <code>i</code> chooses an element. CUDA C++ uses <code>;</code> to end a statement and <code>2.0f</code> to write a floating-point number.</p>
-        ${pre('hello-line',stage===3?'if (i < n) {\n    '+lineFor(2)+'\n}':lineFor(2))}
+        ${stage===2?'<p>A bounds check tests whether an index names an existing element. Here <code>n</code> is 5; <code>i &lt; n</code> lets indices 0–4 access the arrays and skips indices 5–7.</p>':''}
+        ${pre('hello-line',stage>=2?'if (i < n) {\n    '+lineFor(2)+'\n}':lineFor(2))}
         ${stage>=2?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p><pre>int i = blockIdx.x * blockDim.x + threadIdx.x;</pre><p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
         <p>${stage===3?'n is the number of elements (5). The condition i &lt; n asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.':'We will see the complete function below, after exploring bounds checks.'}</p>
       </div>`:''}
       ${stage===4?`<div class="hello-complete">
-        <h3>The Python operation</h3>${pre('hello-python','import torch\nx = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], device="cuda")\ny = x * 2')}
-        <p><code>device="cuda"</code> asks PyTorch to store the tensor on an NVIDIA GPU. PyTorch handles allocation and launches its own implementation of the operation; it does not compile the example below.</p>
+        <h3>The PyTorch operation we started with</h3>${pre('hello-python','y = x * 2')}
+        <p>PyTorch handles allocation and launches its own implementation of the operation; it does not compile the example below.</p>
         <h3>The complete CUDA example</h3>${pre('hello-full',kernelSource(2))}
         <p><code>__global__</code> marks a GPU kernel. <code>void</code> means it returns no value directly: it writes into <code>output</code>. <code>float*</code> passes the location of an array of floating-point numbers; <code>const</code> means this function does not change that input. <code>n</code> is the number of elements.</p>
         <details class="more-settings"><summary>Run the CUDA example on an NVIDIA GPU</summary>
