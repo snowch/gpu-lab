@@ -81,3 +81,9 @@ The extended challenge implementation checks 432 model/WebGPU combinations acros
 workgroup sizes 8, 16, 32 and 64, scalar and vector operations, guarded/unguarded
 accesses and six input lengths. Validation uses the same Chromium SwiftShader
 software adapter; physical GPU validation remains outstanding.
+
+
+Hello, GPU uses the same WebGPU/WGSL specifications. Browser tests cover the four-step
+flow, edits, bounds diagnostics, explicitly labelled CPU-model fallback and offline
+access. The software-WebGPU suite also runs that flow through shader compilation and
+buffer read-back, including an all-skipped guard. This is not physical GPU validation.

@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- Copyright © 2026 Christopher Snow. -->
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Run your first GPU kernel, change its output and gradually learn invocation IDs, arrays and bounds checks.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <title>Hello, GPU · GPU Lab</title>
+  <link rel="stylesheet" href="../src/style.css">
+  <link rel="stylesheet" href="../src/lessons.css">
+  <link rel="stylesheet" href="../src/hello.css">
+  <script type="module" src="../src/hello.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to lesson</a>
+  <header class="topbar">
+    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Course navigation">
+      <p class="eyebrow">HOW GPUS RUN AI</p>
+      <p class="sidebar-title">Under the hood.</p>
+      <nav class="lesson-nav" aria-label="Course lessons">
+        <a href="../index.html">Course overview</a><a href="../index.html#meet-gpu">Meet the GPU</a>
+        <a class="current" aria-current="page" href="hello.html">Start here: Hello, GPU</a><a href="kernel.html">Repair a kernel</a><a href="memory.html">01 Reading a tensor</a>
+        <a href="scheduling.html">02 Keeping the GPU busy</a><a href="divergence.html">03 Taking different paths</a><a href="shared-memory.html">04 Sharing work</a><a href="matmul.html">05 Reusing data</a><a href="tensor-cores.html">06 Using tensor cores</a><a href="attention.html">07 Attention fusion</a><a href="inference.html">08 Inference performance</a><a href="../index.html#curriculum">Course roadmap</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-label">EIGHT LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
+    </aside>
+    <main id="main">
+      <section class="intro">
+        <p class="eyebrow" id="hello-count">Step 1 of 4</p>
+        <h1 id="hello-title" tabindex="-1">Hello, GPU</h1>
+        <p class="lead" id="hello-description">Write one number, then read it back.</p>
+      </section>
+      <p id="hello-instruction">Run this program. Then change 42.0 to another number and run it again.</p>
+      <noscript><p class="notice">Enable JavaScript to edit and run. This kernel writes 42 into the first output element.</p></noscript>
+      <p id="hello-input" hidden></p>
+      <div class="hello-editor">
+        <pre id="hello-before">@compute @workgroup_size(1)
+fn main() {</pre>
+        <label for="hello-code">Edit the highlighted code · WGSL, WebGPU’s shader language</label>
+        <textarea id="hello-code" rows="2" spellcheck="false" autocapitalize="off" autocorrect="off" aria-describedby="hello-instruction">output[0] = 42.0;</textarea>
+        <pre id="hello-after">}</pre>
+      </div>
+      <button id="hello-run" type="button" class="primary">Run</button>
+      <p id="hello-output" role="status">Run to see the output.</p>
+      <p id="hello-backend"></p>
+      <p id="hello-explanation">The kernel writes into a buffer. The browser reads the value back and displays it; the shader does not print to a terminal.</p>
+      <div class="hello-actions">
+        <button id="hello-back" type="button" hidden>← Previous step</button>
+        <button id="hello-next" type="button" hidden>Next step →</button>
+        <a id="hello-repair" href="kernel.html" hidden>Now try repairing a kernel →</a>
+      </div>
+      <details class="more-settings">
+        <summary>About this example</summary>
+        <p>The application allocates the buffers and launches the kernel. The highlighted code is real WGSL. These opening exercises accept the statements shown and the numeric edits described above, not arbitrary shader programs. Restore the example if you get stuck.</p>
+        <button id="hello-reset" type="button">Restore example</button>
+        <p>The complete shader includes the buffer declarations:</p><pre id="hello-full"></pre>
+        <p>Without WebGPU, a small browser model evaluates these supported statements. It does not simulate hardware scheduling or performance. No GPU timing is measured.</p>
+      </details>
+      <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
+    </main>
+  </div>
+</body>
+</html>

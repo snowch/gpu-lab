@@ -2,6 +2,7 @@ from version_check import mock_version, check_version
 from navigation import check_navigation
 from overview import check_overview
 from kernel import check_kernel
+from hello import check_hello
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
 import os
@@ -53,7 +54,7 @@ try:
                 expect(page.locator(".roadmap h3")).to_have_count(8)
                 expect(page.locator("html")).to_have_attribute("data-theme", theme)
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Introduction overflows"
-                page.get_by_role("link", name="Start here: Meet the GPU →").click()
+                page.get_by_role("link", name="Meet the GPU →").click()
                 layers = page.locator(".architecture-layer")
                 expect(layers).to_have_count(3)
                 expect(layers.nth(0)).to_have_attribute("open", "")
@@ -226,6 +227,7 @@ try:
         check_navigation(browser, URL, ROOT, errors)
         check_overview(browser, URL, ROOT, errors)
         check_kernel(browser, URL, ROOT, errors)
+        check_hello(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

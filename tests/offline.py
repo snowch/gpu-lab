@@ -177,6 +177,10 @@ try:
                   return {ok: response.ok, text: await response.text()};
                 }''', url + file)
                 assert result['ok'] and len(result['text']) > 100
+            page.goto(url + 'lessons/hello.html')
+            page.locator('#hello-code').fill('output[0] = 9.0;')
+            page.locator('#hello-run').click()
+            expect(page.locator('#hello-output')).to_have_text('Output: 9')
             page.goto(url + 'lessons/kernel.html')
             page.locator('#reset-kernel').click()
             page.locator('#kernel-index').select_option('global')

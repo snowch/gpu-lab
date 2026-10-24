@@ -241,3 +241,24 @@ The mapping visual derives invocation membership and output targets from model i
 events. It marks skipped/invalid accesses, duplicate targets and missing outputs.
 Selecting an invocation seeks its first source operation; it does not model scheduling.
 Only editor choices persist; challenge answers/completion are session state.
+
+
+## Hello, GPU
+
+The introduction uses a fixed WGSL function scaffold and an editable body. The supported
+exercise statements are constant output, invocation-ID output, scalar multiplication,
+and a bounded multiply with an editable integer guard. The validator accepts only these
+forms, with finite FP32 constants, and prevents a guard from exceeding the buffer length.
+It is not a general shader editor or WGSL interpreter.
+
+One Run action requests a WebGPU adapter. If none exists, a clearly labelled CPU browser
+model evaluates those same supported forms. When an adapter exists, the application
+compiles the WGSL, dispatches the specified workgroups, and reads the output buffer.
+Shader/device errors are reported, not silently replaced with model results. Explicit
+binding layouts retain the buffers even if a compiler optimises away all accesses
+(for example, a guard of zero). NaN marks unwritten output.
+
+The four examples launch 1, 4, 4 and 8 invocations for 1, 4, 4 and 5 output elements.
+The first writes a constant, the second writes IDs, and the last two scale inputs 1..N.
+Workgroup size is not presented as hardware warp size. No timing or scheduling model
+is claimed. Edits persist between steps within the page, but are not saved across reloads.
