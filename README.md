@@ -11,15 +11,15 @@ Course URL: <https://snowch.github.io/gpu-lab/>
 ## Current scope
 
 [Repair a kernel](https://snowch.github.io/gpu-lab/lessons/kernel.html) is a hands-on
-prototype comparing two approaches on the same vector-scaling task. Repair the kernel,
+workshop for understanding and debugging CUDA kernels. Repair the kernel,
 check lengths 8/32/35, replay reads and writes in the browser model, and compile and run
-the generated WGSL with WebGPU when an adapter is available. A structured editor works
-on phones and tablets; the source is visible and downloadable. Model tasks work offline
-without a GPU. WebGPU may use a software adapter, which the page identifies. This is a
-correctness prototype; it reports no measured speedups and does not interpret CUDA.
+the corresponding CUDA C++ program on an NVIDIA GPU after downloading it. The browser
+simulates supported CUDA expressions on the CPU; it neither compiles CUDA nor executes
+GPU code. Generated CUDA programs include their host setup but have not yet been
+compiled or validated on an NVIDIA GPU.
 
 
-Start with [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu), a short visual map of
+Begin with [Hello, GPU](https://snowch.github.io/gpu-lab/lessons/hello.html), then explore [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu), a short visual map of
 CPU/GPU memory, SMs and how blocks and warps execute work. Its three expandable layers
 work offline and without JavaScript.
 
@@ -89,7 +89,6 @@ python -m pip install -r tests/requirements.txt
 python -m playwright install chromium
 python tests/browser.py
 python tests/offline.py
-python tests/kernel_webgpu.py  # real shader execution on Chromium’s software adapter
 ```
 
 CI runs the model/build and both browser suites before deploying `dist/` from `main` through GitHub Pages Actions.
@@ -150,6 +149,6 @@ not yet integrate `snowch/learning-platform`; migration is a separate curriculum
 
 
 Start with **Hello, GPU** (`lessons/hello.html`): run a working kernel, edit a number,
-then discover invocation IDs, input arrays and bounds checks. It uses one Run button
-and labels WebGPU execution or browser-model fallback. **Repair a kernel** follows
+then discover thread IDs, input arrays and bounds checks. It uses one Run button
+and clearly labels browser simulation and offers a CUDA download. **Repair a kernel** follows
 this introduction; the eight architecture labs remain available independently.

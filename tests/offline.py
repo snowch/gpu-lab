@@ -189,10 +189,10 @@ try:
             page.get_by_role('button', name='Inspect 35', exact=True).click()
             page.locator('#trace-end').click()
             expect(page.locator('#kernel-event')).to_contain_text('63 < 35: false')
-            page.get_by_text('Full shader, including data bindings', exact=True).click()
-            with page.expect_download() as shader_download:
-                page.locator('#download-shader').click()
-            assert 'let i = global_id.x;' in Path(shader_download.value.path()).read_text()
+            page.get_by_text('Run this kernel on an NVIDIA GPU', exact=True).click()
+            with page.expect_download() as cuda_download:
+                page.locator('#download-cuda').click()
+            assert 'int i = blockIdx.x * blockDim.x + threadIdx.x;' in Path(cuda_download.value.path()).read_text()
             page.close()
             page = context.new_page()
             response = page.goto(url)

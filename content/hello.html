@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Run your first GPU kernel, change its output and gradually learn invocation IDs, arrays and bounds checks.">
+  <meta name="description" content="Run your first GPU kernel, change its output and gradually learn thread IDs, arrays and bounds checks.">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="data:,">
   <title>Hello, GPU · GPU Lab</title>
@@ -40,27 +40,41 @@
       <noscript><p class="notice">Enable JavaScript to edit and run. This kernel writes 42 into the first output element.</p></noscript>
       <p id="hello-input" hidden></p>
       <div class="hello-editor">
-        <pre id="hello-before">@compute @workgroup_size(1)
-fn main() {</pre>
-        <label for="hello-code">Edit the highlighted code · WGSL, WebGPU’s shader language</label>
+        <pre id="hello-before">__global__ void runKernel(float* output) {</pre>
+        <label for="hello-code">Edit the highlighted code · CUDA C++</label>
         <textarea id="hello-code" rows="2" spellcheck="false" autocapitalize="off" autocorrect="off" aria-describedby="hello-instruction">output[0] = 42.0;</textarea>
         <pre id="hello-after">}</pre>
       </div>
-      <button id="hello-run" type="button" class="primary">Run</button>
+      <button id="hello-run" type="button" class="primary">Run simulation</button>
       <p id="hello-output" role="status">Run to see the output.</p>
-      <p id="hello-backend"></p>
-      <p id="hello-explanation">The kernel writes into a buffer. The browser reads the value back and displays it; the shader does not print to a terminal.</p>
+      <p id="hello-backend">Browser simulation · no CUDA compilation or GPU execution.</p><p id="hello-launch" class="kernel-note"></p>
+      <p id="hello-explanation">The kernel writes into a buffer. This page simulates that write; it does not run CUDA on your device.</p>
       <div class="hello-actions">
         <button id="hello-back" type="button" hidden>← Previous step</button>
         <button id="hello-next" type="button" hidden>Next step →</button>
         <a id="hello-repair" href="kernel.html" hidden>Now try repairing a kernel →</a>
       </div>
       <details class="more-settings">
+        <summary>The same operation in PyTorch</summary>
+        <pre id="hello-pytorch">import torch
+y = torch.full((1,), 42.0)</pre>
+        <p>These snippets describe the starting examples, not PyTorch’s internal kernel implementation. PyTorch may choose a different implementation.</p>
+      </details>
+      <details class="more-settings">
+        <summary>Run this on an NVIDIA GPU</summary>
+        <p>Download a complete CUDA C++ program containing your edited kernel, memory setup, launch and output read-back.</p>
+        <button id="hello-download" type="button">Download CUDA program</button>
+        <p>Requires an NVIDIA GPU, compatible driver, CUDA Toolkit and host C++ compiler. In a terminal:</p>
+        <pre>nvcc -std=c++17 hello.cu -o hello
+./hello</pre>
+        <p>These new examples have not yet been compiled or tested on an NVIDIA GPU. The browser only checks its explicitly supported examples.</p>
+      </details>
+      <details class="more-settings">
         <summary>About this example</summary>
-        <p>The application allocates the buffers and launches the kernel. The highlighted code is real WGSL. These opening exercises accept the statements shown and the numeric edits described above, not arbitrary shader programs. Restore the example if you get stuck.</p>
+        <p>The highlighted code is CUDA C++. The browser model accepts the statements shown and numeric edits described above; it is not a general CUDA interpreter. Allocation and launch setup are included in the download.</p>
         <button id="hello-reset" type="button">Restore example</button>
-        <p>The complete shader includes the buffer declarations:</p><pre id="hello-full"></pre>
-        <p>Without WebGPU, a small browser model evaluates these supported statements. It does not simulate hardware scheduling or performance. No GPU timing is measured.</p>
+        <pre id="hello-full"></pre>
+        <p>No hardware scheduling or performance is simulated. The model runs on the CPU, including offline.</p>
       </details>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
     </main>
