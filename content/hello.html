@@ -38,7 +38,7 @@
       </header>
       <noscript><p class="notice">Enable JavaScript to change the examples. The worked diagrams and code below remain readable without it.</p></noscript>
       <!-- INTRO_SECTIONS -->
-      <section class="hello-section-end"><h2>Try a new case</h2><p>Imagine six inputs and four threads per block. How many blocks do you need? Which threads should skip the arrays?</p><details><summary>Compare your explanation</summary><p>Two blocks supply eight threads. Indices 0–5 handle inputs; indices 6 and 7 skip the arrays. The check becomes <code>i &lt; 6</code>.</p></details><p><a href="kernel.html">Optional practice: repair a kernel →</a></p></section>
+      <!-- HELLO_TRANSFER -->
       <section class="section-space"><h2>Run it with PyTorch</h2><p>Run the opening snippet in your own PyTorch environment with an NVIDIA GPU, then inspect <code>y.cpu()</code>. Chapter 2 explains that copy. The <a href="../examples/book-opening.py" download>PyTorch companion</a> checks the examples from all three opening chapters and offers a CPU-only mode for checking values and layouts.</p><p>The companion’s GPU path has not yet been validated on an NVIDIA GPU. The CUDA download above is a separate handwritten implementation.</p></section>
       <nav class="lesson-pagination" aria-label="Chapter sequence"><a href="../index.html">← Book overview</a><a href="devices.html">Chapter 2: Where do the numbers live? →</a></nav>
       <details class="more-settings"><summary>About the simulation</summary>

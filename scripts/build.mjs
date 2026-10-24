@@ -8,6 +8,7 @@ import { buildOffline } from './offline.mjs';
 import { renderReferenceTask } from '../src/reference-tasks.mjs';
 import {renderBookNav,renderRoadmap,renderBookPage} from '../content/book.mjs';
 import {renderDeviceSections,renderReadingSections} from '../src/foundations-view.mjs';
+import {simulateKernel} from '../src/kernel-model.mjs';
 import { renderIntroSections } from '../src/hello-view.mjs';
 import { renderSmOverview, renderWorkMap } from '../src/overview-visuals.mjs';
 await rm('dist', { recursive: true, force: true });
@@ -20,7 +21,11 @@ await writeFile('dist/index.html', (await readFile('index.html', 'utf8'))
   .replace('<!-- SM_OVERVIEW -->', renderSmOverview())
   .replace('<!-- WORK_MAP -->', renderWorkMap()));
 await mkdir('dist/lessons', { recursive: true });
-await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8')).replace('<!-- INTRO_SECTIONS -->', renderIntroSections()));
+const transfer = simulateKernel({index:'global',guard:true,operation:'multiply',blockSize:8},Array.from({length:6},(_,i)=>i+1));
+const skipped = transfer.trace.filter(event=>event.op==='guard'&&!event.allowed).map(event=>event.global);
+await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
+  .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())
+  .replace('<!-- HELLO_TRANSFER -->', `<section class="hello-section-end"><h2>Try a new case</h2><p>Imagine ${transfer.input.length} inputs and ${transfer.blockSize} threads per block. How many blocks do you need? Which threads should skip the arrays?</p><details><summary>Compare your explanation</summary><p>${transfer.groups} block supplies ${transfer.threads} threads. Indices 0–${transfer.input.length-1} handle inputs; indices ${skipped.join(' and ')} skip the arrays. The check becomes <code>i &lt; ${transfer.input.length}</code>.</p></details><p><a href="kernel.html">Optional practice: repair a kernel →</a></p></section>`));
 await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where do the numbers live?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: One operation, many numbers'},next:{href:'reading.html',title:'Chapter 3: How do threads read a tensor?'}}));
 await writeFile('dist/lessons/reading.html', renderBookPage({slug:'reading',number:3,title:'How do threads read a tensor?',lead:'Multiply five values from a row or column, then follow their positions in memory.',content:renderReadingSections(),previous:{href:'devices.html',title:'Chapter 2: Where do the numbers live?'},next:{href:'scheduling.html',title:'Continue to the scheduling lab'}}));
 await writeFile('dist/lessons/kernel.html', (await readFile('content/kernel.html', 'utf8')).replace('<!-- REFERENCE_KERNEL -->',renderReferenceTask('kernel')));
