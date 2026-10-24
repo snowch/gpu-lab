@@ -6,7 +6,7 @@ const META = PREFIX + 'status-v1';
 const STATE = new URL('__app_status_state__', BASE).href;
 const MANIFEST = new URL('__release_manifest__', BASE).href;
 const cacheName = id => PREFIX + 'release-' + id;
-let operation = null;
+let operation = null, pruning = null;
 let restarting = false;
 let navigationGate, releaseNavigation;
 const seen = new Map();
@@ -38,14 +38,20 @@ async function broadcast(message) {
     if (client.url.startsWith(BASE.href)) client.postMessage(message);
   }
 }
-async function prune(state) {
+function prune(state) {
   if (!state.active || operation || restarting) return;
-  const release = await manifest(state.active);
-  if (!await complete(release)) return;
-  const windows = await courseWindows(release);
-  if (windows.some(client => seen.get(client.id) !== state.active)) return;
-  const keep = new Set([META, ...[state.active, state.previous, state.pending, state.partial].filter(Boolean).map(cacheName)]);
-  for (const name of await caches.keys()) if (name.startsWith(PREFIX) && !keep.has(name)) await caches.delete(name);
+  if (pruning) return pruning;
+  // Cleanup owns the cache list until it finishes. Mutating requests reserve
+  // their operation immediately, then wait before opening or deleting caches.
+  pruning = (async () => {
+    const release = await manifest(state.active);
+    if (!await complete(release)) return;
+    const windows = await courseWindows(release);
+    if (windows.some(client => seen.get(client.id) !== state.active)) return;
+    const keep = new Set([META, ...[state.active, state.previous, state.pending, state.partial].filter(Boolean).map(cacheName)]);
+    for (const name of await caches.keys()) if (name.startsWith(PREFIX) && !keep.has(name)) await caches.delete(name);
+  })().finally(() => { pruning = null; });
+  return pruning;
 }
 async function status(running) {
   const state = await readState();
@@ -170,13 +176,14 @@ self.addEventListener('message', event => {
       else if (data.type === 'REMEMBER_PAGE') {
         if (operation || restarting) throw new Error('A download or restart is already in progress.');
         operation = new AbortController();
-        try { await rememberPage(data.release, data.paths); result = {}; } finally { operation = null; }
+        try { await pruning; await rememberPage(data.release, data.paths); result = {}; } finally { operation = null; }
       } else if (data.type === 'CANCEL') {
         operation?.abort(); result = {};
       } else if (data.type === 'PREPARE') {
         if (operation || restarting) throw new Error('Another window is downloading or restarting. Wait for it to finish.');
         operation = new AbortController();
         try {
+          await pruning; operation.signal.throwIfAborted();
           validateRelease(data.release);
           const state = await readState(); state.partial = data.release.id; await writeState(state);
           await prepare(data.release, Boolean(data.save), port, operation.signal);
@@ -186,12 +193,16 @@ self.addEventListener('message', event => {
         if (operation || restarting) throw new Error('Wait for the current operation to finish.');
         restarting = true;
         navigationGate = new Promise(resolve => { releaseNavigation = resolve; });
-        try { await restart(); result = {}; } finally { restarting = false; releaseNavigation(); }
+        try { await pruning; await restart(); result = {}; } finally { restarting = false; releaseNavigation(); }
       } else if (data.type === 'REMOVE') {
         if (operation || restarting) throw new Error('Cancel the download or wait for the restart before removing files.');
-        for (const name of await caches.keys()) if (name.startsWith(PREFIX)) await caches.delete(name);
-        await self.registration.unregister();
-        await broadcast({ type: 'OFFLINE_REMOVED' }); result = {};
+        operation = new AbortController();
+        try {
+          await pruning;
+          for (const name of await caches.keys()) if (name.startsWith(PREFIX)) await caches.delete(name);
+          await self.registration.unregister();
+          await broadcast({ type: 'OFFLINE_REMOVED' }); result = {};
+        } finally { operation = null; }
       } else throw new Error('Unsupported App status request');
       port.postMessage({ result });
     } catch (error) { port.postMessage({ error: error.name === 'AbortError' ? 'Download cancelled. Verified files can be resumed.' : error.message }); }
