@@ -22,3 +22,17 @@ test('intro diagram and outputs derive from thread indices and selected multipli
  assert.throws(()=>simulateIntro(9,2));
  assert.match(kernelSource(3),/input\[i\] \* 3.0f/);
 });
+
+import {renderIntroSections} from '../src/hello-view.mjs';
+test('static introduction includes all worked diagrams with unique control IDs',()=>{
+ const html=renderIntroSections();
+ const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+ assert.equal(new Set(ids).size,ids.length);
+ assert.equal((html.match(/class="hello-section"/g)||[]).length,5);
+ assert.equal((html.match(/class="hello-thread"/g)||[]).length,28);
+ for(let i=0;i<5;i++){
+  assert.ok(html.includes('id="hello-factor-'+i+'"'));
+  assert.ok(html.includes('id="hello-output-'+i+'"'));
+ }
+ assert.doesNotMatch(html,/hello-next|hello-back/);
+});
