@@ -1,338 +1,267 @@
 # Copyright © 2026 Christopher Snow.
-"""Real service-worker checks: complete offline use and transactional updates."""
+"""Two independently built releases, actual worker/cache/network lifecycle.
+No mocked service-worker methods or synthetic version-only SW substitutions.
+"""
+import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-import re
+import shutil
+import subprocess
 from threading import Thread
 from tempfile import TemporaryDirectory
+import time
 from urllib.parse import unquote, urlsplit
-
 from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
-DIST = ROOT / 'dist'
-LESSONS = ['memory', 'scheduling', 'divergence', 'shared-memory', 'reduction',
-           'matmul', 'tensor-cores', 'attention', 'inference']
-
+RESULTS = ROOT / 'test-results'
+RESULTS.mkdir(exist_ok=True)
 
 class CourseHandler(BaseHTTPRequestHandler):
     revision = 'one'
-
-    def log_message(self, *_):
-        pass
-
+    roots = {}
+    requests = []
+    fail = None
+    slow = False
+    legacy = False
+    corrupt = None
+    def log_message(self, *_): pass
     def do_GET(self):
         path = unquote(urlsplit(self.path).path)
-        if path.startswith('/gpu-lab/'):
-            path = path[len('/gpu-lab'):]
-        if path.endswith('/'):
-            path += 'index.html'
-        file = (DIST / path.lstrip('/')).resolve()
-        if not file.is_relative_to(DIST) or not file.is_file() or (
-            self.revision == 'broken' and path == '/examples/gather.cu'
-        ):
-            self.send_error(404)
-            return
+        if path.startswith('/gpu-lab/'): path = path[len('/gpu-lab'):]
+        if path.endswith('/'): path += 'index.html'
+        path = path.lstrip('/')
+        self.requests.append(path)
+        root = self.roots[self.revision]
+        # A real static release directory. Both versions are retained for this
+        # test deployment, just as documented for durable immutable assets.
+        if path.startswith('releases/'):
+            for candidate in self.roots.values():
+                if (candidate / path).is_file(): root = candidate; break
+        file = (root / path).resolve()
+        if self.slow and path.startswith('releases/') and not path.endswith('release.json'): time.sleep(.07)
+        if self.fail and path.endswith(self.fail): self.send_error(503); return
+        if not file.is_relative_to(root) or not file.is_file(): self.send_error(404); return
         body = file.read_bytes()
-        if path == '/sw.js':
-            body = re.sub(rb'const VERSION = "([^"]+)";',
-                          lambda m: b'const VERSION = "' + m[1] + b'-' + self.revision.encode() + b'";', body)
-        if path == '/index.html':
-            body = body.replace(b'<html ', b'<html data-test-release="' + self.revision.encode() + b'" ')
-        types = {'.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript',
-                 '.css': 'text/css', '.cu': 'text/plain', '.py': 'text/plain',
-                 '.webmanifest': 'application/manifest+json', '.svg': 'image/svg+xml', '.png': 'image/png'}
-        self.send_response(200)
-        self.send_header('Content-Type', types.get(file.suffix, 'application/octet-stream'))
-        self.send_header('Cache-Control', 'no-store')
-        self.send_header('Content-Length', str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        if self.corrupt and path.endswith(self.corrupt): body += b'corrupt'
+        if self.legacy and path == 'sw.js':
+            legacy=(ROOT/'tests/fixtures/legacy-worker.js').read_text()
+            files=json.loads((root/'release.json').read_text())['files']
+            body=legacy.replace('__VERSION__',json.dumps('legacy-complete')).replace('__FILES__',json.dumps([f['path'] for f in files])).encode()
+        types = {'.html':'text/html', '.js':'text/javascript', '.mjs':'text/javascript', '.css':'text/css', '.json':'application/json', '.webmanifest':'application/manifest+json', '.svg':'image/svg+xml', '.png':'image/png', '.cu':'text/plain', '.py':'text/plain'}
+        self.send_response(200); self.send_header('Content-Type', types.get(file.suffix,'application/octet-stream'))
+        self.send_header('Cache-Control','no-store'); self.send_header('Content-Length',str(len(body))); self.end_headers()
+        try: self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError): pass
 
+def panel(page):
+    if not page.locator('#app-status-dialog').is_visible(): page.locator('#app-status-open').click()
+
+def check(page):
+    panel(page); page.locator('#check-update').click()
 
 def ready(page):
-    expect(page.locator('#offline-status')).to_have_attribute('data-state', 'ready')
-    page.wait_for_function('navigator.serviceWorker.controller !== null')
+    expect(page.locator('#offline-status')).to_have_text('Available offline', timeout=30000)
 
+def built(temp, name):
+    source = temp / name; source.mkdir()
+    for path in ['scripts','src','content','assets','examples','index.html','manifest.webmanifest']:
+        item = ROOT / path
+        if item.is_dir(): shutil.copytree(item, source / path)
+        else: shutil.copy2(item, source / path)
+    p = source / 'index.html'; p.write_text(p.read_text().replace('<html ', f'<html data-test-release="{name}" ',1))
+    subprocess.run(['node','scripts/build.mjs'],cwd=source,check=True,stdout=subprocess.DEVNULL)
+    return source / 'dist'
 
-def update(page, outcome):
-    page.evaluate('''async () => {
-      window.installOutcome = null;
-      const registration = await navigator.serviceWorker.getRegistration();
-      registration.addEventListener('updatefound', () => {
-        const worker = registration.installing;
-        worker.addEventListener('statechange', () => {
-          window.installOutcome = worker.state;
-        });
-      }, {once: true});
-      await registration.update();
-    }''')
-    page.wait_for_function('(state) => window.installOutcome === state', arg=outcome)
-
-
-def check_install(page, context, url):
-    # Check the browser's actual manifest parsing and installability diagnostics.
-    session = context.new_cdp_session(page)
-    manifest = session.send('Page.getAppManifest')
-    assert manifest['url'] == url + 'manifest.webmanifest', manifest
-    assert not manifest['errors'], manifest
-    errors = session.send('Page.getInstallabilityErrors')['installabilityErrors']
-    # Isolated Playwright contexts are incognito; test the same diagnostics in a
-    # normal persistent profile below, where installation is allowed.
-    assert not [error for error in errors if error['errorId'] != 'in-incognito'], errors
-    session.detach()
-    page.locator('#install').click()
-    expect(page.get_by_role('dialog')).to_be_visible()
-    page.keyboard.press('Escape')
-    expect(page.get_by_role('dialog')).not_to_be_visible()
-    expect(page.locator('#install')).to_be_focused()
-    # Simulate browser events to test our UI without accepting an OS install.
-    page.evaluate('''() => {
-      const event = new Event('beforeinstallprompt', {cancelable: true});
-      window.promptCalls = 0;
-      event.prompt = async () => { window.promptCalls += 1; };
-      event.userChoice = Promise.resolve({outcome: 'dismissed'});
-      dispatchEvent(event);
-      if (!event.defaultPrevented) throw new Error('Install prompt was not deferred');
-    }''')
-    page.locator('#install').click()
-    page.locator('#install-confirm').click()
-    expect(page.locator('#install-message')).to_contain_text('Installation cancelled')
-    assert page.evaluate('window.promptCalls') == 1
-    expect(page.locator('#install-confirm')).to_be_hidden()
-    expect(page.locator('#install-instructions')).to_be_visible()
-    page.evaluate("dispatchEvent(new Event('appinstalled'))")
-    expect(page.locator('#install')).to_be_hidden()
-    expect(page.locator('#install-message')).to_contain_text('GPU Lab is installed')
-    page.locator('#install-close').click()
-
-
-server = ThreadingHTTPServer(('127.0.0.1', 0), CourseHandler)
-thread = Thread(target=server.serve_forever, daemon=True)
-thread.start()
-try:
-    with sync_playwright() as playwright:
-        options = {'headless': True}
-        if os.environ.get('CHROMIUM_PATH'):
-            options['executable_path'] = os.environ['CHROMIUM_PATH']
-        browser = playwright.chromium.launch(**options)
-        for prefix, width in [('/gpu-lab/', 390), ('/', 1440)]:
-            CourseHandler.revision = 'one'
-            url = f'http://127.0.0.1:{server.server_port}{prefix}'
-            context = browser.new_context(viewport={'width': width, 'height': 900})
-            errors = []
-            context.on('page', lambda page: page.on('pageerror', lambda error: errors.append(str(error))))
-            page = context.new_page()
-            # A direct visit to the last lab must save the introduction and every other lab.
-            page.goto(url + 'lessons/inference.html')
-            ready(page)
-            expect(page.locator('#offline-update')).to_be_hidden()
-            check_install(page, context, url)
-            keys = page.evaluate('caches.keys()')
-            assert len(keys) == 1 and keys[0].endswith('-one'), keys
-            old_cache = keys[0]
-            # An unrelated app's cache must survive GPU Lab updates on this origin.
-            page.evaluate("caches.open('another-app:keep')")
-            context.set_offline(True)
-            expect(page.locator('#offline-status')).to_contain_text('Working offline')
-            # Install metadata and every icon must remain available without network.
-            assert page.evaluate('''async base => {
-              const manifest = await (await fetch(base + 'manifest.webmanifest')).json();
-              if (manifest.display !== 'standalone' || new URL(manifest.start_url, base).href !== base) return false;
-              for (const icon of [...manifest.icons, {src:'assets/apple-touch-icon.png',sizes:'180x180'}]) {
-                const blob = await (await fetch(new URL(icon.src, base))).blob();
-                const bitmap = await createImageBitmap(blob);
-                if (`${bitmap.width}x${bitmap.height}` !== icon.sizes) return false;
-                bitmap.close();
-              }
-              return (await fetch(base + 'assets/icon.svg')).ok;
-            }''', url)
-            for slug in LESSONS:
-                response = page.goto(url + f'lessons/{slug}.html?offline-test=1#simulator')
-                assert response.ok and response.from_service_worker
-                ready(page)
-                page.locator('#show-result').click()
-                expect(page.locator('#results')).to_be_visible()
-                if slug == 'memory':
-                    expect(page.locator('#sector-count')).to_have_text('4')
-                    page.get_by_role('button', name='Tensor column', exact=True).click()
-                    page.locator('#show-result').click()
-                    expect(page.locator('#sector-count')).to_have_text('32')
-                else:
-                    before = page.locator('#step-detail').inner_text()
-                    page.locator('#step').focus()
-                    page.locator('#step').press('End')
-                    assert page.locator('#step-detail').inner_text() != before
-                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-                page.reload()
-                ready(page)
-            page.goto(url + 'lessons/memory.html')
-            with page.expect_download() as download:
-                page.get_by_role('link', name='Download runnable example ↓').click()
-            assert 'cudaGetLastError' in Path(download.value.path()).read_text()
-            for file in ['examples/ai-kernels.cu', 'examples/tensor-layout.py']:
-                result = page.evaluate('''async url => {
-                  const response = await fetch(url);
-                  return {ok: response.ok, text: await response.text()};
-                }''', url + file)
-                assert result['ok'] and len(result['text']) > 100
-            page.goto(url + 'lessons/hello.html')
-            page.locator('#hello-factor-0').fill('3')
-            page.locator('#hello-run-0').click()
-            expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12]')
-            page.goto(url + 'lessons/kernel.html')
-            page.locator('#reset-kernel').click()
-            page.locator('#kernel-index').select_option('global')
-            page.locator('#run-model').click()
-            expect(page.locator('#kernel-status')).to_contain_text('3 of 3')
-            page.get_by_role('button', name='Inspect 35', exact=True).click()
-            page.locator('#trace-end').click()
-            expect(page.locator('#kernel-event')).to_contain_text('63 < 35: false')
-            page.get_by_text('Run this kernel on an NVIDIA GPU', exact=True).click()
-            with page.expect_download() as cuda_download:
-                page.locator('#download-cuda').click()
-            assert 'int i = blockIdx.x * blockDim.x + threadIdx.x;' in Path(cuda_download.value.path()).read_text()
-            page.close()
-            page = context.new_page()
-            response = page.goto(url)
-            assert response.from_service_worker
-            expect(page.locator('.roadmap h3')).to_have_count(8)
-            expect(page.locator('html')).to_have_attribute('data-test-release', 'one')
-            page.get_by_role('link', name='Start Lab 01: Reading a tensor →').click()
-            page.locator('#show-result').click()
-            expect(page.locator('#sector-count')).to_have_text('4')
-            print(f'PASS: {prefix}, {width}px; all unvisited labs, controls, reload, tab reopen and downloads offline')
-
-            # A failed update cannot damage the saved course or claim to be ready.
-            context.set_offline(False)
-            page.goto(url)
-            CourseHandler.revision = 'broken'
-            update(page, 'redundant')
-            assert page.evaluate('caches.keys()') == [old_cache, 'another-app:keep']
-            expect(page.locator('#offline-status')).not_to_contain_text('Update saved')
-            expect(page.locator('#offline-update')).to_be_hidden()
-            context.set_offline(True)
-            page.reload()
-            expect(page.locator('html')).to_have_attribute('data-test-release', 'one')
-            ready(page)
-
-            # A successful update waits while either course tab remains open.
-            CourseHandler.revision = 'one'
-            context.set_offline(False)
-            second = context.new_page()
-            second.goto(url + 'lessons/memory.html')
-            ready(second)
-            CourseHandler.revision = 'two'
-            update(page, 'installed')
-            expect(page.locator('#offline-status')).to_contain_text('Update saved')
-            page.reload()
-            expect(page.locator('html')).to_have_attribute('data-test-release', 'one')
-            page.close()
-            second.reload()
-            expect(second.locator('#offline-status')).to_contain_text('Update saved')
-            second.close()
-            # Allow activation without keeping a controlled course tab alive.
-            observer = context.new_page()
-            observer.goto(url + 'missing.html')
-            observer.wait_for_function('''async () => {
-              const keys = await caches.keys();
-              return keys.some(key => key.endsWith('-two')) && !keys.some(key => key.endsWith('-one'));
-            }''')
-            assert 'another-app:keep' in observer.evaluate('caches.keys()')
-            context.set_offline(True)
-            observer.goto(url)
-            expect(observer.locator('html')).to_have_attribute('data-test-release', 'two')
-            ready(observer)
-            expect(observer.locator('#offline-status')).not_to_contain_text('Update saved')
-
-            # A learner can defer an update, reopen its controls, then explicitly
-            # reload every course window together without closing the browser.
-            context.set_offline(False)
-            second = context.new_page()
-            second.goto(url + 'lessons/memory.html?exercise=1#simulator')
-            ready(second)
-            second.locator('#show-result').click()
-            expect(second.locator('#results')).to_be_visible()
-            second.evaluate('window.beforeUpdate = true')
-            unrelated = context.new_page()
-            unrelated.goto(url + 'unrelated.html')
-            unrelated.evaluate('window.keepThisPage = true')
-            CourseHandler.revision = 'three'
-            update(observer, 'installed')
-            expect(observer.locator('#update-prompt')).to_be_visible()
-            expect(observer.locator('#update-prompt')).to_contain_text('reset their experiments')
-            expect(second.locator('#update-prompt')).to_be_visible()
-            assert observer.evaluate('document.documentElement.scrollWidth <= innerWidth')
-            observer.locator('#defer-update').click()
-            expect(observer.locator('#update-prompt')).to_be_hidden()
-            expect(observer.locator('#show-update')).to_be_visible()
-            expect(observer.locator('html')).to_have_attribute('data-test-release', 'two')
-            expect(second.locator('#results')).to_be_visible()
-            observer.locator('#show-update').click()
-            expect(observer.locator('#apply-update')).to_be_focused()
-            # The entire update is saved, so the phone can apply it while offline.
-            if prefix == '/gpu-lab/':
+with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
+    temp = Path(tmp)
+    CourseHandler.roots = {name: built(temp, name) for name in ['one','two']}
+    releases = {name: json.loads((root/'release.json').read_text()) for name,root in CourseHandler.roots.items()}
+    assert releases['one']['id'] != releases['two']['id']
+    server = ThreadingHTTPServer(('127.0.0.1',0),CourseHandler)
+    Thread(target=server.serve_forever,daemon=True).start()
+    try:
+        with sync_playwright() as p:
+            options = {'headless':True}
+            if os.environ.get('CHROMIUM_PATH'): options['executable_path'] = os.environ['CHROMIUM_PATH']
+            browser = p.chromium.launch(**options)
+            for prefix,width,theme in [('/gpu-lab/',390,'dark'),('/',1440,'light')]:
+                CourseHandler.revision='one'; CourseHandler.fail=None; CourseHandler.slow=False
+                url=f'http://127.0.0.1:{server.server_port}{prefix}'
+                context=browser.new_context(viewport={'width':width,'height':900},color_scheme=theme,has_touch=width<500,reduced_motion='reduce')
+                errors=[]; context.on('page',lambda page:page.on('pageerror',lambda error:errors.append(str(error))))
+                page=context.new_page(); page.goto(url+'lessons/hello.html?exercise=1#idea-2'); panel(page)
+                expect(page.locator('#version-status')).to_have_text('Up to date')
+                page.wait_for_function('navigator.serviceWorker.controller !== null')
+                expect(page.locator('#offline-status')).to_have_text('Not saved for offline use')
+                expect(page.locator('#offline-size')).to_contain_text(f"{releases['one']['bytes']:,} bytes")
+                # Installation/checking/opening must not fetch other labs or CUDA assets.
+                assert not any(x.startswith('releases/') and x.endswith('examples/gather.cu') for x in CourseHandler.requests)
+                assert not any(x.endswith('.html') and not x.endswith('lessons/hello.html') for x in CourseHandler.requests)
+                check(page); expect(page.locator('#version-status')).to_have_text('Up to date')
+                assert not any(x.endswith('examples/gather.cu') for x in CourseHandler.requests)
+                page.screenshot(path=str(RESULTS/f'status-{width}-{theme}-online.png'))
+                page.evaluate("caches.open('sibling-app:keep'); localStorage.setItem('user-content','keep')")
+                # Interrupted first download resumes verified earlier files.
+                CourseHandler.slow=True
+                page.locator('#save-offline').click()
+                expect(page.locator('#download-progress')).to_be_visible()
+                page.wait_for_function('document.getElementById("asset-progress").value > 0')
+                page.locator('#cancel-download').click()
+                expect(page.locator('#save-offline')).to_have_text('Resume download')
+                expect(page.locator('#offline-status')).to_have_text('Offline download incomplete')
+                CourseHandler.slow=False
+                before=CourseHandler.requests.count(f"releases/{releases['one']['id']}/assets/apple-touch-icon.png")
+                page.locator('#save-offline').click(); ready(page)
+                assert before == CourseHandler.requests.count(f"releases/{releases['one']['id']}/assets/apple-touch-icon.png")
+                page.screenshot(path=str(RESULTS/f'status-{width}-{theme}-saved.png'))
+                page.keyboard.press('Escape')
+                # Fresh offline tabs visit every saved HTML and required asset.
                 context.set_offline(True)
-            observer.locator('#apply-update').click()
-            expect(observer.locator('html')).to_have_attribute('data-test-release', 'three')
-            second.wait_for_function('window.beforeUpdate === undefined')
-            ready(observer)
-            ready(second)
-            expect(second).to_have_url(url + 'lessons/memory.html?exercise=1#simulator')
-            expect(second.locator('#results')).to_be_hidden()
-            expect(observer.locator('#offline-update')).to_be_hidden()
-            expect(second.locator('#offline-update')).to_be_hidden()
-            assert unrelated.evaluate('window.keepThisPage') is True
-            keys = observer.evaluate('caches.keys()')
-            assert 'another-app:keep' in keys
-            assert len([key for key in keys if key.startswith('gpu-lab:')]) == 1
-            assert any(key.endswith('-three') for key in keys)
-            assert not errors, errors
-            context.close()
-            print(f'PASS: {prefix}; failed update recovery, natural activation, Later, manual multi-tab reload, scoped cache cleanup')
-
-        # Failed first installation is reported without preventing normal online use.
-        CourseHandler.revision = 'broken'
-        context = browser.new_context()
-        page = context.new_page()
-        page.goto(url)
-        expect(page.locator('#offline-status')).to_have_attribute('data-state', 'unavailable')
-        expect(page.locator('.roadmap h3')).to_have_count(8)
-        CourseHandler.revision = 'two'
-        page.reload()
-        ready(page)
-        context.close()
-        # Unsupported / blocked service workers degrade to an online course.
-        context = browser.new_context(service_workers='block')
-        page = context.new_page()
-        page.goto(url + 'lessons/memory.html')
-        page.locator('#show-result').click()
-        expect(page.locator('#sector-count')).to_have_text('4')
-        context.close()
-        browser.close()
-        print('PASS: failed first save recovers on revisit; simulators work when service workers are blocked')
-        # Offline storage must survive restarting the browser, not just a tab reload.
-        with TemporaryDirectory(prefix='gpu-lab-profile-') as profile:
-            context = playwright.chromium.launch_persistent_context(profile, **options)
-            page = context.new_page()
-            page.goto(url)
-            ready(page)
-            session = context.new_cdp_session(page)
-            assert not session.send('Page.getInstallabilityErrors')['installabilityErrors']
-            session.detach()
-            context.close()
-            context = playwright.chromium.launch_persistent_context(profile, **options)
-            context.set_offline(True)
-            page = context.new_page()
-            page.goto(url + 'lessons/memory.html')
-            ready(page)
-            page.locator('#show-result').click()
-            expect(page.locator('#sector-count')).to_have_text('4')
-            expect(page.locator('#offline-status')).to_contain_text('Working offline')
-            context.close()
-        print('PASS: saved course and simulator work offline after a full browser restart')
-finally:
-    server.shutdown()
-    server.server_close()
-    thread.join(timeout=5)
+                for file in releases['one']['files']:
+                    if file['path'].endswith('.html'):
+                        tab=context.new_page(); response=tab.goto(url+file['path']); assert response.ok and response.from_service_worker
+                        assert tab.locator('meta[name="gpu-release"]').get_attribute('content')==releases['one']['id']
+                        tab.close()
+                assets=page.evaluate('''async files => {for (const f of files) { const r=await fetch(new URL(f.path, new URL(document.querySelector('meta[name="gpu-base"]').content,location.href))); if(!r.ok || (await r.arrayBuffer()).byteLength!==f.bytes) return f.path;} return null;}''',releases['one']['files'])
+                assert assets is None, assets
+                page.locator('#hello-factor-1').fill('7'); page.locator('#hello-run-1').click()
+                page.locator('#hello-map-1 button[data-thread="2"]').click()
+                expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28]')
+                second=context.new_page(); second.goto(url+'lessons/memory.html?keep=1#simulator')
+                second.locator('#stride').select_option('8'); second.locator('#show-result').click()
+                second.locator('#lanes button').nth(5).click()
+                kernel=context.new_page(); kernel.goto(url+'lessons/kernel.html')
+                kernel.locator('#kernel-index').select_option('global');kernel.locator('#run-model').click()
+                kernel.get_by_role('button',name='Inspect 35',exact=True).click();kernel.locator('#trace-end').click()
+                trace=kernel.locator('#kernel-event').inner_text()
+                lesson=context.new_page();lesson.goto(url+'lessons/scheduling.html')
+                lesson.locator('#show-result').click();lesson.locator('#step').press('End')
+                lesson_trace=lesson.locator('#step-detail').inner_text()
+                context.set_offline(False);CourseHandler.revision='two';check(page)
+                expect(page.locator('#version-status')).to_have_text('Update available')
+                expect(page.locator('#app-status-summary')).to_contain_text('Update available')
+                # Real browser quota failure cannot overwrite a complete release.
+                cdp=context.new_cdp_session(page)
+                cdp.send('Storage.overrideQuotaForOrigin', {'origin':urlsplit(url).scheme+'://'+urlsplit(url).netloc,'quotaSize':1})
+                page.locator('#download-update').click()
+                expect(page.locator('#app-status-error')).not_to_be_empty(timeout=30000)
+                ready(page);expect(page.locator('#restart-update')).to_be_hidden()
+                cdp.send('Storage.overrideQuotaForOrigin', {'origin':urlsplit(url).scheme+'://'+urlsplit(url).netloc})
+                cdp.detach()
+                # Failed replacement keeps the complete old release available.
+                CourseHandler.fail='examples/gather.cu';page.locator('#download-update').click()
+                expect(page.locator('#app-status-error')).not_to_be_empty(timeout=30000)
+                ready(page);expect(page.locator('#restart-update')).to_be_hidden()
+                CourseHandler.fail=None;page.locator('#download-update').click()
+                expect(page.locator('#version-status')).to_have_text('Update ready',timeout=30000)
+                page.locator('#later-update').click();expect(page.locator('#app-status-summary')).to_contain_text('Update ready')
+                assert second.locator('meta[name="gpu-release"]').get_attribute('content')==releases['one']['id']
+                # Input composition in ANY window blocks everyone without resetting state.
+                second.evaluate("dispatchEvent(new CompositionEvent('compositionstart'))")
+                panel(page);page.locator('#restart-update').click()
+                expect(page.locator('#app-status-error')).to_contain_text('Finish the current input')
+                second.evaluate("dispatchEvent(new CompositionEvent('compositionend'))")
+                expect(second.locator('#sector-count')).to_have_text('32')
+                # A busy/unsaved participant or denied snapshot storage blocks all tabs.
+                second.evaluate("window.updateGuard=e=>{e.detail.reason='Finish the unsaved operation first.'};addEventListener('gpu-lab:before-restart',updateGuard)")
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('unsaved operation')
+                second.evaluate("() => {removeEventListener('gpu-lab:before-restart',updateGuard);window.originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('Storage denied','SecurityError')};}")
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('Storage denied')
+                second.evaluate('() => {Storage.prototype.setItem=window.originalSet;}')
+                # A tab with its JS disabled never receives a forced navigation.
+                blocked=context.new_page();blocked.goto(url+'index.html');blocked.wait_for_load_state('networkidle')
+                blocked_cdp=context.new_cdp_session(blocked);blocked_cdp.send('Emulation.setScriptExecutionDisabled',{'value':True})
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('did not respond',timeout=10000)
+                blocked_cdp.detach();blocked.close()
+                # Activation works offline and restores each tab's independent work/route.
+                context.set_offline(True);page.locator('#restart-update').click()
+                for tab in [page,second,kernel,lesson]:
+                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
+                    assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
+                expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
+                expect(page.locator('#hello-factor-1')).to_have_value('7')
+                expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28]')
+                expect(page.locator('#hello-map-1 button[data-thread="2"]')).to_have_attribute('aria-pressed','true')
+                expect(second).to_have_url(url+'lessons/memory.html?keep=1#simulator')
+                expect(second.locator('#stride')).to_have_value('8');expect(second.locator('#sector-count')).to_have_text('32')
+                expect(second.locator('#lanes button').nth(5)).to_have_attribute('aria-pressed','true')
+                expect(kernel.locator('#kernel-event')).to_have_text(trace)
+                expect(lesson.locator('#step-detail')).to_have_text(lesson_trace)
+                panel(page);ready(page)
+                # Eviction is detected on focus; repair retains/reuses remaining assets.
+                cache=f"gpu-lab:{url}:release-{releases['two']['id']}"
+                page.evaluate('''async ({cache,url}) => {await (await caches.open(cache)).delete(url+'examples/gather.cu');dispatchEvent(new Event('focus'));}''',{'cache':cache,'url':url})
+                expect(page.locator('#offline-status')).to_have_text('Offline download incomplete')
+                context.set_offline(False);CourseHandler.corrupt='examples/gather.cu'
+                assert not page.evaluate('''async url => (await fetch(url+'examples/gather.cu')).ok''',url)
+                CourseHandler.corrupt=None;page.locator('#save-offline').click();ready(page)
+                page.locator('#remove-offline').click();page.locator('#cancel-remove').click();ready(page)
+                page.locator('#remove-offline').click();page.locator('#confirm-remove').click()
+                expect(page.locator('#offline-status')).to_have_text('Not saved for offline use')
+                assert page.evaluate('caches.keys()') == ['sibling-app:keep']
+                assert page.evaluate("localStorage.getItem('user-content')") == 'keep'
+                expect(page.locator('#hello-factor-1')).to_have_value('7')
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+                assert not errors,errors
+                context.close();CourseHandler.requests=[]
+                print(f'PASS {prefix} {width}px {theme}: opt-in, real bytes, cancel/resume, all offline assets/pages, failed replacement, deployed update, Later, composition guard, three-tab restart and restored experiments, eviction/repair, scoped removal')
+            # An online-only update does not grant permanent offline consent.
+            CourseHandler.revision='one'
+            url=f'http://127.0.0.1:{server.server_port}/gpu-lab/'
+            ctx=browser.new_context();tab=ctx.new_page();tab.goto(url);panel(tab)
+            expect(tab.locator('#offline-status')).to_have_text('Not saved for offline use')
+            CourseHandler.revision='two';check(tab);expect(tab.locator('#version-status')).to_have_text('Update available')
+            tab.locator('#download-update').click();expect(tab.locator('#version-status')).to_have_text('Update ready',timeout=30000)
+            tab.locator('#later-update').click();tab.reload()
+            expect(tab.locator('html')).to_have_attribute('data-test-release','one')
+            tab.close();tab=ctx.new_page();tab.goto(url)
+            expect(tab.locator('html')).to_have_attribute('data-test-release','one')
+            panel(tab);expect(tab.locator('#version-status')).to_have_text('Update ready')
+            tab.locator('#restart-update').click();expect(tab.locator('html')).to_have_attribute('data-test-release','two')
+            panel(tab);expect(tab.locator('#offline-status')).to_have_text('Not saved for offline use')
+            tab.locator('#save-offline').click();ready(tab);ctx.close()
+            print('PASS online-only update: prepare/restart succeeds without opting into offline access; explicit save remains available')
+            # A persistent installed profile: closing every window does NOT apply
+            # a prepared release. Reopen completely offline, then explicitly restart.
+            CourseHandler.revision='one';CourseHandler.requests=[]
+            url=f'http://127.0.0.1:{server.server_port}/gpu-lab/'
+            profile=temp/'profile'
+            ctx=p.chromium.launch_persistent_context(str(profile),**options)
+            tab=ctx.pages[0];tab.goto(url);panel(tab);tab.locator('#save-offline').click();ready(tab)
+            manifest=ctx.new_cdp_session(tab).send('Page.getAppManifest')
+            assert not manifest['errors'],manifest
+            CourseHandler.revision='two';check(tab);expect(tab.locator('#version-status')).to_have_text('Update available')
+            tab.locator('#download-update').click();expect(tab.locator('#version-status')).to_have_text('Update ready',timeout=30000)
+            tab.locator('#later-update').click();ctx.close()
+            ctx=p.chromium.launch_persistent_context(str(profile),**options);ctx.set_offline(True)
+            tab=ctx.pages[0];tab.goto(url)
+            expect(tab.locator('html')).to_have_attribute('data-test-release','one')
+            panel(tab);ready(tab);expect(tab.locator('#version-status')).to_have_text('Update ready')
+            tab.locator('#restart-update').click();expect(tab.locator('html')).to_have_attribute('data-test-release','two')
+            ctx.close()
+            print('PASS persistent profile: no activation on closing all windows; cold offline reopen, deferred badge and explicit offline restart')
+            # Exercise the actual former worker and its automatically saved cache.
+            CourseHandler.revision='one';CourseHandler.legacy=True
+            legacy_profile=temp/'legacy-profile'
+            ctx=p.chromium.launch_persistent_context(str(legacy_profile),**options)
+            tab=ctx.pages[0];tab.goto(url)
+            tab.wait_for_function('navigator.serviceWorker.controller !== null')
+            legacy_key=f'gpu-lab:{url}:legacy-complete'
+            assert legacy_key in tab.evaluate('caches.keys()')
+            CourseHandler.legacy=False;CourseHandler.revision='two'
+            tab.evaluate('''async () => { const r=await navigator.serviceWorker.getRegistration();await r.update();}''')
+            tab.wait_for_function('''async () => Boolean((await navigator.serviceWorker.getRegistration()).waiting)''')
+            ctx.close()
+            ctx=p.chromium.launch_persistent_context(str(legacy_profile),**options)
+            tab=ctx.pages[0];tab.goto(url);panel(tab)
+            expect(tab.locator('html')).to_have_attribute('data-test-release','two')
+            expect(tab.locator('#offline-status')).to_have_text('Offline download incomplete')
+            assert legacy_key in tab.evaluate('caches.keys()')
+            tab.locator('#save-offline').click();ready(tab)
+            ctx.set_offline(True);tab.reload();panel(tab);ready(tab)
+            ctx.close();CourseHandler.legacy=False
+            print('PASS legacy migration: real former worker, retained cache/consent, explicit verified repair and offline reopen')
+            browser.close()
+    finally:server.shutdown()

@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import { overviewExample, renderWorkMap } from './overview-visuals.mjs';
 const view = document.getElementById('work-map');
 if (view) {
@@ -13,4 +14,5 @@ if (view) {
   }
   blockControl.addEventListener('change', update);
   warpControl.addEventListener('change', update);
+  registerExperiment('overview',()=>({}),update);
 }

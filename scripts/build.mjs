@@ -31,22 +31,24 @@ for (const [index, lesson] of lessons.entries()) {
 }
 // Stamp the checked-out source revision before fingerprinting the offline files.
 // The commit date is stable across rebuilds of the same revision.
-let versionMarkup = '<span class="build-info">Version information unavailable</span>';
+let identity = { commit: null, date: null };
+let versionMarkup = '<span class="build-info">Development build · source revision unavailable</span>';
 try {
+  const dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=normal'], { cwd: new URL('../', import.meta.url), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  if (dirty) throw new Error('Development build has uncommitted changes');
   const [sha, committedAt] = execFileSync('git', ['log', '-1', '--format=%H%n%cI'], {
     cwd: new URL('../', import.meta.url), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
   }).trim().split('\n');
   const date = new Date(committedAt).toISOString().slice(0, 10);
   if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('Invalid commit hash');
-  versionMarkup = `<span class="build-info" data-commit="${sha}">Commit <a href="https://github.com/snowch/gpu-lab/commit/${sha}" aria-label="View commit ${sha.slice(0, 7)}">${sha.slice(0, 7)}</a> · <time datetime="${date}">${date}</time><span class="version-status" role="status">Latest version unchecked</span></span>`;
+  identity = { commit: sha, date };
+  versionMarkup = `<span class="build-info" data-commit="${sha}">Commit <a href="https://github.com/snowch/gpu-lab/commit/${sha}" aria-label="View commit ${sha.slice(0, 7)}">${sha.slice(0, 7)}</a> · <time datetime="${date}">${date}</time></span>`;
 } catch {
   // Source archives may have no Git metadata; keep them buildable without inventing a version.
 }
 for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter(name => name.endsWith('.html')).map(name => `dist/lessons/${name}`)]) {
   const html = await readFile(path, 'utf8');
-  const base = path === 'dist/index.html' ? './' : '../';
-  await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`)
-    .replace('</head>', `<script type="module" src="${base}src/version.mjs"></script></head>`));
+  await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
 }
-await buildOffline('dist');
-console.log('Built static course in dist/ with complete offline caching (all asset paths are relative).');
+await buildOffline('dist', identity);
+console.log('Built static course in dist/ with explicit, verified offline downloads (all asset paths are relative).');

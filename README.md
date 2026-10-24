@@ -55,21 +55,24 @@ icon and standalone window. Chrome and Edge offer a native install prompt when a
 the dialog also explains Safari’s Add to Dock / Add to Home Screen options. Installed apps
 use the same offline course. Installation and shortcut placement are controlled by your browser.
 
-Open any course page while connected and wait for **Available offline** near the footer.
-The browser saves every lesson, simulator, diagram and downloadable CUDA/PyTorch example,
-including lessons you have not opened. You can then reopen the same course URL without a
-connection. External documentation and GitHub links still need the internet; running the
-downloaded examples requires their usual local tools.
+Open **App status → Offline access** and choose **Download for offline use**.
+The panel shows the exact file bytes before saving every lesson, simulator, diagram
+and CUDA/PyTorch example, including lessons you have not visited. Wait for
+**Available offline** before disconnecting. External links need internet access;
+running downloaded examples requires their usual local tools. Installing the app
+and checking for updates do not automatically download the offline course.
 
-Updates download when you return online. When **An update is ready** appears, choose
-**Update and reload** to activate the downloaded version and reload all open GPU Lab tabs
-and app windows. This resets their experiments. The saved update can also be applied offline.
-Choose **Later** to keep working; **Update ready…** lets you return to the update controls.
-Otherwise, the update activates naturally after all GPU Lab tabs and app windows close.
-Open experiments keep their current version until you choose to update or close them.
-If an update cannot download completely, the previous saved version keeps working.
-Clearing site data or browser storage eviction removes the offline copy; revisit online to
-save it again. Service workers require HTTPS (or localhost) and browser storage support.
+App status compares the running build with the deployed release. Choose **Update**
+to prepare it, then **Restart to update** when ready. All open GPU Lab windows save
+their experiment state before restarting together; a busy or non-responsive window
+blocks the restart. **Later** keeps the pending badge visible. Closing all windows
+or refreshing does not apply a prepared update automatically.
+
+Cancelled downloads can resume from verified files. Failed replacements leave the
+previous complete copy usable. App status detects missing/evicted files and offers
+repair. **Remove offline copy** asks for confirmation and preserves learner work,
+preferences and other apps. HTTPS (or localhost) and browser storage are required.
+See [the release contract, migration notes and validation](docs/app-status.md).
 
 ## Develop
 
@@ -94,19 +97,14 @@ python tests/offline.py
 CI runs the model/build and both browser suites before deploying `dist/` from `main` through GitHub Pages Actions.
 Pull requests run checks without deployment. All application assets use relative paths.
 
-The build generates `dist/sw.js` with a content fingerprint and complete file list. The
-footer on every page includes the checked-out Git commit (linked to GitHub) and its
-commit date in UTC, so the version remains visible offline and without JavaScript.
-When online, a live GitHub check adds **✓ Latest** only when the full commit matches
-the current `main` branch. A mismatch is labelled “Different from latest on main”.
-Offline browsing, failed checks and JavaScript-disabled browsing leave the latest
-version unverified. The check runs on page load, reconnect and return to a visible tab.
-Source archives without Git metadata display “Version information unavailable”. The
-service worker saves one complete version and serves it from a cache scoped to the site's
-base URL. The offline browser suite checks root and `/gpu-lab/` hosting, all labs without
-network access, downloads, failed installs, and updates across multiple tabs. During local
-development, close course tabs after rebuilding to activate an update, or unregister the
-worker in browser developer tools while iterating.
+The build emits `release.json`, immutable `releases/<build-id>/` assets and a stable
+`sw.js` lifecycle engine. Clean Git builds retain their source commit/date in the
+footer; archives and dirty development builds identify themselves without a fake
+revision. App status uses network-only deployed metadata, never GitHub `main`.
+The worker prepares files only on request and verifies size and SHA-256 before
+selection. During development, use App status to update, or unregister the worker
+in browser developer tools while iterating. The browser suites exercise both root
+and `/gpu-lab/` hosting, complete offline access and multiple real built releases.
 
 A separate workflow compiles and runs small CUDA examples in GPGPU-Sim on a CPU runner.
 It validates outputs against a CPU reference and saves logs; it does not yet compare timing

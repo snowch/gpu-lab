@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
 import './tensor-layout-view.mjs';
 import { simulateLoad, kernelSource } from './model.mjs';
@@ -110,3 +111,5 @@ $('copy').addEventListener('click', async () => {
   catch { setText('copy-status', 'Clipboard unavailable. Select the code to copy it.'); }
 });
 render();
+
+registerExperiment('memory',()=>({selectedLane,revealed}),state=>{selectedLane=state.selectedLane;revealed=state.revealed;render();});

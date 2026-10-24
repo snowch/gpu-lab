@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
 import {steps,simulateIntro,lineFor,kernelSource,runnableSource} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
@@ -36,6 +37,7 @@ function draw(){
 }
 function invalidate(){
   result=null;$('hello-output').textContent='Run to see the results.';code();draw();
+registerExperiment('hello-'+stage,()=>({selected,ran:result!==null}),state=>{ selected=state.selected; result=state.ran?model():null; code();draw(); });
 }
 $('hello-map').addEventListener('click',event=>{
   const button=event.target.closest('button[data-thread]');
@@ -53,4 +55,5 @@ $('hello-run').addEventListener('click',()=>{
 });
 $('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
 code();draw();
+registerExperiment('hello-'+stage,()=>({selected,ran:result!==null}),state=>{ selected=state.selected; result=state.ran?model():null; code();draw(); });
 }
