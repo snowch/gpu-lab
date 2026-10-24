@@ -245,20 +245,22 @@ Only editor choices persist; challenge answers/completion are session state.
 ## Hello, GPU
 
 Five steps progressively introduce elementwise multiplication, thread-to-element indices,
-block grouping, tail checks and Python-to-kernel orchestration. A single multiplier in
-[-10, 10] persists between steps. Inputs are 1..4 for the first three steps and 1..5
+block grouping, tail checks and Python-to-kernel orchestration. Each section has its own multiplier in
+[-10, 10], selection and results. All five sections remain visible in reading order. Inputs are 1..4 for the first three steps and 1..5
 for the final two; block sizes are 4, 4, 2, 4 and 4 respectively. The model rounds the
 multiplier and results to FP32. It derives every card's input, output, global index,
 block membership and local index from those values.
 
 The bounds-check experiment has eight threads for five elements. With the check disabled,
 threads 5..7 report invalid accesses without inventing out-of-range values. All valid
-outputs still compute, but the run is unsafe and cannot advance. The final step always
+outputs still compute, but the run is marked unsafe. Other sections remain independently usable. The final step always
 uses the guarded kernel. The download contains that kernel with the selected multiplier
 and a separate C++ host harness; the PyTorch example does not compile or call it.
 
 Run evaluates the teaching model on the CPU. The layout is a mapping diagram, not a
 physical GPU arrangement or execution timeline. No parsing of arbitrary CUDA, GPU
 execution or speed claim is made. The complete CUDA function, pointer definitions and
-download only appear after threads, indices, blocks and guards have been introduced.
+download appear in the final section, below threads, indices, blocks and guards.
+Worked diagrams are generated from the same model during build, so all five examples
+remain readable without JavaScript. Interaction never replaces or scrolls to an earlier section.
 Generated programs have not been compiled or validated on an NVIDIA GPU.

@@ -149,7 +149,8 @@ not yet integrate `snowch/learning-platform`; migration is a separate curriculum
 
 
 Start with **Hello, GPU** (`lessons/hello.html`): change a multiplier and see how
-each thread connects an input to an output. Five steps introduce indices, blocks and
+each thread connects an input to an output. Five sections flow down one page, each with its own visual and independent controls.
+They introduce indices, blocks and
 bounds checks before revealing a complete CUDA kernel. The browser simulation makes
 no GPU execution claim. **Repair a kernel** follows; the eight architecture labs
 remain available independently.

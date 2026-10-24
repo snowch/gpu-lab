@@ -2,7 +2,7 @@
 main .intro { padding-bottom:20px; margin-bottom:24px; }
 .hello-concept { font-size:18px; max-width:720px; }
 .hello-factor-label { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:20px 0; }
-#hello-factor { width:95px; }
+[id^="hello-factor-"] { width:95px; }
 .hello-note { color:var(--muted); font-size:13px; margin:8px 0 20px; }
 .hello-group { margin:16px 0; border:1px solid var(--line); border-radius:8px; padding:12px; }
 .hello-group h3 { margin-bottom:12px; }
@@ -14,11 +14,11 @@ main .intro { padding-bottom:20px; margin-bottom:24px; }
 .hello-thread[aria-pressed="true"] { outline:2px solid var(--accent); background:var(--accent-soft); }
 .hello-thread[data-state="invalid"] { border:2px dashed var(--accent); }
 .hello-thread[data-state] strong { font-size:14px; }
-#hello-output { padding:14px; background:var(--soft); border-left:3px solid var(--accent); overflow-wrap:anywhere; }
-#hello-guard-section { margin:16px 0; }
-#hello-guard { min-height:0; }
-#hello-cuda-section, #hello-complete { margin:26px 0; }
-#hello-cuda-section pre,#hello-complete pre,#hello-selected-code { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; font:14px/1.7 ui-monospace,monospace; }
+[id^="hello-output-"] { padding:14px; background:var(--soft); border-left:3px solid var(--accent); overflow-wrap:anywhere; }
+.hello-guard-section { margin:16px 0; }
+[id^="hello-guard-"] { min-height:0; }
+.hello-cuda-section, .hello-complete { margin:26px 0; }
+.hello-cuda-section pre,.hello-complete pre,[id^="hello-selected-code-"] { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; font:14px/1.7 ui-monospace,monospace; }
 .hello-actions { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
 @media(max-width:500px) { .hello-threads { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:500px) {
@@ -31,3 +31,7 @@ main .intro { padding-bottom:20px; margin-bottom:24px; }
  .hello-thread strong { grid-row:2; position:relative; }
  .hello-thread strong:not(:last-child)::after { content:'→'; display:inline; position:absolute; right:-5px; top:3px; padding:0; }
 }
+
+.hello-section { border-top:1px solid var(--line); margin:44px 0; padding-top:36px; scroll-margin-top:90px; }
+.hello-section h2 { font-size:30px; }
+.hello-section:first-of-type { border-top:0; padding-top:0; }
