@@ -244,10 +244,13 @@ Only editor choices persist; challenge answers/completion are session state.
 
 ## Hello, GPU
 
-Five steps progressively introduce elementwise multiplication, thread-to-element indices,
+An opening PyTorch snippet and model-derived input/result vectors come before the
+thread explanation. Five steps then introduce elementwise multiplication, thread-to-element indices,
 block grouping, tail checks and Python-to-kernel orchestration. Each section has its own multiplier in
-[-10, 10], selection and results. All five sections remain visible in reading order. Inputs are 1..4 for the first three steps and 1..5
-for the final two; block sizes are 4, 4, 2, 4 and 4 respectively. The model rounds the
+[-10, 10], selection and results. All five sections remain visible in reading order. All steps use inputs 1..5; block sizes are 5, 5, 4, 4 and 4 respectively.
+The block-grouping example introduces the guarded eight-thread launch before the next
+section lets the learner disable its check. The opening reference keeps its multiplier
+of two; each following experiment has independent controls. The model rounds the
 multiplier and results to FP32. It derives every card's input, output, global index,
 block membership and local index from those values.
 

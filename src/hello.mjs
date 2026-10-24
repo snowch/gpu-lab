@@ -16,10 +16,10 @@ function model(){return simulateIntro(stage,factor(),stage===3?$('hello-guard').
 function code(){
   let value;try{value=factor();}catch{return;}
   $('hello-operation').textContent='y = x * '+value;
-  if($('hello-line')) $('hello-line').textContent=stage===3&&$('hello-guard').checked?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
+  if($('hello-line')) $('hello-line').textContent=stage===2||stage===3&&$('hello-guard').checked?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
   if(stage===4){
     $('hello-full').textContent=kernelSource(value);
-    $('hello-python').textContent='import torch\nx = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], device="cuda")\ny = x * '+value;
+    $('hello-python').textContent='y = x * '+value;
   }
 }
 function inspect(t){
@@ -37,8 +37,8 @@ function draw(){
 }
 function invalidate(){
   result=null;$('hello-output').textContent='Run to see the results.';code();draw();
-registerExperiment('hello-'+stage,()=>({selected,ran:result!==null}),state=>{ selected=state.selected; result=state.ran?model():null; code();draw(); });
 }
+function resultText(){return result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';}
 $('hello-map').addEventListener('click',event=>{
   const button=event.target.closest('button[data-thread]');
   if(!button)return;
@@ -50,10 +50,13 @@ $('hello-guard')?.addEventListener('change',invalidate);
 $('hello-run').addEventListener('click',()=>{
   try{
     result=model();draw();
-    $('hello-output').textContent=result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';
+    $('hello-output').textContent=resultText();
   }catch(error){result=null;$('hello-output').textContent=error.message;}
 });
 $('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
 code();draw();
-registerExperiment('hello-'+stage,()=>({selected,ran:result!==null}),state=>{ selected=state.selected; result=state.ran?model():null; code();draw(); });
+registerExperiment('hello-'+stage,()=>({selected,ran:result!==null,length:steps[stage].length,message:$('hello-output').textContent}),state=>{
+  selected=state.selected;result=state.ran?model():null;code();draw();
+  $('hello-output').textContent=state.length===steps[stage].length&&typeof state.message==='string'?state.message:result?resultText():'Run to see the results.';
+});
 }
