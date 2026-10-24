@@ -11,6 +11,7 @@ def check_overview(browser, base_url, root, errors):
             mock_version(context)
             page = context.new_page()
             page.on('pageerror', lambda error: errors.append(str(error)))
+            page.goto(base_url)
             page.goto(base_url+'#meet-gpu')
             expect(page).to_have_url(base_url+'lessons/meet-gpu.html')
             for layer in page.locator('.architecture-layer').all():
