@@ -31,9 +31,15 @@ its download fails honestly and the learner can prepare the current release.
 A missing old file never falls through to an incompatible new root asset.
 
 Checks use an eight-second deadline, a unique URL, `cache: no-store`, a no-cache
-request header, strict metadata validation and rejection of a positive `Age`.
+request header and strict metadata validation. GitHub Pages legitimately returns
+positive `Age` values from its shared cache. Accept them only with an explicit
+`max-age` of at most 600 seconds while `Age` is below that lifetime; reject expired,
+unbounded or malformed cache responses. The panel explains that publication may
+take up to ten minutes. Immutable running manifests need validation, not freshness.
 The worker always forwards release metadata to the network. Aborted/late checks
-cannot mark the app up to date. Opening, focus, reconnect and visibility changes
+cannot mark the app up to date. A check cancelled when the app is hidden preserves
+the last verified status and retries on return. A failed check clears the offered
+release, so Retry cannot appear alongside a stale deployment and Update button. Opening, focus, reconnect and visibility changes
 check with a 15-second throttle; visible connected pages check once a minute.
 Manual checks bypass the throttle and concurrent checks are deduplicated.
 No version check prepares app assets. Static hosting cannot prove freshness
@@ -52,6 +58,12 @@ or Update prepares the selected manifest, checks every file's length and SHA-256
 and reports verified bytes. Cancellation/failure retains valid partial files for
 resume and leaves the previously selected complete release intact. The real
 browser quota test verifies the same failure path under storage pressure.
+
+Background cleanup and explicit cache mutations are coordinated: an operation
+reserves its lock before waiting for in-progress pruning to finish. Cleanup cannot
+delete a staging cache created during a download. Cancellation still reaches a
+queued download. A deterministic worker test pauses cleanup and starts an update;
+it reproduces the former race without relying on timing.
 
 The worker stores a small selection record separately from per-release caches.
 Preparing an update sets `pending`; only Restart to update changes `active`.

@@ -12,8 +12,8 @@ def mock_version(context):
 
 def check_version(browser, base_url):
     context = browser.new_context(service_workers='block', viewport={'width': 360, 'height': 800})
-    state = {'release': RELEASE, 'status': 200, 'age': '0'}
-    context.route('**/release.json?*', lambda route: route.fulfill(status=state['status'], json=state['release'], headers={'Age':state['age']}))
+    state = {'release': RELEASE, 'status': 200, 'age': '0', 'cache_control':'no-store'}
+    context.route('**/release.json?*', lambda route: route.fulfill(status=state['status'], json=state['release'], headers={'Age':state['age'],'Cache-Control':state['cache_control']}))
     page = context.new_page(); page.goto(base_url); page.locator('#app-status-open').click()
     indicator = page.locator('#version-status')
     expect(indicator).to_have_text('Up to date')
@@ -23,6 +23,15 @@ def check_version(browser, base_url):
     state['release'] = {**RELEASE, 'id':'0'*64}
     context.set_offline(False); expect(indicator).to_have_text('Update available')
     expect(page.locator('#running-version')).to_have_text(original)
+    state.update(age='17',cache_control='max-age=600')
+    page.locator('#check-update').click(); expect(indicator).to_have_text('Update available')
+    expect(page.locator('#version-detail')).to_contain_text('10 minutes')
+    expect(page.locator('#download-update')).to_be_visible()
+    state.update(age='600')
+    page.locator('#check-update').click();expect(indicator).to_have_text('Couldn’t check for updates')
+    expect(page.locator('#download-update')).to_be_hidden()
+    expect(page.locator('#version-detail')).not_to_contain_text('Deployed release')
+    state.update(age='0',cache_control='no-store')
     for bad in ['http', 'malformed', 'cached']:
         state.update(status=503 if bad=='http' else 200, release={} if bad=='malformed' else RELEASE, age='10' if bad=='cached' else '0')
         page.locator('#check-update').click(); expect(indicator).to_have_text('Couldn’t check for updates')
@@ -43,4 +52,30 @@ def check_version(browser, base_url):
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     page.keyboard.press('Escape'); expect(page.locator('#app-status-open')).to_be_focused()
     context.close()
+    check_background_abort(browser,base_url)
     print('PASS: deployed identity, mismatch, offline/reconnect, failure, malformed/cached metadata, immutable running identity, keyboard focus')
+
+
+def check_background_abort(browser,base_url):
+    context=browser.new_context(service_workers='block')
+    candidate={**RELEASE,'id':'0'*64}
+    context.route('**/release.json?*',lambda route:route.fulfill(json=candidate))
+    page=context.new_page();page.goto(base_url);page.locator('#app-status-open').click()
+    expect(page.locator('#version-status')).to_have_text('Update available')
+    held=[]
+    context.unroute('**/release.json?*')
+    context.route('**/release.json?*',lambda route:held.append(route))
+    page.locator('#check-update').click()
+    expect(page.locator('#version-status')).to_have_text('Checking for updates')
+    page.evaluate("Object.defineProperty(document,'visibilityState',{configurable:true,value:'hidden'});document.dispatchEvent(new Event('visibilitychange'))")
+    expect(page.locator('#version-status')).to_have_text('Update available')
+    expect(page.locator('#download-update')).to_be_visible()
+    for route in held:
+        try:route.fulfill(json=RELEASE)
+        except Exception:pass
+    expect(page.locator('#version-status')).to_have_text('Update available')
+    context.unroute('**/release.json?*')
+    context.route('**/release.json?*',lambda route:route.fulfill(json=RELEASE))
+    page.evaluate("delete document.visibilityState;document.dispatchEvent(new Event('visibilitychange'))")
+    expect(page.locator('#version-status')).to_have_text('Up to date')
+    context.close()

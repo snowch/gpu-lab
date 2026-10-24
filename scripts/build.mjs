@@ -17,10 +17,11 @@ for (const path of ['index.html', 'src', 'examples', 'assets', 'manifest.webmani
   await cp(path, `dist/${path}`, { recursive: true });
 }
 await writeFile('dist/index.html', (await readFile('index.html', 'utf8'))
-  .replace('<!-- BOOK_ROADMAP -->', renderRoadmap())
-  .replace('<!-- SM_OVERVIEW -->', renderSmOverview())
-  .replace('<!-- WORK_MAP -->', renderWorkMap()));
+  .replace('<!-- BOOK_ROADMAP -->', renderRoadmap()));
 await mkdir('dist/lessons', { recursive: true });
+await writeFile('dist/lessons/meet-gpu.html', (await readFile('content/gpu-reference.html','utf8'))
+  .replace('<!-- SM_OVERVIEW -->',renderSmOverview())
+  .replace('<!-- WORK_MAP -->',renderWorkMap()));
 const transfer = simulateKernel({index:'global',guard:true,operation:'multiply',blockSize:8},Array.from({length:6},(_,i)=>i+1));
 const skipped = transfer.trace.filter(event=>event.op==='guard'&&!event.allowed).map(event=>event.global);
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))

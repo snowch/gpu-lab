@@ -1,12 +1,12 @@
 // Copyright © 2026 Christopher Snow.
 import './experiment-state.mjs';
-import { validateRelease } from './release-contract.mjs';
+import {readReleaseMetadata} from './release-metadata.mjs';
 const $ = id => document.getElementById(id);
 const base = new URL(document.querySelector('meta[name="gpu-base"]').content, location.href);
 const running = document.querySelector('meta[name="gpu-release"]').content;
 const dialog = $('app-status-dialog');
 let registration, worker, latest, runningRelease, snapshot = {}, checking, lastCheck = 0, checkingAbort;
-let downloading = false, mode, removed = false, refreshGeneration = 0;
+let downloading = false, mode, removed = false, refreshGeneration = 0, cacheLifetime = 0;
 let version = navigator.onLine ? 'Checking for updates' : 'Cannot check for updates';
 const supported = 'serviceWorker' in navigator && isSecureContext && 'caches' in self;
 let unavailable = !supported;
@@ -35,7 +35,8 @@ function render() {
   $('save-offline').textContent = unavailable ? 'Retry offline access' : snapshot.partial === running ? 'Resume download' : snapshot.saved ? 'Repair offline copy' : 'Download for offline use';
   $('remove-offline').hidden = !supported || !(snapshot.saved || snapshot.partial || snapshot.active || snapshot.pending);
   $('remove-offline').disabled = downloading;
-  $('version-detail').textContent = !supported ? 'This browser cannot save or prepare updates here. You can keep using GPU Lab online.' : latest && available ? `Deployed release ${latest.commit?.slice(0, 7) || latest.id.slice(0, 7)}${latest.date ? ' · ' + latest.date : ''}. Download: ${bytes(latest.bytes)}.` : version === 'Cannot check for updates' ? 'You are offline. Saved files remain usable; the published version cannot be checked.' : version === 'Couldn’t check for updates' ? 'The deployed release could not be verified. Try again when connected.' : '';
+  const cacheNote = cacheLifetime ? ` The host may take up to ${Math.ceil(cacheLifetime/60)} minutes to show a new deployment.` : '';
+  $('version-detail').textContent = !supported ? 'This browser cannot save or prepare updates here. You can keep using GPU Lab online.' : latest && available ? `Deployed release ${latest.commit?.slice(0, 7) || latest.id.slice(0, 7)}${latest.date ? ' · ' + latest.date : ''}. Download: ${bytes(latest.bytes)}.${cacheNote}` : latest && cacheLifetime ? 'The published release matches this app.'+cacheNote : version === 'Cannot check for updates' ? 'You are offline. Saved files remain usable; the published version cannot be checked.' : version === 'Couldn’t check for updates' ? 'The deployed release could not be verified. Try again when connected.' : '';
 }
 function rpc(type, data = {}, progress) {
   return new Promise((resolve, reject) => {
@@ -63,27 +64,39 @@ async function refresh() {
     render();
   } catch (failure) { unavailable = true; error(failure.message); render(); }
 }
-async function metadata(url, signal) {
+async function metadata(url, signal, options) {
   const response = await fetch(url, { cache: 'no-store', credentials: 'same-origin', signal, headers: { 'Cache-Control': 'no-cache' } });
-  if (!response.ok || Number(response.headers.get('Age') || 0) > 0) throw new Error('Release unavailable or cached');
-  return validateRelease(await response.json());
+  return readReleaseMetadata(response,options);
 }
 async function check(force = false) {
-  if (checking || (!force && Date.now() - lastCheck < 15000)) return checking;
-  if (!navigator.onLine) { version = 'Cannot check for updates'; render(); return; }
+  if (checking) return checkingAbort?.signal.aborted ? checking.then(()=>check(force)) : checking;
+  if (!force && Date.now() - lastCheck < 15000) return;
+  if (!navigator.onLine) { latest = null; version = 'Cannot check for updates'; render(); return; }
   lastCheck = Date.now();
   const abort = new AbortController(); checkingAbort = abort;
   const timer = setTimeout(() => abort.abort(), 8000);
+  const previousVersion = version;
   version = 'Checking for updates';
   checking = (async () => {
     try {
       const url = new URL('release.json', base); url.searchParams.set('check', crypto.randomUUID());
-      const release = await metadata(url, abort.signal);
+      const result = await metadata(url, abort.signal);
+      const release = result.release;
       if (checkingAbort !== abort || abort.signal.aborted) return;
-      latest = release;
+      latest = release; cacheLifetime = result.cacheLifetime;
       if (release.id === running) runningRelease = release;
       version = release.id === running ? 'Up to date' : 'Update available';
-    } catch { if (checkingAbort === abort) version = navigator.onLine ? 'Couldn’t check for updates' : 'Cannot check for updates'; }
+    } catch {
+      if (checkingAbort === abort) {
+        if(abort.signal.reason==='hidden') {
+          version=previousVersion==='Checking for updates'?'Check for updates':previousVersion;
+          lastCheck=0;
+        } else {
+          latest=null;cacheLifetime=0;
+          version=navigator.onLine?'Couldn’t check for updates':'Cannot check for updates';
+        }
+      }
+    }
     finally { clearTimeout(timer); checking = null; render(); }
   })();
   render(); return checking;
@@ -157,14 +170,14 @@ navigator.serviceWorker?.addEventListener('message', ({ data }) => {
   if (data?.type === 'OFFLINE_REMOVED') { snapshot = {}; removed = true; render(); }
 });
 addEventListener('online', () => { lastCheck = 0; check(); refresh(); });
-addEventListener('offline', () => { checkingAbort?.abort(); version = 'Cannot check for updates'; render(); });
+addEventListener('offline', () => { checkingAbort?.abort('offline'); latest=null; version = 'Cannot check for updates'; render(); });
 addEventListener('focus', () => { check(); refresh(); });
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') { check(); refresh(); }
-  else { checkingAbort?.abort(); }
+  else { checkingAbort?.abort('hidden'); }
 });
 setInterval(() => { if (document.visibilityState === 'visible' && navigator.onLine) check(); }, 60000);
 addEventListener('load', remember, { once: true });
 render(); check(); connect();
 // Running metadata is immutable and small; it is not a course download.
-metadata(new URL(`releases/${running}/release.json`, base), AbortSignal.timeout(8000)).then(r => { if (r.id === running) { runningRelease = r; render(); remember(); } }).catch(() => {});
+metadata(new URL(`releases/${running}/release.json`, base), AbortSignal.timeout(8000),{immutable:true}).then(({release:r}) => { if (r.id === running) { runningRelease = r; render(); remember(); } }).catch(() => {});

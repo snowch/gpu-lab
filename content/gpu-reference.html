@@ -1,0 +1,96 @@
+<!doctype html>
+<!-- Copyright © 2026 Christopher Snow. -->
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An optional visual reference for CPU and GPU memory, streaming multiprocessors, blocks and warps.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <title>Meet the GPU · GPU Lab</title>
+  <link rel="stylesheet" href="../src/style.css">
+  <link rel="stylesheet" href="../src/lessons.css">
+  <link rel="stylesheet" href="../src/architecture-overview.css">
+  <script type="module" src="../src/gpu-reference.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to lesson</a>
+  <header class="topbar">
+    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Course navigation">
+      <p class="eyebrow">HOW GPUS RUN AI</p>
+      <p class="sidebar-title">Under the hood.</p>
+      <nav class="lesson-nav" aria-label="Course lessons">
+        <a href="../index.html">Course overview</a><a href="../index.html#meet-gpu">Meet the GPU</a>
+        <a class="current" aria-current="page" href="hello.html">Start here: Hello, GPU</a><a href="kernel.html">Repair a kernel</a><a href="memory.html">01 Reading a tensor</a>
+        <a href="scheduling.html">02 Keeping the GPU busy</a><a href="divergence.html">03 Taking different paths</a><a href="shared-memory.html">04 Sharing work</a><a href="matmul.html">05 Reusing data</a><a href="tensor-cores.html">06 Using tensor cores</a><a href="attention.html">07 Attention fusion</a><a href="inference.html">08 Inference performance</a><a href="../index.html#curriculum">Course roadmap</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-label">EIGHT LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
+    </aside>
+    <main id="main">
+      <header class="intro"><p class="eyebrow">OPTIONAL VISUAL REFERENCE</p><h1>Meet the GPU</h1><p>Use this map when you want to look up how the parts relate. The chapters introduce each idea alongside an operation and experiment.</p><p><a href="../index.html#curriculum">← Back to the book contents</a></p></header>
+      <section id="meet-gpu" class="section-space architecture-overview" aria-labelledby="meet-gpu-title">
+        <p class="eyebrow">ARCHITECTURE OVERVIEW · ABOUT FIVE MINUTES</p>
+        <h2 id="meet-gpu-title">From tensors to the machine</h2>
+        <p>A PyTorch operation such as <code>y = x + 1</code> looks simple. When <code>x</code> is a CUDA tensor, PyTorch arranges for GPU work to read its values, add one, and write the result. Here is the machine that executes that work.</p>
+        <p>A <strong>thread</strong> is one instance of a GPU program. Many threads can execute the same program on different tensor elements.</p>
+        <p>Open each layer to look inside. This map follows the NVIDIA CUDA architecture used in the labs.</p>
+        <details class="architecture-layer" open>
+          <summary>1. The system: where tensors live</summary>
+          <figure class="architecture-map">
+            <div class="architecture-system">
+              <div class="architecture-box"><strong>CPU</strong><span>Runs your Python program and launches GPU work</span><div class="architecture-memory"><strong>System RAM</strong><span>Holds CPU tensor values</span></div></div>
+              <div class="architecture-connection"><span aria-hidden="true">↔</span><span>Data transfers<br>when needed</span></div>
+              <div class="architecture-box"><strong>GPU</strong><span>Executes many threads of work</span><div class="architecture-memory"><strong>GPU memory / VRAM</strong><span>Holds CUDA tensor values</span></div></div>
+            </div>
+            <figcaption>Moving a tensor to the GPU usually copies its values into GPU memory. Later operations can use those values there without copying them back to the CPU each time.</figcaption>
+          </figure>
+          <p><strong>Memory holds the numbers; processors execute the work.</strong> A tensor also has metadata, such as its shape and strides, describing how to interpret those numbers. Chapters 2 and 3 explore those ideas.</p>
+        </details>
+        <details class="architecture-layer">
+          <summary>2. Inside the GPU: many places to execute work</summary>
+          <figure class="architecture-map">
+            <div class="architecture-box"><strong>GPU</strong>
+              <div class="architecture-sms"><span>SM</span><span>SM</span><span>SM</span><span>…</span></div>
+              <p>Many streaming multiprocessors (SMs)</p>
+              <div class="architecture-connection"><span aria-hidden="true">↕</span><span>Read and write data through caches, which keep some data close to the execution units for reuse</span></div>
+              <div class="architecture-memory"><strong>GPU memory / VRAM</strong><span>Accessible by all SMs</span></div>
+            </div>
+            <!-- SM_OVERVIEW -->
+            <figcaption>This view groups storage by who uses it; it is not a chip floor plan. The execution units and storage belong to the SM. SM counts, execution units and memory capacities vary by GPU.</figcaption>
+          </figure>
+          <p>The GPU can keep other work moving while some threads wait for data. How well it does that depends on having enough ready work and resources to hold it.</p>
+        </details>
+        <details class="architecture-layer">
+          <summary>3. How work maps onto the machine</summary>
+          <p>A <strong>kernel</strong> is a GPU function. A launch creates a <strong>grid</strong> of thread blocks to execute it. Follow one block from that grid into an SM, then look inside its warps.</p>
+          <p class="overview-example-note"><strong>Example:</strong> four blocks, 64 threads per block, two SMs. Placement is chosen to show the relationships; this is not a scheduling simulation or a hardware-capacity claim.</p>
+          <div id="work-map-controls" class="work-map-controls" hidden>
+            <label for="map-block">Follow a block<select id="map-block"><option>A</option><option>B</option><option>C</option><option>D</option></select></label>
+            <label for="map-warp">Inspect its warp<select id="map-warp"><option value="0">Warp 0</option><option value="1">Warp 1</option></select></label>
+          </div>
+          <p id="work-map-selection" class="overview-small" role="status">Following block A on SM 0, warp 0.</p>
+          <figure class="architecture-map">
+            <div id="work-map"><!-- WORK_MAP --></div>
+            <ol class="architecture-work">
+              <li><strong>Each block → one SM</strong><span>A block stays on one SM for its lifetime. Several blocks can reside on the same SM when resources allow.</span></li>
+              <li><strong>Ready warps → execution units</strong><span>The SM chooses a warp whose next instruction can run. Some instructions involve only some of that warp’s threads. A warp is not permanently assigned its own set of execution units.</span></li>
+            </ol>
+            <figcaption>A thread is a unit of program execution, not a dedicated physical core. A tensor's rows do not automatically correspond to blocks or warps; the kernel determines the mapping.</figcaption>
+          </figure>
+          <p>You do not need to memorise these terms. The labs revisit them when they explain a tensor operation.</p>
+        </details>
+        <div class="architecture-takeaway"><h3>What makes a GPU fast?</h3><p>Running many threads in parallel helps when they have useful work and can get the data they need. Moving data, waiting for dependencies, and taking different instruction paths all affect how much work the GPU completes.</p></div>
+        <p>Follow the map through <a href="memory.html">memory access</a>, <a href="scheduling.html">scheduling</a>, <a href="divergence.html">different paths</a>, <a href="shared-memory.html">cooperation</a>, <a href="matmul.html">data reuse</a>, and <a href="tensor-cores.html">tensor cores</a>. Then apply those ideas to attention and inference.</p>
+        <p>Use this map as a reference while reading the opening chapters. For more detailed address experiments, try the existing memory-access lab.</p>
+        <p><a class="start-course" href="memory.html">Explore the memory-access lab →</a></p>
+        <p class="architecture-source">Reference: <a href="https://docs.nvidia.com/cuda/cuda-programming-guide/index.html">NVIDIA CUDA Programming Guide ↗</a></p>
+      </section>
+      <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -44,7 +44,7 @@ def check_navigation(browser, base_url, root, errors):
             expect(navigation).to_be_hidden()
             toggle.click()
             navigation.get_by_role('link', name='Meet the GPU', exact=True).click()
-            expect(page).to_have_url(base_url + 'index.html#meet-gpu')
+            expect(page).to_have_url(base_url + 'lessons/meet-gpu.html')
             expect(navigation).to_be_hidden()
             toggle.click()
             navigation.get_by_role('link', name='Memory access lab', exact=True).click()

@@ -17,7 +17,7 @@ export function renderBookNav(current='index') {
   return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}${chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug)).join('')}
     <p class="nav-group">Further labs</p>${[
       ['memory','Memory access lab'],['scheduling','Keeping the GPU busy'],['divergence','Taking different paths'],['reduction','Reduction workshop'],['shared-memory','Shared-memory banks'],['matmul','Reusing data'],['tensor-cores','Using tensor cores'],['attention','Attention'],['inference','Inference'],['kernel','Repair a kernel'],
-    ].map(([slug,title])=>link(base+slug+'.html',title,current===slug)).join('')}${link(overview+'#meet-gpu','Meet the GPU')}${link(overview+'#curriculum','Book roadmap')}</nav>`;
+    ].map(([slug,title])=>link(base+slug+'.html',title,current===slug)).join('')}${link(base+'meet-gpu.html','Meet the GPU',current==='meet-gpu')}${link(overview+'#curriculum','Book roadmap')}</nav>`;
 }
 export function renderRoadmap() {
   return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div><span class="tag live">${c.opening?'Read the chapter':'Explore existing lab'}</span></a>`).join('\n');

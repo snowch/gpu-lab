@@ -31,7 +31,7 @@ PyTorch: `python examples/book-opening.py --device cpu` or `--device cuda`.
 CPU mode checks values/layouts without GPU transfers; CUDA mode needs an NVIDIA
 GPU and has not yet been validated on hardware. Neither mode is a benchmark.
 The remaining book chapters are planned adaptations of the existing labs, not
-completed rewrites. [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu)
+completed rewrites. [Meet the GPU](https://snowch.github.io/gpu-lab/lessons/meet-gpu.html)
 remains an optional visual reference available offline and without JavaScript.
 
 All eight labs are available as working drafts, with a reduction workshop extending Lab 04:

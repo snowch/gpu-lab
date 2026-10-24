@@ -63,7 +63,7 @@ test('opening has independent experiment ownership and all-page chapter navigati
   assert.equal([...device.matchAll(/data-book-experiment=/g)].length,3);
   assert.equal([...reading.matchAll(/data-book-experiment=/g)].length,4);
   assert.equal(chapters.filter(c=>c.opening).length,3);
-  for(const current of ['index','hello','devices','reading','memory','reduction']) {
+  for(const current of ['index','hello','devices','reading','memory','reduction','meet-gpu']) {
     const nav=renderBookNav(current);
     assert.equal([...nav.matchAll(/aria-current="page"/g)].length,1);
     for(const slug of ['hello','devices','reading']) assert.ok(nav.includes(slug+'.html'));

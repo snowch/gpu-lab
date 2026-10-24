@@ -68,7 +68,7 @@ hesitate; do not treat automated interface checks as learner validation.
 
 ## Architecture introduction
 
-Before Lab 01, the course overview offers **Meet the GPU**, a five-minute map with
+The optional **Meet the GPU** reference (`lessons/meet-gpu.html`) is a five-minute map with
 three progressively disclosed layers: CPU/GPU memory, SM internals, and kernel/block/warp
 mapping. It introduces terms without requiring learners to memorise them. The map describes
 NVIDIA CUDA relationships rather than a simulated chip or performance measurement. Chapter 1 provides the first hands-on experience; the architecture map is optional. Native disclosure controls keep the map available
