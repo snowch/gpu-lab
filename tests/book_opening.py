@@ -12,6 +12,7 @@ def check_book_opening(browser,url,root,errors):
         page.get_by_role('link',name='Chapter 2: Where do the numbers live? →',exact=True).click()
         expect(page.locator('h1')).to_have_text('Where do the numbers live?')
         expect(page.locator('[data-book-experiment]')).to_have_count(3)
+        expect(page.locator('#device-run-0')).to_be_enabled()
         page.locator('#device-run-0').focus();page.keyboard.press('Enter')
         expect(page.locator('#device-feedback-0')).to_contain_text('20 bytes copied')
         expect(page.locator('#device-map-0 .device-buffer')).to_have_count(2)

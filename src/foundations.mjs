@@ -42,5 +42,6 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
   for(const control of section.querySelectorAll('input,select')) control.addEventListener(control.tagName==='INPUT'?'input':'change',()=>{ran=false;render();});
   $('run').addEventListener('click',()=>{ran=true;render();});
   render();
+  $('run').disabled=false;section.dataset.ready='true';
   registerExperiment(section.dataset.bookExperiment,()=>({ran}),state=>{ran=state.ran===true;render();});
 }

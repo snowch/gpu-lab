@@ -1,6 +1,5 @@
 // Copyright © 2026 Christopher Snow.
 import {simulateLoad} from './model.mjs';
-export const initialValues = Object.freeze([1,2,3,4,5]);
 function multiplier(value) {
   if(typeof value!=='number'||!Number.isFinite(value)||value < -10||value > 10) throw new RangeError('Choose a multiplier from −10 to 10.');
   return Math.fround(value);
