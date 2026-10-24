@@ -60,6 +60,26 @@ async function status(running) {
     pendingReady: Boolean(pending && await complete(pending)),
     busy: Boolean(operation || restarting) };
 }
+async function rememberPage(release, paths) {
+  validateRelease(release);
+  const state = await readState();
+  if (state.active && state.active !== release.id) return;
+  const cache = await caches.open(cacheName(release.id));
+  await cache.put(MANIFEST, new Response(JSON.stringify(release)));
+  const requested = new Set(paths);
+  // These files have already been loaded by this document. This is a visited-page
+  // cache, not a background download of the rest of the app or offline consent.
+  for (const file of release.files.filter(f => requested.has(f.path))) {
+    const key = new URL(file.path, BASE);
+    if (await verified(await cache.match(key), file)) continue;
+    const response = await fetch(new URL(`releases/${release.id}/${file.path}`, BASE), { cache: 'no-cache', signal: AbortSignal.timeout(8000) });
+    if (!await verified(response.clone(), file)) throw new Error('The running page could not be retained. Keep this tab open until you restart to update.');
+    await cache.put(key, response);
+  }
+  // Re-read after I/O so a concurrent explicit download cannot lose its consent.
+  const latest = await readState();
+  if (!latest.active) { latest.active = release.id; await writeState(latest); }
+}
 async function prepare(release, save, port, signal) {
   validateRelease(release);
   const cache = await caches.open(cacheName(release.id));
@@ -147,7 +167,11 @@ self.addEventListener('message', event => {
         result = await status(data.running);
         await prune(await readState());
       }
-      else if (data.type === 'CANCEL') {
+      else if (data.type === 'REMEMBER_PAGE') {
+        if (operation || restarting) throw new Error('A download or restart is already in progress.');
+        operation = new AbortController();
+        try { await rememberPage(data.release, data.paths); result = {}; } finally { operation = null; }
+      } else if (data.type === 'CANCEL') {
         operation?.abort(); result = {};
       } else if (data.type === 'PREPARE') {
         if (operation || restarting) throw new Error('Another window is downloading or restarting. Wait for it to finish.');
@@ -195,7 +219,10 @@ self.addEventListener('fetch', event => {
       if (cached) return cached;
       // Missing assets from a selected release must never fall through to a
       // different root deployment. The immutable release URL may repair them.
-      return fetch(new URL(`releases/${id}/${path}`, BASE), { cache: 'no-store' });
+      const response = await fetch(new URL(`releases/${id}/${path}`, BASE), { cache: 'no-store' });
+      const release = await manifest(id), file = release?.files.find(f => f.path === path);
+      if (file && await verified(response.clone(), file)) await cache.put(new URL(path, BASE), response.clone());
+      return response;
     }
     try { return await fetch(event.request); }
     catch (error) {

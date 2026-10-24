@@ -42,7 +42,12 @@ about response age; the deployment must honour the network-only contract.
 
 ## Downloads and activation
 
-Worker installation fetches no course assets. Explicit Download for offline use
+Worker installation fetches no course assets. Once a document has loaded, its
+already-visited HTML and resource URLs are retained and verified as a small
+visited-page cache. Later visits are cached on demand. This pins the running
+release across refresh/reopen even for online-only tabs; it neither downloads
+unvisited lessons nor grants offline consent. Initial retention can require a
+repeat request when the browser has no reusable HTTP response. Explicit Download for offline use
 or Update prepares the selected manifest, checks every file's length and SHA-256,
 and reports verified bytes. Cancellation/failure retains valid partial files for
 resume and leaves the previously selected complete release intact. The real
@@ -100,7 +105,7 @@ fixture is the actual worker from commit `4875086`, not a mock worker API.
   workers. Explicit save, measured size, cancel/resume, every offline asset/page,
   real quota failure, failed replacement, Later, input composition, unsaved guard,
   denied snapshot storage, non-responsive tab, multi-tab route/input/result/trace
-  restoration, eviction/repair, confirmed scoped removal, persistent cold offline
+  restoration, eviction/repair, confirmed scoped removal, online-only deferred refresh/reopen, persistent cold offline
   startup, no activation on closing windows, and legacy-worker migration.
 - Screenshots: [before phone](app-status/before-mobile.png),
   [after phone](app-status/after-mobile.png),

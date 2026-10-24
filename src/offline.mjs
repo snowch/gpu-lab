@@ -10,6 +10,7 @@ let downloading = false, mode, removed = false, refreshGeneration = 0;
 let version = navigator.onLine ? 'Checking for updates' : 'Cannot check for updates';
 const supported = 'serviceWorker' in navigator && isSecureContext && 'caches' in self;
 let unavailable = !supported;
+let remembered = false, remembering;
 const bytes = n => `${n.toLocaleString('en-GB')} bytes (${(n / 1048576).toFixed(2)} MiB)`;
 function error(message = '') { $('app-status-error').textContent = message; }
 function render() {
@@ -98,12 +99,24 @@ async function connect() {
       await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('Offline access unavailable. Retry when browser storage is enabled.')), 8000))]);
       worker = registration.active;
     }
-    removed = false; await refresh();
+    removed = false; await refresh(); await remember();
   } catch (failure) { unavailable = true; error(failure.message); render(); }
+}
+async function remember() {
+  if (remembered || remembering || !worker || !runningRelease || removed || document.readyState !== 'complete') return remembering;
+  const prefix = new URL(`releases/${running}/`, base).href;
+  const paths = performance.getEntriesByType('resource').map(entry => entry.name).filter(url => url.startsWith(prefix)).map(url => url.slice(prefix.length).split('?')[0]);
+  paths.push(location.pathname.slice(base.pathname.length) || 'index.html');
+  remembering = rpc('REMEMBER_PAGE', { release: runningRelease, paths }).then(() => { remembered = true; }).catch(() => {
+    // Storage is optional for normal online use; an explicit save/update reports
+    // its own error. Never claim offline readiness for this best-effort cache.
+  }).finally(() => { remembering = null; });
+  return remembering;
 }
 async function download(save) {
   const release = save ? runningRelease : latest;
   if (!release || downloading) return;
+  await remembering;
   if (!worker || removed || unavailable) await connect();
   downloading = true; mode = save ? 'offline' : 'update'; error();
   $('download-progress').hidden = false; $('asset-progress').value = 0; $('asset-progress').max = release.bytes;
@@ -150,6 +163,7 @@ document.addEventListener('visibilitychange', () => {
   else { checkingAbort?.abort(); }
 });
 setInterval(() => { if (document.visibilityState === 'visible' && navigator.onLine) check(); }, 60000);
+addEventListener('load', remember, { once: true });
 render(); check(); connect();
 // Running metadata is immutable and small; it is not a course download.
-metadata(new URL(`releases/${running}/release.json`, base), AbortSignal.timeout(8000)).then(r => { if (r.id === running) { runningRelease = r; render(); } }).catch(() => {});
+metadata(new URL(`releases/${running}/release.json`, base), AbortSignal.timeout(8000)).then(r => { if (r.id === running) { runningRelease = r; render(); remember(); } }).catch(() => {});

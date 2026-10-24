@@ -17,6 +17,7 @@ def check_version(browser, base_url):
     page = context.new_page(); page.goto(base_url); page.locator('#app-status-open').click()
     indicator = page.locator('#version-status')
     expect(indicator).to_have_text('Up to date')
+    expect(page.locator('#offline-status')).to_have_text('Offline access unavailable')
     original = page.locator('#running-version').inner_text()
     context.set_offline(True); expect(indicator).to_have_text('Cannot check for updates')
     state['release'] = {**RELEASE, 'id':'0'*64}
