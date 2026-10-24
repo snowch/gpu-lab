@@ -38,12 +38,14 @@ async function broadcast(message) {
     if (client.url.startsWith(BASE.href)) client.postMessage(message);
   }
 }
-function prune(state) {
-  if (!state.active || operation || restarting) return;
+function prune() {
+  if (operation || restarting) return;
   if (pruning) return pruning;
   // Cleanup owns the cache list until it finishes. Mutating requests reserve
   // their operation immediately, then wait before opening or deleting caches.
   pruning = (async () => {
+    const state = await readState();
+    if (!state.active) return;
     const release = await manifest(state.active);
     if (!await complete(release)) return;
     const windows = await courseWindows(release);
@@ -171,7 +173,7 @@ self.addEventListener('message', event => {
       if (data.type === 'STATUS') {
         if (/^[a-f0-9]{64}$/.test(data.running)) seen.set(event.source.id, data.running);
         result = await status(data.running);
-        await prune(await readState());
+        await prune();
       }
       else if (data.type === 'REMEMBER_PAGE') {
         if (operation || restarting) throw new Error('A download or restart is already in progress.');
