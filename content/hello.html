@@ -33,12 +33,14 @@
     <main id="main">
       <header class="intro">
         <p class="eyebrow">CHAPTER 1</p>
-        <h1>How a GPU handles many numbers</h1>
-        <p>Start with a short PyTorch program, then follow how the GPU handles its numbers. Each example below keeps its own controls and results, so you can look back as you go.</p>
+        <h1>One operation, many numbers</h1>
+        <p>Start with a short PyTorch program, then follow how the GPU handles its numbers. By the end, you will be able to trace one input to its output and explain why extra threads need a bounds check. Each example below keeps its own controls and results, so you can look back as you go.</p>
       </header>
       <noscript><p class="notice">Enable JavaScript to change the examples. The worked diagrams and code below remain readable without it.</p></noscript>
       <!-- INTRO_SECTIONS -->
-      <p class="hello-actions"><a href="kernel.html">Now try repairing a kernel →</a></p>
+      <section class="hello-section-end"><h2>Try a new case</h2><p>Imagine six inputs and four threads per block. How many blocks do you need? Which threads should skip the arrays?</p><details><summary>Compare your explanation</summary><p>Two blocks supply eight threads. Indices 0–5 handle inputs; indices 6 and 7 skip the arrays. The check becomes <code>i &lt; 6</code>.</p></details><p><a href="kernel.html">Optional practice: repair a kernel →</a></p></section>
+      <section class="section-space"><h2>Run it with PyTorch</h2><p>Run the opening snippet in your own PyTorch environment with an NVIDIA GPU, then inspect <code>y.cpu()</code>. Chapter 2 explains that copy. The <a href="../examples/book-opening.py" download>PyTorch companion</a> checks the examples from all three opening chapters and offers a CPU-only mode for checking values and layouts.</p><p>The companion’s GPU path has not yet been validated on an NVIDIA GPU. The CUDA download above is a separate handwritten implementation.</p></section>
+      <nav class="lesson-pagination" aria-label="Chapter sequence"><a href="../index.html">← Book overview</a><a href="devices.html">Chapter 2: Where do the numbers live? →</a></nav>
       <details class="more-settings"><summary>About the simulation</summary>
         <p>This browser model computes the illustrated operations on the CPU, including offline. It does not run PyTorch, compile CUDA or execute GPU code. The picture shows which element each thread handles, not hardware placement, execution timing or a promise that all threads run at once.</p>
       </details>

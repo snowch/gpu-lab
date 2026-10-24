@@ -33,11 +33,11 @@ export function renderIntroSections() {
       ${stage===2?`<p>For <code>y = x * 2</code>, each thread works independently. Later, in matrix multiplication, a block can load inputs into shared memory once and reuse them across its threads.</p>
       <h3>Where do they run?</h3>
       <p>Each block stays on one streaming multiprocessor (SM), a part of the GPU that executes threads in parallel. Different blocks can run on different SMs; several blocks can share one SM when resources allow.</p>
-      <p>Within a block, threads are organised into groups of 32 called warps. A small block uses only part of a warp. The SM schedules instructions for warps, so a block’s threads do not necessarily all execute at once. We explore warp scheduling later.</p>
+      <p>A block’s threads do not necessarily all execute at once. The SM organises them into groups called warps and schedules work from those groups. We explore warps and scheduling later.</p>
       <h3>Try two blocks</h3>
       <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
       <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
-      <p>${step.instruction}</p>
+      <p>${stage===0?'Predict the five outputs before you run. ':stage===3?'Predict which threads have no input. ':''}${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?`<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>`:''}
       <button id="hello-run-${stage}" type="button" class="primary">Run</button>

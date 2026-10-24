@@ -2,6 +2,7 @@
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
   pytorch: 'https://docs.pytorch.org/docs/stable/',
+  to: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html',
   tensor: 'https://docs.pytorch.org/docs/stable/generated/torch.tensor.html',
   stride: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.stride.html',
   cuda: 'https://docs.nvidia.com/cuda/cuda-programming-guide/index.html',
@@ -26,6 +27,16 @@ export const referenceTasks = {
     title:'CUDA thread indices', page:'indices', label:'CUDA: built-in variables',
     prompt:'Find threadIdx, blockIdx and blockDim. Which gives a thread’s position inside its block? Which gives the block’s size?',
     answer:'threadIdx gives the position within the block; blockDim gives its dimensions. blockIdx identifies the block in the grid.',
+  },
+  devices: {
+    title:'When does moving a tensor make a copy?', page:'to', label:'PyTorch: Tensor.to',
+    prompt:'Find what happens when the requested device and dtype already match. Does calling .to() always allocate a new tensor?',
+    answer:'If the device and dtype already match, .to() returns the original tensor by default. Our CPU-to-CUDA example changes the device, so it creates a copy.',
+  },
+  reading: {
+    title:'Check what a stride counts', page:'stride', label:'PyTorch: Tensor.stride',
+    prompt:'Does stride count bytes or element positions? Use the definition to explain why this column has stride 5 but a byte step of 20.',
+    answer:'Stride counts element positions. These FP32 values take four bytes each, so five elements correspond to 20 bytes.',
   },
   kernel: {
     title:'Check the repair against the reference', page:'indices', label:'CUDA: built-in variables',

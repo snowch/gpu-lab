@@ -26,7 +26,7 @@ def check_reference_practice(browser,url,root):
         task.screenshot(path=str(root/f'test-results/reference-{width}-{theme}.png'))
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         context.set_offline(False)
-        for slug in ['memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference']:
+        for slug in ['devices','reading','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference']:
             page.goto(url+'lessons/'+slug+'.html')
             expect(page.locator('.reference-task')).to_have_count(1)
             task=page.locator('.reference-task')

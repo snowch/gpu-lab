@@ -3,6 +3,7 @@ from navigation import check_navigation
 from overview import check_overview
 from kernel import check_kernel
 from hello import check_hello
+from book_opening import check_book_opening
 from reference_practice import check_reference_practice
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
@@ -52,7 +53,7 @@ try:
                 page.goto(URL)
                 expect(page.locator("#simulator")).to_have_count(0)
                 expect(page.locator("#prediction")).to_have_count(0)
-                expect(page.locator(".roadmap h3")).to_have_count(8)
+                expect(page.locator(".roadmap h3")).to_have_count(9)
                 expect(page.locator("html")).to_have_attribute("data-theme", theme)
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Introduction overflows"
                 page.get_by_role("link", name="Meet the GPU →").click()
@@ -67,7 +68,7 @@ try:
                 expect(page.locator(".architecture-work")).to_be_visible()
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Expanded architecture map overflows"
                 page.screenshot(path=str(ROOT / f"test-results/intro-{width}-{theme}.png"), full_page=True)
-                page.get_by_role("link", name="Start Lab 01: Reading a tensor →").click()
+                page.get_by_role("link", name="Explore the memory-access lab →").click()
                 expect(page).to_have_url(URL + "lessons/memory.html")
                 expect(page.locator("h1")).to_have_text("Reading a tensor")
                 expect(page.locator("#curriculum")).to_have_count(0)
@@ -182,7 +183,7 @@ try:
                 page.get_by_role("link", name="← Previous lesson").click()
                 expect(page.locator("h1")).to_have_text("Reading a tensor")
                 page.get_by_role("link", name="← Course overview").click()
-                expect(page.locator(".roadmap h3")).to_have_count(8)
+                expect(page.locator(".roadmap h3")).to_have_count(9)
                 page.goto(URL + "#lab")
                 expect(page).to_have_url(URL + "lessons/memory.html#lab")
                 expect(page.locator("#lanes button")).to_have_count(32)
@@ -202,11 +203,11 @@ try:
         mock_version(context)
         page = context.new_page()
         page.goto(URL)
-        expect(page.locator(".roadmap h3")).to_have_count(8)
+        expect(page.locator(".roadmap h3")).to_have_count(9)
         expect(page.locator("#simulator")).to_have_count(0)
         page.locator(".architecture-layer").nth(2).locator("summary").click()
         expect(page.locator(".architecture-work")).to_be_visible()
-        page.get_by_role("link", name="Start Lab 01: Reading a tensor →").click()
+        page.get_by_role("link", name="Explore the memory-access lab →").click()
         expect(page.locator("noscript .notice")).to_be_visible()
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")
         expect(page.locator("h1")).to_have_text("Reading a tensor")
@@ -229,6 +230,7 @@ try:
         check_overview(browser, URL, ROOT, errors)
         check_kernel(browser, URL, ROOT, errors)
         check_hello(browser, URL, ROOT, errors)
+        check_book_opening(browser, URL, ROOT, errors)
         check_reference_practice(browser, URL, ROOT)
         browser.close()
         assert not errors, errors

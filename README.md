@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-An interactive course for AI practitioners who want to understand how GPUs execute tensor
+An interactive book and set of labs for AI practitioners who want to understand how GPUs execute tensor
 operations. Familiarity with Python, arrays and basic tensor shapes is enough to start.
 CUDA arrives through small programs tied to the hardware model.
 
@@ -19,9 +19,20 @@ GPU code. Generated CUDA programs include their host setup but have not yet been
 compiled or validated on an NVIDIA GPU.
 
 
-Begin with [Hello, GPU](https://snowch.github.io/gpu-lab/lessons/hello.html), then explore [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu), a short visual map of
-CPU/GPU memory, SMs and how blocks and warps execute work. Its three expandable layers
-work offline and without JavaScript.
+Start with the new book opening:
+
+1. [One operation, many numbers](https://snowch.github.io/gpu-lab/lessons/hello.html): five values, threads, indices, blocks and bounds checks.
+2. [Where do the numbers live?](https://snowch.github.io/gpu-lab/lessons/devices.html): copy to the GPU, calculate there, and copy a result back.
+3. [How do threads read a tensor?](https://snowch.github.io/gpu-lab/lessons/reading.html): rows, columns, views, packed copies and equal-work memory requests.
+
+Each example retains its own controls, diagram and results. The
+[PyTorch companion](examples/book-opening.py) checks these operations using real
+PyTorch: `python examples/book-opening.py --device cpu` or `--device cuda`.
+CPU mode checks values/layouts without GPU transfers; CUDA mode needs an NVIDIA
+GPU and has not yet been validated on hardware. Neither mode is a benchmark.
+The remaining book chapters are planned adaptations of the existing labs, not
+completed rewrites. [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu)
+remains an optional visual reference available offline and without JavaScript.
 
 All eight labs are available as working drafts, with a reduction workshop extending Lab 04:
 
