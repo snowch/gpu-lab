@@ -26,7 +26,7 @@ function snapshot() {
   if (guard.reason) throw new Error(guard.reason);
   const data = { schema: 1, controls: formState(), experiments: Object.fromEntries([...hooks].map(([name, hook]) => [name, hook.save()])),
     details: [...document.querySelectorAll('main details')].map(el => el.open),
-    messages: Object.fromEntries([...document.querySelectorAll('main [id]')].filter(el => /(?:feedback|hello-output-\d|kernel-status|prediction-feedback|challenge-feedback)$/.test(el.id)).map(el => [el.id, el.textContent])),
+    messages: Object.fromEntries([...document.querySelectorAll('main [id]')].filter(el => /(?:feedback|kernel-status|prediction-feedback|challenge-feedback)$/.test(el.id)).map(el => [el.id, el.textContent])),
     scroll: [scrollX, scrollY] };
   const encoded = JSON.stringify(data);
   sessionStorage.setItem(key, encoded);
@@ -61,7 +61,12 @@ function restore() {
     // Rebuilding a visual may replace controls; restore selections once more.
     restoreForm(data.controls);
     document.querySelectorAll('main details').forEach((el, i) => { el.open = data.details[i]; });
-    for (const [id, text] of Object.entries(data.messages)) { const el = document.getElementById(id); if (el) el.textContent = text; }
+    for (const [id, text] of Object.entries(data.messages)) {
+      // Hello owns its derived output text. Older snapshots may describe four
+      // inputs; its restore hook recomputes that text for the current model.
+      if (/^hello-output-\d+$/.test(id)) continue;
+      const el = document.getElementById(id); if (el) el.textContent = text;
+    }
     requestAnimationFrame(() => scrollTo({ left: data.scroll[0], top: data.scroll[1], behavior: 'instant' }));
     sessionStorage.removeItem(key);
   } catch {

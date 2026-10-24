@@ -37,8 +37,8 @@ function draw(){
 }
 function invalidate(){
   result=null;$('hello-output').textContent='Run to see the results.';code();draw();
-registerExperiment('hello-'+stage,()=>({selected,ran:result!==null}),state=>{ selected=state.selected; result=state.ran?model():null; code();draw(); });
 }
+function resultText(){return result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';}
 $('hello-map').addEventListener('click',event=>{
   const button=event.target.closest('button[data-thread]');
   if(!button)return;
@@ -50,10 +50,13 @@ $('hello-guard')?.addEventListener('change',invalidate);
 $('hello-run').addEventListener('click',()=>{
   try{
     result=model();draw();
-    $('hello-output').textContent=result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';
+    $('hello-output').textContent=resultText();
   }catch(error){result=null;$('hello-output').textContent=error.message;}
 });
 $('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
 code();draw();
-registerExperiment('hello-'+stage,()=>({selected,ran:result!==null}),state=>{ selected=state.selected; result=state.ran?model():null; code();draw(); });
+registerExperiment('hello-'+stage,()=>({selected,ran:result!==null,length:steps[stage].length,message:$('hello-output').textContent}),state=>{
+  selected=state.selected;result=state.ran?model():null;code();draw();
+  $('hello-output').textContent=state.length===steps[stage].length&&typeof state.message==='string'?state.message:result?resultText():'Run to see the results.';
+});
 }

@@ -59,6 +59,25 @@ def hello_flow(page, url):
     expect(page.locator('#hello-output-3')).to_contain_text('3 threads would access outside')
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
 
+def check_old_hello_snapshot(browser,url):
+    context=browser.new_context(service_workers='block')
+    page=context.new_page();page.goto(url+'lessons/hello.html')
+    page.locator('#hello-factor-1').fill('7')
+    page.evaluate("""() => {
+      const controls=[...document.querySelectorAll('main input,main select,main textarea')].map(el=>({id:el.id,name:el.name,value:el.value,checked:el.checked}));
+      sessionStorage.setItem('gpu-lab:restart:'+location.pathname+location.search,JSON.stringify({
+        schema:1,controls,experiments:{'hello-1':{selected:2,ran:true}},details:[],
+        messages:{'hello-output-1':'Output: [7, 14, 21, 28]'},scroll:[0,0]
+      }));
+    }""")
+    page.reload()
+    expect(page.locator('#hello-factor-1')).to_have_value('7')
+    expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')
+    expect(page.locator('#hello-map-1 .hello-thread')).to_have_count(5)
+    expect(page.locator('#hello-map-1 [data-thread="2"]')).to_have_attribute('aria-pressed','true')
+    expect(page.locator('.restore-notice')).to_have_count(0)
+    context.close()
+
 def check_hello(browser,url,root,errors):
     for width in [360,820,1440]:
         for theme in ['light','dark']:
@@ -71,6 +90,7 @@ def check_hello(browser,url,root,errors):
             for i in [1,3,4]:
                 page.locator(f'#idea-{i}').screenshot(path=str(root/f'test-results/hello-idea-{i}-{width}-{theme}.png'),style='.topbar {position:static!important}')
             context.close()
+    check_old_hello_snapshot(browser,url)
     context=browser.new_context(java_script_enabled=False)
     page=context.new_page();page.goto(url+'lessons/hello.html')
     expect(page.locator('.hello-section')).to_have_count(5)
