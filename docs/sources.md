@@ -64,3 +64,15 @@ not validate the new scheduling assumptions, compiler lowering, or bank model ag
 CI compiles and runs them through GPGPU-Sim with CPU-reference checks. This checks those kernels'
 outputs, not tensor-core lowering, attention-kernel correctness or inference performance. No real
 GPU validation or performance measurement is claimed by this revision.
+
+## Repair-a-kernel prototype: WebGPU
+
+- [WGSL specification](https://www.w3.org/TR/WGSL/): compute entry points,
+  invocation IDs, workgroup size, storage/uniform bindings and FP32 arithmetic.
+- [WebGPU specification](https://www.w3.org/TR/webgpu/): shader compilation,
+  pipeline creation, compute dispatch, buffer copies and asynchronous read-back.
+
+`tests/kernel_webgpu.py` compiles and dispatches the generated shader through real
+WebGPU in Chromium 145 (Playwright 1.58) with its SwiftShader fallback adapter.
+The 2026-10-24 local run passed 72 model/WebGPU combinations and the end-to-end repair
+flow. This is software-adapter validation, not a physical GPU benchmark or CUDA test.

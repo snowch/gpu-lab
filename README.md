@@ -10,6 +10,15 @@ Course URL: <https://snowch.github.io/gpu-lab/>
 
 ## Current scope
 
+[Repair a kernel](https://snowch.github.io/gpu-lab/lessons/kernel.html) is a hands-on
+prototype comparing two approaches on the same vector-scaling task. Repair the kernel,
+check lengths 8/32/35, replay reads and writes in the browser model, and compile and run
+the generated WGSL with WebGPU when an adapter is available. A structured editor works
+on phones and tablets; the source is visible and downloadable. Model tasks work offline
+without a GPU. WebGPU may use a software adapter, which the page identifies. This is a
+correctness prototype; it reports no measured speedups and does not interpret CUDA.
+
+
 Start with [Meet the GPU](https://snowch.github.io/gpu-lab/#meet-gpu), a short visual map of
 CPU/GPU memory, SMs and how blocks and warps execute work. Its three expandable layers
 work offline and without JavaScript.
@@ -80,6 +89,7 @@ python -m pip install -r tests/requirements.txt
 python -m playwright install chromium
 python tests/browser.py
 python tests/offline.py
+python tests/kernel_webgpu.py  # real shader execution on Chromium’s software adapter
 ```
 
 CI runs the model/build and both browser suites before deploying `dist/` from `main` through GitHub Pages Actions.

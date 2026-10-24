@@ -29,6 +29,8 @@ jobs:
       - run: pip install -r tests/requirements.txt
       - run: python -m playwright install --with-deps chromium
       - run: python tests/browser.py
+      - name: Compile and execute the prototype with software WebGPU
+        run: python tests/kernel_webgpu.py
       - run: python tests/offline.py
       - uses: actions/upload-artifact@v4
         if: always()

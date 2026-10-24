@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- Copyright © 2026 Christopher Snow. -->
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Repair a small kernel, inspect its execution in a browser model, and run the same WGSL program with WebGPU.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <title>Repair a kernel · GPU Lab</title>
+  <link rel="stylesheet" href="../src/style.css">
+  <link rel="stylesheet" href="../src/lessons.css">
+  <link rel="stylesheet" href="../src/kernel.css">
+  <script type="module" src="../src/kernel-lesson.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to lesson</a>
+  <header class="topbar">
+    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Course navigation">
+      <p class="eyebrow">HOW GPUS RUN AI</p>
+      <p class="sidebar-title">Under the hood.</p>
+      <nav class="lesson-nav" aria-label="Course lessons">
+        <a href="../index.html">Course overview</a><a href="../index.html#meet-gpu">Start here: Meet the GPU</a>
+        <a class="current" aria-current="page" href="kernel.html">Prototype: Repair a kernel</a><a href="memory.html">01 Reading a tensor</a>
+        <a href="scheduling.html">02 Keeping the GPU busy</a><a href="divergence.html">03 Taking different paths</a><a href="shared-memory.html">04 Sharing work</a><a href="matmul.html">05 Reusing data</a><a href="tensor-cores.html">06 Using tensor cores</a><a href="attention.html">07 Attention fusion</a><a href="inference.html">08 Inference performance</a><a href="../index.html#curriculum">Course roadmap</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-label">EIGHT LABS · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p><a href="https://snowch.github.io/digital-design/">Digital Design ↗</a><a href="https://snowch.github.io/assembly-lab/">Assembly Lab ↗</a></div>
+    </aside>
+    <main id="main">
+      <section class="intro">
+        <p class="eyebrow">HANDS-ON PROTOTYPE · MODEL AND WEBGPU</p>
+        <h1>Repair a kernel</h1>
+        <p class="lead">Make every output element equal twice its input: <code>y = 2 * x</code>.</p>
+        <p>The starting kernel has an indexing error. Repair it, check three vector lengths, and follow what each invocation reads and writes.</p>
+        <p>A <strong>kernel</strong> is a function run many times; one run is an <strong>invocation</strong>. Each invocation should write one output element. Array indices start at zero.</p>
+      </section>
+      <noscript><p class="notice">Enable JavaScript to edit and run the kernel. The task and explanations remain readable below.</p></noscript>
+      <section class="kernel-task" aria-labelledby="task-title">
+        <h2 id="task-title">Your task: pass all three checks</h2>
+        <p>For <code>x = [0.5, -1, 1.5, -2, …]</code>, the output must start <code>[1, -2, 3, -4, …]</code>. Check lengths <strong>8, 32 and 35</strong>, including the last element of each vector.</p>
+      </section>
+      <section class="section-space" aria-labelledby="build-title">
+        <h2 id="build-title">1. Build your kernel</h2>
+        <p>We launch <strong>workgroups</strong> of 32 invocations. <code>global_id.x</code> counts across all groups; <code>local_id.x</code> restarts in each group.</p><p class="kernel-note">Choose statements to generate WGSL, WebGPU’s shader language. The model executes the same supported choices; this is not a general WGSL or CUDA interpreter.</p>
+        <fieldset id="kernel-editor" class="kernel-editor"><legend>Editable statements</legend>
+          <label for="kernel-index">Element index, <code>i</code><select id="kernel-index"><option value="next">global_id.x + 1u</option><option value="global">global_id.x</option><option value="local">local_id.x</option></select></label>
+          <label for="kernel-guard">Before accessing the arrays<select id="kernel-guard"><option value="yes">Only if i &lt; params.n</option><option value="no">Always access them</option></select></label>
+          <label for="kernel-operation">Value written to y[i]<select id="kernel-operation"><option value="multiply">x[i] * params.factor</option><option value="add">x[i] + params.factor</option></select></label>
+        </fieldset>
+        <p><code>params.n</code> is the vector length. <code>params.factor</code> is 2. The <code>u</code> in <code>1u</code> marks an unsigned integer.</p>
+        <div class="kernel-actions"><button id="run-model" class="primary" type="button">Run model checks</button><button id="run-gpu" type="button">Run WebGPU checks</button><button id="reset-kernel" type="button">Reset starter</button></div>
+        <p id="gpu-support" class="kernel-note">The browser model needs no GPU. WebGPU availability depends on your browser and device.</p>
+        <p id="kernel-status" role="status">Change the kernel, then run the checks.</p>
+        <div class="code-panel"><div class="code-title">Your kernel · WGSL</div><pre><code id="kernel-source">Enable JavaScript to build the source.</code></pre></div>
+        <details class="more-settings"><summary>Full shader, including data bindings</summary><p>The application provides input/output buffers and the length and factor. These declarations connect them to the kernel.</p><pre><code id="shader-source"></code></pre><button id="download-shader" type="button">Download this shader</button></details>
+        <details class="more-settings"><summary>Hint: where should the first invocation write?</summary><p>The first output is <code>y[0]</code>. Work out <code>i</code> when <code>global_id.x</code> is zero. Then check whether that expression still reaches the right elements in a second workgroup.</p></details>
+      </section>
+      <section id="kernel-results" class="section-space" aria-labelledby="run-title" hidden>
+        <h2 id="run-title">2. Compare finished outputs</h2>
+        <div class="kernel-table-wrap"><table class="kernel-checks"><caption>Finished output compared with y = 2 * x</caption><thead><tr><th>Length</th><th>Browser model</th><th>WebGPU</th><th>Inspect</th></tr></thead><tbody id="kernel-cases"></tbody></table></div>
+        <p id="gpu-adapter" class="kernel-note" hidden></p>
+      </section>
+      <section id="kernel-inspector" class="section-space" hidden aria-labelledby="inspect-title">
+        <h2 id="inspect-title">3. Explain the result</h2>
+        <p id="inspection-case"></p>
+        <p class="kernel-note">This is a replay of the <strong>browser model</strong>, not a captured GPU trace. It visits invocations by global ID for inspection; real invocations can run in a different order. Each step is a source operation, not a GPU instruction or clock cycle.</p>
+        <div class="kernel-actions"><button id="trace-back" type="button">Previous step</button><button id="trace-next" type="button">Next step</button><button id="trace-start" type="button">Replay from start</button><button id="trace-end" type="button">Jump to end</button></div>
+        <label for="kernel-step">Source-operation position</label><input id="kernel-step" type="range" min="0" value="0"><p id="trace-position" class="kernel-note"></p>
+        <p id="kernel-event" class="kernel-event" role="status"></p>
+        <dl id="kernel-state" class="kernel-state"></dl>
+        <h3>Input x · highlighted at a read</h3><p class="kernel-note">Each tile shows its element index and value. FP32 elements occupy four bytes; offsets are relative to this buffer.</p><div id="kernel-input" class="kernel-memory"></div>
+        <h3>Model output y after this step</h3><p class="kernel-note">A dash means no invocation has written that element yet. Finished-run checks above are independent of the replay position.</p><div id="kernel-output" class="kernel-memory"></div>
+        <div id="gpu-output-panel" hidden><h3>Output read back from WebGPU</h3><p class="kernel-note">These values come from the submitted shader, after it finishes. They are not produced by the model replay.</p><div id="kernel-gpu-output" class="kernel-memory"></div></div>
+      </section>
+      <section class="challenge section-space"><h2>Keep investigating</h2><ol><li>Pass all three lengths. Which element did the starting kernel miss?</li><li>Inspect length 35. Jump to the last invocation: why does its guard skip the memory access?</li><li>Remove the bounds check and run the model. Find the first invalid access, then repair it.</li><li>Try the local index. Why can a single-workgroup test pass while length 35 fails?</li></ol><p>Unsafe model configurations are stopped before WebGPU dispatch. This prototype does not execute out-of-bounds accesses or write races on your device.</p></section>
+      <details class="more-settings section-space"><summary>What each approach establishes</summary><p><strong>Browser model:</strong> explicit indexing, guards, FP32 arithmetic, reads, writes, duplicate writes and unfilled outputs for these expressions. It does not compile WGSL, simulate SMs, caches or warps, or predict time.</p><p><strong>WebGPU:</strong> the browser compiles the generated WGSL and dispatches it to its selected adapter. Some environments use a software adapter. Results check correctness, not speed. The replay is explanatory model state, not measured GPU internals. WebGPU workgroups play a similar role to CUDA blocks but do not promise NVIDIA’s 32-thread warps.</p><p>Both paths use the same input vectors and an independent reference calculation. There is no server, CUDA compiler or GPU account.</p><p><a href="https://www.w3.org/TR/WGSL/">WGSL specification ↗</a> · <a href="https://www.w3.org/TR/webgpu/">WebGPU specification ↗</a></p></details>
+      <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><a href="memory.html">Explore memory access →</a></nav>
+      <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
+    </main>
+  </div>
+</body>
+</html>
