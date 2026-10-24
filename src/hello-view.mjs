@@ -29,6 +29,9 @@ export function renderIntroSections() {
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
       <p class="hello-concept">${step.concept}</p>
+      ${stage===2?`<p>Blocks also give the GPU groups of work to distribute. Each block stays on one streaming multiprocessor (SM), a part of the GPU that executes threads. Different blocks can run on different SMs; several blocks can share one SM when resources allow.</p>
+      <p>For <code>y = x * 2</code>, each thread works independently, so it does not need that cooperation. Later, in matrix multiplication, a block can load input values into shared memory once and reuse them across its threads.</p>
+      <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
       <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
       <p>${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
