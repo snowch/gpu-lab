@@ -5,6 +5,7 @@ import { renderTensorStep,renderTensorSlice,renderStrideExample,viewCopyComparis
 import { lessons, renderLesson } from '../content/lessons.mjs';
 import { renderConcepts, warpConcepts } from '../src/concepts.mjs';
 import { buildOffline } from './offline.mjs';
+import { renderReferenceTask } from '../src/reference-tasks.mjs';
 import { renderIntroSections } from '../src/hello-view.mjs';
 import { renderSmOverview, renderWorkMap } from '../src/overview-visuals.mjs';
 await rm('dist', { recursive: true, force: true });
@@ -17,8 +18,9 @@ await writeFile('dist/index.html', (await readFile('index.html', 'utf8'))
   .replace('<!-- WORK_MAP -->', renderWorkMap()));
 await mkdir('dist/lessons', { recursive: true });
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8')).replace('<!-- INTRO_SECTIONS -->', renderIntroSections()));
-await cp('content/kernel.html', 'dist/lessons/kernel.html');
+await writeFile('dist/lessons/kernel.html', (await readFile('content/kernel.html', 'utf8')).replace('<!-- REFERENCE_KERNEL -->',renderReferenceTask('kernel')));
 await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html','utf8'))
+  .replace('<!-- REFERENCE_MEMORY -->',renderReferenceTask('memory'))
   .replace('<!-- TENSOR_LAYOUT_FIGURE -->',renderTensorStep())
   .replace('<!-- TENSOR_SLICE_FIGURE -->',renderTensorSlice())
   .replace('<!-- WARP_CONCEPTS -->',renderConcepts({id:'memory',terms:warpConcepts,warpDiagram:true}))

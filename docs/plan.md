@@ -10,11 +10,20 @@ background is assumed. Introduce C/CUDA syntax when an experiment needs it.
 
 The outcome: explain where the time and memory go in an AI operation, predict which changes
 might help, and test those predictions against a model and eventually a real GPU.
+A second outcome is to find and apply the relevant official PyTorch or CUDA reference
+to check an API argument, an indexing rule or a synchronisation requirement.
 
 ## Teaching loop
 
 Start from an AI operation; introduce the smallest mechanism that explains it; ask for a
 prediction; run the model; change one variable; explain the difference; connect it to code.
+Short reference tasks sit beside the relevant code or experiment. Early tasks link to
+the exact API/guide section; later tasks start at the official guide and ask the learner
+to find it, then apply the result to their experiment. Native “Compare your answer”
+disclosures provide a local explanation and, for independent tasks, the direct section
+link. They are optional reading exercises, with no score or extra editor controls.
+External documentation opens in a labelled new tab so the experiment stays in place.
+Questions and comparisons remain available offline; official sites require internet.
 Every visual value comes from model state. Counts and timing estimates must be visibly
 different. Each lab records what its model leaves out.
 

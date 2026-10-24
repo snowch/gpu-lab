@@ -3,6 +3,7 @@ from navigation import check_navigation
 from overview import check_overview
 from kernel import check_kernel
 from hello import check_hello
+from reference_practice import check_reference_practice
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
 import os
@@ -228,6 +229,7 @@ try:
         check_overview(browser, URL, ROOT, errors)
         check_kernel(browser, URL, ROOT, errors)
         check_hello(browser, URL, ROOT, errors)
+        check_reference_practice(browser, URL, ROOT)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

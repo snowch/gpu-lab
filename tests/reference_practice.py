@@ -1,0 +1,45 @@
+# Copyright © 2026 Christopher Snow.
+"""Native disclosures, new-tab references and independent lookup progression."""
+from playwright.sync_api import expect
+
+def check_reference_practice(browser,url,root):
+    for width,theme in [(360,'light'),(360,'dark'),(1440,'light'),(1440,'dark')]:
+        context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
+        # Test navigation behaviour without depending on external sites in CI.
+        context.route('https://docs.pytorch.org/**',lambda route:route.fulfill(content_type='text/html',body='<h1>Official documentation</h1>'))
+        page=context.new_page();page.goto(url+'lessons/hello.html')
+        expect(page.locator('.reference-task')).to_have_count(2)
+        task=page.locator('aside[aria-labelledby="reference-hello-pytorch"]')
+        expect(task).to_contain_text('device and dtype')
+        expect(task.locator('details')).not_to_have_attribute('open','')
+        task.locator('summary').focus();page.keyboard.press('Enter')
+        expect(task.locator('details')).to_have_attribute('open','')
+        expect(task).to_contain_text('numerical representation')
+        page.locator('#hello-factor-0').fill('3');page.locator('#hello-run-0').click()
+        with page.expect_popup() as popup:
+            task.get_by_role('link').click()
+        expect(popup.value.get_by_role('heading')).to_have_text('Official documentation')
+        popup.value.close()
+        expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
+        context.set_offline(True)
+        expect(task).to_contain_text('numerical representation')
+        task.screenshot(path=str(root/f'test-results/reference-{width}-{theme}.png'))
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        context.set_offline(False)
+        for slug in ['memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference']:
+            page.goto(url+'lessons/'+slug+'.html')
+            expect(page.locator('.reference-task')).to_have_count(1)
+            task=page.locator('.reference-task')
+            if slug in ['reduction','matmul','tensor-cores','attention','inference']:
+                expect(task.get_by_role('heading')).to_contain_text('Find it in the guide')
+                expect(task.locator('details')).not_to_have_attribute('open','')
+                task.locator('summary').click()
+                expect(task.get_by_role('link',name='Open the relevant section')).to_be_visible()
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),slug
+        context.close()
+    context=browser.new_context(java_script_enabled=False)
+    page=context.new_page();page.goto(url+'lessons/reduction.html')
+    task=page.locator('.reference-task');task.locator('summary').click()
+    expect(task).to_contain_text('All participating block threads')
+    context.close()
+    print('PASS: reference tasks across all lessons, guided/independent lookup, native keyboard/no-JavaScript disclosures, new tab preserving work, offline text and both themes')
