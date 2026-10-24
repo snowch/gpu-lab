@@ -17,7 +17,7 @@ export function renderIntroSections() {
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
       <p class="hello-concept">${step.concept}</p>
-      <p>In PyTorch, <code>x</code> holds the inputs and <code>y</code> the results.</p>
+      ${stage===0?'<p>In PyTorch, <code>x</code> holds the inputs and <code>y</code> the results.</p>':''}
       <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
       <p>${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
