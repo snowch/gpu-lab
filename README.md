@@ -148,7 +148,8 @@ and [Assembly Lab](https://github.com/snowch/assembly-lab). This small standalon
 not yet integrate `snowch/learning-platform`; migration is a separate curriculum/platform decision.
 
 
-Start with **Hello, GPU** (`lessons/hello.html`): run a working kernel, edit a number,
-then discover thread IDs, input arrays and bounds checks. It uses one Run button
-and clearly labels browser simulation and offers a CUDA download. **Repair a kernel** follows
-this introduction; the eight architecture labs remain available independently.
+Start with **Hello, GPU** (`lessons/hello.html`): change a multiplier and see how
+each thread connects an input to an output. Five steps introduce indices, blocks and
+bounds checks before revealing a complete CUDA kernel. The browser simulation makes
+no GPU execution claim. **Repair a kernel** follows; the eight architecture labs
+remain available independently.

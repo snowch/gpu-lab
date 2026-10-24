@@ -1,62 +1,73 @@
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
-import {steps,kernelSource,runnableSource,analyse} from './hello-model.mjs';
+import {steps,simulateIntro,lineFor,kernelSource,runnableSource} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
 const $=id=>document.getElementById(id);
-let current=0,busy=false;
-const edits=steps.map(step=>step.body);
-function show(){
-  const step=steps[current];
-  $('hello-title').textContent=step.title;
-  $('hello-count').textContent='Step '+(current+1)+' of '+steps.length;
-  $('hello-description').textContent=step.description;
-  $('hello-instruction').textContent=step.instruction;
-  $('hello-before').textContent=step.before;
-  $('hello-code').value=edits[current]; $('hello-code').rows=current===3?4:2;
-  $('hello-after').textContent=step.after;
-  $('hello-explanation').textContent=step.explain;
-  $('hello-pytorch').textContent = [
-    'import torch\ny = torch.full((1,), 42.0)',
-    'import torch\ny = torch.arange(4, dtype=torch.float32)',
-    'import torch\nx = torch.arange(1, 5, dtype=torch.float32)\ny = 2 * x',
-    'import torch\nx = torch.arange(1, 6, dtype=torch.float32)\ny = 2 * x'
-  ][current];
-  $('hello-launch').textContent='Launch: '+Math.ceil(step.length/step.size)+' block(s), '+step.size+' thread(s) per block.';
-  $('hello-input').hidden=current<2;
-  $('hello-input').textContent='Input: ['+Array.from({length:step.length},(_,i)=>i+1).join(', ')+']';
-  $('hello-output').textContent='Run to see the output.';
-  $('hello-backend').textContent='Browser simulation · evaluates the supported CUDA examples on the CPU; no CUDA compilation or GPU execution.';
-  $('hello-next').hidden=true; $('hello-repair').hidden=true;
-  $('hello-back').hidden=current===0;
-  $('hello-full').textContent=kernelSource(current,edits[current]);
+let stage=0,selected=0,result=null;
+function factor(){
+  if($('hello-factor').value.trim()==='') throw new Error('Enter a multiplier first.');
+  const value=Number($('hello-factor').value);simulateIntro(stage,value);return value;
 }
-$('hello-code').addEventListener('input',()=>{
-  edits[current]=$('hello-code').value;
-  $('hello-output').textContent='Code changed. Run to see the new output.';
-  $('hello-next').hidden=true;$('hello-repair').hidden=true;
-  $('hello-full').textContent=kernelSource(current,edits[current]);
+function model(){return simulateIntro(stage,factor(),stage===3?$('hello-guard').checked:true);}
+function code(){
+  let value;try{value=factor();}catch{return;}
+  $('hello-operation').textContent='y = x * '+value;
+  $('hello-bound-explanation').textContent=stage===3?'n is the number of elements (5). The condition i < n asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.':'This line is part of a function. We will see the complete function after exploring bounds checks.';
+  $('hello-line').textContent=stage===3&&$('hello-guard').checked?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
+  $('hello-full').textContent=kernelSource(value);
+  $('hello-python').textContent='import torch\nx = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], device="cuda")\ny = x * '+value;
+}
+function inspect(t){
+  if(stage===0)return;
+  $('hello-index').textContent=stage===1
+    ? 'Thread '+t.i+': i = '+t.i+'. Read input['+t.i+'], multiply it, then write output['+t.i+'].'
+    : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips array access.':t.invalid?' No element '+t.i+' exists: this access is invalid.':'');
+  $('hello-selected-code').textContent=t.i<steps[stage].length?'output['+t.i+'] = input['+t.i+'] * '+factor()+';':'No array element at index '+t.i+'.';
+}
+function draw(){
+  const container=$('hello-map');container.replaceChildren();
+  let state;try{state=model();}catch{return;}
+  const groups=stage>=2?Array.from({length:state.blocks},(_,i)=>i):[null];
+  for(const group of groups){
+    const box=document.createElement('div');box.className='hello-group';
+    if(group!==null){const label=document.createElement('h3');label.textContent='Block '+group;box.append(label);}
+    const grid=document.createElement('div');grid.className='hello-threads';
+    for(const t of state.threads.filter(t=>group===null||t.block===group)){
+      const cell=document.createElement(stage===0?'div':'button');cell.className='hello-thread';
+      if(stage>0){cell.type='button';cell.setAttribute('aria-pressed',String(t.i===selected));cell.addEventListener('click',()=>{selected=t.i;draw();$('hello-map').querySelector('[aria-pressed="true"]')?.focus();});}
+      const values=[['Input',t.input===null?'No element':String(t.input)],['Thread '+t.i,'× '+state.factor],['Output',!result?'?':t.skipped?'Skipped':t.invalid?'Invalid access':String(t.output)]];
+      for(const [label,value] of values){const small=document.createElement('small'),strong=document.createElement('strong');small.textContent=label;strong.textContent=value;cell.append(small,strong);}
+      if(result&&(t.skipped||t.invalid))cell.dataset.state=t.skipped?'skip':'invalid';
+      grid.append(cell);
+    }
+    box.append(grid);container.append(box);
+  }
+  inspect(state.threads[selected]??state.threads[0]);
+}
+function invalidate(){
+  result=null;$('hello-output').textContent='Run to see the results.';$('hello-next').hidden=true;$('hello-repair').hidden=true;code();draw();
+}
+function show(){
+  const step=steps[stage];selected=0;result=null;
+  $('hello-count').textContent='Chapter 1 · '+(stage+1)+' of '+steps.length;
+  $('hello-title').textContent=step.title;$('hello-concept').textContent=step.concept;$('hello-instruction').textContent=step.instruction;
+  $('hello-index-section').hidden=stage===0;$('hello-cuda-section').hidden=stage===0||stage===4;
+  $('hello-group-code').hidden=stage<2;$('hello-guard-section').hidden=stage!==3;
+  $('hello-complete').hidden=stage!==4;$('hello-back').hidden=stage===0;
+  $('hello-guard').checked=true;
+  invalidate();
+}
+$('hello-factor').addEventListener('input',invalidate);
+$('hello-guard').addEventListener('change',invalidate);
+$('hello-run').addEventListener('click',()=>{
+  try{
+    result=model();draw();
+    $('hello-output').textContent=result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';
+    $('hello-next').hidden=stage===steps.length-1||!result.safe;
+    $('hello-repair').hidden=stage!==steps.length-1||!result.safe;
+  }catch(error){result=null;$('hello-output').textContent=error.message;$('hello-next').hidden=true;}
 });
-$('hello-run').addEventListener('click',async()=>{
-  if(busy)return;
-  busy=true;$('hello-run').disabled=true;$('hello-code').disabled=true;$('hello-back').disabled=true;$('hello-reset').disabled=true;
-  $('hello-next').hidden=true;$('hello-repair').hidden=true;
-  $('hello-output').textContent='Running…';
-  try {
-    const result=analyse(current,edits[current]);
-    $('hello-output').textContent='Output: '+(current===0?result.output[0]:'['+result.output.map(v=>v===null?'unwritten':v).join(', ')+']');
-    $('hello-backend').textContent='Browser simulation · not measured GPU output.';
-    if(current===3) $('hello-output').textContent+='\n'+result.launched+' threads launched; '+result.skipped+' skipped the arrays.';
-    $('hello-next').hidden=current===steps.length-1;
-    $('hello-repair').hidden=current!==steps.length-1 || result.output.some(v=>v===null);
-  }catch(error){$('hello-output').textContent=error.message;$('hello-backend').textContent='No result produced. Adjust the code or restore the example.';}
-  finally{busy=false;$('hello-run').disabled=false;$('hello-code').disabled=false;$('hello-back').disabled=false;$('hello-reset').disabled=false;}
-});
-$('hello-next').addEventListener('click',()=>{current++;show();$('hello-title').focus();});
-$('hello-back').addEventListener('click',()=>{current--;show();$('hello-title').focus();});
-$('hello-reset').addEventListener('click',()=>{edits[current]=steps[current].body;show();});
+$('hello-next').addEventListener('click',()=>{stage++;show();$('hello-title').focus();});
+$('hello-back').addEventListener('click',()=>{stage--;show();$('hello-title').focus();});
+$('hello-download').addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
 show();
-
-$('hello-download').addEventListener('click',()=>{
-  try {downloadCuda(runnableSource(current,edits[current]),'hello.cu');}
-  catch(error){$('hello-output').textContent=error.message;}
-});

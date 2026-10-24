@@ -244,17 +244,21 @@ Only editor choices persist; challenge answers/completion are session state.
 
 ## Hello, GPU
 
-Four working CUDA C++ examples precede repair: write a constant, write thread
-indices, scale inputs, then guard a partial block. The fixed kernel scaffold and
-editable body are valid CUDA syntax. The model accepts only the displayed forms
-and described numeric edits; this is not a general CUDA interpreter.
+Five steps progressively introduce elementwise multiplication, thread-to-element indices,
+block grouping, tail checks and Python-to-kernel orchestration. A single multiplier in
+[-10, 10] persists between steps. Inputs are 1..4 for the first three steps and 1..5
+for the final two; block sizes are 4, 4, 2, 4 and 4 respectively. The model rounds the
+multiplier and results to FP32. It derives every card's input, output, global index,
+block membership and local index from those values.
 
-Run always evaluates the supported example on the CPU, visibly labelled as a
-browser simulation. The four examples launch 1, 4, 4 and 8 threads for 1, 4, 4 and 5
-elements. Invalid guards are rejected. Optional PyTorch snippets describe the
-starting operation, not PyTorch's actual kernel implementation. Edits persist
-between steps within the page, not across reloads.
+The bounds-check experiment has eight threads for five elements. With the check disabled,
+threads 5..7 report invalid accesses without inventing out-of-range values. All valid
+outputs still compute, but the run is unsafe and cannot advance. The final step always
+uses the guarded kernel. The download contains that kernel with the selected multiplier
+and a separate C++ host harness; the PyTorch example does not compile or call it.
 
-A download includes the exact edited kernel plus host allocation, copies, launch
-and output read-back. These new programs have not been compiled or validated on
-an NVIDIA GPU. No hardware execution or performance claim is made.
+Run evaluates the teaching model on the CPU. The layout is a mapping diagram, not a
+physical GPU arrangement or execution timeline. No parsing of arbitrary CUDA, GPU
+execution or speed claim is made. The complete CUDA function, pointer definitions and
+download only appear after threads, indices, blocks and guards have been introduced.
+Generated programs have not been compiled or validated on an NVIDIA GPU.

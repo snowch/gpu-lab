@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Run your first GPU kernel, change its output and gradually learn thread IDs, arrays and bounds checks.">
+  <meta name="description" content="Learn GPU computation from a familiar tensor operation, then explore threads, array indices, blocks and bounds checks.">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="data:,">
   <title>Hello, GPU · GPU Lab</title>
@@ -32,49 +32,55 @@
     </aside>
     <main id="main">
       <section class="intro">
-        <p class="eyebrow" id="hello-count">Step 1 of 4</p>
-        <h1 id="hello-title" tabindex="-1">Hello, GPU</h1>
-        <p class="lead" id="hello-description">Write one number, then read it back.</p>
+        <p class="eyebrow" id="hello-count">Chapter 1 · 1 of 5</p>
+        <h1 id="hello-title" tabindex="-1">Many numbers, one calculation</h1>
       </section>
-      <p id="hello-instruction">Run this program. Then change 42.0 to another number and run it again.</p>
-      <noscript><p class="notice">Enable JavaScript to edit and run. This kernel writes 42 into the first output element.</p></noscript>
-      <p id="hello-input" hidden></p>
-      <div class="hello-editor">
-        <pre id="hello-before">__global__ void runKernel(float* output) {</pre>
-        <label for="hello-code">Edit the highlighted code · CUDA C++</label>
-        <textarea id="hello-code" rows="2" spellcheck="false" autocapitalize="off" autocorrect="off" aria-describedby="hello-instruction">output[0] = 42.0;</textarea>
-        <pre id="hello-after">}</pre>
-      </div>
-      <button id="hello-run" type="button" class="primary">Run simulation</button>
-      <p id="hello-output" role="status">Run to see the output.</p>
-      <p id="hello-backend">Browser simulation · no CUDA compilation or GPU execution.</p><p id="hello-launch" class="kernel-note"></p>
-      <p id="hello-explanation">The kernel writes into a buffer. This page simulates that write; it does not run CUDA on your device.</p>
+      <p id="hello-concept" class="hello-concept">A GPU can run many copies of a small program. Each copy is called a thread. Here, each thread multiplies one input number by the same amount.</p>
+      <p>In PyTorch, <code>x</code> holds the input numbers and <code>y</code> holds the results: <code id="hello-operation">y = x * 2</code>.</p>
+      <p id="hello-instruction">Run to double the numbers. Then change the multiplier and run again.</p>
+      <label class="hello-factor-label" for="hello-factor">Multiply each number by <input id="hello-factor" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
+      <noscript><p class="notice">Enable JavaScript to try the experiment. Doubling [1, 2, 3, 4] gives [2, 4, 6, 8], with one thread handling each number.</p></noscript>
+      <div id="hello-guard-section" hidden><label><input id="hello-guard" type="checkbox" checked> Only access elements that exist</label></div>
+      <button id="hello-run" type="button" class="primary">Run</button>
+      <p class="hello-note">Browser simulation</p>
+      <div id="hello-map" aria-label="Each thread connects one input to one output"></div>
+      <p id="hello-output" role="status">Run to see the results.</p>
+      <section id="hello-index-section" hidden>
+        <p id="hello-index" role="status"></p>
+        <pre id="hello-selected-code"></pre>
+      </section>
+      <section id="hello-cuda-section" hidden>
+        <h2>The same idea in CUDA</h2>
+        <p>This code runs inside a GPU function. <code>input</code> and <code>output</code> are arrays; <code>i</code> chooses an element. CUDA C++ uses <code>;</code> to end a statement and <code>2.0f</code> to write a floating-point number.</p>
+        <pre id="hello-line"></pre>
+        <div id="hello-group-code" hidden>
+          <p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p>
+          <pre>int i = blockIdx.x * blockDim.x + threadIdx.x;</pre>
+          <p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>
+        </div>
+        <p id="hello-bound-explanation">The complete function comes later.</p>
+      </section>
+      <section id="hello-complete" hidden>
+        <h2>The Python operation</h2><pre id="hello-python"></pre>
+        <p><code>device="cuda"</code> asks PyTorch to store the tensor on an NVIDIA GPU. PyTorch handles allocation and launches its own implementation of the operation; it does not compile the example below.</p>
+        <h2>The complete CUDA example</h2><pre id="hello-full"></pre>
+        <p><code>__global__</code> marks a GPU kernel. <code>void</code> means it returns no value directly: it writes into <code>output</code>. <code>float*</code> passes the location of an array of floating-point numbers; <code>const</code> means this function does not change that input. <code>n</code> is the number of elements.</p>
+        <details class="more-settings"><summary>Run the CUDA example on an NVIDIA GPU</summary>
+          <p>The download contains this kernel and a separate CPU-side C++ program that allocates memory, copies inputs, launches the kernel and reads the output. It is not a Python extension.</p>
+          <button id="hello-download" type="button">Download CUDA program</button>
+          <p>Requires an NVIDIA GPU, compatible driver, CUDA Toolkit and host C++ compiler:</p>
+          <pre>nvcc -std=c++17 hello.cu -o hello
+./hello</pre>
+          <p>The generated CUDA program has not yet been compiled or tested on an NVIDIA GPU.</p>
+        </details>
+      </section>
       <div class="hello-actions">
         <button id="hello-back" type="button" hidden>← Previous step</button>
-        <button id="hello-next" type="button" hidden>Next step →</button>
+        <button id="hello-next" type="button" hidden>Next idea →</button>
         <a id="hello-repair" href="kernel.html" hidden>Now try repairing a kernel →</a>
       </div>
-      <details class="more-settings">
-        <summary>The same operation in PyTorch</summary>
-        <pre id="hello-pytorch">import torch
-y = torch.full((1,), 42.0)</pre>
-        <p>These snippets describe the starting examples, not PyTorch’s internal kernel implementation. PyTorch may choose a different implementation.</p>
-      </details>
-      <details class="more-settings">
-        <summary>Run this on an NVIDIA GPU</summary>
-        <p>Download a complete CUDA C++ program containing your edited kernel, memory setup, launch and output read-back.</p>
-        <button id="hello-download" type="button">Download CUDA program</button>
-        <p>Requires an NVIDIA GPU, compatible driver, CUDA Toolkit and host C++ compiler. In a terminal:</p>
-        <pre>nvcc -std=c++17 hello.cu -o hello
-./hello</pre>
-        <p>These new examples have not yet been compiled or tested on an NVIDIA GPU. The browser only checks its explicitly supported examples.</p>
-      </details>
-      <details class="more-settings">
-        <summary>About this example</summary>
-        <p>The highlighted code is CUDA C++. The browser model accepts the statements shown and numeric edits described above; it is not a general CUDA interpreter. Allocation and launch setup are included in the download.</p>
-        <button id="hello-reset" type="button">Restore example</button>
-        <pre id="hello-full"></pre>
-        <p>No hardware scheduling or performance is simulated. The model runs on the CPU, including offline.</p>
+      <details class="more-settings"><summary>About the simulation</summary>
+        <p>This browser model computes the illustrated operations on the CPU, including offline. It does not run PyTorch, compile CUDA or execute GPU code. The picture shows which element each thread handles, not hardware placement, execution timing or a promise that all threads run at once.</p>
       </details>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
     </main>

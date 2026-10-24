@@ -73,7 +73,7 @@ synchronisation and error handling. PyTorch snippets describe equivalent operati
 they are not claims about the framework's internal kernel implementation.
 
 Browser tests exercise supported CUDA expressions in an explicit CPU teaching model,
-including edits, prediction/repair checks, invalid accesses, generated downloads and
+including the concept-first thread mapping, prediction/repair checks, invalid accesses, generated downloads and
 offline use. There is no in-browser CUDA compiler. The new generated programs have
 not yet been compiled with nvcc or run on an NVIDIA GPU; they remain explicitly
 unvalidated for real CUDA execution. The previous WGSL/WebGPU prototype and its

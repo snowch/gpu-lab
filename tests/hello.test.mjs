@@ -1,18 +1,24 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,analyse,kernelSource} from '../src/hello-model.mjs';
-test('hello progression computes outputs and exposes unwritten tail elements',()=>{
- assert.deepEqual(steps.map((s,i)=>analyse(i,s.body).output),[[42],[0,1,2,3],[2,4,6,8],[2,4,6,8,10]]);
- for(const number of [-12.5,0,7,100.25]) assert.equal(analyse(0,'output[0] = '+number+';').output[0],number);
- assert.deepEqual(analyse(2,'output[i] = input[i] * 3.0;').output,[3,6,9,12]);
- const tail=analyse(3,steps[3].body.replace('5','4'));
- assert.deepEqual(tail.output,[2,4,6,8,null]);assert.equal(tail.skipped,4);
- assert.equal(analyse(3,steps[3].body.replace('5','0')).skipped,8);
- assert.throws(()=>analyse(3,steps[3].body.replace('5','6')),/past/);
- assert.throws(()=>analyse(0,'output[7] = 42.0;'),/change only/);
- assert.throws(()=>analyse(0,'loop {}'));
- assert.throws(()=>analyse(0,'output[0] = 010;'),/leading zeroes/);
- assert.throws(()=>analyse(0,'output[0] = 4 2.0;'),/without spaces/);
- assert.match(kernelSource(2,steps[2].body),/__global__ void runKernel/);
+import {steps,simulateIntro,kernelSource} from '../src/hello-model.mjs';
+test('intro diagram and outputs derive from thread indices and selected multiplier',()=>{
+ for(let stage=0;stage<steps.length;stage++)for(const factor of [-10,-0.5,0,2,3,10]){
+  const r=simulateIntro(stage,factor);
+  assert.deepEqual(r.output,r.input.map(x=>Math.fround(x*Math.fround(factor))));
+  assert.equal(r.safe,true);
+  for(const t of r.threads) {
+   assert.equal(t.block*r.size+t.local,t.i);
+   assert.equal(t.skipped,t.i>=r.input.length);
+   if(!t.skipped){assert.equal(t.input,r.input[t.i]);assert.equal(t.output,r.output[t.i]);}
+  }
+ }
+ const unsafe=simulateIntro(3,2,false);
+ assert.equal(unsafe.safe,false);
+ assert.deepEqual(unsafe.threads.filter(t=>t.invalid).map(t=>t.i),[5,6,7]);
+ assert.deepEqual(simulateIntro(2,2).threads.map(t=>t.block),[0,0,1,1]);
+ assert.throws(()=>simulateIntro(0,NaN));
+ assert.throws(()=>simulateIntro(0,11));
+ assert.throws(()=>simulateIntro(9,2));
+ assert.match(kernelSource(3),/input\[i\] \* 3.0f/);
 });
