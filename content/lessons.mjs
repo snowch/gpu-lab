@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import { renderReferenceTask, guides } from '../src/reference-tasks.mjs';
 import { remainingLessons } from './remaining-lessons.mjs';
 import { renderWorkedExample } from '../src/worked-examples.mjs';
 import { renderConcepts } from '../src/concepts.mjs';
@@ -35,7 +36,7 @@ scale<<<(n + 127) / 128, 128>>>(x, y, n);`,
     takeaway: `<p>More ready warps can fill issue slots that a single warp leaves unused. They cannot make this single-issue model start more than one instruction per cycle. Compare issue-slot use, or work completed per cycle, when the amount of work changes.</p>
       <p><strong>Occupancy</strong> is resident warps divided by the hardware's maximum resident warps on an SM. Registers, shared memory, block sizes, and hardware limits affect it. Occupancy does not tell you how many warps are ready. This lab selects the resident count directly and does not calculate resource-limited occupancy.</p>`,
     limits: 'This is a teaching machine, not a model of a particular NVIDIA SM. Real SMs have multiple schedulers, execution pipelines, variable memory latency and limited bandwidth. Loads from all warps can overlap without contention here. Stores complete after issue, and block placement, register limits, caches and instruction overlap are omitted. Model cycles are not GPU clock-cycle predictions.',
-    source: 'https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#hardware-multithreading',
+    source: guides.scheduling,
     sourceLabel: 'CUDA Programming Guide: hardware multithreading',
   },
   {
@@ -151,6 +152,7 @@ ${lesson.namedChoices ? `<form id="prediction" class="prediction"><fieldset clas
 <div id="trace" class="trace" aria-label="Computed instruction trace"></div><p id="explanation" class="explanation"></p></div>
 <details class="model-note"><summary>Model assumptions and limits</summary><p>${lesson.limits}</p><a href="${lesson.source}">${lesson.sourceLabel} ↗</a></details></div></section>
 <section class="two-col section-space"><div><p class="eyebrow">CONNECT TO CUDA</p><h2>The programming connection</h2>${lesson.codeNote}</div><div class="code-panel"><div class="code-title">Illustrative CUDA · not executed in this page</div><pre><code>${escape(lesson.code)}</code></pre></div></section>
+${renderReferenceTask(lesson.slug)}
 <section class="challenge section-space"><p class="eyebrow">TRY IT YOURSELF</p><h2>Change one thing. Explain the result.</h2><ol>${lesson.exercises.map(x=>`<li>${x}</li>`).join('')}</ol><details><summary>Compare your explanation</summary>${lesson.takeaway}</details></section>
 <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="${previous}">← Previous lesson</a><a href="${next}">${index + 1 < lessons.length ? 'Next lesson →' : 'Return to roadmap →'}</a></nav>
 <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;

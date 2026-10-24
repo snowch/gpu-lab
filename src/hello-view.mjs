@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,lineFor,kernelSource,pythonSource} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderIntroMap(stage,state,selected=0,showOutput=true) {
@@ -28,6 +29,9 @@ export function renderIntroSections() {
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
       <p class="hello-concept">${step.concept}</p>
+      ${stage===2?`<p>Blocks also give the GPU groups of work to distribute. Each block stays on one streaming multiprocessor (SM), a part of the GPU that executes threads. Different blocks can run on different SMs; several blocks can share one SM when resources allow.</p>
+      <p>For <code>y = x * 2</code>, each thread works independently, so it does not need that cooperation. Later, in matrix multiplication, a block can load input values into shared memory once and reuse them across its threads.</p>
+      <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
       <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
       <p>${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
@@ -36,6 +40,8 @@ export function renderIntroSections() {
       <p class="hello-note">Browser simulation · this example has its own controls</p>
       <div id="hello-map-${stage}" aria-label="Each thread connects one input to one output">${renderIntroMap(stage,state)}</div>
       <p id="hello-output-${stage}" class="hello-output" role="status">Example output: [${state.output.join(', ')}]</p>
+      ${stage===0?`<p class="reference-goal">As you work through the course, practise using the official PyTorch and CUDA references. Start with direct links; later labs ask you to find the relevant section. Choose the documentation version that matches your installed tools.</p>
+    ${renderReferenceTask('hello-pytorch')}`: ''}
       ${stage>0?`<div class="hello-index-section"><p id="hello-index-${stage}" role="status">Select a thread to follow its index.</p>${pre('hello-selected-code','output[0] = input[0] * 2;')}</div>`:''}
       ${stage>0&&stage<4?`<div class="hello-cuda-section">
         <h3>The same idea in CUDA</h3>
@@ -45,6 +51,7 @@ export function renderIntroSections() {
         ${stage>=2?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p><pre>int i = blockIdx.x * blockDim.x + threadIdx.x;</pre><p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
         <p>${stage===3?'n is the number of elements (5). The condition i &lt; n asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.':'We will see the complete function below, after exploring bounds checks.'}</p>
       </div>`:''}
+      ${stage===2?renderReferenceTask('hello-indices'):''}
       ${stage===4?`<div class="hello-complete">
         <h3>The PyTorch operation we started with</h3>${pre('hello-python','y = x * 2')}
         <p>PyTorch handles allocation and launches its own implementation of the operation; it does not compile the example below.</p>

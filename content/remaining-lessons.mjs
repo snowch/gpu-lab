@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import { guides } from '../src/reference-tasks.mjs';
 export const remainingLessons = [
   {
     engine:'ai',slug:'reduction',number:'04B',title:'A reduction needs an ordering',workedExample:'reduction',
@@ -28,7 +29,7 @@ if (t == 0) output[0] = partial[0];`,
     ],
     takeaway:`<p>Every safe stage combines disjoint groups from the previous stage. The group represented by the first partial sum grows until it contains every input. Barriers establish when those shared values can be consumed.</p><p>The unsafe schedule is evidence that the unsynchronised program lacks a required guarantee. One successful run would not prove it correct. The experiment reports a hazard instead of inventing a numeric answer for a data race.</p>`,
     limits:'The teaching schedule uses small integer-valued sums, shared words initially marked unwritten, and stage snapshots. It detects one deliberately exposed read-before-write hazard; it is not a general CUDA race detector or a scheduler model. No output is assigned to the racy program. Floating-point summation-order error and optimised warp reductions are outside this experiment.',
-    source:'https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#synchronization-functions',sourceLabel:'CUDA Programming Guide: synchronisation functions',
+    source:guides.barriers,sourceLabel:'CUDA Programming Guide: synchronisation functions',
   },
   {
     engine:'ai',slug:'matmul',number:'05',title:'Reusing data in matrix multiplication',workedExample:'matmul',
@@ -93,7 +94,7 @@ wmma::store_matrix_sync(C, c, 16, wmma::mem_row_major);`,
     ],
     takeaway:`<p>Input conversion and accumulation are separate choices. Cancellation can make a small input-rounding error dominate the final result. Exact inputs can avoid conversion error; values outside a format's useful range can lose information even before arithmetic starts.</p><p>Tensor-core performance depends on shapes, layouts, data movement, supported formats and the implementation selected by a library or compiler. The numeric experiment gives a reason to check accuracy alongside throughput.</p>`,
     limits:'Input conversion uses round-to-nearest, ties-to-even with subnormals. The arithmetic illustration uses a chosen sequential FP32 accumulation order. It does not reproduce hardware MMA accumulation order or precision guarantees, flush-to-zero behaviour, fragment mapping, tensor-core scheduling, compiler lowering or performance. The FP32 option is a numeric reference, not a claim that this WMMA FP16 sketch accepts FP32 matrix inputs.',
-    source:'https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-matrix-functions',sourceLabel:'CUDA Programming Guide: warp matrix functions',
+    source:guides.wmma,sourceLabel:'CUDA Programming Guide: warp matrix functions',
   },
   {
     engine:'ai',slug:'attention',number:'07',title:'Moving less data in attention',workedExample:'attention',

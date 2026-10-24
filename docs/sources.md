@@ -16,7 +16,7 @@ references for the implemented lab, not evidence that this browser model reprodu
   Documents 32-byte transaction accounting on compute capability 6.0 or newer, sequential
   accesses, misalignment and strided accesses. The course calls these addressed units sectors
   to distinguish them from physical DRAM transactions.
-- [CUDA C++ Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html).
+- [CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/index.html).
   Thread hierarchy, block/grid indexing, warp size, global memory and kernel launches.
 - [CUDA Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/index.html).
   Allocation, copies, error handling and synchronisation in the optional CUDA example.
@@ -27,7 +27,7 @@ hardware. Each additional teaching model distinguishes its assumptions from hard
 
 ## Labs 02–04
 
-- [Hardware multithreading](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#hardware-multithreading):
+- [Hardware multithreading](https://docs.nvidia.com/cuda/cuda-programming-guide/03-advanced/advanced-kernel-programming.html#hardware-multithreading):
   resident warps, readiness, scheduling and block residency. The course's one-issue-slot machine
   and numeric latencies are explicit teaching assumptions, not NVIDIA specifications.
 - [Branching and divergence](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#branching-and-divergence):
@@ -35,7 +35,7 @@ hardware. Each additional teaching model distinguishes its assumptions from hard
   unoptimised operation counts are assumptions; no compiled instruction count is asserted.
 - [Shared memory and banks](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-and-memory-banks):
   bank conflicts, 32 banks, successive 32-bit words, read broadcasts and padding.
-- [Synchronisation functions](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#synchronization-functions):
+- [Synchronisation functions](https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#thread-block-synchronization-functions):
   block barriers, memory visibility and conditions for using `__syncthreads()` in conditional code.
 
 The lesson CUDA fragments are illustrative source, not recorded compiler output or standalone
@@ -48,7 +48,7 @@ not validate the new scheduling assumptions, compiler lowering, or bank model ag
 - [CUDA Best Practices: matrix multiplication](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-ab):
   shared-memory tile reuse and synchronisation. Traffic counts in the lesson are derived from
   the implemented tile loops, not measured HBM transactions.
-- [CUDA Programming Guide: warp matrix functions](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-matrix-functions):
+- [CUDA Programming Guide: warp matrix functions](https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#warp-matrix-functions):
   cooperative WMMA calls, fragment types, alignment and target-dependent support. The lesson's
   chosen sequential accumulation is not asserted to match tensor-core hardware.
 - [CUDA Math API: half precision](https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH__INTRINSIC__HALF.html):
@@ -67,7 +67,7 @@ GPU validation or performance measurement is claimed by this revision.
 
 ## CUDA introduction and repair workshop
 
-The introduction and repair workshop use the CUDA C++ Programming Guide and Runtime
+The introduction and repair workshop use the CUDA Programming Guide and Runtime
 API linked above: thread/block indexing, kernel launches, device allocation, copies,
 synchronisation and error handling. PyTorch snippets describe equivalent operations;
 they are not claims about the framework's internal kernel implementation.
@@ -78,3 +78,25 @@ offline use. There is no in-browser CUDA compiler. The new generated programs ha
 not yet been compiled with nvcc or run on an NVIDIA GPU; they remain explicitly
 unvalidated for real CUDA execution. The previous WGSL/WebGPU prototype and its
 software-adapter execution tests have been retired rather than treated as CUDA evidence.
+
+
+## Reference-reading practice
+
+`src/reference-tasks.mjs` records the official links and short original questions.
+The opening points directly to `torch.tensor` (device/dtype) and CUDA’s built-in
+variables; Lab 01 uses `Tensor.stride`. Subsequent guided checks cover readiness,
+divergence and block synchronisation. Reduction, matmul, tensor-core, attention and
+inference tasks begin at a guide’s contents/search and ask learners to locate the
+relevant contract themselves. Comparison disclosures include direct section links.
+
+The official PyTorch tensor/stride, scaled-dot-product-attention and CUDA-semantics
+pages were read on 2026-10-24 (stable resolved to PyTorch 2.14). The timing comparison
+links to that verified version’s asynchronous-execution section. Learners are asked
+to check their installed version. CUDA links use the reorganised Programming Guide;
+its old `cuda-c-programming-guide` URLs now redirect to the front page and lose the
+intended sections. NVIDIA page and fragment targets were checked against current HTML.
+The guide links document contracts, not measured validation of the course’s models.
+
+No external documentation is fetched while using the course: links open on demand.
+Questions and local comparisons are built into the offline app. These conceptual
+reference checks do not claim to execute PyTorch or CUDA or validate GPU timing.

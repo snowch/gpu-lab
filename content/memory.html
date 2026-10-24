@@ -125,6 +125,7 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
           <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
           <p>This CPU example needs no GPU. The same shape and stride reasoning applies to the corresponding CUDA tensor. PyTorch can choose its own kernels, thread mapping and copies; slicing alone does not launch the particular load modelled here.</p>
         </div>
+        <!-- REFERENCE_MEMORY -->
         <div class="presets"><button type="button" data-tensor-pattern="row">Model x[0, :] · first row</button><button type="button" data-tensor-pattern="column">Model x[:, 0] · first column</button></div>
       </section>
       <section id="lab">

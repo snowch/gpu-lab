@@ -64,3 +64,13 @@ footer { flex-wrap:wrap; }
 .restore-notice { border:2px solid var(--accent); padding:16px; }
 @media(max-width:760px) { .topbar { height:auto; min-height:74px; flex-wrap:wrap; gap:8px; padding:10px 16px; } .top-actions { gap:8px; flex-wrap:wrap; } #app-status-open { max-width:180px; } }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+
+/* Small reference exercises share the course's native disclosure controls. */
+.reference-task { max-width:760px; margin:24px 0; padding:18px 20px; border:1px solid var(--line); border-radius:8px; background:var(--panel); overflow-wrap:anywhere; }
+.reference-task h3 { margin:0 0 12px; font-size:16px; line-height:1.5; }
+.reference-task p { font-size:14px; margin:0 0 12px; }
+.reference-task details { border-top:1px solid var(--line); margin-top:8px; }
+.reference-task .reference-note { color:var(--muted); font-size:12px; margin:12px 0 0; }
+.reference-new-tab { font-size:12px; }
+.reference-goal { max-width:760px; margin-top:24px; }
+@media(max-width:760px) { .reference-task { padding:16px; } }
