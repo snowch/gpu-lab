@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
 import { scheduleWarps, branchWarp, sharedBanks } from './architecture.mjs';
 import { mechanismVisual } from './mechanism-visuals.mjs';
@@ -116,3 +117,5 @@ $('restart').addEventListener('click', () => { cursor = 0; render(); });
 $('step').addEventListener('input', () => { cursor = num('step'); render(); });
 $('lane').addEventListener('change', inspectLane);
 compute(); render();
+
+registerExperiment('lesson',()=>({cursor,revealed}),state=>{cursor=state.cursor;revealed=state.revealed;compute();render();});

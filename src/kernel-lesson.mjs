@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
 import { STARTER, CASE_LENGTHS, inputFor, simulateKernel, snapshot, kernelBody, cudaSource, validateProgram } from './kernel-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
@@ -155,7 +156,7 @@ function renderMap(result, event) {
 challenges.forEach((challenge, index) => {
   const option = document.createElement('option'); option.value = index; option.textContent = challenge.title; byId('challenge-choice').append(option);
 });
-byId('start-challenge').addEventListener('click', () => {
+function startChallenge() {
   activeChallenge = challenges[Number(byId('challenge-choice').value)]; predicted = false;
   program = {...activeChallenge.program, task:activeChallenge.task}; applyControls(); invalidate();
   byId('challenge-active').hidden = false;
@@ -168,7 +169,8 @@ byId('start-challenge').addEventListener('click', () => {
   activeChallenge.answers.forEach((answer, index) => { const option = document.createElement('option'); option.value = index; option.textContent = answer; byId('challenge-answer').append(option); });
   setStatus('Record your prediction before repairing this starter.');
   setBusy(false); byId('challenge-prediction').focus();
-});
+}
+byId('start-challenge').addEventListener('click', startChallenge);
 byId('check-prediction').addEventListener('click', () => {
   const value = byId('challenge-prediction').value;
   if (!activeChallenge || value === '' || !Number.isInteger(Number(value)) || Number(value) < 0) { byId('prediction-feedback').textContent = 'Enter a non-negative whole number first.'; return; }
@@ -185,3 +187,12 @@ byId('check-challenge').addEventListener('click', () => {
   runModel();
 });
 byId('challenge-answer').addEventListener('change', () => { byId('challenge-feedback').textContent = ''; });
+
+registerExperiment('kernel',()=>{
+  if(busy) throw new Error('Wait for the kernel operation to finish.');
+  return {program,ran:models.length>0,selected,position,challenge:activeChallenge?challenges.indexOf(activeChallenge):null,predicted};
+},state=>{
+  if(state.challenge!==null){byId('challenge-choice').value=state.challenge;startChallenge();}
+  program=validateProgram(state.program);predicted=state.predicted;applyControls();setBusy(false);
+  if(state.ran){models=inputs.map(input=>simulateKernel(program,input));selected=state.selected;position=state.position;showCases();renderTrace();}
+});

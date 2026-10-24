@@ -45,3 +45,22 @@ footer { flex-wrap:wrap; }
   .sidebar .course-nav a,.sidebar .lesson-nav a { display:flex; min-height:44px; padding:10px 14px; font-variant-numeric:tabular-nums; }
   .course-contents-toggle[aria-expanded="true"] { margin-bottom:10px; }
 }
+
+/* App status is available on every page, with the pending badge outside its dialog. */
+#app-status-open { display:flex; flex-direction:column; align-items:start; line-height:1.4; text-align:left; max-width:230px; }
+#app-status-summary { font-size:10px; color:var(--muted); overflow-wrap:anywhere; }
+#app-status-dialog { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:12px; padding:24px; width:min(600px,calc(100% - 24px)); max-height:calc(100dvh - 32px); overflow:auto; }
+#app-status-dialog::backdrop { background:#0009; }
+#app-status-dialog section { border-top:1px solid var(--line); padding-top:20px; margin-top:20px; }
+#app-status-dialog h3 { font-size:20px; margin-bottom:10px; }
+#app-status-dialog p { font-size:14px; overflow-wrap:anywhere; }
+#app-status-dialog .build-info { display:inline; }
+.status-heading,.status-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.status-heading h2 { margin:0; }
+.status-actions { justify-content:start; }
+#download-progress { margin-top:20px; }
+#asset-progress { display:block; width:100%; accent-color:var(--accent); }
+#app-status-error { margin-top:16px; }
+.restore-notice { border:2px solid var(--accent); padding:16px; }
+@media(max-width:760px) { .topbar { height:auto; min-height:74px; flex-wrap:wrap; gap:8px; padding:10px 16px; } .top-actions { gap:8px; flex-wrap:wrap; } #app-status-open { max-width:180px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }

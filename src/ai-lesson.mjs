@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
 import {tiledMatmul,precisionMatmul,attention,inferenceBudget,reduceBlock} from './ai-models.mjs';
 import {mechanismVisual} from './mechanism-visuals.mjs';
@@ -112,3 +113,5 @@ $('back').addEventListener('click',()=>{cursor=Math.max(0,cursor-1);render();});
 $('restart').addEventListener('click',()=>{cursor=0;render();});
 $('step').addEventListener('input',()=>{cursor=number('step');render();});
 compute();render();
+
+registerExperiment('lesson',()=>({cursor,revealed}),state=>{cursor=state.cursor;revealed=state.revealed;if(revealed)compute();render();});

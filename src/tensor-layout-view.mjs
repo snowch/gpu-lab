@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {registerExperiment} from './experiment-state.mjs';
 import {renderTensorStep,renderTensorSlice} from './tensor-layout.mjs';
 let direction='row';
 function render(){
@@ -15,3 +16,5 @@ const renderSlice=()=>{document.getElementById('tensor-slice-diagram').innerHTML
 sliceMode.addEventListener('change',renderSlice);
 renderSlice();sliceMode.disabled=false;
 document.getElementById('tensor-slice-diagram').dataset.ready='true';
+
+registerExperiment('tensor-layout',()=>({direction}),state=>{direction=state.direction;render();renderSlice();});
