@@ -19,13 +19,11 @@ mapping function and show unoccupied lane positions as inactive.
 ## Repair-a-kernel prototype
 
 The structured editor selects one index expression (`global_id.x`, `global_id.x + 1u`,
-or `local_id.x`), an optional `i < params.n` guard, and multiplication or addition by
-an FP32 factor of two. These choices generate real WGSL source and drive the explicit
-browser model. No general WGSL or CUDA interpreter is claimed. Workgroups have 32
-invocations in this example; WebGPU does not guarantee a 32-thread hardware subgroup.
+or `local_id.x`), an optional `i < params.n` guard, and multiplication/addition by an FP32 factor of two or addition of a second input buffer. These choices generate real WGSL source and drive the explicit
+browser model. No general WGSL or CUDA interpreter is claimed. Workgroup size is selectable from 8, 16, 32 and 64; WebGPU does not guarantee a 32-thread hardware subgroup.
 
 Inputs are deterministic alternating positive/negative half-integers stored as FP32.
-The reference computes `2*x[i]` independently. The model records index, guard, load,
+The reference computes the selected goal, `2*x[i]` or `x[i]+b[i]`, independently. The second input repeats quarter-integers `(i % 5) - 2.25`. The model records index, guard, load,
 arithmetic and store operations, using `Math.fround` for FP32 values. Output starts
 unwritten. Out-of-bounds accesses and repeated output writes are hazards and fail the
 check even when all valid output values match. The replay visits invocations in global-ID
@@ -229,3 +227,17 @@ before and after the invocation. View/copy diagrams derive original and destinat
 the first lesson's contiguous tensor layout. The two foundational tensor diagrams are rendered
 at build time for a readable JavaScript-disabled fallback. Experiment-dependent diagrams remain
 behind prediction/inspection. See `visual-review.md` for the page-by-page review and limits.
+
+## Guided kernel challenges
+
+Four challenges assess missing output, repeated local IDs across workgroups, a partial
+workgroup without a guard, and vector addition. Predictions are computed from each
+starter model. A prediction is required before editing/running a guided starter, but
+an incorrect prediction does not prevent learning or completion. Completion requires
+safe correct outputs and a correct explanation. The transfer assessment checks five
+lengths (1, 7, 17, 35, 65) at all four workgroup sizes. The sandbox remains available.
+
+The mapping visual derives invocation membership and output targets from model index
+events. It marks skipped/invalid accesses, duplicate targets and missing outputs.
+Selecting an invocation seeks its first source operation; it does not model scheduling.
+Only editor choices persist; challenge answers/completion are session state.

@@ -45,8 +45,8 @@ try:
           const {runWebGPU} = await import('../src/kernel-webgpu.mjs');
           const {simulateKernel,inputFor} = await import('../src/kernel-model.mjs');
           let checked = 0;
-          for (const index of ['global','next','local']) for (const guard of [true,false]) for (const operation of ['multiply','add']) {
-            const program = {index,guard,operation};
+          for (const workgroupSize of [8,16,32,64]) for (const index of ['global','next','local']) for (const guard of [true,false]) for (const operation of ['multiply','add','vector-add']) {
+            const program = {index,guard,operation,workgroupSize,task:operation==='vector-add'?'vector-add':'scale'};
             const inputs = [0,1,8,32,35,65].map(inputFor);
             const gpu = await runWebGPU(program,inputs);
             for (const [j,input] of inputs.entries()) {
@@ -63,7 +63,7 @@ try:
           }
           return checked;
         }''')
-        assert cases == 72
+        assert cases == 432
         page.locator('#kernel-index').select_option('local')
         page.locator('#run-gpu').click()
         expect(page.locator('#kernel-status')).to_contain_text('WebGPU: 2 of 3', timeout=30000)
@@ -71,7 +71,7 @@ try:
         assert not errors, errors
         context.close()
         browser.close()
-        print('PASS: actual WGSL compilation/dispatch/read-back on SwiftShader; 72 model/WebGPU cases and unsafe-dispatch prevention')
+        print('PASS: actual WGSL compilation/dispatch/read-back on SwiftShader; 432 model/WebGPU cases and unsafe-dispatch prevention')
 finally:
     server.terminate()
     server.wait(timeout=5)

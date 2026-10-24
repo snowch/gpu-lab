@@ -48,3 +48,16 @@ test('changing arithmetic changes computed output, and unsupported expressions a
   assert.throws(() => simulateKernel({ ...repaired, index: 'eval(code)' }, inputFor(8)));
   assert.throws(() => simulateKernel(repaired, [NaN]));
 });
+
+test('all launch sizes and vector addition match an independent reference', () => {
+  for (const workgroupSize of [8,16,32,64]) for (let n=0;n<=129;n++) {
+    const program = {...repaired,workgroupSize,task:'vector-add',operation:'vector-add'};
+    const input = inputFor(n), result = simulateKernel(program,input);
+    assert.equal(result.passed,true);
+    assert.deepEqual(result.output, Array.from(input,(x,i)=>Math.fround(x + (i%5)-2.25)));
+    assert.equal(result.invocations,Math.ceil(n/workgroupSize)*workgroupSize);
+    assert.equal(result.trace.filter(e=>e.op==='load-b').length,n);
+  }
+  assert.throws(()=>simulateKernel({...repaired,workgroupSize:0},inputFor(8)));
+  assert.throws(()=>simulateKernel({...repaired,task:'unknown'},inputFor(8)));
+});

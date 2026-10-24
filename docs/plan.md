@@ -33,7 +33,9 @@ Before redesigning all eight labs, `lessons/kernel.html` compares an inspectable
 model and real WebGPU execution on one task: repair vector scaling, pass several input
 lengths, inspect addresses, and diagnose a missing guard or a local/global indexing
 mistake. Source is built from a small explicit set of editable WGSL expressions. The
-prototype is optional and separately labelled; it does not replace Lab 01 or promise
+prototype now provides four assessed prediction–repair–explanation challenges, a selectable
+workgroup/invocation/output map, configurable launch sizes and a vector-addition transfer task.
+It is optional and separately labelled; it does not replace Lab 01 or promise
 CUDA compilation or hardware timing. Evaluate learner control and feedback before
 choosing a larger execution platform.
 
