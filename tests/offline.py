@@ -25,6 +25,7 @@ class CourseHandler(BaseHTTPRequestHandler):
     fail = None
     slow = False
     legacy = False
+    corrupt = None
     def log_message(self, *_): pass
     def do_GET(self):
         path = unquote(urlsplit(self.path).path)
@@ -43,6 +44,7 @@ class CourseHandler(BaseHTTPRequestHandler):
         if self.fail and path.endswith(self.fail): self.send_error(503); return
         if not file.is_relative_to(root) or not file.is_file(): self.send_error(404); return
         body = file.read_bytes()
+        if self.corrupt and path.endswith(self.corrupt): body += b'corrupt'
         if self.legacy and path == 'sw.js':
             legacy=(ROOT/'tests/fixtures/legacy-worker.js').read_text()
             files=json.loads((root/'release.json').read_text())['files']
@@ -192,7 +194,9 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 cache=f"gpu-lab:{url}:release-{releases['two']['id']}"
                 page.evaluate('''async ({cache,url}) => {await (await caches.open(cache)).delete(url+'examples/gather.cu');dispatchEvent(new Event('focus'));}''',{'cache':cache,'url':url})
                 expect(page.locator('#offline-status')).to_have_text('Offline download incomplete')
-                context.set_offline(False);page.locator('#save-offline').click();ready(page)
+                context.set_offline(False);CourseHandler.corrupt='examples/gather.cu'
+                assert not page.evaluate('''async url => (await fetch(url+'examples/gather.cu')).ok''',url)
+                CourseHandler.corrupt=None;page.locator('#save-offline').click();ready(page)
                 page.locator('#remove-offline').click();page.locator('#cancel-remove').click();ready(page)
                 page.locator('#remove-offline').click();page.locator('#confirm-remove').click()
                 expect(page.locator('#offline-status')).to_have_text('Not saved for offline use')

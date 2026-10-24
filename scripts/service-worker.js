@@ -221,7 +221,10 @@ self.addEventListener('fetch', event => {
       // different root deployment. The immutable release URL may repair them.
       const response = await fetch(new URL(`releases/${id}/${path}`, BASE), { cache: 'no-store' });
       const release = await manifest(id), file = release?.files.find(f => f.path === path);
-      if (file && await verified(response.clone(), file)) await cache.put(new URL(path, BASE), response.clone());
+      if (file) {
+        if (!await verified(response.clone(), file)) return new Response('This release file could not be verified. Return to App status to repair or update.', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+        await cache.put(new URL(path, BASE), response.clone());
+      }
       return response;
     }
     try { return await fetch(event.request); }
