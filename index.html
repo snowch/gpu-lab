@@ -66,25 +66,25 @@
               <div class="architecture-connection"><span aria-hidden="true">↕</span><span>Read and write data through caches, which keep some data close to the execution units for reuse</span></div>
               <div class="architecture-memory"><strong>GPU memory / VRAM</strong><span>Accessible by all SMs</span></div>
             </div>
-            <div class="architecture-box architecture-sm"><strong>A closer look at one SM</strong>
-              <dl>
-                <div><dt>Execution units</dt><dd>Perform arithmetic and other instructions.</dd></div>
-                <div><dt>Registers</dt><dd>Hold working values for individual threads.</dd></div>
-                <div><dt>Shared memory</dt><dd>A workspace for a <strong>thread block</strong>: a group of threads that runs on one SM and can cooperate by sharing data.</dd></div>
-                <div><dt>Tensor cores</dt><dd>Specialised units for supported matrix operations on GPUs that have them.</dd></div>
-              </dl>
-            </div>
-            <figcaption>This is a map of relationships, not a chip floor plan. SM counts, execution units and memory capacities vary by GPU.</figcaption>
+            <!-- SM_OVERVIEW -->
+            <figcaption>This view groups storage by who uses it; it is not a chip floor plan. The execution units and storage belong to the SM. SM counts, execution units and memory capacities vary by GPU.</figcaption>
           </figure>
           <p>The GPU can keep other work moving while some threads wait for data. How well it does that depends on having enough ready work and resources to hold it.</p>
         </details>
         <details class="architecture-layer">
           <summary>3. How work maps onto the machine</summary>
+          <p>A <strong>kernel</strong> is a GPU function. A launch creates a <strong>grid</strong> of thread blocks to execute it. Follow one block from that grid into an SM, then look inside its warps.</p>
+          <p class="overview-example-note"><strong>Example:</strong> four blocks, 64 threads per block, two SMs. Placement is chosen to show the relationships; this is not a scheduling simulation or a hardware-capacity claim.</p>
+          <div id="work-map-controls" class="work-map-controls" hidden>
+            <label for="map-block">Follow a block<select id="map-block"><option>A</option><option>B</option><option>C</option><option>D</option></select></label>
+            <label for="map-warp">Inspect its warp<select id="map-warp"><option value="0">Warp 0</option><option value="1">Warp 1</option></select></label>
+          </div>
+          <p id="work-map-selection" class="overview-small" role="status">Following block A on SM 0, warp 0.</p>
           <figure class="architecture-map">
+            <div id="work-map"><!-- WORK_MAP --></div>
             <ol class="architecture-work">
-              <li><strong>Kernel launch → a grid of thread blocks</strong><span>A kernel is a GPU function. A launch specifies blocks of threads to execute it.</span></li>
               <li><strong>Each block → one SM</strong><span>A block stays on one SM for its lifetime. Several blocks can reside on the same SM when resources allow.</span></li>
-              <li><strong>Threads within a block → warps</strong><span>Within each block, NVIDIA GPUs organise threads into groups of 32 called warps. Each thread’s position within its warp is called a lane. The SM chooses a warp whose next instruction can run. Some instructions involve only some of that warp’s threads.</span></li>
+              <li><strong>Ready warps → execution units</strong><span>The SM chooses a warp whose next instruction can run. Some instructions involve only some of that warp’s threads. A warp is not permanently assigned its own set of execution units.</span></li>
             </ol>
             <figcaption>A thread is a unit of program execution, not a dedicated physical core. A tensor's rows do not automatically correspond to blocks or warps; the kernel determines the mapping.</figcaption>
           </figure>

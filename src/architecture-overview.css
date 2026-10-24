@@ -26,10 +26,59 @@
 .architecture-takeaway { padding:20px; margin:24px 0; border-left:3px solid var(--accent); background:var(--soft); }
 .architecture-takeaway p { margin:10px 0 0; }
 .architecture-source { font-size:13px; color:var(--muted); }
+.sm-ownership h3 { font-size:18px; color:var(--accent); margin-bottom:14px; }
+.sm-ownership h4,.work-launch h4,.work-sm h4,.work-detail h4 { font-size:14px; margin:0 0 12px; }
+.sm-ownership p { font-size:14px; }
+.sm-units { border:1px solid var(--line); padding:14px; border-radius:8px; }
+.sm-units > strong { display:block; font-size:14px; margin-bottom:12px; }
+.sm-unit-grid,.sm-block-grid,.sm-thread-grid,.work-sms,.work-warp-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.sm-unit-grid > div { padding:12px; background:var(--soft); border-radius:5px; }
+.sm-unit-grid strong,.sm-thread strong,.sm-shared strong { display:block; font-size:13px; }
+.sm-unit-grid span,.sm-registers span,.sm-shared span { display:block; font-size:12px; color:var(--muted); margin-top:6px; }
+.sm-block { padding:12px; border:1px solid var(--line); border-radius:7px; min-width:0; }
+.sm-thread { min-width:0; text-align:center; }
+.sm-registers { padding:10px 5px; margin-top:8px; border:1px solid var(--line); border-radius:4px; background:var(--soft); }
+.sm-shared { padding:12px; border:1px solid var(--accent); border-radius:5px; background:var(--accent-soft); }
+.sm-ownership .overview-small,.overview-small { font-size:12px; color:var(--muted); margin:12px 0; }
+.overview-arrow { display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px; margin:16px 0!important; font-size:12px!important; color:var(--muted); }
+.overview-arrow > span { font-size:24px; color:var(--accent); }
+.overview-example-note { padding:14px; background:var(--soft); border-left:3px solid var(--accent); font-size:13px; }
+.work-map-controls { display:flex; flex-wrap:wrap; gap:12px; margin:18px 0; padding:12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); position:sticky; top:84px; z-index:2; }
+.work-map-controls label { flex:1; min-width:100px; font-size:13px; font-weight:650; }
+.work-map-controls select { display:block; margin-top:6px; min-height:44px; font-size:14px; }
+.work-launch,.work-detail { padding:16px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+.work-launch > p,.work-detail > p { font-size:13px; margin:12px 0 0; }
+.work-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.work-block { display:block; padding:10px; border:1px solid var(--line); border-radius:5px; font-size:13px; text-align:center; background:var(--panel); }
+.block-selection { font-size:11px; }
+.work-sm { padding:12px; border:2px solid var(--line); border-radius:8px; background:var(--bg); }
+.work-sm .work-block + .work-block { margin-top:8px; }
+.work-sm.is-selected,.work-block.is-selected,.work-warp.is-selected { border-color:var(--accent); }
+.work-block.is-selected,.work-warp.is-selected { background:var(--accent-soft); }
+.work-detail > p { margin-bottom:16px; }
+.work-warp { border:1px solid var(--line); border-radius:5px; padding:10px; font-size:12px; background:var(--panel); }
+.work-warp strong,.work-warp span { display:block; }
+.work-warp span { color:var(--muted); margin-top:4px; }
+.work-detail .lane-heading { margin-top:22px; margin-bottom:8px; }
+.overview-lanes { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:4px; }
+.overview-lane { min-width:0; padding:7px 1px; border:1px solid var(--line); border-radius:4px; background:var(--accent-soft); text-align:center; }
+.overview-lane strong,.overview-lane span { display:block; font:12px/1.5 ui-monospace,monospace; }
+.overview-lane span { color:var(--muted); font-size:10px; }
+.overview-lane.inactive { background:var(--soft); }
+.sm-ownership > .overview-small { margin-bottom:0; }
+.architecture-work { margin-top:20px; }
 @media(max-width:760px) {
   .architecture-system { grid-template-columns:1fr; }
   .architecture-system > .architecture-connection > span:first-child { transform:rotate(90deg); }
   .architecture-layer { padding-inline:16px; }
   .architecture-box { padding:14px; }
+  .sm-block-grid,.sm-unit-grid { grid-template-columns:minmax(0,1fr); }
+  .sm-thread-grid { gap:8px; }
+  .work-sms { gap:8px; }
+  .work-sm { padding:10px; }
+  .work-launch,.work-detail { padding:12px; }
+  .block-selection { display:block; }
+  .overview-lanes { gap:3px; }
+  .work-map-controls { top:74px; }
   .course-nav a[href="#meet-gpu"],.lesson-nav a[href="../index.html#meet-gpu"] { display:flex; }
 }
