@@ -11,7 +11,9 @@
   <link rel="stylesheet" href="../src/style.css">
   <link rel="stylesheet" href="../src/lessons.css">
   <link rel="stylesheet" href="../src/tensor-layout.css">
+  <link rel="stylesheet" href="../src/packing-challenge.css">
   <script type="module" src="../src/app.mjs"></script>
+  <script type="module" src="../src/packing-challenge.mjs"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to lesson</a>
@@ -172,10 +174,59 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
         <div><p class="eyebrow">CONNECT THE MODEL TO CODE</p><h2>A small CUDA kernel.</h2><p>CUDA lets you write the program each GPU thread runs. This kernel copies selected input values into consecutive output positions. Change stride or offset above and the input indexing below changes with it.</p><p>Threads are also grouped into <strong>blocks</strong>. Here, <code>threadIdx.x</code> is a thread’s index in its block; <code>blockIdx.x</code> identifies the block; <code>blockDim.x</code> is its thread count. Together they calculate <code>i</code>, the output index.</p><p>The simulator shows the input load for the first warp of the first block. Its active-lane control corresponds to a bound <code>n</code> smaller than a warp. The output store is not counted.</p></div>
         <div class="code-panel"><div class="code-title"><span>gather.cu · illustrative source</span><button id="copy" type="button">Copy</button></div><pre><code id="kernel"></code></pre><div class="code-footer"><span id="copy-status" role="status">The browser models addresses; it does not compile CUDA.</span><a href="../examples/gather.cu" download>Download runnable example ↓</a></div></div>
       </section>
-      <section id="challenge" class="challenge section-space">
-        <p class="eyebrow">TRY IT YOURSELF</p><h2>Make a prediction you can explain.</h2>
-        <ol><li>Choose <strong>Tensor column</strong>. Think of a row-major tensor with eight features per row. The warp reads the same feature from successive rows. Predict the sector count, then check it.</li><li>Switch to <strong>Contiguous</strong>. Now it reads neighbouring features. Compare requested bytes and sector coverage. Which changed?</li><li>Choose <strong>Shift by one</strong>. Explain what happens at the two ends of the address range.</li><li>Set <strong>8 active lanes</strong>, stride 1, and offset 0. Predict what changes if you move the offset to 1.</li></ol>
-        <details><summary>Explain the result in your own words, then compare</summary><p>Each sector holds eight FP32 values. Neighbouring lanes can use different values in the same sector. With a stride of eight elements, each lane reaches a different sector. Shifting a consecutive range by one element can make it cross an extra sector boundary.</p><p>In an AI workload, changing how threads map onto tensor dimensions can change this access pattern. A transpose or a different tensor layout may help one operation and add costs elsewhere. Count the work across the whole operation before choosing a layout.</p></details>
+      <section id="challenge" class="challenge section-space packing-challenge" aria-labelledby="packing-title">
+        <p class="eyebrow">APPLY · SAME VALUES, DIFFERENT PLAN</p>
+        <h2 id="packing-title">Should we pack the column first?</h2>
+        <p>You need to read <code>x[:, 0]</code>, the first column of the same 32 × 8 FP32 tensor, more than once. Every read must return the same 32 values: <code>0, 8, 16, …, 248</code>. You can choose where those values live, but cannot change which values are returned.</p>
+        <div class="packing-plan-cards">
+          <div><h3>Plan A · Read the view</h3><p>Read the original strided column every time. There is no preparatory copy.</p><code>column = x[:, 0]</code></div>
+          <div><h3>Plan B · Pack once</h3><p>Read the strided column, write its 32 values into new consecutive storage, then read that copy each time.</p><code>column = x[:, 0].contiguous()</code></div>
+        </div>
+        <p class="packing-model-note">The browser compares <strong>model sector touches</strong> across separate memory operations. Each strided column read requests 32 values; the packed copy contains exactly the same values. Packing itself needs both a read and a write. These are simplified aligned 32-byte sector counts, not actual PyTorch kernel behaviour, cache misses, elapsed time or GPU speedups.</p>
+        <form id="packing-prediction">
+          <label for="packing-reads">How many times will the column be read?
+            <select id="packing-reads" name="packing-reads">
+              <option value="1">1 read</option>
+              <option value="2">2 reads</option>
+              <option value="4">4 reads</option>
+              <option value="8">8 reads</option>
+            </select>
+          </label>
+          <fieldset>
+            <legend>Which plan touches fewer sectors across all these operations?</legend>
+            <label class="packing-radio"><input type="radio" name="packing-plan" value="direct" required> A · Read the original view</label>
+            <label class="packing-radio"><input type="radio" name="packing-plan" value="packed"> B · Pack once, then read the copy</label>
+          </fieldset>
+          <div class="packing-actions">
+            <button class="primary" type="submit">Check my plan</button>
+            <button id="packing-show" type="button">Show model counts</button>
+          </div>
+        </form>
+        <p id="packing-feedback" role="status" aria-live="polite">Predict first. The two plans must produce exactly the same column values.</p>
+        <div id="packing-results" hidden>
+          <h3>What the model counts</h3>
+          <p id="packing-counts"></p>
+          <div class="packing-bar-row"><span>Plan A</span><div class="packing-bar-track" aria-hidden="true"><span id="packing-direct-bar" class="packing-bar"></span></div><strong id="packing-direct-total"></strong></div>
+          <div class="packing-bar-row"><span>Plan B</span><div class="packing-bar-track" aria-hidden="true"><span id="packing-packed-bar" class="packing-bar"></span></div><strong id="packing-packed-total"></strong></div>
+          <p id="packing-winner"></p>
+          <div class="packing-explain">
+            <label for="packing-explanation">Explain why that plan wins</label>
+            <select id="packing-explanation">
+              <option value="">Choose an explanation…</option>
+              <option value="overhead">For a single read, the extra copy operations cost more than they save.</option>
+              <option value="reuse">With repeated reads, paying to pack once can be cheaper than repeated strided access.</option>
+              <option value="free">Changing stride alone always produces the same values, with no copying.</option>
+            </select>
+            <div><button id="packing-check-explanation" type="button">Check explanation</button></div>
+            <p id="packing-explanation-feedback" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+        <p class="packing-model-note"><strong>Transfer check:</strong> make and explain a correct decision for both <strong>1 read</strong> and <strong>4 reads</strong>. You can make a wrong prediction and try again. A GPU might cache repeated reads, and a real packing implementation may do more work than this model; decide based on real measurements before claiming a speedup.</p>
+        <noscript><p>With JavaScript off, the model checker is unavailable. The key tradeoff is still visible: packing performs an extra read and write now so that later accesses may be more coalesced. The same tensor values must be preserved in both layouts.</p></noscript>
+        <details class="packing-extra"><summary>More practice with the earlier sector experiment</summary>
+          <ol><li>Choose <strong>Tensor column</strong> and predict the sectors touched. Then try <strong>Contiguous</strong>. What changes in the addresses?</li><li>Choose <strong>Shift by one</strong>. Explain what happens at both ends of the address range.</li><li>Set <strong>8 active lanes</strong>, stride 1 and offset 0. Predict what changes if the offset becomes 1.</li></ol>
+          <p>Changing the stride in the address experiment generally changes <em>which elements are read</em>; it is not a free optimisation of the same computation. A different layout, algorithm or copy can preserve the result but brings its own costs.</p>
+        </details>
       </section>
       <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><a href="scheduling.html">Next lesson →</a></nav>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
