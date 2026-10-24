@@ -10,7 +10,7 @@ let downloading = false, mode, removed = false, refreshGeneration = 0;
 let version = navigator.onLine ? 'Checking for updates' : 'Cannot check for updates';
 const supported = 'serviceWorker' in navigator && isSecureContext && 'caches' in self;
 let unavailable = !supported;
-let remembered = false, remembering;
+let remembered = false, remembering, connected = false;
 const bytes = n => `${n.toLocaleString('en-GB')} bytes (${(n / 1048576).toFixed(2)} MiB)`;
 function error(message = '') { $('app-status-error').textContent = message; }
 function render() {
@@ -99,11 +99,12 @@ async function connect() {
       await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('Offline access unavailable. Retry when browser storage is enabled.')), 8000))]);
       worker = registration.active;
     }
-    removed = false; await refresh(); await remember();
+    removed = false; await refresh(); connected = true; await remember();
   } catch (failure) { unavailable = true; error(failure.message); render(); }
 }
 async function remember() {
-  if (remembered || remembering || !worker || !runningRelease || removed || document.readyState !== 'complete') return remembering;
+  if (remembered || remembering || !connected || !worker || !runningRelease || removed || document.readyState !== 'complete') return remembering;
+  if (snapshot.active === running) { remembered = true; return; }
   const prefix = new URL(`releases/${running}/`, base).href;
   const paths = performance.getEntriesByType('resource').map(entry => entry.name).filter(url => url.startsWith(prefix)).map(url => url.slice(prefix.length).split('?')[0]);
   paths.push(location.pathname.slice(base.pathname.length) || 'index.html');

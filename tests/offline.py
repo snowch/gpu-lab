@@ -169,7 +169,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('Storage denied')
                 second.evaluate('() => {Storage.prototype.setItem=window.originalSet;}')
                 # A tab with its JS disabled never receives a forced navigation.
-                blocked=context.new_page();blocked.goto(url+'index.html')
+                blocked=context.new_page();blocked.goto(url+'index.html');blocked.wait_for_load_state('networkidle')
                 blocked_cdp=context.new_cdp_session(blocked);blocked_cdp.send('Emulation.setScriptExecutionDisabled',{'value':True})
                 page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('did not respond',timeout=10000)
                 blocked_cdp.detach();blocked.close()
