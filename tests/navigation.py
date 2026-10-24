@@ -44,10 +44,10 @@ def check_navigation(browser, base_url, root, errors):
             expect(navigation).to_be_hidden()
             toggle.click()
             navigation.get_by_role('link', name='Meet the GPU', exact=True).click()
-            expect(page).to_have_url(base_url + '#meet-gpu')
+            expect(page).to_have_url(base_url + 'index.html#meet-gpu')
             expect(navigation).to_be_hidden()
             toggle.click()
-            navigation.get_by_role('link', name='01 Reading a tensor', exact=True).click()
+            navigation.get_by_role('link', name='Memory access lab', exact=True).click()
             expect(page.locator('h1')).to_have_text('Reading a tensor')
             expect(page.locator('.sidebar nav')).to_be_hidden()
             # Generated lessons use the same navigation enhancement.

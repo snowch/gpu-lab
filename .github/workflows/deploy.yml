@@ -51,6 +51,7 @@ jobs:
       - name: Install CPU PyTorch for the optional example
         run: pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
       - run: python examples/tensor-layout.py
+      - run: python examples/book-opening.py --device cpu
 
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

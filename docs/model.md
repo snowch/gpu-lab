@@ -267,3 +267,35 @@ download appear in the final section, below threads, indices, blocks and guards.
 Worked diagrams are generated from the same model during build, so all five examples
 remain readable without JavaScript. Interaction never replaces or scrolls to an earlier section.
 Generated programs have not been compiled or validated on an NVIDIA GPU.
+
+## Book opening: devices and tensor reading
+
+`foundations-model.mjs` supplies each chapter 2–3 diagram, byte count and result.
+`deviceJourney` models separate CPU and GPU allocations for five or eight FP32
+values. Its three snapshots show a CPU-to-GPU copy, out-of-place multiplication
+on the GPU, and a GPU-to-CPU copy. Earlier setup is included in each independent
+example. Each copy duplicates N×4 value bytes; multiplication transfers zero bytes
+between devices but allocates and writes a GPU output. Original buffers remain.
+These counts exclude metadata, allocator overhead, physical bus traffic, unified
+memory, caching and overlap. They are not timings.
+
+`readTensor` uses a 5×5 row-major tensor containing 1..25. Every selected row or
+column has five elements. Row r uses offsets 5r+i; column c uses 5i+c. Packing a
+column copies its five values into offsets 0..4 of separate storage. Results use
+FP32-rounded multipliers and products, matching the Hello teaching model.
+The sector experiment delegates the five input addresses to `simulateLoad`,
+assuming a 32-byte-aligned base for each original or packed allocation. It counts
+one input read, excluding copy traffic and output stores. The selected five-thread
+mapping is a teaching choice, not a claim about PyTorch's implementation.
+
+Each section has independent controls, generated code, a local diagram and result.
+Changing a control invalidates only that section. Update snapshots require all
+section hooks to be registered and restore each section's controls and run state.
+The offline suite exercises these pages in fresh offline tabs and across an actual
+release update. Node checks cover copy independence, all rows/columns, FP32 results,
+address sets, sector boundaries, equal useful byte counts and invalid settings.
+
+`examples/book-opening.py` checks real PyTorch values, devices, transpose/view
+aliasing and packed copies. CI runs its CPU path with PyTorch 2.5.1. CPU mode does
+not test transfers; its CUDA path has not yet been validated on a GPU. It records
+no timing or speedup claim.

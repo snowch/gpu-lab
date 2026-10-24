@@ -27,25 +27,51 @@ Questions and comparisons remain available offline; official sites require inter
 Every visual value comes from model state. Counts and timing estimates must be visibly
 different. Each lab records what its model leaves out.
 
-## First run: Hello, GPU
+## Book opening: chapters 1–3
 
-The main course entry is `lessons/hello.html`: five concept-first sections on one continuous page before repair.
-Open with a complete three-line PyTorch scaling example, explain the CUDA device choice,
-and show its five inputs and computed results before introducing threads. Reuse those same
-five values in every input → thread → output picture. Learners change the multiplier and run. Then introduce array indices, block
-grouping and bounds checks, each with a selectable visual before its CUDA expression.
-Each section repeats the visual and retains its own controls and results. There are no
-Next/Previous controls or automatic scroll jumps. Only the final section contains a complete kernel and the CUDA download. It refers back
-to the opening Python operation rather than repeating its setup.
-The first screen has no function declaration, pointers, launch counts or code editor.
-A short browser-simulation label links to limitations in an optional disclosure.
+Build the book from familiar operations: see the operation, predict, run, change
+one thing, explain, inspect the code, and apply the idea to a new case. Keep each
+experiment and visual beside its own explanation in a continuous downward flow.
+
+1. **One operation, many numbers** (`hello.html`): open with the three-line PyTorch
+   example and five values. Introduce threads, indices, blocks and bounds checks
+   as needed; assemble the CUDA kernel at the end. SMs, warps and shared memory
+   receive brief signposts here, with detailed mechanisms deferred. Finish with a
+   six-input transfer question and the optional repair workshop.
+2. **Where do the numbers live?** (`devices.html`): follow the same five inputs
+   through a CPU-to-GPU copy, multiplication in GPU memory, and a result copy back.
+   Each action has its own setup, prediction prompt, control, diagram and result.
+   Compare five/eight-input copy sizes and change the multiplier. Explain allocation
+   separately from transfers; retain the original tensors in the diagram.
+3. **How do threads read a tensor?** (`reading.html`): make the first five values a
+   row of a 5×5 tensor. Run equal-length row and column reads, pack a column, and
+   compare aligned sector coverage. Each example retains its own settings/result.
+   Finish by predicting what a transpose changes and checking the explanation.
+
+The optional PyTorch companion runs on a CPU for value/layout verification or on a
+CUDA device to follow the transfers. Browser models are clearly labelled; neither
+browser counts nor CPU validation are presented as GPU performance evidence.
+Reference exercises introduce `torch.tensor`, `Tensor.to`, indexing and strides
+beside the operations that need them. Version guidance remains beside the first
+lookup task.
+
+The home page and shared navigation prioritise these three chapters. The existing
+memory-access lab, repair workshop and architecture map remain additional resources.
+Chapters 4–9 are planned book adaptations: keeping work ready, different paths,
+cooperation/reduction, matrix reuse, tensor cores/precision, then attention/inference.
+Their roadmap links open the existing labs and are labelled accordingly.
+
+Before rewriting the remaining chapters, observe newcomers using the opening.
+Can they trace one input to its output, explain extra threads, distinguish a copy
+from a calculation, and explain the addresses in a column view? Record where they
+hesitate; do not treat automated interface checks as learner validation.
 
 ## Architecture introduction
 
 Before Lab 01, the course overview offers **Meet the GPU**, a five-minute map with
 three progressively disclosed layers: CPU/GPU memory, SM internals, and kernel/block/warp
 mapping. It introduces terms without requiring learners to memorise them. The map describes
-NVIDIA CUDA relationships rather than a simulated chip or performance measurement. Hello, GPU provides the first hands-on experience; Lab 01 follows the introductory exercises. Native disclosure controls keep the map available
+NVIDIA CUDA relationships rather than a simulated chip or performance measurement. Chapter 1 provides the first hands-on experience; the architecture map is optional. Native disclosure controls keep the map available
 without JavaScript and in the offline course.
 
 ## Hands-on prototype

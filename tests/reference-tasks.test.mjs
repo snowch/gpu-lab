@@ -6,7 +6,7 @@ import {lessons,renderLesson} from '../content/lessons.mjs';
 import {renderIntroSections} from '../src/hello-view.mjs';
 
 test('reference practice covers the course and progresses to independent lookups',()=>{
-  for(const key of ['hello-pytorch','hello-indices','kernel','memory',...lessons.map(l=>l.slug)]){
+  for(const key of ['hello-pytorch','hello-indices','devices','reading','kernel','memory',...lessons.map(l=>l.slug)]){
     const task=referenceTasks[key];assert.ok(task,key);
     for(const target of [task.page,task.solution].filter(Boolean)) {
       const url=new URL(guides[target]);

@@ -15,7 +15,7 @@
 <body>
   <a class="skip" href="#main">Skip to course overview</a>
   <header class="topbar">
-    <a class="brand" href="#"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <a class="brand" href="#"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive book</span></a>
     <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
   </header>
   <div class="layout">
@@ -37,10 +37,10 @@
         <h1>Follow the data.<br>Understand the GPU.</h1>
         <p class="lead">You know what a tensor operation does. Find out how threads execute it, where its data moves, and what makes it wait.</p>
         <p>You’ll also practise finding and using the official PyTorch and CUDA references to explain an experiment.</p>
-        <p><a class="start-course" href="./lessons/hello.html">Start here: Hello, GPU →</a></p>
+        <p><a class="start-course" href="./lessons/hello.html">Start chapter 1: One operation, many numbers →</a></p>
         <p><a href="#meet-gpu">Meet the GPU →</a></p>
-        <p><a href="./lessons/memory.html">Already familiar? Go to Lab 01 →</a></p>
-        <p><a href="./lessons/kernel.html">Continue to kernel repair →</a></p>
+        <p><a href="#curriculum">Browse the book and further labs →</a></p>
+        <p>Start with five numbers, follow them into GPU memory, then explore how their layout changes the work. You need some Python and tensor familiarity; no CUDA or hardware knowledge is assumed.</p>
         <div class="intro-meta"><span>Predict → inspect → experiment</span><span>Some Python and tensor familiarity</span></div>
       </section>
       <section id="meet-gpu" class="section-space architecture-overview" aria-labelledby="meet-gpu-title">
@@ -59,7 +59,7 @@
             </div>
             <figcaption>Moving a tensor to the GPU usually copies its values into GPU memory. Later operations can use those values there without copying them back to the CPU each time.</figcaption>
           </figure>
-          <p><strong>Memory holds the numbers; processors execute the work.</strong> A tensor also has metadata, such as its shape and strides, describing how to interpret those numbers. Lab 01 starts there.</p>
+          <p><strong>Memory holds the numbers; processors execute the work.</strong> A tensor also has metadata, such as its shape and strides, describing how to interpret those numbers. Chapters 2 and 3 explore those ideas.</p>
         </details>
         <details class="architecture-layer">
           <summary>2. Inside the GPU: many places to execute work</summary>
@@ -96,22 +96,13 @@
         </details>
         <div class="architecture-takeaway"><h3>What makes a GPU fast?</h3><p>Running many threads in parallel helps when they have useful work and can get the data they need. Moving data, waiting for dependencies, and taking different instruction paths all affect how much work the GPU completes.</p></div>
         <p>Follow the map through <a href="./lessons/memory.html">memory access</a>, <a href="./lessons/scheduling.html">scheduling</a>, <a href="./lessons/divergence.html">different paths</a>, <a href="./lessons/shared-memory.html">cooperation</a>, <a href="./lessons/matmul.html">data reuse</a>, and <a href="./lessons/tensor-cores.html">tensor cores</a>. Then apply those ideas to attention and inference.</p>
-        <p>First, let’s follow the data: where does a tensor keep its numbers?</p>
-        <p><a class="start-course" href="./lessons/memory.html">Start Lab 01: Reading a tensor →</a></p>
+        <p>Use this map as a reference while reading the opening chapters. For more detailed address experiments, try the existing memory-access lab.</p>
+        <p><a class="start-course" href="./lessons/memory.html">Explore the memory-access lab →</a></p>
         <p class="architecture-source">Reference: <a href="https://docs.nvidia.com/cuda/cuda-programming-guide/index.html">NVIDIA CUDA Programming Guide ↗</a></p>
       </section>
       <section id="curriculum" class="section-space">
-        <p class="eyebrow">THE COURSE AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">All eight labs are available as interactive drafts. Start with Reading a tensor, then follow the course through matrix multiplication, precision, attention and inference. Lab 04 also includes a reduction and synchronisation workshop.</p>
-        <div class="roadmap">
-          <a href="./lessons/memory.html"><span class="module-no">01</span><div><h3>Reading a tensor</h3><p>Warps, addresses, coalescing, and a first CUDA kernel.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/scheduling.html"><span class="module-no">02</span><div><h3>Keeping the GPU busy</h3><p>Resident warps, a model scheduler, and latency hiding.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/divergence.html"><span class="module-no">03</span><div><h3>Taking different paths</h3><p>Active lanes, branch divergence, and masked tensor operations.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/shared-memory.html"><span class="module-no">04</span><div><h3>Sharing work within a block</h3><p>Shared-memory banks, broadcasts, padding, and block barriers.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/matmul.html"><span class="module-no">05</span><div><h3>Reusing data in matrix multiplication</h3><p>Naive and tiled matmul, register budgets, and arithmetic intensity.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/tensor-cores.html"><span class="module-no">06</span><div><h3>Using tensor cores</h3><p>Matrix instructions, precision, accumulation, and numerical error.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/attention.html"><span class="module-no">07</span><div><h3>Moving less data in attention</h3><p>Softmax, fusion, and avoiding large intermediate tensors.</p></div><span class="tag live">Try the draft</span></a>
-          <a href="./lessons/inference.html"><span class="module-no">08</span><div><h3>Explaining inference performance</h3><p>Prefill, decode, KV-cache budgets, batching, and measurement comparison.</p></div><span class="tag live">Try the draft</span></a>
-        </div>
+        <p class="eyebrow">THE BOOK AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">Start with the three opening chapters below. Each follows an operation through a prediction, an experiment and an explanation. Chapters 4–9 are the planned continuation of the book; their links open the existing labs while those chapters are developed. The final topic also has a separate <a href="./lessons/inference.html">inference lab</a>.</p>
+        <div class="roadmap"><!-- BOOK_ROADMAP --></div>
       </section>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
     </main>

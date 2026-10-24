@@ -100,3 +100,19 @@ The guide links document contracts, not measured validation of the course’s mo
 No external documentation is fetched while using the course: links open on demand.
 Questions and local comparisons are built into the offline app. These conceptual
 reference checks do not claim to execute PyTorch or CUDA or validate GPU timing.
+
+## Book opening: device copies and layout
+
+The chapter 2 copy rules follow [Tensor.to](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html)
+and [Tensor.cpu](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.cpu.html).
+The chapter 3 packing rule follows [Tensor.contiguous](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.contiguous.html),
+alongside the stride and tensor-view references above. These pages were checked
+on 2026-10-24; stable resolved to PyTorch 2.14. Device/dtype-preserving `to()` and
+already-contiguous `contiguous()` can return the existing tensor. The teaching
+examples explicitly choose cases that do allocate copies.
+
+The five-thread load uses the same CUDA coalescing source and sector model as the
+memory-access lab, with a declared aligned base and equal useful byte counts.
+It does not claim to reproduce PyTorch's kernel selection. CI checks the optional
+book companion with CPU PyTorch 2.5.1; CUDA-mode transfer behaviour has not yet
+been executed on a GPU. No performance measurements are inferred from that check.

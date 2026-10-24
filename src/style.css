@@ -74,3 +74,6 @@ footer { flex-wrap:wrap; }
 .reference-new-tab { font-size:12px; }
 .reference-goal { max-width:760px; margin-top:24px; }
 @media(max-width:760px) { .reference-task { padding:16px; } }
+
+/* Group the book opening separately from the existing deeper labs. */
+.nav-group { margin:20px 12px 6px; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }

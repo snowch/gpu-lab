@@ -1,0 +1,28 @@
+/* Copyright © 2026 Christopher Snow. */
+.book-section { border-top:1px solid var(--line); margin:40px 0; padding-top:28px; scroll-margin-top:90px; }
+.book-section h2 { font-size:clamp(25px,3vw,32px); }
+.book-code { padding:18px; border:1px solid var(--line); border-radius:6px; background:var(--panel); white-space:pre-wrap; overflow-wrap:anywhere; font:15px/1.7 ui-monospace,monospace; }
+.book-code code { font:inherit; }
+.book-note { font-size:14px; color:var(--muted); }
+.book-controls { display:flex; gap:16px; flex-wrap:wrap; margin:20px 0; }
+.book-controls label,.book-guess { display:flex; flex-direction:column; gap:8px; }
+.book-controls input,.book-guess input { width:100px; }
+.book-guess { margin:16px 0; }
+.book-summary,[id^="device-feedback-"],[id^="reading-feedback-"] { padding:14px; border-left:3px solid var(--accent); background:var(--accent-soft); overflow-wrap:anywhere; }
+.device-map,.book-read-map { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:20px; }
+.device-memory,.book-read-map>div { min-width:0; padding:16px; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+.device-memory h3,.book-read-map h3 { margin-top:0; }
+.device-buffer { padding:8px 0; border-top:1px solid var(--line); }
+.book-values { display:flex; flex-wrap:wrap; gap:6px; }
+.book-values span { padding:8px 12px; border:1px solid var(--line); border-radius:4px; font-weight:600; }
+.book-matrix { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; }
+.book-cell { display:flex; flex-direction:column; align-items:center; padding:8px 2px; border:1px solid var(--line); border-radius:4px; }
+.book-cell small { font-size:10px; color:var(--muted); }
+.book-cell.chosen { background:var(--accent-soft); border:2px solid var(--accent); padding:7px 1px; }
+.book-reads { padding:0; list-style:none; }
+.book-reads li { display:grid; grid-template-columns:1fr 1.3fr 1fr; gap:8px; border-bottom:1px solid var(--line); padding:10px 0; font-size:14px; }
+.book-reads strong { font-size:18px; overflow-wrap:anywhere; }
+.book-sectors { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+.book-sectors>div { flex:1 1 120px; border:1px solid var(--accent); padding:12px; display:flex; flex-direction:column; }
+.book-pager { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; border-top:1px solid var(--line); padding:24px 0; }
+@media(max-width:1050px) { .device-map,.book-read-map { grid-template-columns:minmax(0,1fr); } }
