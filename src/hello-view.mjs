@@ -28,9 +28,13 @@ export function renderIntroSections() {
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
+      ${stage===2?'<h3>Why group threads?</h3>':''}
       <p class="hello-concept">${step.concept}</p>
-      ${stage===2?`<p>Blocks also give the GPU groups of work to distribute. Each block stays on one streaming multiprocessor (SM), a part of the GPU that executes threads. Different blocks can run on different SMs; several blocks can share one SM when resources allow.</p>
-      <p>For <code>y = x * 2</code>, each thread works independently, so it does not need that cooperation. Later, in matrix multiplication, a block can load input values into shared memory once and reuse them across its threads.</p>
+      ${stage===2?`<p>For <code>y = x * 2</code>, each thread works independently. Later, in matrix multiplication, a block can load inputs into shared memory once and reuse them across its threads.</p>
+      <h3>Where do they run?</h3>
+      <p>Each block stays on one streaming multiprocessor (SM), a part of the GPU that executes threads in parallel. Different blocks can run on different SMs; several blocks can share one SM when resources allow.</p>
+      <p>Within a block, threads are organised into groups of 32 called warps. A small block uses only part of a warp. The SM schedules instructions for warps, so a block’s threads do not necessarily all execute at once. We explore warp scheduling later.</p>
+      <h3>Try two blocks</h3>
       <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
       <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
       <p>${step.instruction}</p>
