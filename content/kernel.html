@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Repair a small kernel, inspect its execution in a browser model, and run the same WGSL program with WebGPU.">
+  <meta name="description" content="Repair a small kernel, inspect its execution in a browser model, and download CUDA C++ to run on an NVIDIA GPU.">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="data:,">
   <title>Repair a kernel · GPU Lab</title>
@@ -33,11 +33,11 @@
     <main id="main">
       <section class="intro">
         <p>New to kernels? <a href="hello.html">Begin with Hello, GPU →</a></p>
-        <p class="eyebrow">HANDS-ON PROTOTYPE · MODEL AND WEBGPU</p>
+        <p class="eyebrow">HANDS-ON PROTOTYPE · CUDA C++ · BROWSER SIMULATION</p>
         <h1>Repair a kernel</h1>
         <p class="lead">Repair a kernel, explain its failures, then build vector addition.</p>
         <p>Begin with <code>y = 2 * x</code>, then transfer what you learn to <code>y = x + b</code>: the elementwise addition used in residual connections in neural networks.</p>
-        <p>A <strong>kernel</strong> is a function run many times; one run is an <strong>invocation</strong>. An invocation with a valid element index should write one output value. Array indices start at zero.</p>
+        <p>A <strong>kernel</strong> is a function run many times; one run is an <strong>thread</strong>. An thread with a valid element index should write one output value. Array indices start at zero.</p>
       </section>
       <noscript><p class="notice">Enable JavaScript to edit and run the kernel. The task and explanations remain readable below.</p></noscript>
       <section class="kernel-task" aria-labelledby="guided-title">
@@ -62,44 +62,46 @@
       </section>
       <section class="section-space" aria-labelledby="build-title">
         <h2 id="build-title">1. Build your kernel</h2>
-        <p>A <strong>workgroup</strong> is a group of invocations launched together. Choose how many it contains below. Its size is not a hardware warp size. <code>global_id.x</code> counts across all groups; <code>local_id.x</code> restarts in each group.</p><p class="kernel-note">Choose statements to generate WGSL, WebGPU’s shader language. The model executes the same supported choices; this is not a general WGSL or CUDA interpreter.</p>
+        <p>A <strong>block</strong> is a group of threads. <code>threadIdx.x</code> is a thread’s index within its block, <code>blockIdx.x</code> identifies the block, and <code>blockDim.x</code> is the number of threads per block. Combining them gives an index across blocks.</p><p class="kernel-note">Choose CUDA C++ statements. The browser simulates these supported choices on the CPU; it does not compile CUDA or execute GPU code.</p>
         <fieldset id="kernel-editor" class="kernel-editor"><legend>Editable statements</legend>
-          <label for="kernel-index">Element index, <code>i</code><select id="kernel-index"><option value="next">global_id.x + 1u</option><option value="global">global_id.x</option><option value="local">local_id.x</option></select></label>
-          <label for="kernel-guard">Before accessing the arrays<select id="kernel-guard"><option value="yes">Only if i &lt; params.n</option><option value="no">Always access them</option></select></label>
-          <label for="kernel-operation">Value written to y[i]<select id="kernel-operation"><option value="multiply">x[i] * params.factor</option><option value="add">x[i] + params.factor</option><option value="vector-add">x[i] + b[i]</option></select></label>
-        <label for="kernel-size">Invocations per workgroup<select id="kernel-size"><option>8</option><option>16</option><option selected>32</option><option>64</option></select></label>
+          <label for="kernel-index">Element index, <code>i</code><select id="kernel-index"><option value="next">blockIdx.x * blockDim.x + threadIdx.x + 1</option><option value="global">blockIdx.x * blockDim.x + threadIdx.x</option><option value="local">threadIdx.x</option></select></label>
+          <label for="kernel-guard">Before accessing the arrays<select id="kernel-guard"><option value="yes">Only if i &lt; n</option><option value="no">Always access them</option></select></label>
+          <label for="kernel-operation">Value written to y[i]<select id="kernel-operation"><option value="multiply">x[i] * factor</option><option value="add">x[i] + factor</option><option value="vector-add">x[i] + b[i]</option></select></label>
+        <label for="kernel-size">Threads per block<select id="kernel-size"><option>8</option><option>16</option><option selected>32</option><option>64</option></select></label>
           <label for="kernel-task">Output goal<select id="kernel-task"><option value="scale">y = 2 * x</option><option value="vector-add">y = x + b</option></select></label>
         </fieldset>
-        <p><code>params.n</code> is the vector length. <code>params.factor</code> is 2. The <code>u</code> in <code>1u</code> marks an unsigned integer.</p>
-        <div class="kernel-actions"><button id="run-model" class="primary" type="button">Run model checks</button><button id="run-gpu" type="button">Run WebGPU checks</button><button id="reset-kernel" type="button">Reset starter</button></div>
-        <p id="gpu-support" class="kernel-note">The browser model needs no GPU. WebGPU availability depends on your browser and device.</p>
+        <p><code>n</code> is the vector length. <code>factor</code> is 2.</p>
+        <div class="kernel-actions"><button id="run-model" class="primary" type="button">Run model checks</button><button id="reset-kernel" type="button">Reset starter</button></div>
+        <p id="simulation-note" class="kernel-note">Browser simulation · no CUDA compilation or GPU execution.</p><p>In PyTorch: <code id="kernel-pytorch">y = 2 * x</code>. This is the operation we are implementing, not PyTorch’s internal kernel source.</p>
         <p id="kernel-status" role="status">Start the first guided challenge, or explore the editor below.</p>
-        <div class="code-panel"><div class="code-title">Your kernel · WGSL</div><pre><code id="kernel-source">Enable JavaScript to build the source.</code></pre></div>
-        <details class="more-settings"><summary>Full shader, including data bindings</summary><p>The application provides input/output buffers and the length and factor. These declarations connect them to the kernel.</p><pre><code id="shader-source"></code></pre><button id="download-shader" type="button">Download this shader</button></details>
-        <details class="more-settings"><summary>Hint: where should the first invocation write?</summary><p>The first output is <code>y[0]</code>. Work out <code>i</code> when <code>global_id.x</code> is zero. Then check whether that expression still reaches the right elements in a second workgroup.</p></details>
+        <div class="code-panel"><div class="code-title">Your kernel · CUDA C++</div><pre><code id="kernel-source">Enable JavaScript to build the source.</code></pre></div>
+        <details class="more-settings"><summary>Run this kernel on an NVIDIA GPU</summary>
+        <p>Download a complete CUDA C++ program for 35 elements, including your kernel, allocation, launch and output read-back. Invalid accesses and duplicate writes must be repaired before download.</p>
+        <pre><code id="cuda-source"></code></pre><button id="download-cuda" type="button">Download CUDA program</button>
+        <p>Requires an NVIDIA GPU, compatible driver, CUDA Toolkit and a host C++ compiler:</p><pre>nvcc -std=c++17 kernel.cu -o kernel
+./kernel</pre><p>These new generated programs have not yet been compiled or tested on an NVIDIA GPU.</p></details>
+        <details class="more-settings"><summary>Hint: where should the first thread write?</summary><p>The first output is <code>y[0]</code>. Work out <code>i</code> when <code>blockIdx.x * blockDim.x + threadIdx.x</code> is zero. Then check whether that expression still reaches the right elements in a second block.</p></details>
       </section>
       <section id="kernel-results" class="section-space" aria-labelledby="run-title" hidden>
         <h2 id="run-title">2. Compare finished outputs</h2>
-        <div class="kernel-table-wrap"><table class="kernel-checks"><caption>Finished output compared with the selected goal</caption><thead><tr><th>Length</th><th>Browser model</th><th>WebGPU</th><th>Inspect</th></tr></thead><tbody id="kernel-cases"></tbody></table></div>
-        <p id="gpu-adapter" class="kernel-note" hidden></p>
+        <div class="kernel-table-wrap"><table class="kernel-checks"><caption>Finished output compared with the selected goal</caption><thead><tr><th>Length</th><th>Browser model</th><th>Inspect</th></tr></thead><tbody id="kernel-cases"></tbody></table></div>
       </section>
       <section id="kernel-inspector" class="section-space" hidden aria-labelledby="inspect-title">
         <h2 id="inspect-title">3. Explain the result</h2>
-        <h3>Workgroups → invocations → output elements</h3>
-        <p class="kernel-note">Select an invocation to inspect its operations. These groups show membership, not execution order or physical GPU placement. “Duplicate” means multiple invocations target the same element.</p>
-        <div id="invocation-map"></div><p id="mapping-summary"></p>
+        <h3>Blocks → threads → output elements</h3>
+        <p class="kernel-note">Select an thread to inspect its operations. These groups show membership, not execution order or physical GPU placement. “Duplicate” means multiple threads target the same element.</p>
+        <div id="thread-map"></div><p id="mapping-summary"></p>
         <p id="inspection-case"></p>
-        <p class="kernel-note">This is a replay of the <strong>browser model</strong>, not a captured GPU trace. It visits invocations by global ID for inspection; real invocations can run in a different order. Each step is a source operation, not a GPU instruction or clock cycle.</p>
+        <p class="kernel-note">This is a replay of the <strong>browser model</strong>, not a captured GPU trace. It visits threads by global ID for inspection; real threads can run in a different order. Each step is a source operation, not a GPU instruction or clock cycle.</p>
         <div class="kernel-actions"><button id="trace-back" type="button">Previous step</button><button id="trace-next" type="button">Next step</button><button id="trace-start" type="button">Replay from start</button><button id="trace-end" type="button">Jump to end</button></div>
         <label for="kernel-step">Source-operation position</label><input id="kernel-step" type="range" min="0" value="0"><p id="trace-position" class="kernel-note"></p>
         <p id="kernel-event" class="kernel-event" role="status"></p>
         <dl id="kernel-state" class="kernel-state"></dl>
         <h3>Input x · highlighted at a read</h3><p class="kernel-note">Each tile shows its element index and value. FP32 elements occupy four bytes; offsets are relative to this buffer.</p><div id="kernel-input" class="kernel-memory"></div>
-        <div id="second-input-panel" hidden><h3>Second input b</h3><div id="kernel-second-input" class="kernel-memory"></div></div><h3>Model output y after this step</h3><p class="kernel-note">A dash means no invocation has written that element yet. Finished-run checks above are independent of the replay position.</p><div id="kernel-output" class="kernel-memory"></div>
-        <div id="gpu-output-panel" hidden><h3>Output read back from WebGPU</h3><p class="kernel-note">These values come from the submitted shader, after it finishes. They are not produced by the model replay.</p><div id="kernel-gpu-output" class="kernel-memory"></div></div>
+        <div id="second-input-panel" hidden><h3>Second input b</h3><div id="kernel-second-input" class="kernel-memory"></div></div><h3>Model output y after this step</h3><p class="kernel-note">A dash means no thread has written that element yet. Finished-run checks above are independent of the replay position.</p><div id="kernel-output" class="kernel-memory"></div>
       </section>
-      <section class="challenge section-space"><h2>Keep investigating</h2><ol><li>Pass all three lengths. Which element did the starting kernel miss?</li><li>Inspect length 35. Jump to the last invocation: why does its guard skip the memory access?</li><li>Remove the bounds check and run the model. Find the first invalid access, then repair it.</li><li>Try the local index. Why can a single-workgroup test pass while length 35 fails?</li></ol><p>Unsafe model configurations are stopped before WebGPU dispatch. This prototype does not execute out-of-bounds accesses or write races on your device.</p></section>
-      <details class="more-settings section-space"><summary>What each approach establishes</summary><p><strong>Browser model:</strong> explicit indexing, guards, FP32 arithmetic, reads, writes, duplicate writes and unfilled outputs for these expressions. It does not compile WGSL, simulate SMs, caches or warps, or predict time.</p><p><strong>WebGPU:</strong> the browser compiles the generated WGSL and dispatches it to its selected adapter. Some environments use a software adapter. Results check correctness, not speed. The replay is explanatory model state, not measured GPU internals. WebGPU workgroups play a similar role to CUDA blocks but do not promise NVIDIA’s 32-thread warps.</p><p>Both paths use the same input vectors and an independent reference calculation. There is no server, CUDA compiler or GPU account.</p><p><a href="https://www.w3.org/TR/WGSL/">WGSL specification ↗</a> · <a href="https://www.w3.org/TR/webgpu/">WebGPU specification ↗</a></p></details>
+      <section class="challenge section-space"><h2>Keep investigating</h2><ol><li>Pass all three lengths. Which element did the starting kernel miss?</li><li>Inspect length 35. Jump to the last thread: why does its guard skip the memory access?</li><li>Remove the bounds check and run the model. Find the first invalid access, then repair it.</li><li>Try the local index. Why can a single-block test pass while length 35 fails?</li></ol><p>Unsafe configurations are diagnosed by the model and cannot be downloaded until repaired.</p></section>
+      <details class="more-settings section-space"><summary>What the simulation establishes</summary><p>The browser computes indexing, guards, FP32 arithmetic, reads, writes, duplicate writes and unfilled outputs for the supported expressions. It does not compile CUDA, simulate SM scheduling, caches or warps, or predict time. Replay order is chosen for inspection, not GPU execution order.</p><p>Downloaded programs use CUDA C++ and require an NVIDIA GPU and CUDA Toolkit. Browser checks do not establish hardware correctness or performance.</p><p><a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/">CUDA C++ Programming Guide ↗</a></p></details>
       <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><a href="memory.html">Explore memory access →</a></nav>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
     </main>

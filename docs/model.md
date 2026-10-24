@@ -16,29 +16,28 @@ Static figures are generated during the build; optional controls change the insp
 block and warp without requiring a GPU. Incomplete final warps are supported by the
 mapping function and show unoccupied lane positions as inactive.
 
-## Repair-a-kernel prototype
+## Repair-a-kernel workshop
 
-The structured editor selects one index expression (`global_id.x`, `global_id.x + 1u`,
-or `local_id.x`), an optional `i < params.n` guard, and multiplication/addition by an FP32 factor of two or addition of a second input buffer. These choices generate real WGSL source and drive the explicit
-browser model. No general WGSL or CUDA interpreter is claimed. Workgroup size is selectable from 8, 16, 32 and 64; WebGPU does not guarantee a 32-thread hardware subgroup.
+The structured editor selects a CUDA index expression (the global index
+`blockIdx.x * blockDim.x + threadIdx.x`, that index plus one, or `threadIdx.x`),
+an optional `i < n` guard, and multiplication/addition by two or vector addition.
+Blocks contain 8, 16, 32 or 64 threads. Block size is not hardware warp size.
 
-Inputs are deterministic alternating positive/negative half-integers stored as FP32.
-The reference computes the selected goal, `2*x[i]` or `x[i]+b[i]`, independently. The second input repeats quarter-integers `(i % 5) - 2.25`. The model records index, guard, load,
-arithmetic and store operations, using `Math.fround` for FP32 values. Output starts
-unwritten. Out-of-bounds accesses and repeated output writes are hazards and fail the
-check even when all valid output values match. The replay visits invocations in global-ID
-order for inspection, not as a guarantee about device execution order or instructions.
-Each load/store includes a buffer-relative byte offset. No cache or sector model,
-physical DRAM traffic, SM scheduling, hardware timing or speedup is inferred.
+The browser model computes these supported expressions on the CPU; it does not
+compile CUDA or run GPU code. Inputs are alternating positive/negative half-integers
+stored as FP32; the second input is `(i % 5) - 2.25`. An independent reference
+computes the selected goal. The model records indexing, guards, reads, arithmetic
+and writes, with FP32 rounding. Invalid accesses and repeated writes are hazards
+even when all valid output values match. Replay visits threads in global-index
+order for inspection, not as a GPU scheduling claim. No timings are inferred.
 
-WebGPU compiles that generated source and dispatches safe cases to the browser-selected
-adapter, with input/output storage buffers and a uniform containing length and factor.
-Output is initialised with NaN to identify unwritten elements; all reference outputs
-are finite. Read-back values are checked independently against the reference. Unsafe
-configurations are diagnosed by the model before dispatch; the app does not submit
-write races or invalid logical accesses. Unsupported WebGPU never falls back silently
-to CPU-produced “GPU” results. The adapter’s fallback/software flag is shown when
-available. The inspection replay always remains model state, including after a GPU run.
+The download wraps the displayed kernel in a complete CUDA C++ program for 35
+elements. It includes input/output allocation, transfers, launch error checking,
+synchronisation, read-back, printing and cleanup. Output starts as NaN to expose
+unwritten elements. The download is blocked if the selected configuration has
+invalid accesses or duplicate writes for that input. Safe incorrect results remain
+downloadable for comparison. No CUDA compiler or NVIDIA GPU is available in this
+environment, so generated programs are explicitly marked uncompiled and untested.
 
 ## Global-memory loads
 
@@ -230,35 +229,32 @@ behind prediction/inspection. See `visual-review.md` for the page-by-page review
 
 ## Guided kernel challenges
 
-Four challenges assess missing output, repeated local IDs across workgroups, a partial
-workgroup without a guard, and vector addition. Predictions are computed from each
+Four challenges assess missing output, repeated local IDs across blocks, a partial
+block without a guard, and vector addition. Predictions are computed from each
 starter model. A prediction is required before editing/running a guided starter, but
 an incorrect prediction does not prevent learning or completion. Completion requires
 safe correct outputs and a correct explanation. The transfer assessment checks five
-lengths (1, 7, 17, 35, 65) at all four workgroup sizes. The sandbox remains available.
+lengths (1, 7, 17, 35, 65) at all four block sizes. The sandbox remains available.
 
-The mapping visual derives invocation membership and output targets from model index
+The mapping visual derives thread membership and output targets from model index
 events. It marks skipped/invalid accesses, duplicate targets and missing outputs.
-Selecting an invocation seeks its first source operation; it does not model scheduling.
+Selecting a thread seeks its first source operation; it does not model scheduling.
 Only editor choices persist; challenge answers/completion are session state.
 
 
 ## Hello, GPU
 
-The introduction uses a fixed WGSL function scaffold and an editable body. The supported
-exercise statements are constant output, invocation-ID output, scalar multiplication,
-and a bounded multiply with an editable integer guard. The validator accepts only these
-forms, with finite FP32 constants, and prevents a guard from exceeding the buffer length.
-It is not a general shader editor or WGSL interpreter.
+Four working CUDA C++ examples precede repair: write a constant, write thread
+indices, scale inputs, then guard a partial block. The fixed kernel scaffold and
+editable body are valid CUDA syntax. The model accepts only the displayed forms
+and described numeric edits; this is not a general CUDA interpreter.
 
-One Run action requests a WebGPU adapter. If none exists, a clearly labelled CPU browser
-model evaluates those same supported forms. When an adapter exists, the application
-compiles the WGSL, dispatches the specified workgroups, and reads the output buffer.
-Shader/device errors are reported, not silently replaced with model results. Explicit
-binding layouts retain the buffers even if a compiler optimises away all accesses
-(for example, a guard of zero). NaN marks unwritten output.
+Run always evaluates the supported example on the CPU, visibly labelled as a
+browser simulation. The four examples launch 1, 4, 4 and 8 threads for 1, 4, 4 and 5
+elements. Invalid guards are rejected. Optional PyTorch snippets describe the
+starting operation, not PyTorch's actual kernel implementation. Edits persist
+between steps within the page, not across reloads.
 
-The four examples launch 1, 4, 4 and 8 invocations for 1, 4, 4 and 5 output elements.
-The first writes a constant, the second writes IDs, and the last two scale inputs 1..N.
-Workgroup size is not presented as hardware warp size. No timing or scheduling model
-is claimed. Edits persist between steps within the page, but are not saved across reloads.
+A download includes the exact edited kernel plus host allocation, copies, launch
+and output read-back. These new programs have not been compiled or validated on
+an NVIDIA GPU. No hardware execution or performance claim is made.

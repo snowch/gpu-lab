@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STARTER, inputFor, reference, simulateKernel, snapshot, kernelBody } from '../src/kernel-model.mjs';
 const repaired = { ...STARTER, index: 'global' };
-test('repaired kernel matches an independent scalar reference through partial workgroups', () => {
+test('repaired kernel matches an independent scalar reference through partial blocks', () => {
   for (let length = 0; length <= 129; length++) {
     const input = inputFor(length), result = simulateKernel(repaired, input);
     assert.equal(result.passed, true);
@@ -24,10 +24,10 @@ test('starter misses exactly the first output and source follows every supported
     assert.deepEqual(result.failures.map(failure => failure.index), [0]);
     assert.equal(result.output[0], null);
   }
-  assert.match(kernelBody(STARTER), /let i = global_id.x \+ 1u/);
-  assert.match(kernelBody(repaired), /let i = global_id.x;/);
+  assert.ok(kernelBody(STARTER).includes('int i = blockIdx.x * blockDim.x + threadIdx.x + 1;'));
+  assert.ok(kernelBody(repaired).includes('int i = blockIdx.x * blockDim.x + threadIdx.x;'));
   assert.doesNotMatch(kernelBody({ ...repaired, guard: false }), /if \(/);
-  assert.match(kernelBody({ ...repaired, operation: 'add' }), /x\[i\] \+ params.factor/);
+  assert.match(kernelBody({ ...repaired, operation: 'add' }), /x\[i\] \+ factor/);
 });
 test('unsafe configurations fail even when the in-bounds outputs happen to match', () => {
   const tail = simulateKernel({ ...repaired, guard: false }, inputFor(8));
@@ -38,7 +38,7 @@ test('unsafe configurations fail even when the in-bounds outputs happen to match
   assert.equal(simulateKernel(local, inputFor(32)).passed, true);
   const repeated = simulateKernel(local, inputFor(35));
   assert.equal(repeated.safe, false);
-  assert.match(repeated.hazards[0], /different workgroups/);
+  assert.match(repeated.hazards[0], /different blocks/);
   assert.deepEqual(repeated.output.slice(32), [null, null, null]);
 });
 test('changing arithmetic changes computed output, and unsupported expressions are rejected', () => {
@@ -50,14 +50,14 @@ test('changing arithmetic changes computed output, and unsupported expressions a
 });
 
 test('all launch sizes and vector addition match an independent reference', () => {
-  for (const workgroupSize of [8,16,32,64]) for (let n=0;n<=129;n++) {
-    const program = {...repaired,workgroupSize,task:'vector-add',operation:'vector-add'};
+  for (const blockSize of [8,16,32,64]) for (let n=0;n<=129;n++) {
+    const program = {...repaired,blockSize,task:'vector-add',operation:'vector-add'};
     const input = inputFor(n), result = simulateKernel(program,input);
     assert.equal(result.passed,true);
     assert.deepEqual(result.output, Array.from(input,(x,i)=>Math.fround(x + (i%5)-2.25)));
-    assert.equal(result.invocations,Math.ceil(n/workgroupSize)*workgroupSize);
+    assert.equal(result.threads,Math.ceil(n/blockSize)*blockSize);
     assert.equal(result.trace.filter(e=>e.op==='load-b').length,n);
   }
-  assert.throws(()=>simulateKernel({...repaired,workgroupSize:0},inputFor(8)));
+  assert.throws(()=>simulateKernel({...repaired,blockSize:0},inputFor(8)));
   assert.throws(()=>simulateKernel({...repaired,task:'unknown'},inputFor(8)));
 });

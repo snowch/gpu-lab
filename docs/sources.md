@@ -65,25 +65,16 @@ CI compiles and runs them through GPGPU-Sim with CPU-reference checks. This chec
 outputs, not tensor-core lowering, attention-kernel correctness or inference performance. No real
 GPU validation or performance measurement is claimed by this revision.
 
-## Repair-a-kernel prototype: WebGPU
+## CUDA introduction and repair workshop
 
-- [WGSL specification](https://www.w3.org/TR/WGSL/): compute entry points,
-  invocation IDs, workgroup size, storage/uniform bindings and FP32 arithmetic.
-- [WebGPU specification](https://www.w3.org/TR/webgpu/): shader compilation,
-  pipeline creation, compute dispatch, buffer copies and asynchronous read-back.
+The introduction and repair workshop use the CUDA C++ Programming Guide and Runtime
+API linked above: thread/block indexing, kernel launches, device allocation, copies,
+synchronisation and error handling. PyTorch snippets describe equivalent operations;
+they are not claims about the framework's internal kernel implementation.
 
-`tests/kernel_webgpu.py` compiles and dispatches the generated shader through real
-WebGPU in Chromium 145 (Playwright 1.58) with its SwiftShader fallback adapter.
-The 2026-10-24 local run passed 72 model/WebGPU combinations and the end-to-end repair
-flow. This is software-adapter validation, not a physical GPU benchmark or CUDA test.
-
-The extended challenge implementation checks 432 model/WebGPU combinations across
-workgroup sizes 8, 16, 32 and 64, scalar and vector operations, guarded/unguarded
-accesses and six input lengths. Validation uses the same Chromium SwiftShader
-software adapter; physical GPU validation remains outstanding.
-
-
-Hello, GPU uses the same WebGPU/WGSL specifications. Browser tests cover the four-step
-flow, edits, bounds diagnostics, explicitly labelled CPU-model fallback and offline
-access. The software-WebGPU suite also runs that flow through shader compilation and
-buffer read-back, including an all-skipped guard. This is not physical GPU validation.
+Browser tests exercise supported CUDA expressions in an explicit CPU teaching model,
+including edits, prediction/repair checks, invalid accesses, generated downloads and
+offline use. There is no in-browser CUDA compiler. The new generated programs have
+not yet been compiled with nvcc or run on an NVIDIA GPU; they remain explicitly
+unvalidated for real CUDA execution. The previous WGSL/WebGPU prototype and its
+software-adapter execution tests have been retired rather than treated as CUDA evidence.

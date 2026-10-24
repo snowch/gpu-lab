@@ -21,8 +21,8 @@ different. Each lab records what its model leaves out.
 ## First run: Hello, GPU
 
 The main course entry is now `lessons/hello.html`: four small working programs before
-kernel repair. Learners write a constant, see invocation IDs, scale input values, and
-handle a partial workgroup. Each step presents real WGSL with a highlighted editable
+kernel repair. Learners write a constant, see thread IDs, scale input values, and
+handle a partial block. Each step presents CUDA C++ with a highlighted editable
 body, a single Run action and output. There are no prediction forms, grading controls,
 launch settings or backend choices in this introduction. The repair prototype follows.
 
@@ -37,11 +37,11 @@ without JavaScript and in the offline course.
 ## Hands-on prototype
 
 Before redesigning all eight labs, `lessons/kernel.html` compares an inspectable browser
-model and real WebGPU execution on one task: repair vector scaling, pass several input
+model and downloadable CUDA C++ programs on one task: repair vector scaling, pass several input
 lengths, inspect addresses, and diagnose a missing guard or a local/global indexing
-mistake. Source is built from a small explicit set of editable WGSL expressions. The
+mistake. Source is built from a small explicit set of editable CUDA expressions. The
 prototype now provides four assessed prediction–repair–explanation challenges, a selectable
-workgroup/invocation/output map, configurable launch sizes and a vector-addition transfer task.
+block/thread/output map, configurable launch sizes and a vector-addition transfer task.
 It is optional and separately labelled; it does not replace Lab 01 or promise
 CUDA compilation or hardware timing. Evaluate learner control and feedback before
 choosing a larger execution platform.
