@@ -27,6 +27,16 @@ NVIDIA CUDA relationships rather than a simulated chip or performance measuremen
 remains the first hands-on experiment. Native disclosure controls keep the map available
 without JavaScript and in the offline course.
 
+## Hands-on prototype
+
+Before redesigning all eight labs, `lessons/kernel.html` compares an inspectable browser
+model and real WebGPU execution on one task: repair vector scaling, pass several input
+lengths, inspect addresses, and diagnose a missing guard or a local/global indexing
+mistake. Source is built from a small explicit set of editable WGSL expressions. The
+prototype is optional and separately labelled; it does not replace Lab 01 or promise
+CUDA compilation or hardware timing. Evaluate learner control and feedback before
+choosing a larger execution platform.
+
 ## Modules
 
 | Module | Operation and model | Exercise | State |

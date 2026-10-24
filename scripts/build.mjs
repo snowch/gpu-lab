@@ -15,6 +15,7 @@ await writeFile('dist/index.html', (await readFile('index.html', 'utf8'))
   .replace('<!-- SM_OVERVIEW -->', renderSmOverview())
   .replace('<!-- WORK_MAP -->', renderWorkMap()));
 await mkdir('dist/lessons', { recursive: true });
+await cp('content/kernel.html', 'dist/lessons/kernel.html');
 await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html','utf8'))
   .replace('<!-- TENSOR_LAYOUT_FIGURE -->',renderTensorStep())
   .replace('<!-- TENSOR_SLICE_FIGURE -->',renderTensorSlice())

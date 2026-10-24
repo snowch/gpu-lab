@@ -177,6 +177,18 @@ try:
                   return {ok: response.ok, text: await response.text()};
                 }''', url + file)
                 assert result['ok'] and len(result['text']) > 100
+            page.goto(url + 'lessons/kernel.html')
+            page.locator('#reset-kernel').click()
+            page.locator('#kernel-index').select_option('global')
+            page.locator('#run-model').click()
+            expect(page.locator('#kernel-status')).to_contain_text('3 of 3')
+            page.get_by_role('button', name='Inspect 35', exact=True).click()
+            page.locator('#trace-end').click()
+            expect(page.locator('#kernel-event')).to_contain_text('63 < 35: false')
+            page.get_by_text('Full shader, including data bindings', exact=True).click()
+            with page.expect_download() as shader_download:
+                page.locator('#download-shader').click()
+            assert 'let i = global_id.x;' in Path(shader_download.value.path()).read_text()
             page.close()
             page = context.new_page()
             response = page.goto(url)

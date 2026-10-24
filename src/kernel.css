@@ -1,0 +1,37 @@
+/* Copyright © 2026 Christopher Snow. */
+.intro { padding-bottom:24px; margin-bottom:24px; }
+.kernel-task { padding:22px; background:var(--soft); border-left:3px solid var(--accent); }
+.kernel-note { color:var(--muted); font-size:13px; margin:14px 0; }
+.kernel-editor { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; border:1px solid var(--line); border-radius:8px; padding:20px; background:var(--panel); }
+.kernel-editor legend { padding:0 8px; font-size:13px; color:var(--muted); }
+.kernel-editor label { min-width:0; font-size:14px; font-weight:650; }
+.kernel-editor select { display:block; font-size:13px; margin-top:8px; min-height:44px; }
+.kernel-actions { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+button:disabled { cursor:default; opacity:.55; }
+#kernel-status { padding:14px; background:var(--soft); border:1px solid var(--line); border-radius:6px; margin-top:20px; }
+#kernel-status[data-state="pass"] { border-color:var(--accent); color:var(--accent); }
+.kernel-table-wrap { overflow-x:auto; }
+.kernel-checks { border-collapse:collapse; width:100%; font-size:13px; text-align:left; }
+.kernel-checks caption { text-align:left; margin-bottom:12px; color:var(--muted); }
+.kernel-checks th,.kernel-checks td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+.kernel-checks small { display:block; margin-top:6px; color:var(--muted); }
+.kernel-checks button { padding:6px 8px; font-size:12px; }
+.kernel-event { padding:16px; background:var(--accent-soft); border-left:3px solid var(--accent); font-size:14px; }
+.kernel-state { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:18px 0 26px; }
+.kernel-state div { padding:10px; background:var(--soft); border:1px solid var(--line); border-radius:5px; }
+.kernel-state dt { font-size:12px; color:var(--muted); }
+.kernel-state dd { margin:4px 0 0; font:20px ui-monospace,monospace; }
+.kernel-memory { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; margin:14px 0 26px; }
+.kernel-cell { min-width:0; padding:8px 2px; text-align:center; background:var(--panel); border:1px solid var(--line); border-radius:5px; font:12px/1.6 ui-monospace,monospace; }
+.kernel-cell small { display:block; color:var(--muted); font-size:10px; }
+.kernel-cell.active { outline:2px solid var(--accent); background:var(--accent-soft); }
+#kernel-step { display:block; width:100%; padding-inline:0; }
+#gpu-output-panel { margin-top:26px; }
+@media(max-width:1100px) { .kernel-editor { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:760px) {
+ .kernel-editor,.kernel-task { padding:16px; }
+ .kernel-memory { grid-template-columns:repeat(5,minmax(0,1fr)); }
+ .kernel-state { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .kernel-checks th,.kernel-checks td { padding:10px 4px; font-size:12px; }
+ .kernel-checks button { font-size:11px; }
+}
