@@ -20,11 +20,13 @@ different. Each lab records what its model leaves out.
 
 ## First run: Hello, GPU
 
-The main course entry is now `lessons/hello.html`: four small working programs before
-kernel repair. Learners write a constant, see thread IDs, scale input values, and
-handle a partial block. Each step presents CUDA C++ with a highlighted editable
-body, a single Run action and output. There are no prediction forms, grading controls,
-launch settings or backend choices in this introduction. The repair prototype follows.
+The main course entry is `lessons/hello.html`: five concept-first steps before repair.
+Start from a familiar PyTorch scaling expression and a computed input → thread → output
+picture. Learners change the multiplier and run. Then introduce array indices, block
+grouping and bounds checks, each with a selectable visual before its CUDA expression.
+Only the final step reveals a complete kernel, Python orchestration and the CUDA download.
+The first screen has no function declaration, pointers, launch counts or code editor.
+A short browser-simulation label links to limitations in an optional disclosure.
 
 ## Architecture introduction
 
