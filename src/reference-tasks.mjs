@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
   pytorch: 'https://docs.pytorch.org/docs/stable/',
@@ -19,9 +20,10 @@ export const guides = {
 };
 export const referenceTasks = {
   'hello-pytorch': {
-    title:'PyTorch tensor options', page:'tensor', label:'PyTorch: torch.tensor',
-    prompt:'Find the device and dtype arguments. Which chooses where the tensor lives, and which chooses its number type?',
-    answer:'device chooses the storage device; dtype chooses the numerical representation. Changing dtype alone does not move a CUDA tensor to the CPU.',
+    title:'Where does this tensor live?', page:'tensor', label:'PyTorch: torch.tensor', code:pythonSource(),
+    prompt:'In this snippet from the start of the chapter, find device="cuda". Use the torch.tensor reference to explain what it selects.',
+    followUp:'The snippet does not specify dtype. Find that argument in the reference: what does it control, and what number type does PyTorch infer from these floating-point inputs?',
+    answer:'device selects the storage device: "cuda" places this tensor on an NVIDIA GPU. dtype selects the numerical representation. With PyTorch’s usual default settings, these floating-point inputs produce torch.float32. Changing the default floating-point dtype can change that inference. Choosing a dtype alone does not move a tensor between CPU and GPU.',
   },
   'hello-indices': {
     title:'CUDA thread indices', page:'indices', label:'CUDA: built-in variables',
@@ -95,8 +97,10 @@ export function renderReferenceTask(key) {
   const task=referenceTasks[key];
   if(!task) throw new Error('Unknown reference task: '+key);
   return `<aside class="reference-task" aria-labelledby="reference-${key}">
-    <h3 id="reference-${key}">${task.independent?'Find it in the guide':'Look it up'}: ${escape(task.title)}</h3>
+    <h3 id="reference-${key}"><svg class="reference-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Z"/><path d="M12 5v15"/></svg><span>${task.independent?'Find it in the guide':'Look it up'}: ${escape(task.title)}</span></h3>
+    ${task.code?`<pre class="reference-code"><code>${escape(task.code)}</code></pre>`:''}
     <p>${escape(task.prompt)}</p>
+    ${task.followUp?`<p>${escape(task.followUp)}</p>`:''}
     <p>${link(task.page,task.label)}</p>
     <details><summary>Compare your answer</summary><p>${escape(task.answer)}</p>${task.solution?`<p>${link(task.solution,'Open the relevant section')}</p>`:''}</details>
     <p class="reference-note">Reference opens online; the comparison works offline.</p>

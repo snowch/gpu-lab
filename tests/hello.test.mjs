@@ -30,7 +30,7 @@ test('static introduction includes all worked diagrams with unique control IDs',
  assert.equal(pythonSource(),'import torch\nx = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], device="cuda")\ny = x * 2');
  assert.ok(html.indexOf('import torch') < html.indexOf('Idea 1 of 5'));
  assert.match(html,/Result <code>y<\/code><\/dt><dd><code>\[2, 4, 6, 8, 10\]/);
- assert.equal((html.match(/import torch\nx = /g)||[]).length,1);
+ assert.equal((html.match(/import torch\nx = /g)||[]).length,2);
  assert.match(html,/How does the GPU calculate these results/);
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length);
