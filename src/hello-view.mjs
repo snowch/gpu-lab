@@ -1,5 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 import {openingCode,browserNotice,codePanel} from './chapter-view.mjs';
+import {overviewExample} from './overview-visuals.mjs';
 import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,lineFor,kernelSource,pythonSource} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -10,6 +11,33 @@ export function renderIntroMap(stage,state,selected=0,showOutput=true) {
     const values=[['Input',t.input===null?'No element':t.input],['Thread '+t.i,'× '+state.factor],['Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':t.output]];
     return `<${tag} class="hello-thread" ${stage===0?'':`type="button" data-thread="${t.i}" aria-pressed="${t.i===selected}"`} ${showOutput&&(t.skipped||t.invalid)?`data-state="${t.skipped?'skip':'invalid'}"`:''}>${values.map(([label,value])=>`<small>${escape(label)}</small><strong>${escape(value)}</strong>`).join('')}</${tag}>`;
   }).join('')}</div></div>`).join('');
+}
+export function renderIntroRelationships() {
+  const example=overviewExample(steps[2].size,3);
+  const expanded=example.blocks[0];
+  const warp=expanded.warps[0];
+  return `<figure class="hello-relationships" aria-labelledby="hello-relationships-title" aria-describedby="hello-relationships-caption">
+    <h4 id="hello-relationships-title">Inside a GPU: SMs → blocks → warps → threads</h4>
+    <p class="hello-placement-note">Separate placement example: ${example.blocks.length} blocks, ${example.threadsPerBlock} threads per block.</p>
+    <div class="hello-gpu"><strong>GPU</strong>
+      <div class="hello-sm-grid">${example.sms.map(sm=>`<section class="hello-sm" aria-label="SM ${sm.sm} example blocks">
+        <h5>SM ${sm.sm}</h5>
+        ${sm.blocks.map(block=>`<div class="hello-resident-block">
+          <strong>Block ${block.name}</strong><span>Stays on this SM</span>
+          <div class="hello-warp"><strong>Warp 0 · ${block.warps[0].length} threads</strong>
+            ${block===expanded?`<p>One partially filled warp: ${warp.length} of 32 lanes.</p>
+            <div class="hello-warp-lanes" role="list" aria-label="Block A, warp 0: 32 lane positions">${Array.from({length:32},(_,lane)=>{
+              const thread=warp.find(t=>t.lane===lane);
+              return `<span class="hello-warp-lane${thread?' has-thread':''}" role="listitem" aria-label="Lane ${lane}: ${thread?'thread '+thread.thread+' within block A':'no thread'}">${thread?'T'+thread.thread:'<span aria-hidden="true">–</span>'}</span>`;
+            }).join('')}</div>
+            <p>Solid tiles: threads 0–${warp.at(-1).thread} within block A. Dashed tiles: no thread.</p>`:''}
+          </div>
+        </div>`).join('')}
+      </section>`).join('')}</div>
+    </div>
+    <figcaption id="hello-relationships-caption">A lane is a thread’s position within its warp. Each block has its own warp; warps never combine threads from different blocks. This shows one possible placement, not a chip floor plan or an execution timeline. Placement and how much work can execute at once depend on available resources.</figcaption>
+    <p><a href="scheduling.html">Explore warp scheduling in the later lab →</a></p>
+  </figure>`;
 }
 export function renderIntroSections() {
   const start=simulateIntro(0,2);
@@ -34,7 +62,8 @@ export function renderIntroSections() {
       ${stage===2?`<p>For <code>y = x * 2</code>, each thread works independently. Later, in matrix multiplication, a block can load inputs into shared memory once and reuse them across its threads.</p>
       <h3>Where do they run?</h3>
       <p>Each block stays on one streaming multiprocessor (SM), a part of the GPU that executes threads in parallel. Different blocks can run on different SMs; several blocks can share one SM when resources allow.</p>
-      <p>A block’s threads do not necessarily all execute at once. The SM organises them into groups called warps and schedules work from those groups. We explore warps and scheduling later.</p>
+      <p>A block’s threads do not necessarily all execute at once. The SM organises them into groups called warps and schedules work from those groups. On NVIDIA GPUs, each warp has 32 thread positions. We explore warp scheduling later.</p>
+      ${renderIntroRelationships()}
       <h3>Try two blocks</h3>
       <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>

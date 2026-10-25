@@ -11,6 +11,16 @@ def hello_flow(page, url):
     assert page.locator('.hello-start').evaluate('el=>el.getBoundingClientRect().top') < page.locator('#idea-1').evaluate('el=>el.getBoundingClientRect().top')
     for i in range(1,6):
         expect(page.locator(f'#idea-{i}')).to_be_visible()
+    diagram=page.locator('#idea-3 .hello-relationships')
+    expect(diagram).to_be_visible()
+    expect(diagram.locator('.hello-sm')).to_have_count(2)
+    expect(diagram.locator('.hello-sm').nth(0).locator('.hello-resident-block')).to_have_count(2)
+    expect(diagram.locator('.hello-sm').nth(1).locator('.hello-resident-block')).to_have_count(1)
+    expect(diagram.locator('.hello-warp-lane')).to_have_count(32)
+    expect(diagram.locator('.hello-warp-lane.has-thread')).to_have_count(4)
+    expect(diagram).to_contain_text('One partially filled warp: 4 of 32 lanes.')
+    expect(diagram.get_by_role('link')).to_have_attribute('href','scheduling.html')
+    assert diagram.evaluate('el=>el.scrollWidth <= el.clientWidth')
     assert page.locator('#hello-next, #hello-back').count() == 0
     ys=page.locator('.hello-section').evaluate_all('(els)=>els.map(el=>el.getBoundingClientRect().top)')
     assert ys == sorted(ys) and len(set(ys)) == 5
@@ -116,5 +126,6 @@ def check_hello(browser,url,root,errors):
     expect(page.locator('.hello-thread')).to_have_count(34)
     expect(page.locator('#hello-output-4')).to_have_text('Example output: [2, 4, 6, 8, 10]')
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
+    expect(page.locator('.hello-relationships .hello-warp-lane')).to_have_count(32)
     context.close()
     print('PASS: continuous intro, independent state, no scroll jumps, keyboard selection, CUDA download and static diagrams')

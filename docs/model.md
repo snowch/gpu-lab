@@ -16,6 +16,13 @@ Static figures are generated during the build; optional controls change the insp
 block and warp without requiring a GPU. Incomplete final warps are supported by the
 mapping function and show unoccupied lane positions as inactive.
 
+The chapter 1 inline relationship map reuses the same placement rule with three
+blocks of four threads on two SMs. Blocks A and C share SM 0; block B uses SM 1.
+This is explicitly a separate placement illustration, not the two-block launch
+in the following experiment. Block A expands its one partially filled warp into
+32 lanes: four with threads and 28 without threads. Empty lane positions are not
+threads skipped by the array bounds check. No scheduling or timing is inferred.
+
 ## Repair-a-kernel workshop
 
 The structured editor selects a CUDA index expression (the global index
