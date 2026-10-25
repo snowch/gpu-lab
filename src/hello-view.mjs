@@ -44,7 +44,7 @@ export function renderIntroSections() {
       <p class="hello-note">Browser simulation · this example has its own controls</p>
       <div id="hello-map-${stage}" aria-label="Each thread connects one input to one output">${renderIntroMap(stage,state)}</div>
       <p id="hello-output-${stage}" class="hello-output" role="status">Example output: [${state.output.join(', ')}]</p>
-      ${stage===0?`<p class="reference-goal">Practise using the official PyTorch and CUDA references as you work through the course. Start with the links provided; later labs ask you to find the relevant section.</p><p class="reference-version">For the browser exercises, no installation or documentation-version selection is needed: the simulator does not run PyTorch or CUDA. If you run the examples in your own environment, choose documentation matching your own installed PyTorch or CUDA version.</p>
+      ${stage===0?`<p class="reference-goal">Practise using the official PyTorch and CUDA references as you work through the course. Start with the links provided; later labs ask you to find the relevant section.</p><p class="reference-version">Use the documentation links provided for the browser exercises. These simulations do not run PyTorch or CUDA and require no installation. If you run the examples in your own environment, use documentation matching your installed PyTorch or CUDA version.</p>
     ${renderReferenceTask('hello-pytorch')}`: ''}
       ${stage>0?`<div class="hello-index-section"><p id="hello-index-${stage}" role="status">Select a thread to follow its index.</p>${pre('hello-selected-code','output[0] = input[0] * 2;')}</div>`:''}
       ${stage>0&&stage<4?`<div class="hello-cuda-section">
