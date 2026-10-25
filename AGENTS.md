@@ -3,6 +3,8 @@
 Copyright © 2026 Christopher Snow.
 
 Read `docs/plan.md`, `docs/model.md` and `docs/sources.md` before extending the course.
+For chapter writing or review, also follow [the chapter-writing guide](docs/chapter-writing.md)
+and consult [the reader feedback log](docs/reader-feedback.md).
 
 - Keep AI workloads as the motivation and introduce hardware terms at first use.
 - Generate figures and prediction answers from model results; no scripted performance claims.

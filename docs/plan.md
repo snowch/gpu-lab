@@ -15,6 +15,9 @@ to check an API argument, an indexing rule or a synchronisation requirement.
 
 ## Teaching loop
 
+Use [the chapter-writing guide](chapter-writing.md) when drafting or reviewing chapters.
+[The reader feedback log](reader-feedback.md) records the evidence and open follow-ups.
+
 Start from an AI operation; introduce the smallest mechanism that explains it; ask for a
 prediction; run the model; change one variable; explain the difference; connect it to code.
 Short reference tasks sit beside the relevant code or experiment. Early tasks link to
