@@ -1,8 +1,12 @@
 // Copyright © 2026 Christopher Snow.
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function openingCode(source,extraClass='') {
-  return `<pre class="chapter-opening-code${extraClass?' '+extraClass:''}"><code>${escape(source)}</code></pre>`;
+  return `<div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch</p><pre class="chapter-opening-code${extraClass?' '+extraClass:''}"><code>${escape(source)}</code></pre></div>`;
 }
 export function browserNotice() {
   return '<p class="chapter-browser-note">Run the examples below in your browser with no installation or GPU required. The browser simulates the calculation; it does not execute PyTorch or GPU code. To run the PyTorch snippet itself, use a Python environment with PyTorch and an NVIDIA GPU.</p>';
+}
+
+export function codePanel({id,source,language='cuda',label,labelId=id+'-label',selected=false}) {
+  return `<div class="chapter-code-panel${selected?' is-selected-thread':''}" data-language="${language}"><p class="chapter-code-label" id="${labelId}">${escape(label)}</p><pre id="${id}" aria-labelledby="${labelId}"><code>${escape(source)}</code></pre></div>`;
 }

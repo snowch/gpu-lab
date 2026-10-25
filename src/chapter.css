@@ -8,3 +8,14 @@
 .book-chapter .hello-section h2,.book-chapter .book-section h2 { font-size:clamp(25px,3vw,32px); }
 .book-chapter .hello-concept { font-size:inherit; }
 .book-chapter .hello-note,.book-chapter .book-note { font-size:14px; }
+
+.book-chapter { --cuda-ink:#245b91; --cuda-soft:#e9f0f8; }
+:root[data-theme="dark"] .book-chapter { --cuda-ink:#b2d3ff; --cuda-soft:#20354c; }
+.chapter-code-label { margin:16px 0 0; padding:8px 16px; font-size:14px; font-weight:650; }
+.chapter-code-panel[data-language="pytorch"]>.chapter-code-label { color:var(--accent); background:var(--accent-soft); border-left:4px solid var(--accent); }
+.chapter-code-panel[data-language="cuda"]>.chapter-code-label { color:var(--cuda-ink); background:var(--cuda-soft); border-left:4px solid var(--cuda-ink); }
+.book-chapter .chapter-code-panel>pre { margin-top:0; border-radius:0 0 6px 0; }
+.book-chapter .chapter-code-panel[data-language="cuda"]>pre { border:0; border-left:4px solid var(--cuda-ink); background:var(--cuda-soft); color:var(--cuda-ink); padding:16px; font:16px/1.7 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+.chapter-code-panel>pre code { font:inherit; }
+
+.chapter-code-panel.is-selected-thread { outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }

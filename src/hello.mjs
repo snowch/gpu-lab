@@ -27,7 +27,8 @@ function inspect(t){
   $('hello-index').textContent=stage===1
     ? 'Thread '+t.i+': i = '+t.i+'. Read input['+t.i+'], multiply it, then write output['+t.i+'].'
     : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips array access.':t.invalid?' No element '+t.i+' exists: this access is invalid.':'');
-  $('hello-selected-code').textContent=t.i<steps[stage].length?'output['+t.i+'] = input['+t.i+'] * '+factor()+';':'No array element at index '+t.i+'.';
+  $('hello-selected-label').textContent='CUDA C++ · Selected thread: i = '+t.i;
+  $('hello-selected-code').textContent=t.i<steps[stage].length?lineFor(factor()).replaceAll('[i]','['+t.i+']'):'No array element at index '+t.i+'.';
 }
 function draw(){
   const container=$('hello-map');container.replaceChildren();
