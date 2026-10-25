@@ -4,8 +4,8 @@ from playwright.sync_api import expect
 from version_check import mock_version
 
 def check_book_opening(browser,url,root,errors):
-    for width,theme in [(360,'light'),(360,'dark'),(820,'light'),(1440,'dark')]:
-        context=browser.new_context(viewport={'width':width,'height':900},color_scheme=theme,service_workers='block')
+    for width,theme in [(360,'light'),(393,'dark'),(820,'light'),(1440,'dark')]:
+        context=browser.new_context(viewport={'width':width,'height':900},color_scheme=theme,service_workers='block',has_touch=width<500)
         mock_version(context)
         page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(url+'lessons/hello.html')
@@ -13,7 +13,9 @@ def check_book_opening(browser,url,root,errors):
         expect(page.locator('h1')).to_have_text('Where do the numbers live?')
         expect(page.locator('[data-book-experiment]')).to_have_count(3)
         expect(page.locator('#device-run-0')).to_be_enabled()
+        page.locator('#device-run-0').evaluate('el=>scrollTo(0,scrollY+el.getBoundingClientRect().top-400)')
         page.locator('#device-run-0').focus();page.keyboard.press('Enter')
+        expect(page.locator('#device-feedback-0')).to_be_in_viewport(ratio=1)
         expect(page.locator('#device-feedback-0')).to_contain_text('20 bytes copied')
         expect(page.locator('#device-map-0 .device-buffer')).to_have_count(2)
         page.locator('#device-count-0').select_option('8');page.locator('#device-run-0').click()
@@ -34,8 +36,21 @@ def check_book_opening(browser,url,root,errors):
         page.locator('#device-1').screenshot(path=str(root/f'test-results/book-devices-{width}-{theme}.png'),style='.topbar {position:static!important}')
         page.get_by_role('link',name='Chapter 3: How do threads read a tensor? →',exact=True).click()
         expect(page.locator('[data-book-experiment]')).to_have_count(4)
-        page.locator('#reading-run-row').click()
+        run=page.locator('#reading-run-row')
+        expect(run).to_be_enabled()
+        run.evaluate('el=>scrollTo(0,scrollY+el.getBoundingClientRect().top-400)')
+        before=page.evaluate('scrollY')
+        if width<500:run.tap()
+        else:run.click()
+        expect(page.locator('#reading-feedback-row')).to_be_in_viewport(ratio=1)
+        assert abs(page.evaluate('scrollY')-before)<5,'Run moved the page'
+        gap=page.locator('#reading-feedback-row').bounding_box()['y']-(run.bounding_box()['y']+run.bounding_box()['height'])
+        assert 0<=gap<=32,'Run result is separated from its button'
+        page.screenshot(path=str(root/f'test-results/run-result-{width}-{theme}.png'))
         expect(page.locator('#reading-feedback-row')).to_contain_text('[2, 4, 6, 8, 10]')
+        page.locator('#reading-factor-row').fill('3')
+        expect(page.locator('#reading-feedback-row')).to_have_text('Run to inspect the output.')
+        page.locator('#reading-factor-row').fill('2')
         page.locator('#reading-index-row').select_option('1');page.locator('#reading-run-row').click()
         expect(page.locator('#reading-feedback-row')).to_contain_text('[12, 14, 16, 18, 20]')
         page.locator('#reading-run-column').click()
