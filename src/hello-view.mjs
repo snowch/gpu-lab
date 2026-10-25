@@ -13,9 +13,8 @@ export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   }).join('')}</div></div>`).join('');
 }
 export function renderIntroRelationships() {
-  const example=overviewExample(steps[2].size,3);
+  const example=overviewExample(64,3);
   const expanded=example.blocks[0];
-  const warp=expanded.warps[0];
   return `<figure class="hello-relationships" aria-labelledby="hello-relationships-title" aria-describedby="hello-relationships-caption">
     <h4 id="hello-relationships-title">Inside a GPU: SMs → blocks → warps → threads</h4>
     <p class="hello-placement-note">Separate placement example: ${example.blocks.length} blocks, ${example.threadsPerBlock} threads per block.</p>
@@ -23,19 +22,19 @@ export function renderIntroRelationships() {
       <div class="hello-sm-grid">${example.sms.map(sm=>`<section class="hello-sm" aria-label="SM ${sm.sm} example blocks">
         <h5>SM ${sm.sm}</h5>
         ${sm.blocks.map(block=>`<div class="hello-resident-block">
-          <strong>Block ${block.name}</strong><span>Stays on this SM</span>
-          <div class="hello-warp"><strong>Warp 0 · ${block.warps[0].length} threads</strong>
-            ${block===expanded?`<p>One partially filled warp: ${warp.length} of 32 lanes.</p>
-            <div class="hello-warp-lanes" role="list" aria-label="Block A, warp 0: 32 lane positions">${Array.from({length:32},(_,lane)=>{
-              const thread=warp.find(t=>t.lane===lane);
-              return `<span class="hello-warp-lane${thread?' has-thread':''}" role="listitem" aria-label="Lane ${lane}: ${thread?'thread '+thread.thread+' within block A':'no thread'}">${thread?'T'+thread.thread:'<span aria-hidden="true">–</span>'}</span>`;
-            }).join('')}</div>
-            <p>Solid tiles: threads 0–${warp.at(-1).thread} within block A. Dashed tiles: no thread.</p>`:''}
-          </div>
+          <strong>Block ${block.name}</strong><span>${block.threads.length} threads · ${block.warps.length} warps · stays on this SM</span>
+          ${block.warps.map((warp,index)=>`<div class="hello-warp"><strong>Warp ${index} · ${warp.length} threads</strong>
+            <p>Threads ${warp[0].thread}–${warp.at(-1).thread} within block ${block.name}</p>
+            ${block===expanded&&index===0?`<div class="hello-warp-lanes" role="list" aria-label="Block A, warp 0: 32 lane positions">${warp.map(thread=>
+              `<span class="hello-warp-lane has-thread" role="listitem" aria-label="Lane ${thread.lane}: thread ${thread.thread} within block A">${thread.thread}</span>`
+            ).join('')}</div>`:''}
+          </div>`).join('')}
         </div>`).join('')}
       </section>`).join('')}</div>
     </div>
-    <figcaption id="hello-relationships-caption">A lane is a thread’s position within its warp. Each block has its own warp; warps never combine threads from different blocks. This shows one possible placement, not a chip floor plan or an execution timeline. Placement and how much work can execute at once depend on available resources.</figcaption>
+    <figcaption id="hello-relationships-caption">Each block here contains two warps. A lane is a thread’s position within its warp; each tile shows a thread’s index within block A. Warps never combine threads from different blocks. This shows one possible placement, not a chip floor plan or an execution timeline. Placement and how much work can execute at once depend on available resources.</figcaption>
+    <p><strong>Blocks can make progress independently.</strong> The SM can choose ready warps from any of the blocks it holds. Another block can run while some threads in the first are waiting or some lanes are unused, when resources allow. A block does not have to finish before another can start.</p>
+    <p>In the four-thread exercise below, each block uses one partially filled warp: 4 of 32 lanes have threads. The other 28 positions do not prevent another block from running, and cannot be filled with threads from another block.</p>
     <p><a href="scheduling.html">Explore warp scheduling in the later lab →</a></p>
   </figure>`;
 }

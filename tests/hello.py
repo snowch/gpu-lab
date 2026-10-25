@@ -17,8 +17,14 @@ def hello_flow(page, url):
     expect(diagram.locator('.hello-sm').nth(0).locator('.hello-resident-block')).to_have_count(2)
     expect(diagram.locator('.hello-sm').nth(1).locator('.hello-resident-block')).to_have_count(1)
     expect(diagram.locator('.hello-warp-lane')).to_have_count(32)
-    expect(diagram.locator('.hello-warp-lane.has-thread')).to_have_count(4)
-    expect(diagram).to_contain_text('One partially filled warp: 4 of 32 lanes.')
+    expect(diagram.locator('.hello-warp-lane.has-thread')).to_have_count(32)
+    for block in diagram.locator('.hello-resident-block').all():
+        expect(block.locator('.hello-warp')).to_have_count(2)
+        expect(block).to_contain_text('Warp 0 · 32 threads')
+        expect(block).to_contain_text('Warp 1 · 32 threads')
+    expect(diagram).to_contain_text('Threads 32–63 within block A')
+    expect(diagram).to_contain_text('each block uses one partially filled warp: 4 of 32 lanes have threads.')
+    expect(diagram).to_contain_text('Another block can run while some threads in the first are waiting or some lanes are unused')
     expect(diagram.get_by_role('link')).to_have_attribute('href','scheduling.html')
     assert diagram.evaluate('el=>el.scrollWidth <= el.clientWidth')
     assert page.locator('#hello-next, #hello-back').count() == 0

@@ -17,11 +17,15 @@ block and warp without requiring a GPU. Incomplete final warps are supported by 
 mapping function and show unoccupied lane positions as inactive.
 
 The chapter 1 inline relationship map reuses the same placement rule with three
-blocks of four threads on two SMs. Blocks A and C share SM 0; block B uses SM 1.
-This is explicitly a separate placement illustration, not the two-block launch
-in the following experiment. Block A expands its one partially filled warp into
-32 lanes: four with threads and 28 without threads. Empty lane positions are not
-threads skipped by the array bounds check. No scheduling or timing is inferred.
+blocks of 64 threads on two SMs. Blocks A and C share SM 0; block B uses SM 1.
+Each block shows two distinct 32-thread warps (local indices 0–31 and 32–63).
+The first warp in block A expands into 32 occupied lanes. This is explicitly a
+separate placement illustration, not the two-block, four-thread launch in the
+following experiment. The accompanying text explains that four-thread blocks use
+one partially filled warp, without implying this is the general block size.
+Ready warps from different resident blocks may make progress while other threads
+wait or lanes are unused; resource limits still apply. Empty lanes cannot be
+filled with another block’s threads. No scheduling or timing is simulated.
 
 ## Repair-a-kernel workshop
 
