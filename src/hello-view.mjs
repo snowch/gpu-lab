@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {openingCode,browserNotice} from './chapter-view.mjs';
+import {openingCode,browserNotice,codePanel} from './chapter-view.mjs';
 import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,lineFor,kernelSource,pythonSource} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -25,7 +25,7 @@ export function renderIntroSections() {
     <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
   </section>`+steps.map((step,stage)=>{
     const state=simulateIntro(stage,2);
-    const pre=(id,code)=>`<pre id="${id}-${stage}">${escape(code)}</pre>`;
+    const pre=(id,source,label,language='cuda')=>codePanel({id:id+'-'+stage,source,language,label:label??'CUDA C++'});
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
@@ -37,7 +37,7 @@ export function renderIntroSections() {
       <p>A block’s threads do not necessarily all execute at once. The SM organises them into groups called warps and schedules work from those groups. We explore warps and scheduling later.</p>
       <h3>Try two blocks</h3>
       <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
-      <pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre>
+      <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>
       <p>${stage===0?'Predict the five outputs before you run. ':stage===3?'Predict which threads have no input. ':''}${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?`<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>`:''}
@@ -47,20 +47,21 @@ export function renderIntroSections() {
       <p id="hello-output-${stage}" class="hello-output" role="status">Example output: [${state.output.join(', ')}]</p>
       ${stage===0?`<p class="reference-goal">Practise using the official PyTorch and CUDA references as you work through the course. Start with the links provided; later labs ask you to find the relevant section.</p><p class="reference-version">Use the documentation links provided for the browser exercises. These simulations do not run PyTorch or CUDA and require no installation. If you run the examples in your own environment, use documentation matching your installed PyTorch or CUDA version.</p>
     ${renderReferenceTask('hello-pytorch')}`: ''}
-      ${stage>0?`<div class="hello-index-section"><p id="hello-index-${stage}" role="status">Select a thread to follow its index.</p>${pre('hello-selected-code','output[0] = input[0] * 2;')}</div>`:''}
+      ${stage>0?`<div class="hello-index-section"><p id="hello-index-${stage}" role="status">Select a thread to follow its index.</p>${codePanel({id:'hello-selected-code-'+stage,source:'output[0] = input[0] * 2.0f;',label:'CUDA C++ · Selected thread: i = 0',labelId:'hello-selected-label-'+stage,selected:true})}</div>`:''}
       ${stage>0&&stage<4?`<div class="hello-cuda-section">
         <h3>The same idea in CUDA</h3>
         <p>This code runs inside a GPU function. <code>input</code> and <code>output</code> are arrays; <code>i</code> chooses an element. CUDA C++ uses <code>;</code> to end a statement and <code>2.0f</code> to write a floating-point number.</p>
         ${stage===2?'<p>A bounds check tests whether an index names an existing element. Here <code>n</code> is 5; <code>i &lt; n</code> lets indices 0–4 access the arrays and skips indices 5–7.</p>':''}
-        ${pre('hello-line',stage>=2?'if (i < n) {\n    '+lineFor(2)+'\n}':lineFor(2))}
-        ${stage>=2?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p><pre>int i = blockIdx.x * blockDim.x + threadIdx.x;</pre><p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
+        ${pre('hello-line',stage>=2?'if (i < n) {\n    '+lineFor(2)+'\n}':lineFor(2),'CUDA C++ · instruction used by every thread')}
+        <p>The general statement uses <code>i</code> for any thread’s index. The selected-thread example above substitutes a particular index; selecting another thread changes that worked example.</p>
+        ${stage>=2?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p>${pre('hello-index-expression','int i = blockIdx.x * blockDim.x + threadIdx.x;','CUDA C++ · calculate the index')}<p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
         <p>${stage===3?'n is the number of elements (5). The condition i &lt; n asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.':'We will see the complete function below, after exploring bounds checks.'}</p>
       </div>`:''}
       ${stage===2?renderReferenceTask('hello-indices'):''}
       ${stage===4?`<div class="hello-complete">
-        <h3>The PyTorch operation we started with</h3>${pre('hello-python','y = x * 2')}
+        <h3>The PyTorch operation we started with</h3>${pre('hello-python','y = x * 2','PyTorch operation','pytorch')}
         <p>PyTorch handles allocation and launches its own implementation of the operation; it does not compile the example below.</p>
-        <h3>The complete CUDA example</h3>${pre('hello-full',kernelSource(2))}
+        <h3>The complete CUDA example</h3>${pre('hello-full',kernelSource(2),'CUDA C++ · complete kernel')}
         <p><code>__global__</code> marks a GPU kernel. <code>void</code> means it returns no value directly: it writes into <code>output</code>. <code>float*</code> passes the location of an array of floating-point numbers; <code>const</code> means this function does not change that input. <code>n</code> is the number of elements.</p>
         <details class="more-settings"><summary>Run the CUDA example on an NVIDIA GPU</summary>
           <p>The download contains this kernel and a separate CPU-side C++ program that allocates memory, copies inputs, launches the kernel and reads the output. It is not a Python extension.</p>
