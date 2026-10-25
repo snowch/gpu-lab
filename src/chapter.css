@@ -1,0 +1,10 @@
+/* Copyright © 2026 Christopher Snow. */
+/* Shared visual roles for the opening book chapters. */
+.book-chapter .intro { padding-bottom:20px; margin-bottom:24px; }
+.chapter-opening-code { margin:16px 0 24px; padding:20px; background:var(--accent-soft); color:var(--accent); border:0; border-left:4px solid var(--accent); border-radius:0 6px 6px 0; white-space:pre-wrap; overflow-wrap:anywhere; font:600 18px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.chapter-opening-code code { font:inherit; }
+.chapter-browser-note { color:var(--muted); font-size:14px; line-height:1.65; margin:24px 0; }
+.book-chapter .hello-section,.book-chapter .book-section { border-top:1px solid var(--line); margin:40px 0; padding-top:28px; scroll-margin-top:90px; }
+.book-chapter .hello-section h2,.book-chapter .book-section h2 { font-size:clamp(25px,3vw,32px); }
+.book-chapter .hello-concept { font-size:inherit; }
+.book-chapter .hello-note,.book-chapter .book-note { font-size:14px; }

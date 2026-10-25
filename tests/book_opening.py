@@ -4,6 +4,7 @@ from playwright.sync_api import expect
 from version_check import mock_version
 
 def check_book_opening(browser,url,root,errors):
+    check_chapter_styles(browser,url,root)
     for width,theme in [(360,'light'),(393,'dark'),(820,'light'),(1440,'dark')]:
         context=browser.new_context(viewport={'width':width,'height':900},color_scheme=theme,service_workers='block',has_touch=width<500)
         mock_version(context)
@@ -87,3 +88,25 @@ def check_book_opening(browser,url,root,errors):
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     context.close()
     print('PASS: book opening, device copies, equal-work layouts, independent results, keyboard, phone/tablet/desktop and static fallback')
+
+
+def check_chapter_styles(browser,url,root):
+    for width,theme in [(393,'light'),(393,'dark'),(820,'light'),(820,'dark'),(1440,'light'),(1440,'dark')]:
+        context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
+        page=context.new_page();baseline=None
+        for slug in ['hello','devices','reading']:
+            page.goto(url+'lessons/'+slug+'.html')
+            expect(page.locator('.brand-note')).to_have_text('/ interactive book')
+            expect(page.locator('.intro .book-note')).to_have_count(0)
+            expect(page.locator('.chapter-browser-note')).to_have_count(1)
+            expect(page.locator('.chapter-browser-note')).to_contain_text('no installation or GPU required')
+            styles=page.evaluate("""() => Object.fromEntries([
+              ['code','.chapter-opening-code'],['notice','.chapter-browser-note'],
+              ['section','.hello-section, .book-section'],['heading','.hello-section h2, .book-section h2']
+            ].map(([key,selector])=>{const s=getComputedStyle(document.querySelector(selector));return [key,Object.fromEntries(['fontSize','lineHeight','color','backgroundColor','paddingTop','paddingBottom','marginTop','marginBottom','borderLeftWidth','borderLeftColor'].map(p=>[p,s[p]]))]}))""")
+            if baseline is None:baseline=styles
+            else:assert styles==baseline,(width,theme,slug,styles,baseline)
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            page.locator('.hello-start, .book-start').screenshot(path=str(root/f'test-results/chapter-style-{slug}-{width}-{theme}.png'),style='.topbar{position:static!important}')
+        context.close()
+    print('PASS: shared opening code, guidance, section spacing and typography across chapters 1–3, phone/tablet/desktop and both themes')
