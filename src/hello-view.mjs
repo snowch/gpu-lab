@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {openingCode,browserNotice} from './chapter-view.mjs';
 import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,lineFor,kernelSource,pythonSource} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -14,13 +15,13 @@ export function renderIntroSections() {
   const start=simulateIntro(0,2);
   return `<section class="hello-start" aria-labelledby="hello-start-title">
     <h2 id="hello-start-title">Start with a PyTorch operation</h2>
-    <pre class="hello-start-code"><code>${escape(pythonSource())}</code></pre>
+    ${openingCode(pythonSource(),'hello-start-code')}
     <p><code>import torch</code> loads PyTorch. A tensor holds a collection of numbers; here <code>x</code> holds five inputs. <code>device="cuda"</code> places them on an NVIDIA GPU, and <code>y = x * 2</code> multiplies each number by two to produce <code>y</code>.</p>
     <dl class="hello-start-values">
       <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
       <div><dt>Result <code>y</code></dt><dd><code>[${start.output.join(', ')}]</code></dd></div>
     </dl>
-    <p class="hello-note">Run the examples below in your browser with no installation or GPU required. The browser simulates the calculation; it does not execute PyTorch or GPU code. To run the PyTorch snippet itself, use a Python environment with PyTorch and an NVIDIA GPU.</p>
+    ${browserNotice()}
     <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
   </section>`+steps.map((step,stage)=>{
     const state=simulateIntro(stage,2);

@@ -9,6 +9,7 @@ Read `docs/plan.md`, `docs/model.md` and `docs/sources.md` before extending the 
 - Separate CUDA programming semantics, the teaching machine and real hardware measurements.
 - State assumptions beside the experiment. Do not present sector counts as DRAM reads or time.
 - Keep planned modules clearly marked until their lessons and experiments work.
+- Follow [shared chapter styling](docs/chapter-styling.md); reuse the common opening-code and browser-guidance components.
 - Use clear British English, accessible labels and keyboard controls. Preserve mobile layouts.
 - Keep the first build dependency-free unless a feature justifies adding a dependency.
 - Use relative asset paths; the production site is hosted beneath `/gpu-lab/`.
