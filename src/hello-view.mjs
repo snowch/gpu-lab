@@ -20,7 +20,7 @@ export function renderIntroSections() {
       <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
       <div><dt>Result <code>y</code></dt><dd><code>[${start.output.join(', ')}]</code></dd></div>
     </dl>
-    <p class="hello-note">The code above requires PyTorch and an NVIDIA GPU. The examples below simulate its calculation in your browser; they do not run PyTorch or GPU code.</p>
+    <p class="hello-note">Run the examples below in your browser with no installation or GPU required. The browser simulates the calculation; it does not execute PyTorch or GPU code. To run the PyTorch snippet itself, use a Python environment with PyTorch and an NVIDIA GPU.</p>
     <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
   </section>`+steps.map((step,stage)=>{
     const state=simulateIntro(stage,2);
