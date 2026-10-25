@@ -2,7 +2,9 @@
 // Wrap the displayed kernel in a complete CUDA C++ program; no compilation in browser.
 export function cudaProgram({kernel,input,second=[],size,args='d_x, d_y, d_b, n, 2.0f'}) {
   const literal=v=>Number.isInteger(v)?v+'.0f':String(v)+'f';
-  return `// Generated GPU Lab example. Requires NVIDIA GPU, CUDA Toolkit and a C++ host compiler.
+  return `// Generated GPU Lab example.
+// Native execution requires an NVIDIA GPU, CUDA Toolkit and a C++ host compiler.
+// Or use GPGPU-Sim: https://github.com/snowch/gpu-lab/blob/main/docs/run-cuda.md
 // Save as lab.cu, compile: nvcc -std=c++17 lab.cu -o lab
 // Run: ./lab
 // Not compiled or hardware-validated by the browser simulation.

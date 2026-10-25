@@ -74,9 +74,9 @@ they are not claims about the framework's internal kernel implementation.
 
 Browser tests exercise supported CUDA expressions in an explicit CPU teaching model,
 including the concept-first thread mapping, prediction/repair checks, invalid accesses, generated downloads and
-offline use. There is no in-browser CUDA compiler. The new generated programs have
-not yet been compiled with nvcc or run on an NVIDIA GPU; they remain explicitly
-unvalidated for real CUDA execution. The previous WGSL/WebGPU prototype and its
+offline use. There is no in-browser CUDA compiler. CI compiles chapter 1 downloads with nvcc and checks their output in GPGPU-Sim
+using the shared desktop runner. Physical NVIDIA GPU execution remains unvalidated.
+Workshop downloads are not yet included in these compilation checks. The previous WGSL/WebGPU prototype and its
 software-adapter execution tests have been retired rather than treated as CUDA evidence.
 
 
