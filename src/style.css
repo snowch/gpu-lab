@@ -66,9 +66,9 @@ footer { flex-wrap:wrap; }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
 
 /* Small reference exercises share the course's native disclosure controls. */
-.reference-task { max-width:760px; margin:24px 0; padding:18px 20px; border:1px solid var(--line); border-radius:8px; background:var(--panel); overflow-wrap:anywhere; }
-.reference-task h3 { margin:0 0 12px; font-size:16px; line-height:1.5; }
-.reference-task p { font-size:14px; margin:0 0 12px; }
+.reference-task { max-width:760px; margin:24px 0; padding:18px 20px; border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; background:var(--accent-soft); overflow-wrap:anywhere; }
+.reference-task h3 { display:flex; align-items:flex-start; gap:10px; color:var(--accent); margin:0 0 12px; font-size:16px; line-height:1.5; }
+.reference-task p { font-size:inherit; margin:0 0 12px; }
 .reference-task details { border-top:1px solid var(--line); margin-top:8px; }
 .reference-task .reference-note { color:var(--muted); font-size:12px; margin:12px 0 0; }
 .reference-new-tab { font-size:12px; }
@@ -77,3 +77,7 @@ footer { flex-wrap:wrap; }
 
 /* Group the book opening separately from the existing deeper labs. */
 .nav-group { margin:20px 12px 6px; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+
+.reference-icon { width:22px; height:22px; flex:none; margin-top:1px; }
+.reference-code { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; margin:0 0 16px; font:16px/1.7 ui-monospace,monospace; }
+.reference-code code { font:inherit; }
