@@ -12,8 +12,9 @@ colours, type sizes or spacing into another stylesheet.
   blue identifies CUDA, with suitable accents in both themes. Colour supplements
   the language label. Use `codePanel()` for labelled explanatory code.
 - Selected-thread examples: label the selected index and update it with the worked
-  substitution. Keep the general CUDA expression separate and explain that its
-  variable index stays unchanged when the selection changes.
+  substitution. Show the general CUDA expression and worked substitution in one labelled
+  panel. Explain their relationship once; changing the selection updates only the
+  worked substitution, leaving the general expression’s variable index unchanged.
 - Supporting code: neutral panels with 16px code explain setup and later examples.
 - Focal operation: the existing larger operation panel highlights the calculation
   currently being explored. It has a different role from a complete opening program.

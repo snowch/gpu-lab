@@ -26,7 +26,7 @@
 .hello-guard-section { margin:16px 0; }
 [id^="hello-guard-"] { min-height:0; }
 .hello-cuda-section, .hello-complete { margin:26px 0; }
-.hello-cuda-section pre,.hello-complete pre,[id^="hello-selected-code-"] { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; font:16px/1.7 ui-monospace,monospace; }
+.hello-cuda-section pre,.hello-complete pre { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; font:16px/1.7 ui-monospace,monospace; }
 .hello-actions { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
 @media(max-width:500px) { .hello-threads { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:500px) {

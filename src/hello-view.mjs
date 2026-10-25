@@ -47,15 +47,22 @@ export function renderIntroSections() {
       <p id="hello-output-${stage}" class="hello-output" role="status">Example output: [${state.output.join(', ')}]</p>
       ${stage===0?`<p class="reference-goal">Practise using the official PyTorch and CUDA references as you work through the course. Start with the links provided; later labs ask you to find the relevant section.</p><p class="reference-version">Use the documentation links provided for the browser exercises. These simulations do not run PyTorch or CUDA and require no installation. If you run the examples in your own environment, use documentation matching your installed PyTorch or CUDA version.</p>
     ${renderReferenceTask('hello-pytorch')}`: ''}
-      ${stage>0?`<div class="hello-index-section"><p id="hello-index-${stage}" role="status">Select a thread to follow its index.</p>${codePanel({id:'hello-selected-code-'+stage,source:'output[0] = input[0] * 2.0f;',label:'CUDA C++ · Selected thread: i = 0',labelId:'hello-selected-label-'+stage,selected:true})}</div>`:''}
+      ${stage>0?`<div class="hello-index-section">
+        ${stage===1?'<p>Each thread uses the same CUDA statement with its own index <code>i</code>. Select a thread to see its index substituted below. <code>input</code> and <code>output</code> are arrays; <code>;</code> ends the statement and <code>2.0f</code> is a floating-point number.</p>':''}
+        <p id="hello-index-${stage}" role="status">Select a thread to follow its index.</p>
+        <div class="chapter-code-panel is-selected-thread" data-language="cuda">
+          <p class="chapter-code-label" id="hello-cuda-label-${stage}">CUDA C++</p>
+          <pre aria-labelledby="hello-cuda-label-${stage}"><code>// Every thread uses this statement
+<span id="hello-line-${stage}">${escape(stage>=2?'if (i < n) {\n    '+lineFor(2)+'\n}':lineFor(2))}</span>
+
+<span id="hello-selected-label-${stage}">// Selected thread: i = 0</span>
+<span id="hello-selected-code-${stage}" aria-labelledby="hello-selected-label-${stage}">output[0] = input[0] * 2.0f;</span></code></pre>
+        </div>
+      </div>`:''}
       ${stage>0&&stage<4?`<div class="hello-cuda-section">
-        <h3>The same idea in CUDA</h3>
-        <p>This code runs inside a GPU function. <code>input</code> and <code>output</code> are arrays; <code>i</code> chooses an element. CUDA C++ uses <code>;</code> to end a statement and <code>2.0f</code> to write a floating-point number.</p>
         ${stage===2?'<p>A bounds check tests whether an index names an existing element. Here <code>n</code> is 5; <code>i &lt; n</code> lets indices 0–4 access the arrays and skips indices 5–7.</p>':''}
-        ${pre('hello-line',stage>=2?'if (i < n) {\n    '+lineFor(2)+'\n}':lineFor(2),'CUDA C++ · instruction used by every thread')}
-        <p>The general statement uses <code>i</code> for any thread’s index. The selected-thread example above substitutes a particular index; selecting another thread changes that worked example.</p>
         ${stage>=2?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p>${pre('hello-index-expression','int i = blockIdx.x * blockDim.x + threadIdx.x;','CUDA C++ · calculate the index')}<p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
-        <p>${stage===3?'n is the number of elements (5). The condition i &lt; n asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.':'We will see the complete function below, after exploring bounds checks.'}</p>
+        ${stage===3?'<p>The condition <code>i &lt; n</code> asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.</p>':''}
       </div>`:''}
       ${stage===2?renderReferenceTask('hello-indices'):''}
       ${stage===4?`<div class="hello-complete">
