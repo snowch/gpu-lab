@@ -16,7 +16,7 @@ function model(){return simulateIntro(stage,factor(),stage===3?$('hello-guard').
 function code(){
   let value;try{value=factor();}catch{return;}
   $('hello-operation').textContent='y = x * '+value;
-  if($('hello-line')) $('hello-line').textContent=stage===2||stage===3&&$('hello-guard').checked?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
+  if($('hello-line')) $('hello-line').textContent=stage>=2&&(stage!==3||$('hello-guard').checked)?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
   if(stage===4){
     $('hello-full').textContent=kernelSource(value);
     $('hello-python').textContent='y = x * '+value;
@@ -27,7 +27,7 @@ function inspect(t){
   $('hello-index').textContent=stage===1
     ? 'Thread '+t.i+': i = '+t.i+'. Read input['+t.i+'], multiply it, then write output['+t.i+'].'
     : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips array access.':t.invalid?' No element '+t.i+' exists: this access is invalid.':'');
-  $('hello-selected-label').textContent='CUDA C++ · Selected thread: i = '+t.i;
+  $('hello-selected-label').textContent='// Selected thread: i = '+t.i;
   $('hello-selected-code').textContent=t.i<steps[stage].length?lineFor(factor()).replaceAll('[i]','['+t.i+']'):'No array element at index '+t.i+'.';
 }
 function draw(){
