@@ -163,3 +163,5 @@ They introduce indices, blocks and
 bounds checks before revealing a complete CUDA kernel. The browser simulation makes
 no GPU execution claim. **Repair a kernel** follows; the eight architecture labs
 remain available independently.
+
+Download chapter 1’s CUDA program and [run it on an NVIDIA GPU or locally through GPGPU-Sim](docs/run-cuda.md). The desktop container is also used by CI.

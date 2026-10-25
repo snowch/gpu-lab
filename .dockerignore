@@ -1,0 +1,6 @@
+.git
+dist
+node_modules
+test-results
+vendor
+__pycache__

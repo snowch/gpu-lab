@@ -84,7 +84,7 @@ def hello_flow(page, url):
     expect(page.locator('#hello-output-4')).to_have_text('Output: [4, 8, 12, 16, 20]')
     expect(page.locator('#hello-full-4')).to_contain_text('input[i] * 4.0f')
     expect(page.locator('#hello-python-4')).to_contain_text('y = x * 4')
-    page.get_by_text('Run the CUDA example on an NVIDIA GPU',exact=True).click()
+    page.get_by_text('Run the CUDA example on your computer',exact=True).click()
     with page.expect_download() as downloaded:
         page.locator('#hello-download-4').click()
     source=Path(downloaded.value.path()).read_text()

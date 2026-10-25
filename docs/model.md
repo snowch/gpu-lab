@@ -277,7 +277,11 @@ execution or speed claim is made. The complete CUDA function, pointer definition
 download appear in the final section, below threads, indices, blocks and guards.
 Worked diagrams are generated from the same model during build, so all five examples
 remain readable without JavaScript. Interaction never replaces or scrolls to an earlier section.
-Generated programs have not been compiled or validated on an NVIDIA GPU.
+Chapter 1 generated programs are compiled and checked in GPGPU-Sim by the CUDA
+workflow, using the same runner documented for desktop users. The five inputs and
+eight launched threads exercise the guarded tail. Multipliers 2, −0.5, 0 and 3.25
+are compared against independent CPU references; wrong, missing and nonfinite
+outputs fail validation. No physical NVIDIA GPU execution has been validated.
 
 ## Book opening: devices and tensor reading
 

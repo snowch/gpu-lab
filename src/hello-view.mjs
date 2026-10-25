@@ -98,12 +98,14 @@ export function renderIntroSections() {
         <p>PyTorch handles allocation and launches its own implementation of the operation; it does not compile the example below.</p>
         <h3>The complete CUDA example</h3>${pre('hello-full',kernelSource(2),'CUDA C++ · complete kernel')}
         <p><code>__global__</code> marks a GPU kernel. <code>void</code> means it returns no value directly: it writes into <code>output</code>. <code>float*</code> passes the location of an array of floating-point numbers; <code>const</code> means this function does not change that input. <code>n</code> is the number of elements.</p>
-        <details class="more-settings"><summary>Run the CUDA example on an NVIDIA GPU</summary>
+        <details class="more-settings"><summary>Run the CUDA example on your computer</summary>
           <p>The download contains this kernel and a separate CPU-side C++ program that allocates memory, copies inputs, launches the kernel and reads the output. It is not a Python extension.</p>
           <button id="hello-download-4" type="button">Download CUDA program</button>
-          <p>Requires an NVIDIA GPU, compatible driver, CUDA Toolkit and host C++ compiler:</p>
+          <p><strong>With an NVIDIA GPU:</strong> install a compatible driver, CUDA Toolkit and host C++ compiler, then run:</p>
           <pre>nvcc -std=c++17 hello.cu -o hello\n./hello</pre>
-          <p>The generated CUDA program has not yet been compiled or tested on an NVIDIA GPU.</p>
+          <p><strong>Without an NVIDIA GPU:</strong> use our GPGPU-Sim Docker container to compile and simulate the download on your desktop.</p>
+          <p><a href="https://github.com/snowch/gpu-lab/blob/main/docs/run-cuda.md" target="_blank" rel="noopener">Desktop setup and output checks (opens in a new tab)</a></p>
+          <p>CI compiles generated chapter 1 examples with the CUDA Toolkit and checks their outputs in GPGPU-Sim. Physical NVIDIA GPU execution has not yet been validated.</p>
         </details>
       </div>`:''}
     </section>`;

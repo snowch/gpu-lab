@@ -3,9 +3,9 @@ name: CUDA examples in GPGPU-Sim
 on:
   push:
     branches: [main]
-    paths: ['examples/**', 'scripts/cuda-sim.sh', '.github/workflows/cuda-sim.yml']
+    paths: ['examples/**', 'src/hello-model.mjs', 'src/cuda-program.mjs', 'scripts/*cuda*', 'tests/test_cuda_output.py', '.dockerignore', 'docker/cuda-sim.Dockerfile', '.github/workflows/cuda-sim.yml']
   pull_request:
-    paths: ['examples/**', 'scripts/cuda-sim.sh', '.github/workflows/cuda-sim.yml']
+    paths: ['examples/**', 'src/hello-model.mjs', 'src/cuda-program.mjs', 'scripts/*cuda*', 'tests/test_cuda_output.py', '.dockerignore', 'docker/cuda-sim.Dockerfile', '.github/workflows/cuda-sim.yml']
   workflow_dispatch:
 
 permissions:
@@ -19,26 +19,22 @@ jobs:
   gather:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    container:
-      # Same toolchain image as upstream's CUDA-sample CI. Tag is mutable;
-      # provenance.txt records the installed compiler and simulator revision.
-      image: ghcr.io/accel-sim/accel-sim-framework:ubuntu-24.04-cuda-12.8-minimal
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          repository: gpgpu-sim/gpgpu-sim_distribution
-          ref: c3eeb6d19016960ab66789efdd8a3200cc30222a
-          path: vendor/gpgpu-sim
-      - name: Build pinned GPGPU-Sim
-        working-directory: vendor/gpgpu-sim
+          node-version: 22
+      - name: Generate the browser downloads and CPU references
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build -j2
-          cmake --install build
+          python3 tests/test_cuda_output.py
+          node scripts/generate-cuda-cases.mjs
+      - name: Build the desktop simulator image
+        run: docker build -f docker/cuda-sim.Dockerfile -t gpu-lab-cuda-sim .
       - name: Compile and check CUDA examples in functional simulation
-        shell: bash
-        run: bash scripts/cuda-sim.sh
+        run: |
+          docker run --rm --network none --entrypoint bash \
+            --mount "type=bind,src=$PWD,dst=/course" \
+            gpu-lab-cuda-sim /course/scripts/cuda-sim.sh
       - name: Preserve logs and configuration
         if: always()
         uses: actions/upload-artifact@v4
