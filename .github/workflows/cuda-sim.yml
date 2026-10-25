@@ -35,10 +35,17 @@ jobs:
           docker run --rm --network none --entrypoint bash \
             --mount "type=bind,src=$PWD,dst=/course" \
             gpu-lab-cuda-sim /course/scripts/cuda-sim.sh
+      - name: Check the documented desktop command
+        run: |
+          docker run --rm --network none \
+            --mount "type=bind,src=$PWD/test-results/generated-cuda,dst=/input,readonly" \
+            gpu-lab-cuda-sim /input/double.cu '[2,4,6,8,10]' > test-results/cuda-sim/desktop.log 2>&1
       - name: Preserve logs and configuration
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gather-gpgpu-sim
-          path: test-results/cuda-sim/
+          path: |
+            test-results/cuda-sim/
+            test-results/generated-cuda/
           if-no-files-found: warn
