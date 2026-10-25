@@ -29,3 +29,13 @@ test('overview rejects unsupported examples and unknown selections', () => {
   assert.throws(() => renderWorkMap(overviewExample(), 'Z'), RangeError);
   assert.throws(() => renderWorkMap(overviewExample(), 'A', 2), RangeError);
 });
+
+test('intro placement keeps each four-thread block on one SM with a partial warp', () => {
+  const example=overviewExample(4,3);
+  assert.deepEqual(example.sms.map(sm=>sm.blocks.map(b=>b.name)),[['A','C'],['B']]);
+  for(const block of example.blocks) {
+    assert.equal(block.warps.length,1);
+    assert.deepEqual(block.warps[0].map(t=>t.lane),[0,1,2,3]);
+  }
+  for(const count of [0,9,1.5,NaN]) assert.throws(()=>overviewExample(4,count),RangeError);
+});

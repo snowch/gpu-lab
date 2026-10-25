@@ -1,8 +1,9 @@
 // Copyright © 2026 Christopher Snow.
 // A declared placement example, not a scheduler or a hardware-capacity model.
-export function overviewExample(threadsPerBlock = 64) {
+export function overviewExample(threadsPerBlock = 64, blockCount = 4) {
   if (!Number.isInteger(threadsPerBlock) || threadsPerBlock < 1 || threadsPerBlock > 128) throw new RangeError('Expected 1–128 threads per block');
-  const blocks = Array.from({ length: 4 }, (_, index) => {
+  if (!Number.isInteger(blockCount) || blockCount < 1 || blockCount > 8) throw new RangeError('Expected 1–8 blocks');
+  const blocks = Array.from({ length: blockCount }, (_, index) => {
     const threads = Array.from({ length: threadsPerBlock }, (_, thread) => ({ thread, warp: Math.floor(thread / 32), lane: thread % 32 }));
     return { name: String.fromCharCode(65 + index), sm: index % 2, threads,
       warps: Array.from({ length: Math.ceil(threadsPerBlock / 32) }, (_, warp) => threads.filter(thread => thread.warp === warp)) };
