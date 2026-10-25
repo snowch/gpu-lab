@@ -35,6 +35,9 @@ jobs:
           docker run --rm --network none --entrypoint bash \
             --mount "type=bind,src=$PWD,dst=/course" \
             gpu-lab-cuda-sim /course/scripts/cuda-sim.sh
+      - name: Restore ownership of CI artifacts
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" test-results
       - name: Check the documented desktop command
         run: |
           docker run --rm --network none \
@@ -49,3 +52,4 @@ jobs:
             test-results/cuda-sim/
             test-results/generated-cuda/
           if-no-files-found: warn
+
