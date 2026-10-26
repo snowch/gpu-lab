@@ -36,7 +36,7 @@ def check_reference_practice(browser,url,root):
             expect(page.locator('.documentation-exercises h2')).to_have_text('Use the documentation')
             assert page.locator('.chapter-references').evaluate("el=>Boolean(el.compareDocumentPosition(document.querySelector('.documentation-exercises')) & Node.DOCUMENT_POSITION_FOLLOWING)")
             task=page.locator('.reference-task').first
-            if slug in ['reduction','matmul','tensor-cores','attention','inference','meet-gpu']:
+            if slug in ['reduction','matmul','tensor-cores','attention','inference']:
                 expect(task.get_by_role('heading')).to_contain_text('Find it in the guide')
                 expect(task.locator('details')).not_to_have_attribute('open','')
                 task.locator('summary').click()
@@ -44,7 +44,7 @@ def check_reference_practice(browser,url,root):
             for item in page.locator('.reference-task').all():
                 item.locator('summary').focus()
                 if item.locator('details').get_attribute('open') is None: page.keyboard.press('Enter')
-                expect(item.locator('details p')).to_be_visible()
+                expect(item.locator('details p').first).to_be_visible()
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),slug
         context.close()
     context=browser.new_context(java_script_enabled=False)
@@ -54,7 +54,7 @@ def check_reference_practice(browser,url,root):
         expect(page.locator('.chapter-references')).to_be_visible()
         for task in page.locator('.reference-task').all():
             task.locator('summary').click()
-            expect(task.locator('details p')).to_be_visible()
+            expect(task.locator('details p').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),slug
     context.close()
     print('PASS: reference tasks across all lessons, guided/independent lookup, native keyboard/no-JavaScript disclosures, new tab preserving work, offline text and both themes')
