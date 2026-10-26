@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
-import {steps,simulateIntro,lineFor,kernelSource,runnableSource} from './hello-model.mjs';
+import {steps,simulateIntro,kernelSource,runnableSource,launchPlan} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
 import {renderIntroMap} from './hello-view.mjs';
 for (const section of document.querySelectorAll('.hello-section')) {
@@ -16,19 +16,14 @@ function model(){return simulateIntro(stage,factor(),stage===3?$('hello-guard').
 function code(){
   let value;try{value=factor();}catch{return;}
   $('hello-operation').textContent='y = x * '+value;
-  if($('hello-line')) $('hello-line').textContent=stage>=2&&(stage!==3||$('hello-guard').checked)?'if (i < n) {\n    '+lineFor(value)+'\n}':lineFor(value);
-  if(stage===4){
-    $('hello-full').textContent=kernelSource(value);
-    $('hello-python').textContent='y = x * '+value;
-  }
+  if(stage===4) $('hello-full').textContent=kernelSource(value);
 }
 function inspect(t){
   if(stage===0)return;
   $('hello-index').textContent=stage===1
-    ? 'Thread '+t.i+': i = '+t.i+'. Read input['+t.i+'], multiply it, then write output['+t.i+'].'
+    ? 'Thread '+t.i+': i = '+t.i+'. Read the input at index '+t.i+', multiply it, then write the output at index '+t.i+'.'
     : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips array access.':t.invalid?' No element '+t.i+' exists: this access is invalid.':'');
-  $('hello-selected-label').textContent='// Selected thread: i = '+t.i;
-  $('hello-selected-code').textContent=t.i<steps[stage].length?lineFor(factor()).replaceAll('[i]','['+t.i+']'):'No array element at index '+t.i+'.';
+
 }
 function draw(){
   const container=$('hello-map');container.replaceChildren();
@@ -43,8 +38,12 @@ function resultText(){return result.safe?'Output: ['+result.output.join(', ')+']
 $('hello-map').addEventListener('click',event=>{
   const button=event.target.closest('button[data-thread]');
   if(!button)return;
-  selected=Number(button.dataset.thread);draw();
-  $('hello-map').querySelector('[aria-pressed="true"]')?.focus({preventScroll:true});
+  selected=Number(button.dataset.thread);
+  // Preserve the cards and focused element so browser scroll anchoring stays stable.
+  for(const card of $('hello-map').querySelectorAll('button[data-thread]')) {
+    card.setAttribute('aria-pressed',String(Number(card.dataset.thread)===selected));
+  }
+  try{inspect(model().threads[selected]);}catch{/* Keep the validation message until the input is corrected. */}
 });
 $('hello-factor').addEventListener('input',invalidate);
 $('hello-guard')?.addEventListener('change',invalidate);
@@ -61,3 +60,13 @@ registerExperiment('hello-'+stage,()=>({selected,ran:result!==null,length:steps[
   $('hello-output').textContent=state.length===steps[stage].length&&typeof state.message==='string'?state.message:result?resultText():'Run to see the results.';
 });
 }
+
+const count=document.getElementById('hello-transfer-count'),answer=document.getElementById('hello-transfer-result');
+let revealed=false;
+function showTransfer(){
+  const p=launchPlan(Number(count.value));
+  answer.textContent=revealed?`${p.blocks} blocks × ${p.size} threads = ${p.threads} threads. Indices 0–${p.count-1} handle inputs. ${p.skipped.length?'Indices '+p.skipped.join(', ')+' skip the arrays.':'Every thread has an input; none skip the arrays.'}`:'Predict first, then check.';
+}
+count.addEventListener('change',()=>{revealed=false;showTransfer();});
+document.getElementById('hello-transfer-run').addEventListener('click',()=>{revealed=true;showTransfer();});
+registerExperiment('hello-transfer',()=>({revealed}),state=>{revealed=Boolean(state.revealed);showTransfer();});

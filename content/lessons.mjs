@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import { renderReferenceTask, guides } from '../src/reference-tasks.mjs';
 import { remainingLessons } from './remaining-lessons.mjs';
+import {renderSchedulingRelationships} from '../src/scheduling-relationships.mjs';
 import { renderWorkedExample } from '../src/worked-examples.mjs';
 import { renderConcepts } from '../src/concepts.mjs';
 import { conceptsByLesson } from './concept-definitions.mjs';
@@ -128,6 +129,7 @@ export function renderLesson(lesson, index) {
 <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="${lesson.subtitle}"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,">
 <title>${lesson.title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css"><link rel="stylesheet" href="../src/mechanism-visuals.css"><link rel="stylesheet" href="../src/worked-examples.css">
+${lesson.slug==='scheduling'?'<link rel="stylesheet" href="../src/scheduling-relationships.css">':''}
 <script type="module" src="../src/${lesson.engine === 'ai' ? 'ai-lesson' : 'lesson'}.mjs"></script></head>
 <body data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
 <header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
@@ -136,6 +138,7 @@ export function renderLesson(lesson, index) {
 <div class="sidebar-bottom"><span class="status-label">INTERACTIVE DRAFT</span><p>Computed models.<br>No GPU required.</p></div></aside>
 <main id="main"><section class="intro"><p class="eyebrow">LAB ${lesson.number} / GPU ARCHITECTURE</p><h1>${lesson.title}</h1><p class="lead">${lesson.subtitle}</p><p class="prerequisite"><strong>Before you start:</strong> ${lesson.prerequisite}</p></section>
 <section class="prose"><h2>The mechanism</h2>${intro}</section>
+${lesson.slug==='scheduling'?renderSchedulingRelationships():''}
 ${workedExample ? `<section class="section-space"><h2>Worked example</h2>${workedExample}</section>` : ''}
 <section class="section-space"><h2>Experiment: try changing it</h2><div class="prose">${lesson.setup}</div>
 <noscript><p class="notice">Enable JavaScript to use the simulator. The lesson and exercises remain readable.</p></noscript>

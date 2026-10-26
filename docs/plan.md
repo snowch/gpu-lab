@@ -35,9 +35,9 @@ experiment and visual beside its own explanation in a continuous downward flow.
 
 1. **One operation, many numbers** (`hello.html`): open with the three-line PyTorch
    example and five values. Introduce threads, indices, blocks and bounds checks
-   as needed; assemble the CUDA kernel at the end. SMs, warps and shared memory
-   receive brief signposts here, with detailed mechanisms deferred. Finish with a
-   six-input transfer question and the optional repair workshop.
+   as needed; assemble the CUDA kernel at the end. Show no CUDA fragments before the complete function and its launch. SMs, warps
+   and shared memory belong in later mechanism lessons; the ownership diagram lives
+   in the scheduling lab. Finish with an input-count prediction exercise and the optional repair workshop.
 2. **Where do the numbers live?** (`devices.html`): follow the same five inputs
    through a CPU-to-GPU copy, multiplication in GPU memory, and a result copy back.
    Each action has its own setup, prediction prompt, control, diagram and result.

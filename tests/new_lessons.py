@@ -13,6 +13,11 @@ def check_lessons(browser, base_url, root, errors):
             for slug, guess in [('scheduling', '10'), ('divergence', '4'), ('shared-memory', '32')]:
                 page.goto(base_url + 'lessons/' + slug + '.html')
                 expect(page.locator('html')).to_have_attribute('data-theme', theme)
+                if slug == 'scheduling':
+                    expect(page.locator('.hello-relationships')).to_be_visible()
+                    expect(page.locator('.hello-resident-block')).to_have_count(3)
+                    expect(page.locator('.hello-warp')).to_have_count(6)
+                    expect(page.locator('.hello-warp-lane')).to_have_count(32)
                 expect(page.locator('#results')).to_be_hidden()
                 expect(page.locator('.worked-example')).to_be_visible()
                 expect(page.locator('.concepts')).to_be_visible()
