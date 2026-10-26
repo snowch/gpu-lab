@@ -1,0 +1,25 @@
+/* Copyright © 2026 Christopher Snow. */
+.continuation-experiment { margin-block: 1.5rem; }
+.continuation-run { margin-top: 1rem; }
+.continuation-feedback { border-left: 3px solid var(--accent); padding: .6rem 1rem; }
+.continuation-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem; margin-block: 1rem; }
+.continuation-visual { padding: clamp(.75rem, 2vw, 1.5rem); background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; margin-block: 1rem; }
+.continuation-cards,.continuation-metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,10rem),1fr)); gap: .75rem; margin-block: 1rem; }
+.continuation-card,.continuation-metrics > div { padding: .8rem; border: 1px solid var(--line); border-radius: .4rem; min-width: 0; }
+.continuation-metrics dt { color: var(--muted); font-size: .9em; }
+.continuation-metrics dd { margin: .25rem 0 0; font-weight: 700; overflow-wrap: anywhere; }
+.continuation-card.selected { border: 2px solid var(--accent); background: var(--accent-soft); }
+.continuation-table { max-width: 100%; overflow-x: auto; margin-block: 1rem; }
+.continuation-table table { width: 100%; border-collapse: collapse; font-size: .92em; }
+.continuation-table th,.continuation-table td { padding: .55rem; border-bottom: 1px solid var(--line); text-align: left; }
+.continuation-table caption { text-align: left; font-weight: 700; padding-block: .5rem; }
+.continuation-section .lane-grid { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .3rem; }
+.continuation-section .lane-grid > * { padding: .35rem .1rem; text-align: center; border: 1px solid var(--line); border-radius: .25rem; font-size: .8em; overflow-wrap: anywhere; }
+.continuation-section .lane-grid .selected { background: var(--accent-soft); border-color: var(--accent); }
+.continuation-section .muted { color: var(--muted); }
+.continuation-transfer details { margin-block: 1.2rem; }
+@media(max-width: 500px) { .continuation-section .lane-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } }
+
+.continuation-experiment .controls { padding: 0; grid-template-columns: repeat(auto-fit,minmax(min(100%,15rem),1fr)); }
+.continuation-experiment .controls label,.continuation-experiment .controls select { font-size: 1rem; }
+.continuation-experiment .controls select { margin-top: .4rem; min-height: 44px; }

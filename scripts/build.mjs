@@ -8,6 +8,7 @@ import { buildOffline } from './offline.mjs';
 import { renderChapterReferences } from '../src/reference-tasks.mjs';
 import {chapters,renderBookNav,renderRoadmap,renderBookPage} from '../content/book.mjs';
 import {renderDeviceSections,renderReadingSections} from '../src/foundations-view.mjs';
+import {continuationChapters,renderContinuation} from '../src/continuation-view.mjs';
 import { renderIntroSections, renderIntroTransfer } from '../src/hello-view.mjs';
 import { renderSmOverview, renderWorkMap } from '../src/overview-visuals.mjs';
 await rm('dist', { recursive: true, force: true });
@@ -29,7 +30,7 @@ await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html',
 await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where do the numbers live?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: One operation, many numbers'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
 for(const [i,part] of ['selection','layout','requests'].entries()) {
   const chapter=chapters[i+2],previous=chapters[i+1],next=chapters[i+3];
-  await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({slug:chapter.slug,number:i+3,title:chapter.title,lead:chapter.summary,content:renderReadingSections(part),previous:{href:previous.slug+'.html',title:`Chapter ${i+2}: ${previous.title}`},next:{href:next.slug+'.html',title:i<2?`Chapter ${i+4}: ${next.title}`:'Continue to the scheduling lab'}}));
+  await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({slug:chapter.slug,number:i+3,title:chapter.title,lead:chapter.summary,content:renderReadingSections(part),previous:{href:previous.slug+'.html',title:`Chapter ${i+2}: ${previous.title}`},next:{href:next.slug+'.html',title:`Chapter ${i+4}: ${next.title}`}}));
 }
 await writeFile('dist/lessons/kernel.html', (await readFile('content/kernel.html', 'utf8')).replace('<!-- REFERENCE_KERNEL -->',renderChapterReferences('kernel')));
 await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html','utf8'))
@@ -42,7 +43,13 @@ await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html
   .replace('<!-- VIEW_COPY_COMPARISON -->',viewCopyComparison())
   .replace('<!-- SECTOR_COMPARISON -->',sectorComparison()));
 for (const [index, lesson] of lessons.entries()) {
-  await writeFile(`dist/lessons/${lesson.slug}.html`, renderLesson(lesson, index));
+  if(!continuationChapters.some(chapter=>chapter.slug===lesson.slug))await writeFile(`dist/lessons/${lesson.slug}.html`, renderLesson(lesson, index));
+}
+for(const chapter of continuationChapters) {
+  const previous=chapters[chapter.number-2],next=chapters[chapter.number];
+  await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({...chapter,content:renderContinuation(chapter),continuation:true,
+    previous:{href:previous.slug+'.html',title:`Chapter ${chapter.number-1}: ${previous.title}`},
+    next:next?{href:next.slug+'.html',title:`Chapter ${chapter.number+1}: ${next.title}`}:{href:'../index.html#curriculum',title:'Return to the book contents'}}));
 }
 // Stamp the checked-out source revision before fingerprinting the offline files.
 // The commit date is stable across rebuilds of the same revision.

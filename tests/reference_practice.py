@@ -1,6 +1,7 @@
 # Copyright © 2026 Christopher Snow.
 """Native disclosures, new-tab references and independent lookup progression."""
 from playwright.sync_api import expect
+import re
 
 def check_reference_practice(browser,url,root):
     for width,theme in [(360,'light'),(360,'dark'),(1440,'light'),(1440,'dark')]:
@@ -37,6 +38,7 @@ def check_reference_practice(browser,url,root):
             assert page.locator('.chapter-references').evaluate("el=>Boolean(el.compareDocumentPosition(document.querySelector('.documentation-exercises')) & Node.DOCUMENT_POSITION_FOLLOWING)")
             task=page.locator('.reference-task').first
             if slug in ['reduction','matmul','tensor-cores','attention','inference']:
+                task=page.locator('.reference-task').filter(has=page.get_by_role('heading',name=re.compile('Find it in the guide'))).first
                 expect(task.get_by_role('heading')).to_contain_text('Find it in the guide')
                 expect(task.locator('details')).not_to_have_attribute('open','')
                 task.locator('summary').click()

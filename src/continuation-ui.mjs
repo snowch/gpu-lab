@@ -1,0 +1,5 @@
+// Copyright © 2026 Christopher Snow.
+export const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+export const fmt=value=>typeof value!=='number'?String(value):Object.is(value,-0)?'0':!Number.isFinite(value)?String(value):value!==0&&(Math.abs(value)<0.0001||Math.abs(value)>=1e8)?value.toExponential(5):value.toLocaleString('en-GB',{maximumFractionDigits:6});
+export const metrics=items=>`<dl class="continuation-metrics">${items.map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(fmt(value))}</dd></div>`).join('')}</dl>`;
+export const table=(headers,rows,caption='')=>`<div class="continuation-table" tabindex="0" role="region" aria-label="${escape(caption||headers.join(', '))}"><table>${caption?`<caption>${escape(caption)}</caption>`:''}<thead><tr>${headers.map(h=>`<th scope="col">${escape(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${escape(typeof cell==='number'?fmt(cell):cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;

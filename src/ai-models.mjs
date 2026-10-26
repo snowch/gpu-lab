@@ -99,7 +99,7 @@ export function attention({ n=8, tile=2, mode='online', scale=1 }={}) {
     {label:'Read scores, write probabilities',values:probabilities[0],description:'Subtract each row maximum before exponentiating.'},
     {label:'Read probabilities, multiply by V',values:reference[0],description:'The final query-0 output vector.'},
   ];
-  return {n,d,tile,mode,scores,probabilities,reference,output:mode==='online'?online:reference,trace,
+  return {n,d,tile,mode,q,k,v,scores,probabilities,reference,output:mode==='online'?online:reference,trace,
     intermediateComparison:{materialisedWrites:2*n*n,materialisedBytes:4*n*n*4,onlineWrites:0,onlineBytes:0},
     intermediateWrites:mode==='online'?0:2*n*n,
     intermediateBytes:mode==='online'?0:4*n*n*4,

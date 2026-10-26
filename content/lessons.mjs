@@ -81,7 +81,7 @@ if (i < n) {
   {
     slug: 'shared-memory', number: '04', title: 'Sharing work within a block', workedExample: 'shared-memory',
     subtitle: 'A small change in layout can change bank conflicts.',
-    prerequisite: 'Labs 01–03: byte addresses, warps, blocks, and active lanes. This lab introduces shared memory.',
+    prerequisite: 'Chapters 5 and 8: warps, active lanes, shared memory and block barriers. This optional lab explores the layout of that shared workspace.',
     intro: `<p>A tiled tensor operation can load data once and reuse it across threads in the same block. The layout of that reusable data matters.</p><!-- NEW_CONCEPTS --><p>This model uses 32 banks. Successive four-byte words map to successive banks, wrapping around at bank zero. For word index <code>w</code>, the bank is <code>w % 32</code>, where <code>%</code> means remainder.</p><p>These bank rules describe reads; broadcasting a word does not make simultaneous writes safe.</p>`,
     setup: `<p>Imagine a square tile with 32 rows and 32 useful columns. Threads read one column, so successive lanes are separated by the row pitch: the number of allocated words per row. A pitch of 33 adds one unused padding word to each row.</p>
       <p>Each round serves at most one distinct word from each bank. Banks work in parallel; the busiest bank determines the number of rounds. Try a row read, a column read, a padded column, and a broadcast.</p>`,
@@ -107,7 +107,7 @@ output[lane] = tile[lane][0];`,
       'Choose every other word and reduce the active lanes to sixteen. Can this subset avoid the conflict that appears with a full warp?',
     ],
     takeaway: `<p>Bank conflicts depend on both the bank and the word address. A count of requests per bank would incorrectly penalise broadcasts. Padding changes the row pitch, which changes the bank mapping for column reads.</p>
-      <p>Padding uses extra shared memory. That can affect how many blocks fit on an SM, connecting this layout choice to residency in Lab 02. <a href="reduction.html">Continue to the reduction workshop</a> to apply block barriers to a computed tree and inspect an unsafe interleaving. The bank model on this page covers reads only.</p>`,
+      <p>Padding uses extra shared memory. That can affect how many blocks fit on an SM, connecting this layout choice to resident work in chapter 6. <a href="reduction.html">Revisit the cooperation chapter</a> to apply block barriers to a computed tree and inspect an unsafe interleaving. The bank model on this page covers reads only.</p>`,
     limits: 'We model one warp instruction reading aligned FP32 words through 32 banks of four-byte width, one distinct word per bank per round, with read broadcast. Rounds express conflict multiplicity, not measured cycles. Global-memory traffic, shared-memory writes, barriers, races, allocation limits, 64-bit accesses and matrix-specific load instructions are not simulated.',
     source: 'https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-and-memory-banks',
     sourceLabel: 'CUDA Best Practices Guide: shared memory and memory banks',
@@ -122,8 +122,8 @@ export function renderLesson(lesson, index) {
   const terms = conceptsByLesson[lesson.slug] || [];
   if (terms.length && !lesson.intro.includes('<!-- NEW_CONCEPTS -->')) throw new Error('Missing new-concepts marker for ' + lesson.slug);
   const intro = lesson.intro.replace('<!-- NEW_CONCEPTS -->', renderConcepts({id:lesson.slug,terms}));
-  const previous = index ? `${lessons[index - 1].slug}.html` : 'memory.html';
-  const next = index + 1 < lessons.length ? `${lessons[index + 1].slug}.html` : '../index.html#curriculum';
+  const previous = lesson.slug==='shared-memory' ? 'reduction.html' : index ? `${lessons[index - 1].slug}.html` : 'memory.html';
+  const next = lesson.slug==='shared-memory' ? 'matmul.html' : index + 1 < lessons.length ? `${lessons[index + 1].slug}.html` : '../index.html#curriculum';
   return `<!doctype html>
 <!-- Copyright © 2026 Christopher Snow. -->
 <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -136,7 +136,7 @@ ${lesson.slug==='scheduling'?'<link rel="stylesheet" href="../src/scheduling-rel
 <div class="layout"><aside class="sidebar"><p class="eyebrow">HOW GPUS RUN AI</p><p class="sidebar-title">Under the hood.</p>
 <nav class="lesson-nav" aria-label="Course lessons"><a href="../index.html">Course overview</a><a href="../index.html#meet-gpu">Meet the GPU</a><a href="hello.html">Start here: Hello, GPU</a><a href="kernel.html">Repair a kernel</a><a href="memory.html">01 Reading a tensor</a>${lessons.map(l => `<a href="${l.slug}.html" ${l.slug === lesson.slug ? 'class="current" aria-current="page"' : ''}>${l.number} ${l.title}</a>`).join('')}<a href="../index.html#curriculum">Course roadmap</a></nav>
 <div class="sidebar-bottom"><span class="status-label">INTERACTIVE DRAFT</span><p>Computed models.<br>No GPU required.</p></div></aside>
-<main id="main"><section class="intro"><p class="eyebrow">LAB ${lesson.number} / GPU ARCHITECTURE</p><h1>${lesson.title}</h1><p class="lead">${lesson.subtitle}</p><p class="prerequisite"><strong>Before you start:</strong> ${lesson.prerequisite}</p></section>
+<main id="main"><section class="intro"><p class="eyebrow">${lesson.slug==='shared-memory'?'OPTIONAL LAB':'LAB '+lesson.number} / GPU ARCHITECTURE</p><h1>${lesson.title}</h1><p class="lead">${lesson.subtitle}</p><p class="prerequisite"><strong>Before you start:</strong> ${lesson.prerequisite}</p></section>
 <section class="prose"><h2>The mechanism</h2>${intro}</section>
 ${lesson.slug==='scheduling'?renderSchedulingRelationships():''}
 ${workedExample ? `<section class="section-space"><h2>Worked example</h2>${workedExample}</section>` : ''}
