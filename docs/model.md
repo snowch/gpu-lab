@@ -16,12 +16,12 @@ Static figures are generated during the build; optional controls change the insp
 block and warp without requiring a GPU. Incomplete final warps are supported by the
 mapping function and show unoccupied lane positions as inactive.
 
-The chapter 1 inline relationship map reuses the same placement rule with three
+The scheduling lesson’s relationship map reuses the same placement rule with three
 blocks of 64 threads on two SMs. Blocks A and C share SM 0; block B uses SM 1.
 Each block shows two distinct 32-thread warps (local indices 0–31 and 32–63).
 The first warp in block A expands into 32 occupied lanes. This is explicitly a
 separate placement illustration, not the two-block, four-thread launch in the
-following experiment. The accompanying text explains that four-thread blocks use
+chapter 1 experiment. The accompanying text explains that four-thread blocks use
 one partially filled warp, without implying this is the general block size.
 Ready warps from different resident blocks may make progress while other threads
 wait or lanes are unused; resource limits still apply. Empty lanes cannot be
@@ -314,3 +314,14 @@ address sets, sector boundaries, equal useful byte counts and invalid settings.
 aliasing and packed copies. CI runs its CPU path with PyTorch 2.5.1. CPU mode does
 not test transfers; its CUDA path has not yet been validated on a GPU. It records
 no timing or speedup claim.
+
+## Chapter 1 reading progression
+
+The five independent experiments now cover the operation, thread indices, launch
+groups, bounds checks, then a complete CUDA function and launch. CUDA panels occur
+only in the final experiment. Earlier selections explain indices in plain language.
+The SM/block/warp diagram belongs to the scheduling lesson. Reference lookups follow
+the complete kernel. The final input-count exercise uses launchPlan: four threads
+per block, ceiling division for block count, and explicit surplus thread indices.
+Existing multiplier, guard and selection IDs are retained for restart snapshots;
+the new transfer exercise saves whether its explanation has been revealed.

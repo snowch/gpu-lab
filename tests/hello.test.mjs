@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,simulateIntro,kernelSource,pythonSource} from '../src/hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan} from '../src/hello-model.mjs';
 test('intro diagram and outputs derive from thread indices and selected multiplier',()=>{
  for(let stage=0;stage<steps.length;stage++)for(const factor of [-10,-0.5,0,2,3,10]){
   const r=simulateIntro(stage,factor);
@@ -41,4 +41,22 @@ test('static introduction includes all worked diagrams with unique control IDs',
   assert.ok(html.includes('id="hello-output-'+i+'"'));
  }
  assert.doesNotMatch(html,/hello-next|hello-back/);
+});
+
+test('new-case launch plans cover each input and identify only surplus threads',()=>{
+  for(let count=1;count<=32;count++){
+    const p=launchPlan(count);
+    assert.equal(p.size,4);
+    assert.ok(p.threads>=count&&p.threads-count<4);
+    assert.equal(p.blocks*4,p.threads);
+    assert.deepEqual(p.skipped,Array.from({length:p.threads-count},(_,i)=>count+i));
+  }
+  for(const count of [0,33,1.5,NaN])assert.throws(()=>launchPlan(count));
+});
+test('concepts precede CUDA and the first CUDA panel contains a complete kernel',()=>{
+  const html=renderIntroSections();
+  const cuda=html.indexOf('data-language="cuda"');
+  assert.ok(cuda>html.indexOf('id="idea-5"'));
+  assert.ok(html.indexOf('__global__')<html.indexOf('id="hello-launch-4"'));
+  assert.doesNotMatch(html,/hello-relationships|hello-selected-code|hello-line-/);
 });
