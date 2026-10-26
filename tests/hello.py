@@ -114,6 +114,6 @@ def check_hello(browser,url,root,errors):
     expect(page.locator('.hello-thread')).to_have_count(34)
     expect(page.locator('#hello-output-4')).to_have_text('Example output: [2, 4, 6, 8, 10]')
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
-    expect(page.locator('.hello-section-end noscript')).to_contain_text('Indices 6 and 7 skip')
+    expect(page.locator('.hello-section-end noscript p')).to_contain_text('Indices 6 and 7 skip')
     context.close()
     print('PASS: continuous intro, independent state, no scroll jumps, keyboard selection, CUDA download and static diagrams')
