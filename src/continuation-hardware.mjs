@@ -231,9 +231,9 @@ function renderDivergence(result, cursor, focus) {
     return `<div class="continuation-card${event.mask.includes(lane.id) ? ' selected' : ''}"><strong>Lane ${lane.id}</strong><p>${lane.active ? `${lane.input} → ${lane.output}` : '—'}<br>${state}</p></div>`;
   }).join('');
   return `<div class="continuation-visual" aria-label="Computed branch masks and lane outputs">
-    ${metrics(introductory ? [['Non-empty paths', result.paths], ['Path operations', result.instructions]] : [['Non-empty paths', result.paths], ['Path operations', result.instructions], ['Useful lane slots', result.usefulSlots], ['Lane-slot use', percent(result.utilisation)]])}
+    ${metrics(introductory ? [['Paths used', result.paths], ['Path operations', result.instructions]] : [['Paths used', result.paths], ['Path operations', result.instructions], ['Useful lane slots', result.usefulSlots], ['Lane-slot use', percent(result.utilisation)]])}
     <p><strong>${escape(event.label)}: ${event.mask.length} lanes participate.</strong></p>
-    ${table(['Operation', 'Participating lane indices'], result.trace.map(t => [t.label, t.mask.join(', ')]), 'Actual masks in the chosen positive-first teaching order.')}
+    <details><summary>Inspect the lane indices for each path</summary>${table(['Operation', 'Participating lane indices'], result.trace.map(t => [t.label, t.mask.join(', ')]), 'Actual masks in the chosen positive-first teaching order.')}</details>
     <p class="muted">Each card shows input → final output. “Now” participates in the selected operation; “Other path” is masked off now; “Unused” has no input throughout.</p>
     <div class="lane-grid">${lanes}</div>
     <p>${escape(introductory ? 'All participating lanes follow the same path. The other path has no participating lanes, so the model skips it.' : `${result.usefulSlots} useful lane slots out of ${result.instructions * 32} possible slots. Empty paths are skipped. Both different paths and unused tail positions can reduce this ratio; these are explicit path operations, not compiled instructions or timings.`)}</p>

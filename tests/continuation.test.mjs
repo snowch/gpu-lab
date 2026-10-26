@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {continuationChapters,renderContinuation,computeExperiment,experimentResult} from '../src/continuation-view.mjs';
+import {continuationChapters,renderContinuation,computeExperiment,experimentResult,traceLength} from '../src/continuation-view.mjs';
 import {chapters,renderBookNav,renderBookPage} from '../content/book.mjs';
 import {chapterReferences} from '../src/reference-tasks.mjs';
 
@@ -35,4 +35,15 @@ test('published continuation has a continuous sequence and independent local exp
     const attributes=[...page.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
     assert.equal(new Set(attributes).size,attributes.length,'duplicate HTML ids in '+chapter.slug);
   }
+});
+
+test('matrix steps follow one output or tile, while single-result comparisons have no step navigation',()=>{
+  const matrix=continuationChapters.find(c=>c.slug==='matmul');
+  for(const section of matrix.sections){
+    const e=section.experiment,r=computeExperiment(e);
+    assert.equal(traceLength(e,r),e.focus==='dot'?r.n:r.n/r.tile);
+    assert.ok(traceLength(e,r)<r.trace.length);
+  }
+  const capacity=continuationChapters.find(c=>c.slug==='inference').sections[0].experiment;
+  assert.equal(traceLength(capacity,computeExperiment(capacity)),1);
 });
