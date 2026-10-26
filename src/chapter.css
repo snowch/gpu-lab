@@ -19,3 +19,11 @@
 .chapter-code-panel>pre code { font:inherit; }
 
 .chapter-code-panel.is-selected-thread { outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+
+.chapter-definition { margin:20px 0; padding:16px 20px; border-left:4px solid var(--muted); border-radius:0 6px 6px 0; background:var(--soft); color:var(--ink); }
+.chapter-definition-label { margin:0 0 10px; color:var(--muted); font-size:14px; font-weight:650; }
+.chapter-definition dl { margin:0; }
+.chapter-definition dt { margin:14px 0 2px; font-weight:700; }
+.chapter-definition dt:first-child { margin-top:0; }
+.chapter-definition dfn { font-style:normal; }
+.chapter-definition dd { margin:0; line-height:1.65; }
