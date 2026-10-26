@@ -139,3 +139,12 @@ The opening’s distinction between framework and developer responsibilities is 
 `runKernel` is a handwritten teaching function name. Its qualifiers, indexing variables
 and launch syntax have official CUDA documentation; the function name itself does not.
 Documentation links do not imply that the browser runs an installed toolkit version.
+
+## Continuing chapters review (2026-10-26)
+
+The learner-facing references now connect PyTorch `torch.where`, `Tensor.sum`,
+`torch.matmul`, `torch.softmax`, `torch.cat` and scaled dot-product attention to
+chapters 6–12. Official stable pages were checked (redirecting to PyTorch 2.14).
+The reference catalogue keeps the CUDA mechanisms distinct from framework APIs:
+`torch.where` does not promise a divergent branch, `@` does not select a tile size,
+and the sequential precision model does not establish tensor-core execution.

@@ -63,16 +63,43 @@ Reference exercises introduce `torch.tensor`, `Tensor.to`, indexing and strides
 beside the operations that need them. Version guidance remains beside the first
 lookup task.
 
-The home page and shared navigation prioritise these five chapters. The existing
-memory-access lab, repair workshop and architecture map remain additional resources.
-Chapters 6–11 are planned book adaptations: keeping work ready, different paths,
-cooperation/reduction, matrix reuse, tensor cores/precision, then attention/inference.
-Their roadmap links open the existing labs and are labelled accordingly.
+## Continuing the journey: chapters 6–12
 
-Before rewriting the remaining chapters, observe newcomers using the opening.
-Can they trace one input to its output, explain extra threads, distinguish a copy
-from a calculation, and explain the addresses in a column view? Record where they
-hesitate; do not treat automated interface checks as learner validation.
+All twelve chapters are published working drafts in the common book navigation.
+The remaining chapters reuse tested numerical engines and replace the legacy
+single-dashboard teaching flow with local, independent experiments:
+
+6. **How can work continue during a wait?** (`scheduling.html`): follow one load
+   dependency, then compare ready warps. Introduce resident work and issue slots
+   when needed. More warps also add work; model cycles are not hardware timings.
+7. **What if lanes need different calculations?** (`divergence.html`): begin with
+   uniform signs, then mixed masks, then five active inputs. Distinguish a chosen
+   branch model from PyTorch's evaluation of tensor expressions in `torch.where`.
+8. **How do threads combine their results?** (`reduction.html`): start with a safe
+   four-input sum, extend to eight, then diagnose missing ordering. Shared memory
+   and barriers serve a visible dependency; no invented result is given for a race.
+9. **How can matrix multiplication reuse its inputs?** (`matmul.html`): build one
+   dot product before sharing tiles. Compare equal outputs and explicit loads.
+   Resource trade-offs are optional; they do not crowd the reuse experiment.
+10. **What changes when matrix inputs use fewer bits?** (`tensor-cores.html`):
+    inspect conversion before FP32 accumulation. Connect this to cooperative
+    matrix hardware without representing the sequential model as tensor-core execution.
+11. **How can attention store less?** (`attention.html`): scores, weights and a
+    weighted result come before full-intermediate accounting and online tiles.
+    The recurrence is optional after its purpose is understood.
+12. **What limits an inference step?** (`inference.html`): a real small
+    cache example motivates separate cache-capacity, phase-budget and batch-reuse
+    experiments. Synthetic rates produce lower bounds, never fabricated timings.
+
+The optional memory-access lab, shared-memory banks lab, repair workshop and GPU
+map remain supplementary resources. Existing chapter URLs stay valid. Each new
+chapter ends with a transfer question, references and applied documentation tasks.
+See [migration decisions](chapter-migration.md) for the reuse/rewrite rationale.
+
+Automated checks cover functions, interactions, layout and offline restoration.
+They do not establish learner comprehension. Newcomer observations remain needed:
+can readers trace a dependency, explain a changed result, and separate their
+PyTorch choices from this book's illustrative implementation choices?
 
 ## Architecture introduction
 

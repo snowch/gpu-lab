@@ -19,39 +19,37 @@ GPU code. Generated CUDA programs include their host setup but have not yet been
 compiled or validated on an NVIDIA GPU.
 
 
-Start with the new book opening:
+Follow the twelve-chapter book:
 
 1. [One operation, many numbers](https://snowch.github.io/gpu-lab/lessons/hello.html): five values, threads, indices, blocks and bounds checks.
 2. [Where do the numbers live?](https://snowch.github.io/gpu-lab/lessons/devices.html): copy to the GPU, calculate there, and copy a result back.
 3. [How do we select values from a tensor?](https://snowch.github.io/gpu-lab/lessons/reading.html): shape, row and column selection.
 4. [How are tensor values arranged in memory?](https://snowch.github.io/gpu-lab/lessons/layout.html): views, strides and packed copies.
 5. [How do threads read those values?](https://snowch.github.io/gpu-lab/lessons/requests.html): warps and equal-work sector comparisons.
+6. [How can work continue during a wait?](https://snowch.github.io/gpu-lab/lessons/scheduling.html): dependencies and ready warps.
+7. [What if lanes need different calculations?](https://snowch.github.io/gpu-lab/lessons/divergence.html): conditions, masks and unused lanes.
+8. [How do threads combine their results?](https://snowch.github.io/gpu-lab/lessons/reduction.html): safe tree sums and ordering.
+9. [How can matrix multiplication reuse its inputs?](https://snowch.github.io/gpu-lab/lessons/matmul.html): dot products and shared tiles.
+10. [What changes when matrix inputs use fewer bits?](https://snowch.github.io/gpu-lab/lessons/tensor-cores.html): conversion, accumulation and matrix hardware.
+11. [How can attention store less?](https://snowch.github.io/gpu-lab/lessons/attention.html): weighted results and online tiles.
+12. [What limits an inference step?](https://snowch.github.io/gpu-lab/lessons/inference.html): cache payloads, phase budgets and batching.
+
 
 Each example retains its own controls, diagram and results. The
 [PyTorch companion](examples/book-opening.py) checks these operations using real
 PyTorch: `python examples/book-opening.py --device cpu` or `--device cuda`.
 CPU mode checks values/layouts without GPU transfers; CUDA mode needs an NVIDIA
 GPU and has not yet been validated on hardware. Neither mode is a benchmark.
-The remaining book chapters are planned adaptations of the existing labs, not
-completed rewrites. [Meet the GPU](https://snowch.github.io/gpu-lab/lessons/meet-gpu.html)
-remains an optional visual reference available offline and without JavaScript.
+Chapters 6–12 reuse the verified numerical engines with a new progressive teaching
+flow. They retain their original URLs. Each experiment owns its controls, result
+and trace; static worked examples remain readable without JavaScript.
 
-All eight labs are available as working drafts, with a reduction workshop extending Lab 04:
-
-1. [Reading a tensor](https://snowch.github.io/gpu-lab/lessons/memory.html): addresses, stride, alignment and coalescing.
-2. [Keeping the GPU busy](https://snowch.github.io/gpu-lab/lessons/scheduling.html): ready/waiting warps and latency hiding.
-3. [Taking different paths](https://snowch.github.io/gpu-lab/lessons/divergence.html): branch masks and useful lane slots.
-4. [Sharing work within a block](https://snowch.github.io/gpu-lab/lessons/shared-memory.html): shared-memory banks, broadcasts and padding.
-   [Reduction workshop](https://snowch.github.io/gpu-lab/lessons/reduction.html): tree sums, barriers and an unsafe interleaving.
-5. [Reusing data](https://snowch.github.io/gpu-lab/lessons/matmul.html): computed matrix tiles, traffic and teaching resource budgets.
-6. [Using tensor cores](https://snowch.github.io/gpu-lab/lessons/tensor-cores.html): cooperative matrix operations, input rounding and FP32 accumulation.
-7. [Moving less data in attention](https://snowch.github.io/gpu-lab/lessons/attention.html): stable softmax, online normalisation and intermediate traffic.
-8. [Explaining inference](https://snowch.github.io/gpu-lab/lessons/inference.html): prefill/decode, batching, KV caches, roofline bounds and measurement comparison.
-
-Each has predictions, a computed view, CUDA or algorithm connections and exercises. Labs 02–08
-and the reduction workshop have step/replay controls. These are teaching models with explicit
-limits, not complete GPU or transformer simulators. The reduction workshop detects one chosen
-unsafe schedule; it is not a general race detector.
+[Memory access](https://snowch.github.io/gpu-lab/lessons/memory.html),
+[shared-memory banks](https://snowch.github.io/gpu-lab/lessons/shared-memory.html),
+[kernel repair](https://snowch.github.io/gpu-lab/lessons/kernel.html) and
+[Meet the GPU](https://snowch.github.io/gpu-lab/lessons/meet-gpu.html) remain optional
+labs and references. All published pages include documentation exercises with local
+answer comparisons. See [migration decisions](docs/chapter-migration.md).
 
 The teaching models do not interpret CUDA. Their counts and toy scheduling cycles do not
 predict physical DRAM traffic, measured elapsed time, or speedups on a particular GPU.

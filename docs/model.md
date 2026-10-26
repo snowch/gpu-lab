@@ -333,3 +333,14 @@ shows row/column views, memory strips and a packed copy; `requests.html` shows w
 participation and sectors. Each page supplies its own setup and stores experiments
 under its own route. Repeated row/column IDs retain their meanings within that route.
 The new pages are included in offline release generation and update restoration tests.
+
+## Progressive continuation, chapters 6–12
+
+The continuation uses the unchanged architecture and AI engines above. Each local
+experiment fixes most settings and exposes only those needed for its question.
+The build renders a default worked result; JavaScript replaces that with an
+explicit Run flow and invalidates only the changed example. Trace navigation is
+omitted for summary-only capacity/storage comparisons. Existing engine tests
+remain authoritative for numerical invariants; chapter checks additionally verify
+configuration coverage and model-derived presentation. The earlier Lab numbers in
+this document identify engine provenance, not the current chapter numbering.
