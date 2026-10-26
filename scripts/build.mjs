@@ -5,7 +5,7 @@ import { renderTensorStep,renderTensorSlice,renderStrideExample,viewCopyComparis
 import { lessons, renderLesson } from '../content/lessons.mjs';
 import { renderConcepts, warpConcepts } from '../src/concepts.mjs';
 import { buildOffline } from './offline.mjs';
-import { renderReferenceTask } from '../src/reference-tasks.mjs';
+import { renderChapterReferences } from '../src/reference-tasks.mjs';
 import {chapters,renderBookNav,renderRoadmap,renderBookPage} from '../content/book.mjs';
 import {renderDeviceSections,renderReadingSections} from '../src/foundations-view.mjs';
 import { renderIntroSections, renderIntroTransfer } from '../src/hello-view.mjs';
@@ -20,18 +20,20 @@ await writeFile('dist/index.html', (await readFile('index.html', 'utf8'))
 await mkdir('dist/lessons', { recursive: true });
 await writeFile('dist/lessons/meet-gpu.html', (await readFile('content/gpu-reference.html','utf8'))
   .replace('<!-- SM_OVERVIEW -->',renderSmOverview())
-  .replace('<!-- WORK_MAP -->',renderWorkMap()));
+  .replace('<!-- WORK_MAP -->',renderWorkMap())
+  .replace('<!-- REFERENCE_OVERVIEW -->',renderChapterReferences('meet-gpu')));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
   .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())
-  .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer()));
+  .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer())
+  .replace('<!-- REFERENCE_HELLO -->',renderChapterReferences('hello')));
 await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where do the numbers live?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: One operation, many numbers'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
 for(const [i,part] of ['selection','layout','requests'].entries()) {
   const chapter=chapters[i+2],previous=chapters[i+1],next=chapters[i+3];
   await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({slug:chapter.slug,number:i+3,title:chapter.title,lead:chapter.summary,content:renderReadingSections(part),previous:{href:previous.slug+'.html',title:`Chapter ${i+2}: ${previous.title}`},next:{href:next.slug+'.html',title:i<2?`Chapter ${i+4}: ${next.title}`:'Continue to the scheduling lab'}}));
 }
-await writeFile('dist/lessons/kernel.html', (await readFile('content/kernel.html', 'utf8')).replace('<!-- REFERENCE_KERNEL -->',renderReferenceTask('kernel')));
+await writeFile('dist/lessons/kernel.html', (await readFile('content/kernel.html', 'utf8')).replace('<!-- REFERENCE_KERNEL -->',renderChapterReferences('kernel')));
 await writeFile('dist/lessons/memory.html', (await readFile('content/memory.html','utf8'))
-  .replace('<!-- REFERENCE_MEMORY -->',renderReferenceTask('memory'))
+  .replace('<!-- REFERENCE_MEMORY -->',renderChapterReferences('memory'))
   .replace('<!-- TENSOR_LAYOUT_FIGURE -->',renderTensorStep())
   .replace('<!-- TENSOR_SLICE_FIGURE -->',renderTensorSlice())
   .replace('<!-- WARP_CONCEPTS -->',renderConcepts({id:'memory',terms:warpConcepts,warpDiagram:true}))

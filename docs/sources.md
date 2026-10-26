@@ -116,3 +116,26 @@ memory-access lab, with a declared aligned base and equal useful byte counts.
 It does not claim to reproduce PyTorch's kernel selection. CI checks the optional
 book companion with CPU PyTorch 2.5.1; CUDA-mode transfer behaviour has not yet
 been executed on a GPU. No performance measurements are inferred from that check.
+
+
+## Chapter references and documentation exercises
+
+Every available chapter, lab, workshop and architecture-reference page has an explicit
+entry in `chapterReferences` (`src/reference-tasks.mjs`). References are annotated by
+what they support, followed by at least two questions applying the documentation to
+that page’s examples. The answer disclosures are local and available offline. Tests
+cover all published pages, link roles, ordering, keyboard use and JavaScript-free access.
+
+The opening’s distinction between framework and developer responsibilities is supported by:
+
+- [PyTorch dispatcher explanation](https://docs.pytorch.org/docs/2.14/notes/extending.html#extending-torch-native-api):
+  selecting the appropriate backend implementation from an operation and its inputs.
+- [PyTorch CUDA semantics](https://docs.pytorch.org/docs/2.14/notes/cuda.html):
+  tensor-device placement, result placement and asynchronous execution.
+- [PyTorch compiler getting started](https://docs.pytorch.org/docs/2.14/user_guide/torch_compiler/torch.compiler_get_started.html):
+  optional later reading about code generation and operation fusion. This is not the
+  execution path of the opening’s ordinary PyTorch snippet.
+
+`runKernel` is a handwritten teaching function name. Its qualifiers, indexing variables
+and launch syntax have official CUDA documentation; the function name itself does not.
+Documentation links do not imply that the browser runs an installed toolkit version.

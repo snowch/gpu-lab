@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import { renderReferenceTask, guides } from '../src/reference-tasks.mjs';
+import { renderChapterReferences, guides } from '../src/reference-tasks.mjs';
 import { remainingLessons } from './remaining-lessons.mjs';
 import {renderSchedulingRelationships} from '../src/scheduling-relationships.mjs';
 import { renderWorkedExample } from '../src/worked-examples.mjs';
@@ -155,8 +155,8 @@ ${lesson.namedChoices ? `<form id="prediction" class="prediction"><fieldset clas
 <div id="trace" class="trace" aria-label="Computed instruction trace"></div><p id="explanation" class="explanation"></p></div>
 <details class="model-note"><summary>Model assumptions and limits</summary><p>${lesson.limits}</p><a href="${lesson.source}">${lesson.sourceLabel} ↗</a></details></div></section>
 <section class="two-col section-space"><div><p class="eyebrow">CONNECT TO CUDA</p><h2>The programming connection</h2>${lesson.codeNote}</div><div class="code-panel"><div class="code-title">Illustrative CUDA · not executed in this page</div><pre><code>${escape(lesson.code)}</code></pre></div></section>
-${renderReferenceTask(lesson.slug)}
 <section class="challenge section-space"><p class="eyebrow">TRY IT YOURSELF</p><h2>Change one thing. Explain the result.</h2><ol>${lesson.exercises.map(x=>`<li>${x}</li>`).join('')}</ol><details><summary>Compare your explanation</summary>${lesson.takeaway}</details></section>
+${renderChapterReferences(lesson.slug)}
 <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="${previous}">← Previous lesson</a><a href="${next}">${index + 1 < lessons.length ? 'Next lesson →' : 'Return to roadmap →'}</a></nav>
 <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
 }
