@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {openingCode,browserNotice,codePanel,definitions} from './chapter-view.mjs';
+import {openingCode,browserNotice,codePanel,definitions,readerTask} from './chapter-view.mjs';
 import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,kernelSource,pythonSource,launchPlan} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -43,7 +43,7 @@ export function renderIntroSections() {
       <li><strong>Calculate one result.</strong> The assignment reads <code>input[i]</code>, multiplies it and writes <code>output[i]</code>. <code>2.0f</code> is a floating-point number; <code>;</code> ends the statement.</li></ol>
       <p>The launch’s <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code> starts two blocks of four threads. <code>d_input</code> and <code>d_output</code> refer to arrays already allocated in GPU memory; the final <code>5</code> supplies <code>n</code>. The download below includes that allocation and the copies.</p>
       <details><summary>Read the function declaration</summary><p><code>__global__</code> marks a GPU kernel. <code>void</code> means it writes results through <code>output</code> rather than returning a value. <code>float*</code> passes the location of an array of floating-point values; <code>const</code> means this function does not change the input. <code>int</code> declares an integer.</p></details>`:''}
-      <p>${step.instruction}</p>
+      ${readerTask(step.instruction)}
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?'<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>':''}
       <button id="hello-run-${stage}" type="button" class="primary">Run</button>
@@ -73,7 +73,7 @@ export function renderIntroSections() {
 }
 export function renderIntroTransfer() {
   const plan=launchPlan(6);
-  return `<section class="hello-section-end"><h2>Try a new case</h2><p>Keep four threads per block. Choose an input count, then predict how many blocks you need and which thread indices should skip the arrays.</p>
+  return `<section class="hello-section-end"><h2>Try a new case</h2>${readerTask('Keep four threads per block. Choose an input count, then predict how many blocks you need and which thread indices should skip the arrays.','Predict a new case')}
   <label for="hello-transfer-count">Number of inputs <select id="hello-transfer-count"><option>6</option><option>8</option><option>9</option></select></label>
   <button type="button" class="primary" id="hello-transfer-run">Check your explanation</button>
   <p id="hello-transfer-result" role="status">Predict first, then check.</p>

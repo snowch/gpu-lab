@@ -24,3 +24,13 @@
 .book-sectors>div { flex:1 1 120px; border:1px solid var(--accent); padding:12px; display:flex; flex-direction:column; }
 .book-pager { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; border-top:1px solid var(--line); padding:24px 0; }
 @media(max-width:1050px) { .device-map,.book-read-map { grid-template-columns:minmax(0,1fr); } }
+
+.book-storage { margin:20px 0; padding:16px; border:1px solid var(--line); border-radius:6px; }
+.book-storage-values { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+.book-warp { margin:24px 0; padding:20px; border:1px solid var(--line); border-radius:6px; }
+.book-warp figcaption { font-weight:700; margin-bottom:12px; }
+.book-warp-lanes { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; margin-bottom:12px; }
+.book-warp-lanes span { border:1px solid var(--accent); border-radius:4px; text-align:center; padding:4px 0; }
+.book-warp-lanes .used { background:var(--accent-soft); font-weight:700; }
+.book-warp-lanes .unused { border-style:dashed; color:var(--muted); }
+.book-warp p { margin:0; }

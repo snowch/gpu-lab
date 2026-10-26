@@ -283,9 +283,9 @@ eight launched threads exercise the guarded tail. Multipliers 2, −0.5, 0 and 3
 are compared against independent CPU references; wrong, missing and nonfinite
 outputs fail validation. No physical NVIDIA GPU execution has been validated.
 
-## Book opening: devices and tensor reading
+## Book opening: devices, selection, layout and memory requests
 
-`foundations-model.mjs` supplies each chapter 2–3 diagram, byte count and result.
+`foundations-model.mjs` supplies each chapter 2–5 diagram, byte count and result.
 `deviceJourney` models separate CPU and GPU allocations for five or eight FP32
 values. Its three snapshots show a CPU-to-GPU copy, out-of-place multiplication
 on the GPU, and a GPU-to-CPU copy. Earlier setup is included in each independent
@@ -325,3 +325,11 @@ the complete kernel. The final input-count exercise uses launchPlan: four thread
 per block, ceiling division for block count, and explicit surplus thread indices.
 Existing multiplier, guard and selection IDs are retained for restart snapshots;
 the new transfer exercise saves whether its explanation has been revealed.
+
+
+The tensor-reading sequence spans three pages with the same unchanged `readTensor`
+model. `reading.html` shows selection/results without storage offsets; `layout.html`
+shows row/column views, memory strips and a packed copy; `requests.html` shows warp
+participation and sectors. Each page supplies its own setup and stores experiments
+under its own route. Repeated row/column IDs retain their meanings within that route.
+The new pages are included in offline release generation and update restoration tests.

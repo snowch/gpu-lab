@@ -61,11 +61,24 @@ test('models reject unsupported states before generating code',()=>{
 test('opening has independent experiment ownership and all-page chapter navigation',()=>{
   const device=renderDeviceSections(),reading=renderReadingSections();
   assert.equal([...device.matchAll(/data-book-experiment=/g)].length,3);
-  assert.equal([...reading.matchAll(/data-book-experiment=/g)].length,4);
-  assert.equal(chapters.filter(c=>c.opening).length,3);
-  for(const current of ['index','hello','devices','reading','memory','reduction','meet-gpu']) {
+  assert.equal([...reading.matchAll(/data-book-experiment=/g)].length,2);
+  assert.equal(chapters.filter(c=>c.opening).length,5);
+  for(const current of ['index','hello','devices','reading','layout','requests','memory','reduction','meet-gpu']) {
     const nav=renderBookNav(current);
     assert.equal([...nav.matchAll(/aria-current="page"/g)].length,1);
-    for(const slug of ['hello','devices','reading']) assert.ok(nav.includes(slug+'.html'));
+    for(const slug of ['hello','devices','reading','layout','requests']) assert.ok(nav.includes(slug+'.html'));
   }
+});
+
+test('reading progression separates selection, storage and requests',()=>{
+  const selection=renderReadingSections(),layout=renderReadingSections('layout'),requests=renderReadingSections('requests');
+  assert.doesNotMatch(selection,/Byte offset|Stride|book-warp|book-sectors/);
+  assert.match(selection,/Selected values and results/);
+  assert.equal([...layout.matchAll(/data-book-experiment=/g)].length,3);
+  assert.match(layout,/book-storage-values/);
+  assert.ok(layout.indexOf('<dfn>View')<layout.indexOf('View into x'));
+  assert.equal([...requests.matchAll(/data-book-experiment=/g)].length,1);
+  assert.equal([...requests.matchAll(/class="unused"/g)].length,27);
+  assert.ok(requests.indexOf('<dfn>Sector')<requests.indexOf('reading-guess-sectors'));
+  assert.throws(()=>renderReadingSections('unknown'));
 });

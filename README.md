@@ -23,7 +23,9 @@ Start with the new book opening:
 
 1. [One operation, many numbers](https://snowch.github.io/gpu-lab/lessons/hello.html): five values, threads, indices, blocks and bounds checks.
 2. [Where do the numbers live?](https://snowch.github.io/gpu-lab/lessons/devices.html): copy to the GPU, calculate there, and copy a result back.
-3. [How do threads read a tensor?](https://snowch.github.io/gpu-lab/lessons/reading.html): rows, columns, views, packed copies and equal-work memory requests.
+3. [How do we select values from a tensor?](https://snowch.github.io/gpu-lab/lessons/reading.html): shape, row and column selection.
+4. [How are tensor values arranged in memory?](https://snowch.github.io/gpu-lab/lessons/layout.html): views, strides and packed copies.
+5. [How do threads read those values?](https://snowch.github.io/gpu-lab/lessons/requests.html): warps and equal-work sector comparisons.
 
 Each example retains its own controls, diagram and results. The
 [PyTorch companion](examples/book-opening.py) checks these operations using real

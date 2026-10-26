@@ -144,7 +144,10 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 devices.locator('#device-factor-1').fill('3');devices.locator('#device-run-1').click()
                 reading=context.new_page();reading.goto(url+'lessons/reading.html')
                 reading.locator('#reading-index-column').select_option('1');reading.locator('#reading-run-column').click()
-                reading.locator('#reading-pattern-sectors').select_option('column');reading.locator('#reading-run-sectors').click()
+                layout=context.new_page();layout.goto(url+'lessons/layout.html')
+                layout.locator('#reading-index-packed').select_option('2');layout.locator('#reading-run-packed').click()
+                requests=context.new_page();requests.goto(url+'lessons/requests.html')
+                requests.locator('#reading-pattern-sectors').select_option('column');requests.locator('#reading-run-sectors').click()
                 context.set_offline(False);CourseHandler.revision='two';check(page)
                 expect(page.locator('#version-status')).to_have_text('Update available')
                 expect(page.locator('#app-status-summary')).to_contain_text('Update available')
@@ -183,7 +186,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 blocked_cdp.detach();blocked.close()
                 # Activation works offline and restores each tab's independent work/route.
                 context.set_offline(True);page.locator('#restart-update').click()
-                for tab in [page,second,kernel,lesson,devices,reading]:
+                for tab in [page,second,kernel,lesson,devices,reading,layout,requests]:
                     expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
@@ -198,7 +201,8 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(devices.locator('#device-feedback-0')).to_contain_text('32 bytes copied')
                 expect(devices.locator('#device-feedback-1')).to_contain_text('[3, 6, 9, 12, 15]')
                 expect(reading.locator('#reading-feedback-column')).to_contain_text('[4, 14, 24, 34, 44]')
-                expect(reading.locator('#reading-feedback-sectors')).to_contain_text('3 sectors for 20 useful bytes')
+                expect(requests.locator('#reading-feedback-sectors')).to_contain_text('3 sectors for 20 useful bytes')
+                expect(layout.locator('#reading-feedback-packed')).to_contain_text('[6, 16, 26, 36, 46]')
                 panel(page);ready(page)
                 # Eviction is detected on focus; repair retains/reuses remaining assets.
                 cache=f"gpu-lab:{url}:release-{releases['two']['id']}"

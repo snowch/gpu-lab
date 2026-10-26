@@ -1,9 +1,11 @@
 // Copyright © 2026 Christopher Snow.
-// The first three chapters form the new opening; later chapters link to existing labs.
+// The first five chapters form the new opening; later chapters link to existing labs.
 export const chapters=[
   {title:'One operation, many numbers',slug:'hello',summary:'Follow five values from PyTorch to threads, indices and a small CUDA kernel.',opening:true},
   {title:'Where do the numbers live?',slug:'devices',summary:'Copy inputs to the GPU, calculate there, and bring back a result.',opening:true},
-  {title:'How do threads read a tensor?',slug:'reading',summary:'Compare rows, columns and packed copies, then inspect their memory requests.',opening:true},
+  {title:'How do we select values from a tensor?',slug:'reading',summary:'Select rows and columns, then multiply the chosen values.',opening:true},
+  {title:'How are tensor values arranged in memory?',slug:'layout',summary:'Follow values into storage, compare strides, then make a packed copy.',opening:true},
+  {title:'How do threads read those values?',slug:'requests',summary:'Follow five reads from one warp and compare the sectors they touch.',opening:true},
   {title:'How does the GPU keep working?',slug:'scheduling',summary:'Explore ready warps and waiting for data.'},
   {title:'When threads take different paths',slug:'divergence',summary:'Follow active lanes through different calculations.'},
   {title:'When threads need each other',slug:'reduction',summary:'Build a sum using shared values and block barriers.'},

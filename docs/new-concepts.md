@@ -13,11 +13,15 @@ GPU Lab teaches from a fixed, visible explanation first, then invites prediction
 
 ## Implementation
 
-- Author the plain-text term and definition in `content/concept-definitions.mjs` keyed by lesson slug.
-- In the matching intro in `content/lessons.mjs` or `content/remaining-lessons.mjs`, insert `<!-- NEW_CONCEPTS -->` at the correct first-use point (not automatically after the last intro paragraph).
-- `renderLesson` in `content/lessons.mjs` calls `renderConcepts` from `src/concepts.mjs`. It validates that configured lessons have a marker.
-- Manually authored Lab 01 has `<!-- WARP_CONCEPTS -->`, replaced at build time by the same semantic renderer. Its only extra option is the fixed warp/lane diagram.
-- Styling is shared in `src/lessons.css` and uses existing light/dark theme variables. No JS, tooltip, icons per definition, or runtime control is needed.
-- The term and definition strings are escaped when rendered; avoid embedding HTML in the data. Heading IDs are based on each distinct lesson slug.
+Follow the [authoring checklist](authoring-checklist.md) for teaching decisions.
+Book chapters use `definitions()` from `src/chapter-view.mjs` and its shared styles
+in `src/chapter.css`. Supply plain-text term/meaning pairs; the helper escapes them
+and emits a semantic definition list. Keep first-use definitions visible without JS.
 
-Review on a narrow phone: a term and its definition should remain adjacent, with no horizontal page overflow or tiny text. Keep the panel visible with JavaScript off, and avoid repeating definitions after it.
+The older further labs still use `content/concept-definitions.mjs`, `renderConcepts`
+and `NEW_CONCEPTS` markers. These are a legacy implementation, not an alternative
+pattern for new book chapters. When adapting a lab into a chapter, move its terms to
+the shared chapter component and remove the old panel rather than showing both.
+
+Review on a narrow phone: each term stays beside its meaning, with readable text
+and no horizontal overflow. Label and typography convey the role without colour.

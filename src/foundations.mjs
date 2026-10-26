@@ -26,7 +26,7 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
         $('map').innerHTML=renderDeviceMap(s,ran);
         $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).join(', ')}].`:'Run to inspect the result.';
       } else {
-        $('code').textContent=readingCode(c);$('map').innerHTML=renderReadMap(s,ran,{sectors:key==='sectors'});
+        $('code').textContent=readingCode(c);$('map').innerHTML=renderReadMap(s,ran,{sectors:key==='sectors',mode:section.dataset.readingMode});
         let feedback=ran?'Output: ['+s.output.join(', ')+'].':'Run to inspect the output.';
         if(ran&&key==='sectors') {
           const raw=$('guess').value;

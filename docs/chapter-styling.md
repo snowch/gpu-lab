@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapters 1–3 use `src/chapter.css` and the helpers in `src/chapter-view.mjs`.
+Chapters 1–5 use `src/chapter.css` and the helpers in `src/chapter-view.mjs`.
 Use the same components when extending the book rather than copying a chapter's
 colours, type sizes or spacing into another stylesheet.
 
@@ -11,10 +11,9 @@ colours, type sizes or spacing into another stylesheet.
 - Code language: label PyTorch and CUDA C++ explicitly. Green identifies PyTorch;
   blue identifies CUDA, with suitable accents in both themes. Colour supplements
   the language label. Use `codePanel()` for labelled explanatory code.
-- Selected-thread examples: label the selected index and update it with the worked
-  substitution. Show the general CUDA expression and worked substitution in one labelled
-  panel. Explain their relationship once; changing the selection updates only the
-  worked substitution, leaving the general expression’s variable index unchanged.
+- CUDA progression follows the [authoring checklist](authoring-checklist.md): show
+  a complete kernel and launch before excerpts. Later selected-thread substitutions
+  may share one labelled panel with the general expression; avoid duplicate panels.
 - Supporting code: neutral panels with 16px code explain setup and later examples.
 - Focal operation: the existing larger operation panel highlights the calculation
   currently being explored. It has a different role from a complete opening program.
@@ -30,11 +29,12 @@ colours, type sizes or spacing into another stylesheet.
   definition list distinguish these from code and reader actions without colour.
   Group closely related terms in one box; do not repeat the definition in nearby
   prose or highlight every later mention. Keep definitions visible without clicks.
-- Reader tasks: use the shared reference-task component for documentation lookups.
+- Reader tasks: use `readerTask()` for experiment instructions and new-case prompts.
+  Use the shared reference-task component for documentation lookups.
   Its label and decorative icon identify the action; colour supplements the text.
 
 The shared rules are loaded after chapter-specific styles. Keep model-specific
 layouts in their own stylesheets and put common visual decisions in `chapter.css`.
-Browser checks compare computed styles across all three chapters at phone, tablet
+Browser checks compare computed styles across all five chapters at phone, tablet
 and desktop widths in both themes, and record opening screenshots. Review those
 screenshots as well as checking for overflow.

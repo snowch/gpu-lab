@@ -27,3 +27,8 @@
 .chapter-definition dt:first-child { margin-top:0; }
 .chapter-definition dfn { font-style:normal; }
 .chapter-definition dd { margin:0; line-height:1.65; }
+
+.chapter-task { margin:20px 0; padding:16px 20px; border:1px solid var(--accent); border-radius:6px; background:var(--accent-soft); }
+.chapter-task-label { display:flex; gap:10px; color:var(--accent); font-weight:700; }
+.chapter-task p { margin:0; }
+.chapter-task .chapter-task-label { margin-bottom:8px; }
