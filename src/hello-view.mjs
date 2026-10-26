@@ -66,6 +66,12 @@ export function renderIntroSections() {
       <h3>Try two blocks</h3>
       <p>Here we put four threads in each block. Each thread has a position within its block; combining that position with the block number gives its index across the whole array. Two blocks provide eight threads for our five inputs.</p>`:''}
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>
+      ${stage===2?`<p>PyTorch chooses its own kernel and launch settings for this operation. The expression above does not specify blocks or threads. For our CUDA teaching example, we choose the launch size explicitly:</p>
+      ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch two blocks of four threads')}
+      <p>The numbers inside <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code> request two blocks with four threads each. <code>d_input</code> and <code>d_output</code> refer to arrays in GPU memory; the final <code>5</code> tells our kernel how many values exist. The GPU decides which SM receives each block.</p>
+      <p>Inside the kernel, each thread calculates its index. CUDA calls the block number <code>blockIdx.x</code>, the block size <code>blockDim.x</code>, and the thread’s position within its block <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; we use a one-dimensional list.</p>
+      ${pre('hello-index-expression','int i = blockIdx.x * blockDim.x + threadIdx.x;','CUDA C++ · calculate the index')}
+      <p><code>int</code> makes <code>i</code> an integer. For block 1, position 0: <code>i = 1 * 4 + 0 = 4</code>, which selects the fifth input. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
       <p>${stage===0?'Predict the five outputs before you run. ':stage===3?'Predict which threads have no input. ':''}${step.instruction}</p>
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?`<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>`:''}
@@ -89,7 +95,7 @@ export function renderIntroSections() {
       </div>`:''}
       ${stage>0&&stage<4?`<div class="hello-cuda-section">
         ${stage===2?'<p>A bounds check tests whether an index names an existing element. Here <code>n</code> is 5; <code>i &lt; n</code> lets indices 0–4 access the arrays and skips indices 5–7.</p>':''}
-        ${stage>=2?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p>${pre('hello-index-expression','int i = blockIdx.x * blockDim.x + threadIdx.x;','CUDA C++ · calculate the index')}<p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
+        ${stage===3?`<p>CUDA calls the block number <code>blockIdx.x</code>, its size <code>blockDim.x</code>, and a thread’s position within it <code>threadIdx.x</code>. The <code>.x</code> selects the first dimension; this example uses a one-dimensional list.</p>${pre('hello-index-expression','int i = blockIdx.x * blockDim.x + threadIdx.x;','CUDA C++ · calculate the index')}<p>The variable <code>i</code> is an integer. Block size is our grouping choice, not a count of physical GPU cores.</p>`:''}
         ${stage===3?'<p>The condition <code>i &lt; n</code> asks whether this thread’s index is inside the array. Only then does the statement inside the braces run.</p>':''}
       </div>`:''}
       ${stage===2?renderReferenceTask('hello-indices'):''}
