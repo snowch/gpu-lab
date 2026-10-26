@@ -1,6 +1,5 @@
 // Copyright © 2026 Christopher Snow.
 import {openingCode,browserNotice,codePanel,definitions,readerTask} from './chapter-view.mjs';
-import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,kernelSource,pythonSource,launchPlan} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderIntroMap(stage,state,selected=0,showOutput=true) {
@@ -35,7 +34,7 @@ export function renderIntroSections() {
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>
       ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The extra three threads have no input; the next experiment lets you explore that case.</p>':''}
       ${stage===3?'<p>Here, the bounds check asks whether a thread’s index is smaller than the number of inputs. Indices 0–4 pass; indices 5–7 skip the read and write. Turn the check off below to see why it matters.</p>':''}
-      ${stage===4?`<p>PyTorch selects an optimised implementation and handles its launch; <code>y = x * 2</code> does not choose blocks or threads. CUDA lets us write the GPU function and choose those settings ourselves. The compiler also optimises our code. This small example makes the work visible; it is not intended to outperform PyTorch.</p>
+      ${stage===4?`<p>PyTorch selects an optimised implementation and handles its launch; <code>y = x * 2</code> does not choose blocks or threads. CUDA lets us write the GPU function and choose those settings ourselves. The compiler also optimises our code. Our <code>runKernel</code> is a separate teaching function; PyTorch does not call it when evaluating this expression. The example makes the work visible and is not intended to outperform PyTorch.</p>
       ${pre('hello-full',kernelSource(2),'CUDA C++ · complete GPU function (kernel)')}
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}
       <ol><li><strong>Find the input.</strong> <code>blockIdx.x</code> is the block number, <code>blockDim.x</code> is its size, and <code>threadIdx.x</code> is the position within it. Their calculation gives the integer index <code>i</code>. The <code>.x</code> selects the first dimension of our one-dimensional launch.</li>
@@ -62,10 +61,6 @@ export function renderIntroSections() {
           <p>CI compiles generated chapter 1 examples with the CUDA Toolkit and checks their outputs in GPGPU-Sim. Physical NVIDIA GPU execution has not yet been validated.</p>
         </details>
 
-        <h3>Practise using the references</h3>
-        <p class="reference-version">Use the provided links for these browser exercises; no installed PyTorch or CUDA version is involved. For local execution, choose documentation matching your installed tools.</p>
-        ${renderReferenceTask('hello-pytorch')}
-        ${renderReferenceTask('hello-indices')}
         <p><a href="scheduling.html">Later: how the GPU schedules blocks and warps →</a></p>
       </div>`:''}
     </section>`;

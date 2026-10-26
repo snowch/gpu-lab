@@ -30,7 +30,9 @@ colours, type sizes or spacing into another stylesheet.
   Group closely related terms in one box; do not repeat the definition in nearby
   prose or highlight every later mention. Keep definitions visible without clicks.
 - Reader tasks: use `readerTask()` for experiment instructions and new-case prompts.
-  Use the shared reference-task component for documentation lookups.
+  Use `renderChapterReferences(slug)` at the end of each page for the annotated
+  References list followed by documentation exercises. Its catalogue in
+  `src/reference-tasks.mjs` supplies each page’s sources, questions and local answers.
   Its label and decorative icon identify the action; colour supplements the text.
 
 The shared rules are loaded after chapter-specific styles. Keep model-specific

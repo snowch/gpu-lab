@@ -81,3 +81,12 @@ footer { flex-wrap:wrap; }
 .reference-icon { width:22px; height:22px; flex:none; margin-top:1px; }
 .reference-code { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; margin:0 0 16px; font:16px/1.7 ui-monospace,monospace; }
 .reference-code code { font:inherit; }
+
+/* References use normal reading text; exercises retain their labelled action cards. */
+.chapter-references,.documentation-exercises { max-width:900px; }
+.chapter-reference-list { padding-left:22px; }
+.chapter-reference-list li { margin:16px 0; padding-left:4px; }
+.chapter-reference-list li>a { font-weight:650; }
+.chapter-reference-list p { margin:4px 0 0; }
+.reference-version { color:var(--muted); font-size:14px; line-height:1.65; margin:20px 0; }
+.chapter-references a,.documentation-exercises a { overflow-wrap:anywhere; }

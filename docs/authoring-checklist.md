@@ -49,9 +49,15 @@ second set of authoring requirements.
   beside the picture, and defer scheduling details until they are needed.
 - [ ] Label dynamic code as dynamic and update it with the controls. Explain fixed
   reference code as fixed. Never tell readers to follow a change that does not occur.
-- [ ] Place short official-documentation tasks after the relevant concept/code.
-  Early tasks link directly to the section and refer to a visible local snippet;
-  later tasks can ask readers to find the section. Provide an offline comparison.
+- [ ] End each published chapter/lab with `renderChapterReferences(slug)`: a References
+  section with two or three annotated official links, followed by Use the documentation
+  with at least two applied questions and local answer disclosures. Remove superseded
+  scattered tasks. Early questions link directly and repeat a short fixed snippet
+  when needed; later questions can ask readers to locate a rule.
+- [ ] Distinguish names chosen for examples (such as `runKernel`) from official API
+  names. Link to the documented language features, not an invented API entry. Explain
+  ordinary PyTorch implementation selection separately from optional compiler-generated
+  kernels; keep the compiler reference as later reading until it is taught.
 - [ ] Say that browser exercises have no installed PyTorch/CUDA documentation version;
   matching installed versions applies to optional local execution. External links
   open in a labelled new tab so readers retain their experiment.

@@ -1,33 +1,55 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {guides,referenceTasks,renderReferenceTask} from '../src/reference-tasks.mjs';
+import {guides,referenceTasks,renderReferenceTask,chapterReferences,renderChapterReferences} from '../src/reference-tasks.mjs';
 import {lessons,renderLesson} from '../content/lessons.mjs';
+import {chapters} from '../content/book.mjs';
 import {pythonSource} from '../src/hello-model.mjs';
-import {renderIntroSections} from '../src/hello-view.mjs';
 
-test('reference practice covers the course and progresses to independent lookups',()=>{
-  for(const key of ['hello-pytorch','hello-indices','devices','reading','kernel','memory',...lessons.map(l=>l.slug)]){
-    const task=referenceTasks[key];assert.ok(task,key);
+test('reference exercises use official guides and retain local answer comparisons',()=>{
+  for(const [key,task] of Object.entries(referenceTasks)){
     for(const target of [task.page,task.solution].filter(Boolean)) {
       const url=new URL(guides[target]);
       assert.equal(url.protocol,'https:');
       assert.ok(['docs.pytorch.org','docs.nvidia.com'].includes(url.hostname));
-      assert.ok(!url.pathname.includes('/cuda-c-programming-guide/'),'Do not send readers through obsolete guide redirects');
+      assert.ok(!url.pathname.includes('/cuda-c-programming-guide/'));
     }
     const html=renderReferenceTask(key);
     assert.match(html,/target="_blank" rel="noopener noreferrer"/);
     assert.match(html,/<summary>Compare your answer<\/summary>/);
     assert.match(html,/comparison works offline/);
     if(task.independent){
-      assert.ok(!new URL(guides[task.page]).hash,'Start independent tasks at a guide, not its answer');
+      assert.ok(!new URL(guides[task.page]).hash);
       assert.match(html,/Open the relevant section/);
     }
   }
   for(const key of ['reduction','matmul','tensor-cores','attention','inference']) assert.equal(referenceTasks[key].independent,true);
   assert.throws(()=>renderReferenceTask('missing'));
   assert.equal(referenceTasks['hello-pytorch'].code,pythonSource());
-  const intro=renderIntroSections();
-  assert.match(intro,/reference-hello-pytorch/);assert.match(intro,/reference-hello-indices/);
-  lessons.forEach((lesson,i)=>assert.match(renderLesson(lesson,i),new RegExp('id="reference-'+lesson.slug+'"')));
+});
+test('every published chapter and lab has annotated references before two or more exercises',()=>{
+  const pages=new Set([...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','meet-gpu']);
+  assert.deepEqual(new Set(Object.keys(chapterReferences)),pages);
+  for(const slug of pages){
+    const entry=chapterReferences[slug],html=renderChapterReferences(slug);
+    assert.ok(entry.sources.length>=2&&entry.sources.length<=3,slug);
+    assert.ok(entry.tasks.length>=2,slug);
+    for(const [key,label,description] of [...entry.sources,...(entry.optional??[])]){
+      assert.ok(guides[key]&&label&&description,slug);
+    }
+    const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+    assert.equal(ids.length,new Set(ids).size,slug);
+    assert.ok(html.indexOf('>References</h2>')<html.indexOf('>Use the documentation</h2>'));
+    assert.ok(html.indexOf('>Use the documentation</h2>')<html.indexOf('class="reference-task"'));
+    assert.doesNotMatch(html,/href="undefined"/);
+  }
+  assert.throws(()=>renderChapterReferences('missing'));
+  const hello=renderChapterReferences('hello');
+  assert.match(hello,/not a CUDA API/);
+  assert.match(hello,/not code generated from this expression/);
+  lessons.forEach((lesson,i)=>{
+    const html=renderLesson(lesson,i);
+    assert.match(html,new RegExp('id="reference-'+lesson.slug+'"'));
+    assert.ok(html.indexOf('>References</h2>')>html.indexOf('>Change one thing. Explain the result.</h2>'));
+  });
 });

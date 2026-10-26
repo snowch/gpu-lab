@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {renderChapterReferences} from '../src/reference-tasks.mjs';
 // The first five chapters form the new opening; later chapters link to existing labs.
 export const chapters=[
   {title:'One operation, many numbers',slug:'hello',summary:'Follow five values from PyTorch to threads, indices and a small CUDA kernel.',opening:true},
@@ -32,5 +33,6 @@ export function renderBookPage({slug,number,title,lead,content,previous,next}) {
 <div class="layout"><aside class="sidebar" aria-label="Course navigation"><p class="eyebrow">HOW GPUS RUN AI</p><p class="sidebar-title">Under the hood.</p>${renderBookNav(slug)}<div class="sidebar-bottom"><span class="status-label">INTERACTIVE BOOK · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p></div></aside><main id="main"><header class="intro"><p class="eyebrow">CHAPTER ${number}</p><h1>${title}</h1><p>${lead}</p></header><noscript><p class="notice">Enable JavaScript to run the experiments. The code, explanations and input diagrams remain readable without it.</p></noscript>
 ${content}
 <section class="book-section"><h2>Run the real PyTorch example</h2><p><a href="../examples/book-opening.py" download>Download the PyTorch companion</a>. It checks values, devices, views and copies. These checks do not measure performance.</p>${'<pre class="book-code"><code>python book-opening.py --device cuda\n# Or check the values and layouts on a CPU:\npython book-opening.py --device cpu</code></pre>'}<p>Requires an installed PyTorch; CUDA mode also needs a compatible NVIDIA GPU and driver. CPU mode cannot demonstrate CPU–GPU transfers. GPU execution of this new companion has not yet been validated.</p></section>
+${renderChapterReferences(slug)}
 <nav class="book-pager" aria-label="Chapter sequence"><a href="${previous.href}">← ${previous.title}</a><a href="${next.href}">${next.title} →</a></nav><footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
 }

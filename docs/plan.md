@@ -19,7 +19,8 @@ Author and review chapters with [the authoritative checklist](authoring-checklis
 
 Start from an AI operation; introduce the smallest mechanism that explains it; ask for a
 prediction; run the model; change one variable; explain the difference; connect it to code.
-Short reference tasks sit beside the relevant code or experiment. Early tasks link to
+Each published chapter/lab ends with annotated References and Use the documentation
+sections. Short fixed snippets reconnect questions to the example. Early tasks link to
 the exact API/guide section; later tasks start at the official guide and ask the learner
 to find it, then apply the result to their experiment. Native “Compare your answer”
 disclosures provide a local explanation and, for independent tasks, the direct section

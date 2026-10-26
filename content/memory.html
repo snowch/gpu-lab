@@ -125,7 +125,7 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
           <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
           <p>This CPU example needs no GPU. The same shape and stride reasoning applies to the corresponding CUDA tensor. PyTorch can choose its own kernels, thread mapping and copies; slicing alone does not launch the particular load modelled here.</p>
         </div>
-        <!-- REFERENCE_MEMORY -->
+
         <div class="presets"><button type="button" data-tensor-pattern="row">Model x[0, :] · first row</button><button type="button" data-tensor-pattern="column">Model x[:, 0] · first column</button></div>
       </section>
       <section id="lab">
@@ -178,6 +178,7 @@ print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a hr
         <ol><li>Choose <strong>Tensor column</strong>. Think of a row-major tensor with eight features per row. The warp reads the same feature from successive rows. Predict the sector count, then check it.</li><li>Switch to <strong>Contiguous</strong>. Now it reads neighbouring features. Compare requested bytes and sector coverage. Which changed?</li><li>Choose <strong>Shift by one</strong>. Explain what happens at the two ends of the address range.</li><li>Set <strong>8 active lanes</strong>, stride 1, and offset 0. Predict what changes if you move the offset to 1.</li></ol>
         <details><summary>Explain the result in your own words, then compare</summary><p>Each sector holds eight FP32 values. Neighbouring lanes can use different values in the same sector. With a stride of eight elements, each lane reaches a different sector. Shifting a consecutive range by one element can make it cross an extra sector boundary.</p><p>In an AI workload, changing how threads map onto tensor dimensions can change this access pattern. A transpose or a different tensor layout may help one operation and add costs elsewhere. Count the work across the whole operation before choosing a layout.</p></details>
       </section>
+      <!-- REFERENCE_MEMORY -->
       <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><a href="scheduling.html">Next lesson →</a></nav>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
     </main>
