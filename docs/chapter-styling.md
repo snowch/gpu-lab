@@ -24,6 +24,12 @@ colours, type sizes or spacing into another stylesheet.
   warning in each chapter header.
 - Chapter shell: use the `book-chapter` body class and “interactive book” brand label.
   The shared stylesheet sets experiment spacing, heading sizes and note typography.
+- First-use definitions: use `definitions([[term, meaning], ...])` beside the example
+  that introduces a term. Use a bold term, a short plain-language meaning and the
+  shared neutral background/left border. The visible Definition label and semantic
+  definition list distinguish these from code and reader actions without colour.
+  Group closely related terms in one box; do not repeat the definition in nearby
+  prose or highlight every later mention. Keep definitions visible without clicks.
 - Reader tasks: use the shared reference-task component for documentation lookups.
   Its label and decorative icon identify the action; colour supplements the text.
 

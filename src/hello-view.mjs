@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {openingCode,browserNotice,codePanel} from './chapter-view.mjs';
+import {openingCode,browserNotice,codePanel,definitions} from './chapter-view.mjs';
 import {renderReferenceTask} from './reference-tasks.mjs';
 import {steps,simulateIntro,kernelSource,pythonSource,launchPlan} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -16,7 +16,8 @@ export function renderIntroSections() {
   return `<section class="hello-start" aria-labelledby="hello-start-title">
     <h2 id="hello-start-title">Start with a PyTorch operation</h2>
     ${openingCode(pythonSource(),'hello-start-code')}
-    <p><code>import torch</code> loads PyTorch. A tensor holds a collection of numbers; here <code>x</code> holds five inputs. <code>device="cuda"</code> places them on an NVIDIA GPU, and <code>y = x * 2</code> multiplies each number by two to produce <code>y</code>.</p>
+    ${definitions([['Tensor','A collection of numbers arranged in one or more dimensions. Here, our tensor is a one-dimensional list of five numbers.']])}
+    <p><code>import torch</code> loads PyTorch. Here <code>x</code> holds five inputs. <code>device="cuda"</code> places them on an NVIDIA GPU, and <code>y = x * 2</code> multiplies each number by two to produce <code>y</code>.</p>
     <dl class="hello-start-values">
       <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
       <div><dt>Result <code>y</code></dt><dd><code>[${start.output.join(', ')}]</code></dd></div>
@@ -29,10 +30,11 @@ export function renderIntroSections() {
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
+      ${definitions(step.definitions)}
       <p class="hello-concept">${step.concept}</p>
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>
       ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The extra three threads have no input; the next experiment lets you explore that case.</p>':''}
-      ${stage===3?'<p>A bounds check asks whether a thread’s index is smaller than the number of inputs. Indices 0–4 pass; indices 5–7 skip the read and write. Turn the check off below to see why it matters.</p>':''}
+      ${stage===3?'<p>Here, the bounds check asks whether a thread’s index is smaller than the number of inputs. Indices 0–4 pass; indices 5–7 skip the read and write. Turn the check off below to see why it matters.</p>':''}
       ${stage===4?`<p>PyTorch selects an optimised implementation and handles its launch; <code>y = x * 2</code> does not choose blocks or threads. CUDA lets us write the GPU function and choose those settings ourselves. The compiler also optimises our code. This small example makes the work visible; it is not intended to outperform PyTorch.</p>
       ${pre('hello-full',kernelSource(2),'CUDA C++ · complete GPU function (kernel)')}
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}

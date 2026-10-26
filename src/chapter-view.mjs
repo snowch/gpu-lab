@@ -10,3 +10,9 @@ export function browserNotice() {
 export function codePanel({id,source,language='cuda',label,labelId=id+'-label',selected=false}) {
   return `<div class="chapter-code-panel${selected?' is-selected-thread':''}" data-language="${language}"><p class="chapter-code-label" id="${labelId}">${escape(label)}</p><pre id="${id}" aria-labelledby="${labelId}"><code>${escape(source)}</code></pre></div>`;
 }
+
+// Keep first-use definitions readable without JavaScript or colour cues.
+export function definitions(entries) {
+  if(!entries?.length) return '';
+  return `<div class="chapter-definition"><p class="chapter-definition-label">${entries.length===1?'Definition':'Definitions'}</p><dl>${entries.map(([term,meaning])=>`<dt><dfn>${escape(term)}</dfn></dt><dd>${escape(meaning)}</dd>`).join('')}</dl></div>`;
+}
