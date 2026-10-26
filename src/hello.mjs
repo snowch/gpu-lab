@@ -38,8 +38,12 @@ function resultText(){return result.safe?'Output: ['+result.output.join(', ')+']
 $('hello-map').addEventListener('click',event=>{
   const button=event.target.closest('button[data-thread]');
   if(!button)return;
-  selected=Number(button.dataset.thread);draw();
-  $('hello-map').querySelector('[aria-pressed="true"]')?.focus({preventScroll:true});
+  selected=Number(button.dataset.thread);
+  // Preserve the cards and focused element so browser scroll anchoring stays stable.
+  for(const card of $('hello-map').querySelectorAll('button[data-thread]')) {
+    card.setAttribute('aria-pressed',String(Number(card.dataset.thread)===selected));
+  }
+  try{inspect(model().threads[selected]);}catch{/* Keep the validation message until the input is corrected. */}
 });
 $('hello-factor').addEventListener('input',invalidate);
 $('hello-guard')?.addEventListener('change',invalidate);
