@@ -2,6 +2,8 @@
 import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
+  indexing: 'https://docs.pytorch.org/docs/stable/tensor_view.html',
+  coalescing: 'https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#coalesced-access-to-global-memory',
   pytorch: 'https://docs.pytorch.org/docs/stable/',
   to: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html',
   tensor: 'https://docs.pytorch.org/docs/stable/generated/torch.tensor.html',
@@ -34,6 +36,16 @@ export const referenceTasks = {
     title:'When does moving a tensor make a copy?', page:'to', label:'PyTorch: Tensor.to',
     prompt:'Find what happens when the requested device and dtype already match. Does calling .to() always allocate a new tensor?',
     answer:'If the device and dtype already match, .to() returns the original tensor by default. Our CPU-to-CUDA example changes the device, so it creates a copy.',
+  },
+  selection: {
+    title:'Check the indexing notation', page:'indexing', label:'PyTorch: tensor indexing and views',
+    prompt:'Find the basic indexing examples. Which part of x[0, :] chooses a row, and what does the colon select?',
+    answer:'The first index chooses row 0. The colon selects all columns in that row. We explore the guide’s distinction between views and copies in the next chapter.',
+  },
+  requests: {
+    title:'Check how neighbouring reads are grouped', page:'coalescing', label:'CUDA Best Practices: coalesced access',
+    prompt:'Find the aligned and misaligned access examples. Why can neighbouring values require more than one 32-byte region?',
+    answer:'The requested addresses can cross a region boundary. In our row-1 example, bytes 20–39 span two 32-byte sectors despite the values being neighbours. This count alone does not predict elapsed time.',
   },
   reading: {
     title:'Check what a stride counts', page:'stride', label:'PyTorch: Tensor.stride',

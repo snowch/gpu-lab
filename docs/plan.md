@@ -13,6 +13,8 @@ might help, and test those predictions against a model and eventually a real GPU
 A second outcome is to find and apply the relevant official PyTorch or CUDA reference
 to check an API argument, an indexing rule or a synchronisation requirement.
 
+Author and review chapters with [the authoritative checklist](authoring-checklist.md).
+
 ## Teaching loop
 
 Start from an AI operation; introduce the smallest mechanism that explains it; ask for a
@@ -27,7 +29,7 @@ Questions and comparisons remain available offline; official sites require inter
 Every visual value comes from model state. Counts and timing estimates must be visibly
 different. Each lab records what its model leaves out.
 
-## Book opening: chapters 1–3
+## Book opening: chapters 1–5
 
 Build the book from familiar operations: see the operation, predict, run, change
 one thing, explain, inspect the code, and apply the idea to a new case. Keep each
@@ -43,10 +45,15 @@ experiment and visual beside its own explanation in a continuous downward flow.
    Each action has its own setup, prediction prompt, control, diagram and result.
    Compare five/eight-input copy sizes and change the multiplier. Explain allocation
    separately from transfers; retain the original tensors in the diagram.
-3. **How do threads read a tensor?** (`reading.html`): make the first five values a
-   row of a 5×5 tensor. Run equal-length row and column reads, pack a column, and
-   compare aligned sector coverage. Each example retains its own settings/result.
-   Finish by predicting what a transpose changes and checking the explanation.
+3. **How do we select values from a tensor?** (`reading.html`): introduce shape and
+   slicing with a 5×5 tensor. Select rows and columns and multiply five values.
+   Keep memory offsets and warp terminology for the following chapters.
+4. **How are tensor values arranged in memory?** (`layout.html`): follow the same
+   values into a memory strip, introduce views and strides, then compare a column
+   with a packed copy. Transpose is optional practice after those ideas.
+5. **How do threads read those values?** (`requests.html`): introduce a warp and its
+   lanes visually, then sectors. Compare five-value row, column and packed reads;
+   finish with a row crossing a sector boundary. Counts are not timing claims.
 
 The optional PyTorch companion runs on a CPU for value/layout verification or on a
 CUDA device to follow the transfers. Browser models are clearly labelled; neither
@@ -55,9 +62,9 @@ Reference exercises introduce `torch.tensor`, `Tensor.to`, indexing and strides
 beside the operations that need them. Version guidance remains beside the first
 lookup task.
 
-The home page and shared navigation prioritise these three chapters. The existing
+The home page and shared navigation prioritise these five chapters. The existing
 memory-access lab, repair workshop and architecture map remain additional resources.
-Chapters 4–9 are planned book adaptations: keeping work ready, different paths,
+Chapters 6–11 are planned book adaptations: keeping work ready, different paths,
 cooperation/reduction, matrix reuse, tensor cores/precision, then attention/inference.
 Their roadmap links open the existing labs and are labelled accordingly.
 

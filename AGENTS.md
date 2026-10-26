@@ -2,6 +2,8 @@
 
 Copyright © 2026 Christopher Snow.
 
+Use the [chapter authoring checklist](docs/authoring-checklist.md) for every new or revised chapter.
+
 Read `docs/plan.md`, `docs/model.md` and `docs/sources.md` before extending the course.
 
 - Keep AI workloads as the motivation and introduce hardware terms at first use.

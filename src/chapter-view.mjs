@@ -16,3 +16,7 @@ export function definitions(entries) {
   if(!entries?.length) return '';
   return `<div class="chapter-definition"><p class="chapter-definition-label">${entries.length===1?'Definition':'Definitions'}</p><dl>${entries.map(([term,meaning])=>`<dt><dfn>${escape(term)}</dfn></dt><dd>${escape(meaning)}</dd>`).join('')}</dl></div>`;
 }
+
+export function readerTask(text,label='Try it') {
+  return `<div class="chapter-task"><p class="chapter-task-label"><span aria-hidden="true">→</span> ${escape(label)}</p><p>${escape(text)}</p></div>`;
+}
