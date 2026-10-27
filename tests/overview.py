@@ -1,19 +1,10 @@
 # Copyright © 2026 Christopher Snow.
 """Expandable GPU maps: native content, progressive controls and return to reading."""
-from playwright.sync_api import expect, Error
+from playwright.sync_api import expect
 
 def open_nodes(page, ids):
     for node in ids:
         page.locator('#'+node+' > summary').click()
-
-def return_to_reader(page):
-    with page.expect_event('close'):
-        try:
-            page.locator('#map-return').click(no_wait_after=True)
-        except Error:
-            # The click deliberately closes its own window; some Chromium builds
-            # deliver that close before acknowledging the input action.
-            assert page.is_closed()
 
 def check_overview(browser,base_url,root,errors):
     for width in [1440,820,360]:
@@ -22,24 +13,38 @@ def check_overview(browser,base_url,root,errors):
             page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)))
             page.goto(base_url+'lessons/hello.html')
             page.locator('#hello-factor-0').fill('3');page.locator('#hello-run-0').click()
-            with page.expect_popup() as popup:page.locator('.gpu-map-link').click()
-            map_page=popup.value;map_page.on('pageerror',lambda error:errors.append(str(error)))
+            page.evaluate('window.scrollTo({top:600,behavior:"instant"})');page.wait_for_timeout(100)
+            reading_y=page.evaluate('scrollY')
+            toggle_box=page.locator('.gpu-map-link').bounding_box()
+            page.mouse.click(toggle_box['x']+toggle_box['width']/2,toggle_box['y']+toggle_box['height']/2)
+            expect(page.locator('#gpu-map-frame')).to_be_visible()
+            map_page=page.frame_locator('#gpu-map-frame')
+            expect(page.locator('.sidebar')).to_be_hidden()
+            assert page.locator('#gpu-map-frame').bounding_box()['width'] >= width-2
+            expect(map_page.locator('.sidebar')).to_be_hidden()
+            expect(map_page.locator('.topbar')).to_be_hidden()
+            page.locator('#theme').click()
+            expect(map_page.locator('html')).to_have_attribute('data-theme','dark' if theme=='light' else 'light')
+            page.locator('#theme').click()
+            expect(map_page.locator('html')).to_have_attribute('data-theme',theme)
+            assert len(context.pages)==1
             expect(map_page.locator('#map-chapter')).to_have_value('hello')
             expect(map_page.locator('#gpu > summary')).to_contain_text('Related concepts inside')
             expect(map_page.locator('#operation-panel')).to_be_hidden()
             # All essential nodes are already in the document, not generated on expansion.
             expect(map_page.locator('#sm-0')).to_have_count(1)
-            map_page.locator('#gpu > summary').focus();map_page.keyboard.press('Enter')
+            map_page.locator('#gpu > summary').focus();page.keyboard.press('Enter')
             expect(map_page.locator('#sm-0 > summary')).to_be_visible()
             expect(map_page.locator('#sm-1 > summary')).to_be_visible()
             map_page.locator('#hardware-panel').screenshot(path=str(root/f'test-results/map-sm-{width}-{theme}.png'))
+            page.screenshot(path=str(root/f'test-results/map-toggle-{width}-{theme}.png'))
             open_nodes(map_page,['sm-0','block-a','a-warp-1','a-w1-lane-7'])
             expect(map_page.locator('#a-w1-lane-7')).to_contain_text('thread 39 within block A')
             expect(map_page.locator('#block-c > summary')).to_be_visible()
             expect(map_page.locator('#a-warp-0 > summary')).to_be_visible()
-            assert map_page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            assert map_page.locator('html').evaluate('el=>el.scrollWidth <= window.innerWidth')
             map_page.locator('#a-warp-1').screenshot(path=str(root/f'test-results/map-warp-{width}-{theme}.png'))
-            map_page.reload()
+            page.locator('#gpu-map-frame').evaluate('el=>el.contentWindow.location.reload()')
             expect(map_page.locator('#a-w1-lane-7')).to_have_attribute('open','')
             map_page.locator('#map-back').click()
             expect(map_page.locator('#a-w1-lane-7')).not_to_have_attribute('open','')
@@ -52,7 +57,7 @@ def check_overview(browser,base_url,root,errors):
             open_nodes(map_page,['operation','launch','op-grid','op-thread-4','op-thread-7'])
             expect(map_page.locator('#op-thread-4')).to_contain_text('write output[4] = 10')
             expect(map_page.locator('#op-thread-7')).to_contain_text('skips the read and write')
-            assert map_page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            assert map_page.locator('html').evaluate('el=>el.scrollWidth <= window.innerWidth')
             map_page.locator('#operation-panel').screenshot(path=str(root/f'test-results/map-operation-{width}-{theme}.png'))
             map_page.locator('#map-reset').click()
             expect(map_page.locator('#operation')).not_to_have_attribute('open','')
@@ -61,11 +66,18 @@ def check_overview(browser,base_url,root,errors):
             expect(map_page.locator('#ai-operations > summary')).to_contain_text('Related concepts inside')
             open_nodes(map_page,['ai-operations','ai-attention'])
             expect(map_page.locator('#ai-attention a[href="attention.html"]').first).to_be_visible()
-            map_page.reload()
+            page.locator('#gpu-map-frame').evaluate('el=>el.contentWindow.location.reload()')
             expect(map_page.locator('[data-map-view=operation]')).to_have_attribute('aria-current','true')
             expect(map_page.locator('#map-chapter')).to_have_value('attention')
             expect(map_page.locator('#ai-attention')).to_have_attribute('open','')
-            return_to_reader(map_page)
+            page.locator('.gpu-map-link').click()
+            expect(page.locator('#gpu-map-panel')).to_be_hidden()
+            assert abs(page.evaluate('scrollY')-reading_y)<2
+            page.locator('.gpu-map-link').click()
+            expect(map_page.locator('#ai-attention')).to_have_attribute('open','')
+            map_page.locator('#ai-attention > summary').focus();page.keyboard.press('Escape')
+            expect(page.locator('#gpu-map-panel')).to_be_hidden()
+            expect(page.locator('.gpu-map-link')).to_be_focused()
             expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
             page.goto(base_url+'lessons/meet-gpu.html?view=memory&concept=shared')
             expect(page.locator('#shared-a')).to_have_attribute('open','')
@@ -73,18 +85,17 @@ def check_overview(browser,base_url,root,errors):
             page.goto(base_url+'#meet-gpu')
             expect(page.locator('#gpu-map')).to_be_visible()
             context.close()
-    # Each source tab retains its own return destination.
+    # Choosing a chapter from the map navigates the reading window, not the frame.
     context=browser.new_context(service_workers='block')
-    first=context.new_page();first.goto(base_url+'lessons/hello.html')
-    second=context.new_page();second.goto(base_url+'lessons/devices.html')
-    with first.expect_popup() as opened:first.locator('.gpu-map-link').click()
-    first_map=opened.value
-    with second.expect_popup() as opened:second.locator('.gpu-map-link').click()
-    second_map=opened.value
-    expect(second_map.locator('#map-chapter')).to_have_value('devices')
-    assert second_map.evaluate('window.opener.location.pathname.endsWith("devices.html")')
-    return_to_reader(second_map)
-    assert not first_map.is_closed()
+    page=context.new_page();page.goto(base_url+'lessons/hello.html')
+    page.locator('.gpu-map-link').click()
+    frame=page.frame_locator('#gpu-map-frame')
+    frame.locator('#gpu > summary').click()
+    frame.locator('#gpu .map-chapter-links a[href="devices.html"]').last.click()
+    expect(page).to_have_url(base_url+'lessons/devices.html')
+    expect(page.locator('#gpu-map-panel')).to_be_hidden()
+    page.locator('.gpu-map-link').click()
+    expect(page.frame_locator('#gpu-map-frame').locator('#map-chapter')).to_have_value('devices')
     context.close()
     # A release update from the previous map keeps its saved concept, even though
     # the new map rewrites the URL and has a different disclosure structure.
@@ -108,6 +119,7 @@ def check_overview(browser,base_url,root,errors):
         context=browser.new_context(java_script_enabled=False,viewport={'width':width,'height':900})
         page=context.new_page();page.goto(base_url+'lessons/meet-gpu.html')
         expect(page.locator('#gpu-map')).to_be_visible()
+        expect(page.locator('.sidebar')).to_be_hidden()
         expect(page.locator('#map-reset')).to_be_hidden()
         open_nodes(page,['gpu','sm-0','block-a','a-warp-1','a-w1-lane-7'])
         expect(page.locator('#sm-1 > summary')).to_be_visible()
@@ -123,4 +135,4 @@ def check_overview(browser,base_url,root,errors):
             expect(item.locator('.map-chapter-links a').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         context.close()
-    print('PASS: expandable GPU maps, native SM/block/warp/lane content, traces, keyboard, themes, responsive layouts, URL state, chapter highlights, return preserving work and JavaScript-disabled preview')
+    print('PASS: full-width map toggle, restored scroll/results, Escape, theme sync, chapter navigation, expandable GPU maps, native SM/block/warp/lane content, traces, keyboard, themes, responsive layouts, URL state, chapter highlights, return preserving work and JavaScript-disabled preview')

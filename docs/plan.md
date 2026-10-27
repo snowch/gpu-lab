@@ -104,8 +104,10 @@ PyTorch choices from this book's illustrative implementation choices?
 ## Interactive GPU map
 
 The **GPU map** replaces Meet the GPU at its stable `lessons/meet-gpu.html` URL.
-A persistent header link opens it in a separate tab, highlighting the current
-chapter while preserving the original page and experiment. The overview introduces
+A persistent header toggle opens it across the reading area, hiding the contents
+and highlighting the current chapter. Close map or Escape returns to the unchanged
+chapter, scroll position and experiment. The map keeps its expanded components
+when reopened; direct map links also use the full width. The overview introduces
 this reference in one paragraph; it is not an additional prerequisite chapter.
 
 Two expandable diagrams start with the whole system and one tensor operation.

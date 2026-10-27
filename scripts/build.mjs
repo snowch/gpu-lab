@@ -85,7 +85,9 @@ for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter
   const html = (await readFile(path, 'utf8'))
     .replace(/<nav class="(?:course-nav|lesson-nav)"[^>]*>[\s\S]*?<\/nav>/,renderBookNav(current))
     .replaceAll('EIGHT LABS · DRAFT','INTERACTIVE BOOK · DRAFT')
-    .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}&amp;chapter=${current}" target="_blank" rel="opener" aria-label="GPU map (opens a separate tab)">GPU map</a>`))
+    .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'<a class="gpu-map-link" href="../index.html">Close map</a>':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}&amp;chapter=${current}">GPU map</a>`))
+    .replace('<body class="',current==='meet-gpu'?'<body class="gpu-map-page ':'<body class="')
+    .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/map-toggle.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/map-toggle.mjs"></script></head>')
     .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script></head>');
   await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
 }
