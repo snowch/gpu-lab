@@ -52,7 +52,9 @@ second set of authoring requirements.
   simulator workflow; label unsupported features and hardware execution separately.
 - [ ] Make visuals show a relationship or consequence. Generate values from the model.
   Distinguish values, indices, element offsets and byte offsets. A grouping diagram
-  is not a chip floor plan or a promise of simultaneous execution.
+  is not a chip floor plan or a promise of simultaneous execution. Distinguish the
+  GPU device from its compute chip: caches belong on the chip; dedicated device
+  memory is separate from the compute chip. State the architecture scope.
 - [ ] Avoid misleading small examples: a block may have several warps; unused lanes
   do not prevent another block from making progress. State simplifying assumptions
   beside the picture, and defer scheduling details until they are needed.

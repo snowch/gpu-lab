@@ -5,6 +5,13 @@ Copyright © 2026 Christopher Snow.
 ## Concept relationship map
 
 `gpu-map-data.mjs` declares concepts, chapter memberships and directed relationships.
+The outer GPU device contains the GPU compute chip and dedicated device memory.
+The chip contains SMs (including per-SM L1 caches), shared L2 cache and memory
+controllers. VRAM is separate from the compute chip: GDDR is typically on the board;
+HBM stacks sit alongside the GPU die within its package. This is a simplified
+discrete NVIDIA GPU model, not a universal packaging diagram. Shared memory remains
+a block-scoped workspace on the SM; it can share hardware capacity with L1.
+
 The hardware diagram shows three blocks of 64 threads on two SMs: A/C on SM 0
 and B on SM 1. Each block has two warps; thread index is warp index × 32 + lane
 index. The map does not simulate scheduling, placement, cache behaviour or timing.

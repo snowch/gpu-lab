@@ -148,3 +148,12 @@ chapters 6–12. Official stable pages were checked (redirecting to PyTorch 2.14
 The reference catalogue keeps the CUDA mechanisms distinct from framework APIs:
 `torch.where` does not promise a divergent branch, `@` does not select a tile size,
 and the sequential precision model does not establish tensor-core execution.
+
+## GPU device and chip boundaries
+
+The map uses a simplified discrete NVIDIA GPU hierarchy. The
+[NVIDIA Ampere tuning guide](https://docs.nvidia.com/cuda/ampere-tuning-guide/index.html)
+describes per-SM unified L1/shared-memory capacity, the shared L2 cache, and
+HBM2 device memory. These are hardware resources, distinct from CUDA’s
+block-scoped programming model. Packaging and cache details vary by architecture;
+the map does not represent an integrated GPU with shared system memory.

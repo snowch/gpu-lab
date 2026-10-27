@@ -27,7 +27,9 @@
 .map-inside>p:first-child { margin-top:0; }
 .map-gpu { border:2px solid var(--accent); background:var(--accent-soft); }
 .map-gpu>summary strong { color:var(--accent); font-size:26px; }
-.map-device { container:gpu-device / inline-size; }
+.map-device { container:gpu-device / inline-size; min-width:0; border:2px solid var(--line); border-radius:14px; padding:12px; }
+#gpu-device-title { margin:0; font-size:22px; }
+#gpu-map .map-device-note { margin:8px 0 16px; color:var(--muted); font-size:14px; }
 .map-sms { display:grid; gap:12px; align-items:start; }
 .map-sms>.map-sm { margin:0; }
 .map-sm { background:var(--soft); }
@@ -70,6 +72,7 @@
  .map-transfer { padding:8px; }.map-transfer br { display:none; }.map-transfer span { transform:rotate(90deg); }
 }
 @media(max-width:600px) {
+ .map-device { padding:8px; }
  .map-panel { padding:16px 10px; }.map-node>summary { padding:12px; gap:6px; }
  .map-node>summary strong { font-size:17px; }.map-inside { padding:10px; }
  .map-lane>summary { padding:6px 2px; }.map-lane>summary strong { font-size:13px; }
