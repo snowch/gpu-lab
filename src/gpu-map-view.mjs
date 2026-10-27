@@ -25,7 +25,7 @@ function sm(n,names){
 function hardware(){
  return `<section id="hardware-panel" class="map-panel" aria-label="Inside the GPU diagram"><h2>From the system to one thread</h2><p>Open the GPU, then an SM. Keep opening components to see blocks, warps and threads.</p><div class="map-machine">
 ${node('cpu','cpu','CPU','Host · runs your program',info('cpu')+concept('cpu-memory','host'),'map-cpu')}
-<div class="map-transfer">Launches work<br>and copies data<span aria-hidden="true">⇄</span></div><div class="map-device">
+<div class="map-transfer">Launches work and copies data<span aria-hidden="true">⇄</span></div><div class="map-device">
 ${node('gpu','gpu','GPU','Device · open to find the SMs',`<p>A GPU contains many <strong>streaming multiprocessors (SMs)</strong>. Each can execute work from several blocks when resources allow.</p><div class="map-sms">${sm(0,['a','c'])}${sm(1,['b'])}</div><p class="map-note">Two SMs are shown. These boxes show relationships, not the chip’s physical layout.</p>${chapterLinks(conceptById('gpu'))}`,'map-gpu')}
 <div class="map-connection"><span aria-hidden="true">↕</span>${node('memory-cache','cache','Cache hierarchy','Data path between SMs and GPU memory',info('cache')+concept('sectors','memory'))}<span aria-hidden="true">↕</span></div>
 ${node('vram','gpu-memory','GPU memory / VRAM','Storage accessible by all SMs',info('gpu-memory')+concept('tensor','memory',concept('shape','tensor')+concept('strides','tensor')+concept('dtype','tensor'))+concept('copy','memory'),'map-memory')}
