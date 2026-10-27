@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mapConcepts,mapEdges,mapViews,conceptById,connections,initialMap} from '../src/gpu-map-data.mjs';
-import {renderMap,renderMapDiagram} from '../src/gpu-map-view.mjs';
+import {renderMap,renderWarp,renderThread} from '../src/gpu-map-view.mjs';
 import {chapters} from '../src/book-chapters.mjs';
 test('map has unique concepts, valid directed edges and coverage for every chapter',()=>{
  assert.equal(new Set(mapConcepts.map(c=>c.id)).size,mapConcepts.length);
@@ -20,7 +20,24 @@ test('map distinguishes ownership, grouping and scheduling without false contain
  assert.match(conceptById('block').example,/Several blocks/);
  assert.match(conceptById('sectors').example,/not a count of physical DRAM/);
 });
-test('every concept has selectable graphical connections and a complete static reference',()=>{
+test('both diagrams and every concept are built into the HTML',()=>{
  const html=renderMap();
- for(const c of mapConcepts){assert.ok(html.includes(`id="concept-${c.id}"`));const diagram=renderMapDiagram(c.id);assert.ok(diagram.includes('map-selected'));for(const edge of connections(c.id))assert.ok(diagram.includes(`data-concept="${edge.from===c.id?edge.to:edge.from}"`));}
+ for(const c of mapConcepts){
+  assert.ok(html.includes(`id="concept-${c.id}"`),c.id);
+  assert.ok(html.includes(`data-map-concept="${c.id}"`),c.id);
+ }
+ assert.match(html,/id="sm-0"/);assert.match(html,/id="sm-1"/);
+ for(const block of ['a','b','c'])for(const warp of [0,1])assert.ok(html.includes(`id="${block}-warp-${warp}"`));
+ assert.equal((html.match(/class="map-node map-lane"/g)||[]).length,192);
+ assert.doesNotMatch(html,/id="(?:gpu-map|hardware-panel|operation-panel)"[^>]*hidden/);
+ const ids=[...html.matchAll(/ id="([^"]+)"/g)].map(m=>m[1]);
+ assert.equal(new Set(ids).size,ids.length,'Every disclosure has a unique stable ID');
+});
+test('warp lanes and launch traces derive indices from block membership',()=>{
+ assert.match(renderWarp('c',1),/Lane 7 → thread 39 within block C/);
+ assert.match(renderWarp('a',0),/Lane 31 → thread 31 within block A/);
+ assert.match(renderThread(4),/Block 1 × 4 threads per block \+ position 0 = index 4/);
+ assert.match(renderThread(4),/write output\[4\] = 10/);
+ assert.match(renderThread(7),/bounds check skips the read and write/);
+ assert.doesNotMatch(renderThread(7),/write output/);
 });

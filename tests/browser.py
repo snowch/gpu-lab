@@ -63,7 +63,7 @@ try:
                 page.locator('.sidebar nav').get_by_role('link',name='GPU map',exact=True).click()
                 expect(page).to_have_url(URL+'lessons/meet-gpu.html')
                 expect(page.locator('#gpu-map')).to_be_visible()
-                expect(page.locator('#map-detail h2')).to_have_text('PyTorch operations')
+                expect(page.locator('#hardware-panel h2')).to_have_text('From the system to one thread')
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Concept map overflows"
                 page.screenshot(path=str(ROOT / f"test-results/intro-{width}-{theme}.png"), full_page=True)
                 page.goto(URL + "lessons/memory.html")
@@ -206,6 +206,7 @@ try:
         expect(page.locator('.architecture-layer')).to_have_count(0)
         page.locator('.sidebar nav').get_by_role('link',name='GPU map',exact=True).click()
         expect(page.locator('#map-glossary')).to_be_visible()
+        page.locator('#map-glossary > summary').click()
         page.locator('#concept-block > summary').click()
         expect(page.locator('#concept-block')).to_contain_text('stays on one SM')
         page.goto(URL + "lessons/memory.html")

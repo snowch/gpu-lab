@@ -4,12 +4,19 @@ Copyright © 2026 Christopher Snow.
 
 ## Concept relationship map
 
-`gpu-map-data.mjs` declares concepts, their chapter/view memberships and directed
-relationships. The map draws only the selected concept's immediate relationships;
-it does not simulate execution, placement or timing. A shared catalogue generates
-the desktop SVG, narrow-screen directed connections and JavaScript-free reference.
-Hardware terms follow NVIDIA CUDA conventions. Chapter links identify where the
-book teaches a concept, not a restriction on where it applies.
+`gpu-map-data.mjs` declares concepts, chapter memberships and directed relationships.
+Two diagrams group those concepts by hardware relationships and operation flow. The
+hardware view shows three blocks of 64 threads on two SMs: A/C on SM 0 and B on SM 1.
+Each block has two warps; thread index is warp index × 32 + lane index. The operation
+view uses two four-thread blocks for five inputs, multiplying each by two and skipping
+indices 5–7. These are distinct illustrative launches, not PyTorch implementation claims.
+Neither view simulates scheduling, placement, cache behaviour or timing.
+
+Build-time renderers emit all SMs, blocks, warps, lanes and worked traces as native HTML
+disclosures. JavaScript enhances navigation and persistence without creating essential
+content. The text reference retains all directed relationships and book examples.
+Hardware terms follow NVIDIA CUDA conventions; boxes distinguish resident work from
+physical resources and do not imply a chip floor plan or simultaneous execution.
 
 ## Architecture ownership diagrams (chapter 6)
 

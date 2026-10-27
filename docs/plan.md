@@ -108,14 +108,17 @@ A persistent header link opens it in a separate tab, highlighting the current
 chapter while preserving the original page and experiment. The overview introduces
 this reference in one paragraph; it is not an additional prerequisite chapter.
 
-Three connected views cover work execution, data/memory and AI operations. Selecting
-a concept shows directed, labelled relationships, a definition, a book example and
-links to the relevant chapters. Shared concepts connect the views. Chapter highlights
-use visible text as well as colour; the chosen concept and view survive reload in
-the URL. Desktop diagrams show incoming and outgoing connections; phone and tablet
-layouts stack those same directed connections with readable text. A complete text
-reference remains available without JavaScript. The map is available offline after
-the book download, and explicit update/restart preserves its selection.
+Two expandable diagrams start with the whole system and one tensor operation.
+Readers open GPU → SM → block → warp → lane while the surrounding structure stays
+visible. The operation diagram follows inputs → PyTorch operation → kernel launch
+→ blocks → individual results, then connects later AI calculations to their mechanisms.
+Every concept in the shared catalogue appears inside the diagrams and the text reference.
+
+Native disclosures are rendered at build time, so both complete diagrams work without
+JavaScript. Scripts add diagram switching, chapter highlighting, Back and Reset.
+Expanded components and the active diagram persist in the URL and across offline app
+updates; old concept links still reveal their corresponding component. Highlights use
+text as well as colour. The map is available offline after the book download.
 
 Relationships distinguish ownership, grouping, scheduling and data movement. This
 is neither a chip floor plan nor a promise of simultaneous execution. Numerical

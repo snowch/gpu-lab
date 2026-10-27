@@ -84,6 +84,8 @@ second set of authoring requirements.
 - [ ] Keep the GPU map catalogue in sync with concepts taught in a chapter. Give
   each concept a plain definition, a book example and valid chapter links. Label
   relationships explicitly; ownership, containment and data movement are different.
+  Place new concepts in one of the two expandable diagrams. Render essential diagram
+  content at build time and verify nested expansion with JavaScript disabled.
 - [ ] When moving or adding pages, update contents, chapter numbering, previous/next
   links, reference tasks, offline coverage and saved-state restoration checks.
   Preserve stable control IDs where possible; do not silently reuse an ID for a
