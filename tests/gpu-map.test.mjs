@@ -26,6 +26,7 @@ test('both diagrams and every concept are built into the HTML',()=>{
   assert.ok(html.includes(`id="concept-${c.id}"`),c.id);
   assert.ok(html.includes(`data-map-concept="${c.id}"`),c.id);
  }
+ assert.ok(html.indexOf('id="memory-cache"')<html.indexOf('id="vram"'),'Caches are on the data path, not nested inside VRAM');
  assert.match(html,/id="sm-0"/);assert.match(html,/id="sm-1"/);
  for(const block of ['a','b','c'])for(const warp of [0,1])assert.ok(html.includes(`id="${block}-warp-${warp}"`));
  assert.equal((html.match(/class="map-node map-lane"/g)||[]).length,192);

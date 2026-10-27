@@ -42,7 +42,8 @@
 .map-transfer { text-align:center; padding-top:24px; font-size:13px; color:var(--muted); }
 .map-transfer span { display:block; width:40px; height:40px; margin:auto; font-size:28px; }
 .map-connection { text-align:center; padding:10px 0; color:var(--muted); font-size:14px; }
-.map-connection span { display:block; font-size:24px; }
+.map-connection > span { display:block; font-size:24px; }
+.map-connection .map-node { text-align:left; color:var(--ink); }
 .map-note { border-left:3px solid var(--accent); padding-left:14px; color:var(--muted); }
 .map-lanes { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
 .map-lane { margin:0; }

@@ -27,8 +27,8 @@ function hardware(){
 ${node('cpu','cpu','CPU','Host · runs your program',info('cpu')+concept('cpu-memory','host'),'map-cpu')}
 <div class="map-transfer">Launches work<br>and copies data<span aria-hidden="true">⇄</span></div><div class="map-device">
 ${node('gpu','gpu','GPU','Device · open to find the SMs',`<p>A GPU contains many <strong>streaming multiprocessors (SMs)</strong>. Each can execute work from several blocks when resources allow.</p><div class="map-sms">${sm(0,['a','c'])}${sm(1,['b'])}</div><p class="map-note">Two SMs are shown. These boxes show relationships, not the chip’s physical layout.</p>${chapterLinks(conceptById('gpu'))}`,'map-gpu')}
-<div class="map-connection"><span aria-hidden="true">↕</span> SMs read and write through a cache hierarchy</div>
-${node('vram','gpu-memory','GPU memory / VRAM','Storage accessible by all SMs',info('gpu-memory')+concept('cache','memory')+concept('sectors','memory')+concept('tensor','memory',concept('shape','tensor')+concept('strides','tensor')+concept('dtype','tensor'))+concept('copy','memory'),'map-memory')}
+<div class="map-connection"><span aria-hidden="true">↕</span>${node('memory-cache','cache','Cache hierarchy','Data path between SMs and GPU memory',info('cache')+concept('sectors','memory'))}<span aria-hidden="true">↕</span></div>
+${node('vram','gpu-memory','GPU memory / VRAM','Storage accessible by all SMs',info('gpu-memory')+concept('tensor','memory',concept('shape','tensor')+concept('strides','tensor')+concept('dtype','tensor'))+concept('copy','memory'),'map-memory')}
 </div></div><p class="map-note">Illustrative placement: three blocks of 64 threads on two SMs. Each block stays on one SM; several blocks may share it. This is a relationship map, not a schedule or a promise that every thread executes at once.</p></section>`;
 }
 export function renderThread(i){
