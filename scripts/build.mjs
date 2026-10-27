@@ -29,7 +29,7 @@ const dockerfile=await readFile('docker/cuda-sim.Dockerfile','utf8');
 const execution={revision:dockerfile.match(/ARG GPGPUSIM_REV=(\w+)/)[1],image:dockerfile.match(/^FROM (.+)$/m)[1]};
 await writeFile('dist/lessons/desktop.html',renderBookPage({slug:'desktop',appendix:true,title:'Run the examples on your desktop',lead:'Use real PyTorch or compile supported CUDA programs with GPGPU-Sim, with a clear check of what ran.',content:renderDesktop(desktopExamples,execution),previous:{href:'inference.html',title:'Chapter 12: What limits an inference step?'},next:{href:'../index.html',title:'Book contents'}}));
 
-await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',appendix:true,title:'Explore the GPU map',lead:'See how the book’s concepts fit together: work, memory and AI operations.',content:renderMap(),previous:{href:'../index.html',title:'Course overview'},next:{href:'hello.html',title:'Start chapter 1'}}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
+await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
   .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())
   .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer())

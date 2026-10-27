@@ -28,7 +28,7 @@ test('reference exercises use official guides and retain local answer comparison
   assert.equal(referenceTasks['hello-pytorch'].code,pythonSource());
 });
 test('every published chapter and lab has annotated references before two or more exercises',()=>{
-  const pages=new Set([...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','meet-gpu','desktop']);
+  const pages=new Set([...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','desktop']);
   assert.deepEqual(new Set(Object.keys(chapterReferences)),pages);
   for(const slug of pages){
     const entry=chapterReferences[slug],html=renderChapterReferences(slug);

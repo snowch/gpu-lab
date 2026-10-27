@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {mapViews,mapConcepts,conceptById,connections} from './gpu-map-data.mjs';
+import {conceptById} from './gpu-map-data.mjs';
 import {chapters} from './book-chapters.mjs';
 const escape=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const chapterName=slug=>{const index=chapters.findIndex(c=>c.slug===slug);return index>=0?`Chapter ${index+1}: ${chapters[index].title}`:({'shared-memory':'Extra practice: shared-memory banks',kernel:'Extra practice: repair a kernel',memory:'Memory access explorer'}[slug]??slug);};
@@ -31,30 +31,8 @@ ${node('gpu','gpu','GPU','Device · open to find the SMs',`<p>A GPU contains man
 ${node('vram','gpu-memory','GPU memory / VRAM','Storage accessible by all SMs',info('gpu-memory')+concept('tensor','memory',concept('shape','tensor')+concept('strides','tensor')+concept('dtype','tensor'))+concept('copy','memory'),'map-memory')}
 </div></div><p class="map-note">Illustrative placement: three blocks of 64 threads on two SMs. Each block stays on one SM; several blocks may share it. This is a relationship map, not a schedule or a promise that every thread executes at once.</p></section>`;
 }
-export function renderThread(i){
- const b=Math.floor(i/4),t=i%4;
- return node(`op-thread-${i}`,'thread',`Thread ${i}`,i<5?`Input ${i+1} → output ${(i+1)*2}`:'No input · bounds check skips',
- `<p>Block ${b} × 4 threads per block + position ${t} = index ${i}.</p><p>${i<5?`Read input[${i}] = ${i+1} → multiply by 2 → write output[${i}] = ${(i+1)*2}.`:`Index ${i} is beyond the five inputs. The bounds check skips the read and write.`}</p>${chapterLinks(conceptById('thread'))}`,'map-thread');
-}
-function operation(){
- const vector=values=>`<div class="map-vector">${values.map(v=>`<span>${v}</span>`).join('')}</div>`;
- const grid=[0,1].map(b=>`<div class="map-launch-block"><h3>Block ${b}</h3><p>Thread positions 0–3</p>${Array.from({length:4},(_,t)=>renderThread(b*4+t)).join('')}</div>`).join('');
- const ai=concept('reduction','ai',concept('barrier','reduction'),'Combine many values into fewer results')+
- concept('matmul','ai',concept('reuse','matmul')+concept('tensor-cores','matmul',concept('dtype','matrix')),'Row × column → one output')+
- concept('attention','ai',concept('softmax','attention')+concept('fusion','attention'),'Queries and keys → scores → weights → weighted values')+
- concept('inference','ai',concept('kv-cache','inference')+concept('batch','inference')+concept('limits','inference'),'Prefill the context → decode new tokens');
- return `<section id="operation-panel" class="map-panel" aria-label="Follow an operation diagram"><h2>One operation, five results</h2><p>Keep the inputs and outputs in view as you open the work between them.</p>
-<div class="map-flow"><div><span>Input x · GPU tensor</span>${vector([1,2,3,4,5])}</div><span class="map-arrow" aria-hidden="true">→</span><div class="map-expression"><span>PyTorch</span><code>y = x * 2</code></div><span class="map-arrow" aria-hidden="true">→</span><div><span>Result y · GPU tensor</span>${vector([2,4,6,8,10])}</div></div>
-${node('operation','pytorch','What happens between x and y?','Follow the operation into GPU work',`<div class="map-stage"><h3>PyTorch selects an implementation</h3><p>Your operation and the tensor’s device, data type and layout help determine which implementation runs. This expression does not specify blocks or threads.</p>${chapterLinks(conceptById('pytorch'))}</div>
-${node('launch','kernel','A kernel is launched','GPU function → grid of thread blocks',`<p>A <strong>kernel</strong> is a GPU function. Its launch specifies blocks of threads to execute it.</p><p class="map-note">The following blocks belong to the book’s <strong>handwritten CUDA example</strong>. They illustrate the same calculation; these are not PyTorch’s generated code or actual launch settings.</p>${node('op-grid','grid','Inspect the two blocks','Eight threads for five inputs',`<p>A <strong>grid</strong> is all the blocks in a launch. Here there are two blocks with four threads each. Each block has one partially filled warp; larger blocks can have several warps, as the hardware diagram shows.</p><div class="map-launch-grid">${grid}</div>${concept('divergence','launch','','What if lanes need different paths?')}`)}${chapterLinks(conceptById('kernel'))}`)}
-<div class="map-stage"><h3>The result stays on the GPU</h3><p>The output tensor y holds the results. A copy to CPU memory is a separate action when the host needs those values.</p>${concept('copy','result')}</div>`)}
-${node('ai-operations','pytorch','From this calculation to AI operations','Open the later chapters’ calculations and their connections',`<p>Other tensor operations use the same hardware with different calculations and data movement. Open an operation to see the mechanisms it uses.</p>${ai}`)}
-<p class="map-note">This four-thread launch is a separate example from the 64-thread blocks in “Inside the GPU”. No PyTorch or CUDA code runs in this map, and it does not simulate timing.</p></section>`;
-}
 export function renderMap(){return `<div id="gpu-map">
-<p>Start with the big picture, then open a component to look inside. These two diagrams keep the surrounding structure in view. Chapter links connect each concept to its explanation and experiment. No installation or GPU is required.</p><p><a href="../index.html" id="map-return">Return to course overview</a></p>
-<nav class="map-jump" aria-label="Choose a diagram"><a href="#hardware-panel" data-map-view="hardware">1. Inside the GPU</a><a href="#operation-panel" data-map-view="operation">2. Follow an operation</a></nav>
 <div class="map-tools map-enhancement" hidden><label for="map-chapter">Highlight concepts from<select id="map-chapter"><option value="">All chapters</option>${chapters.map((c,i)=>`<option value="${c.slug}">Chapter ${i+1}: ${escape(c.title)}</option>`).join('')}${['memory','kernel','shared-memory'].map(s=>`<option value="${s}">${chapterName(s)}</option>`).join('')}</select></label><div><button type="button" id="map-back" disabled>← Back one level</button><button type="button" id="map-reset">Reset diagram</button></div></div>
 <p id="map-status" class="map-enhancement" role="status" hidden></p>
-${hardware()}${operation()}
-<details class="map-glossary" id="map-glossary"><summary>All concepts and connections · text reference</summary><p>Every concept and directed relationship is also available here.</p>${mapViews.map(view=>`<section><h2>${view.title}</h2>${mapConcepts.filter(c=>c.views[0]===view.id).map(c=>`<details id="concept-${c.id}"><summary>${escape(c.title)}</summary>${info(c.id)}<ul>${connections(c.id).map(e=>`<li><a href="#concept-${e.from}">${escape(conceptById(e.from).title)}</a> ${escape(e.label)} <a href="#concept-${e.to}">${escape(conceptById(e.to).title)}</a>.</li>`).join('')}</ul></details>`).join('')}</section>`).join('')}</details></div>`;}
+${hardware()}
+</div>`;}

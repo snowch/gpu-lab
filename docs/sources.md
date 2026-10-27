@@ -120,7 +120,7 @@ been executed on a GPU. No performance measurements are inferred from that check
 
 ## Chapter references and documentation exercises
 
-Every available chapter, lab, workshop and architecture-reference page has an explicit
+Every available chapter, lab, workshop and desktop appendix has an explicit
 entry in `chapterReferences` (`src/reference-tasks.mjs`). References are annotated by
 what they support, followed by at least two questions applying the documentation to
 that page’s examples. The answer disclosures are local and available offline. Tests

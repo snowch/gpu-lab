@@ -60,7 +60,9 @@ second set of authoring requirements.
   reference code as fixed. Never tell readers to follow a change that does not occur.
 - [ ] End each published chapter/lab with `renderChapterReferences(slug)`: a References
   section with two or three annotated official links, followed by Use the documentation
-  with at least two applied questions and local answer disclosures. Remove superseded
+  with at least two applied questions and local answer disclosures. The GPU map is a
+  navigation tool: keep explanations and chapter links inside its diagrams, without
+  a chapter introduction, duplicate concept catalogue or documentation exercises. Remove superseded
   scattered tasks. Early questions link directly and repeat a short fixed snippet
   when needed; later questions can ask readers to locate a rule.
 - [ ] Distinguish names chosen for examples (such as `runKernel`) from official API
@@ -84,7 +86,8 @@ second set of authoring requirements.
 - [ ] Keep the GPU map catalogue in sync with concepts taught in a chapter. Give
   each concept a plain definition, a book example and valid chapter links. Label
   relationships explicitly; ownership, containment and data movement are different.
-  Place new concepts in one of the two expandable diagrams. Render essential diagram
+  Add hardware, memory and execution relationships to the expandable map; keep
+  worked operations in their chapters. Render essential diagram
   content at build time and verify nested expansion with JavaScript disabled.
 - [ ] When moving or adding pages, update contents, chapter numbering, previous/next
   links, reference tasks, offline coverage and saved-state restoration checks.

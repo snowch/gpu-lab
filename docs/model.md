@@ -5,16 +5,15 @@ Copyright © 2026 Christopher Snow.
 ## Concept relationship map
 
 `gpu-map-data.mjs` declares concepts, chapter memberships and directed relationships.
-Two diagrams group those concepts by hardware relationships and operation flow. The
-hardware view shows three blocks of 64 threads on two SMs: A/C on SM 0 and B on SM 1.
-Each block has two warps; thread index is warp index × 32 + lane index. The operation
-view uses two four-thread blocks for five inputs, multiplying each by two and skipping
-indices 5–7. These are distinct illustrative launches, not PyTorch implementation claims.
-Neither view simulates scheduling, placement, cache behaviour or timing.
+The hardware diagram shows three blocks of 64 threads on two SMs: A/C on SM 0
+and B on SM 1. Each block has two warps; thread index is warp index × 32 + lane
+index. The map does not simulate scheduling, placement, cache behaviour or timing.
+Worked tensor operations belong in the chapters, not a second map tab.
 
-Build-time renderers emit all SMs, blocks, warps, lanes and worked traces as native HTML
+Build-time renderers emit all SMs, blocks, warps and lanes as native HTML
 disclosures. JavaScript enhances navigation and persistence without creating essential
-content. The text reference retains all directed relationships and book examples.
+content. Definitions, book examples and chapter links live inside the expandable
+components. Legacy concept hashes open their matching component in the diagram.
 The header toggle keeps the reading document in place and loads the map in a same-origin
 frame across the reading area. It hides both contents lists, shares the theme, restores
 reading position on close, and includes frame state in the release-update protocol.

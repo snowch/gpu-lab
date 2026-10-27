@@ -202,7 +202,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(concept_map.locator('#a-w1-lane-7')).to_have_attribute('open','')
                 expect(concept_map.locator('#a-w1-lane-7')).to_contain_text('thread 39')
                 expect(concept_map.locator('#map-chapter')).to_have_value('matmul')
-                expect(concept_map.locator('[data-map-view=hardware]')).to_have_attribute('aria-current','true')
+                expect(concept_map.locator('#hardware-panel')).to_be_visible()
                 expect(concept_map.locator('#a-warp-1')).to_have_attribute('open','')
                 expect(page.locator('#gpu-map-panel')).to_be_visible()
                 expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
