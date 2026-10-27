@@ -23,10 +23,15 @@ function sm(n,names){
  `<p>An SM is a part of the GPU that executes instructions for resident threads. It can host several blocks when resources allow.</p><div class="map-resources">${concept('scheduler',`sm${n}`,'','Selects ready instructions from warps')}${concept('registers',`sm${n}`,'','Working values private to each thread')}${concept('l1-cache',`sm${n}`,'','On-chip cache local to this SM')}${concept('tensor-cores',`sm${n}`,'','Specialised units for supported matrix operations')}</div><p class="map-label">Work assigned to this SM</p>${names.map(block).join('')}<p class="map-note">A block’s threads do not necessarily execute all at once. Ready work from other resident blocks may proceed while threads wait or lanes are unused. Unused lanes cannot be filled by another block’s threads.</p>${chapterLinks(conceptById('sm'))}`,'map-sm');
 }
 function hardware(){
- return `<section id="hardware-panel" class="map-panel" aria-label="Inside the GPU diagram"><h2>From the system to one thread</h2><p>Open the GPU chip, then an SM. Keep opening components to see blocks, warps and threads.</p><div class="map-machine">
-${node('cpu','cpu','CPU','Host · runs your program',info('cpu')+concept('cpu-memory','host'),'map-cpu')}
-<div class="map-transfer">Launches work and copies data<span aria-hidden="true">⇄</span></div><section class="map-device" id="gpu-device" aria-labelledby="gpu-device-title">
-<h3 id="gpu-device-title">GPU device / accelerator</h3><p class="map-device-note">A discrete NVIDIA GPU device includes a compute chip and dedicated memory. It may be a card or a module.</p>
+ return `<section id="hardware-panel" class="map-panel" aria-label="Computer / system"><h2>Computer / system</h2><p>Open the GPU chip, then an SM. Keep opening components to see blocks, warps and threads.</p><div class="map-machine">
+<section class="map-system-group map-host" id="host" aria-labelledby="host-title">
+<h3 class="map-group-title" id="host-title">Host (CPU side)</h3><p class="map-device-note">In CUDA, “host” means the CPU side of the system; “device” means the GPU accelerator.</p>
+${node('cpu','cpu','CPU','Runs your host program',info('cpu'),'map-cpu map-device-part')}
+<div class="map-connection"><span aria-hidden="true">↕</span><p>The CPU reads and writes system memory.</p></div>
+${node('host-cpu-memory','cpu-memory','System memory / RAM','Holds CPU tensor data · separate from the CPU',info('cpu-memory'),'map-memory map-device-part')}
+</section>
+<div class="map-transfer">Launches work and copies data<span aria-hidden="true">⇄</span></div><section class="map-system-group map-device" id="gpu-device" aria-labelledby="gpu-device-title">
+<h3 class="map-group-title" id="gpu-device-title">GPU device / accelerator</h3><p class="map-device-note">A discrete NVIDIA GPU device includes a compute chip and dedicated memory. It may be a card or a module.</p>
 ${node('gpu','gpu','GPU chip','Contains SMs, caches and memory controllers',`<p>The compute chip contains many <strong>streaming multiprocessors (SMs)</strong>. Each SM has its own L1 cache; the SMs share an on-chip L2 cache.</p><div class="map-sms">${sm(0,['a','c'])}${sm(1,['b'])}</div>
 <div class="map-connection"><span aria-hidden="true">↕</span><p>SMs read and write through the on-chip cache hierarchy.</p>${node('memory-cache','cache','L2 cache','Inside the chip · shared across SMs',info('cache')+concept('sectors','memory'))}<span aria-hidden="true">↕</span>${node('memory-controllers','memory-controllers','Memory controllers','Inside the chip · connect to device memory',info('memory-controllers'))}</div>
 <p class="map-note">Two SMs are shown. Hardware manages caches; a kernel uses each block’s shared-memory workspace explicitly. On many NVIDIA architectures, L1 and shared memory share on-chip capacity. Boxes show relationships, not the chip’s physical layout.</p>${chapterLinks(conceptById('gpu'))}`,'map-gpu map-device-part')}

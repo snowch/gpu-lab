@@ -5,6 +5,11 @@ Copyright © 2026 Christopher Snow.
 ## Concept relationship map
 
 `gpu-map-data.mjs` declares concepts, chapter memberships and directed relationships.
+The outer Computer / system contains peer Host (CPU side) and GPU device groups.
+The host group contains the CPU and system RAM as siblings; RAM is not inside
+the CPU. “Host” denotes the CUDA CPU side, not a parent of the GPU device.
+CPU caches belong to the processor.
+
 The outer GPU device contains the GPU compute chip and dedicated device memory.
 The chip contains SMs (including per-SM L1 caches), shared L2 cache and memory
 controllers. VRAM is separate from the compute chip: GDDR is typically on the board;
