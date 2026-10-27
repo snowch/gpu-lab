@@ -3,6 +3,8 @@
 const hooks = new Map();
 let composing = false, lock = null, unlockTimer;
 const snapshotKey = () => 'gpu-lab:restart:' + location.pathname + location.search;
+// Read the incoming route before a page migrates its URL; saves still use the live route.
+const incomingSnapshotKey = snapshotKey();
 export function registerExperiment(name, save, restore) { hooks.set(name, { save, restore }); }
 const controls = () => [...document.querySelectorAll('main input,main select,main textarea')];
 function formState() { return controls().map(el => ({ id: el.id, name: el.name, value: el.value, checked: el.checked })); }
@@ -49,7 +51,7 @@ navigator.serviceWorker?.addEventListener('message', ({ data, ports }) => {
   if (data?.type === 'COMMIT_RESTART' && data.token === lock) location.reload();
 });
 function restore() {
-  const key = snapshotKey();
+  const key = incomingSnapshotKey;
   let stored;
   try {
     stored = sessionStorage.getItem(key); if (!stored) return;
@@ -62,7 +64,11 @@ function restore() {
     }
     // Rebuilding a visual may replace controls; restore selections once more.
     restoreForm(data.controls);
-    document.querySelectorAll('main details').forEach((el, i) => { el.open = data.details[i]; });
+    // The GPU map owns its disclosures by stable ID, including migration from its
+    // previous concept view. Positional snapshots must not overwrite that state.
+    document.querySelectorAll('main details').forEach((el, i) => {
+      if (!el.matches('#gpu-map .map-node')) el.open = data.details[i];
+    });
     for (const [id, text] of Object.entries(data.messages)) {
       // Hello owns its derived output text. Older snapshots may describe four
       // inputs; its restore hook recomputes that text for the current model.
