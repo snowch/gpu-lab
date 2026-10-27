@@ -110,15 +110,19 @@ chapter, scroll position and experiment. The map keeps its expanded components
 when reopened; direct map links also use the full width. The overview introduces
 this reference in one paragraph; it is not an additional prerequisite chapter.
 
-Two expandable diagrams start with the whole system and one tensor operation.
-Readers open GPU → SM → block → warp → lane while the surrounding structure stays
-visible. The operation diagram follows inputs → PyTorch operation → kernel launch
-→ blocks → individual results, then connects later AI calculations to their mechanisms.
-Every concept in the shared catalogue appears inside the diagrams and the text reference.
+One expandable hardware diagram starts with the whole system. Readers open
+GPU → SM → block → warp → lane while the surrounding structure stays visible.
+Memory and execution concepts link to their chapters; worked tensor and AI operations
+stay in the chapters rather than being repeated in another map tab.
+The map has a
+compact heading and instruction, without an appendix introduction, duplicate concept
+list, chapter pager or documentation exercises. Chapter links lead to that teaching material.
+SMs stay side by side when the GPU panel has enough space, including when expanded;
+narrow layouts stack them without reducing the text size.
 
-Native disclosures are rendered at build time, so both complete diagrams work without
-JavaScript. Scripts add diagram switching, chapter highlighting, Back and Reset.
-Expanded components and the active diagram persist in the URL and across offline app
+Native disclosures are rendered at build time, so the complete map works without
+JavaScript. Scripts add chapter highlighting, Back and Reset.
+Expanded components persist in the URL and across offline app
 updates; old concept links still reveal their corresponding component. Highlights use
 text as well as colour. The map is available offline after the book download.
 

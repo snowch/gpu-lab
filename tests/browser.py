@@ -205,10 +205,9 @@ try:
         expect(page.locator("#simulator")).to_have_count(0)
         expect(page.locator('.architecture-layer')).to_have_count(0)
         page.locator('.sidebar nav').get_by_role('link',name='GPU map',exact=True).click()
-        expect(page.locator('#map-glossary')).to_be_visible()
-        page.locator('#map-glossary > summary').click()
-        page.locator('#concept-block > summary').click()
-        expect(page.locator('#concept-block')).to_contain_text('stays on one SM')
+        for component in ['gpu','sm-0','block-a']:
+            page.locator('#'+component+' > summary').click()
+        expect(page.locator('#block-a')).to_contain_text('stays on this SM')
         page.goto(URL + "lessons/memory.html")
         expect(page.locator("noscript .notice")).to_be_visible()
         expect(page.locator("noscript .notice")).to_contain_text("Enable JavaScript")

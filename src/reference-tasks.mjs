@@ -208,16 +208,6 @@ export const referenceTasks = {
     followUp:'Use the torch.cat reference above. In the opening example, what happens to the token dimension when one new K entry and one new V entry are appended to caches with three tokens?',
     answer:'element_size() returns bytes per element. The same element count at two rather than four bytes halves that tensor payload estimate. It does not account for every allocation, temporary tensor, allocator overhead or other model state, so total memory need not halve. Concatenation grows each three-token cache to four tokens; K and V remain separate tensors. This small example does not have the layer count or widths of the later synthetic decoder budget.',
   },
-  'overview-placement': {
-    title:'Check the hardware relationships', page:'scheduling', label:'CUDA: hardware multithreading',
-    prompt:'Find the relationship between a block, an SM and a warp. Can one block spread its threads across several SMs? Can an SM hold more than one block?',
-    answer:'A block stays on one SM for its lifetime. Several blocks may reside on an SM when resources allow. Threads within each block are organised into warps; neither a thread nor a warp is a permanently dedicated physical core.',
-  },
-  'overview-memory': {
-    title:'Check where CUDA results remain', page:'cudaSemantics', label:'PyTorch: CUDA semantics',
-    prompt:'Use the opening CUDA device rules to explain why a result from multiplying a CUDA tensor stays in GPU memory. Which operation from the book requests a CPU copy?',
-    answer:'PyTorch keeps ordinary tensor-operation results on the input tensor’s device. Calling .cpu() requests a CPU copy. The CPU can launch GPU work without automatically receiving a CPU copy of every result.',
-  },
 
 };
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -259,7 +249,6 @@ export const chapterReferences = {
   'tensor-cores':{sources:[['finfo','PyTorch: floating-point type information','Look up eps and the representable range of input formats.'],['torchMatmul','PyTorch: torch.matmul','Separate the matrix-operation contract from a particular accumulation order.'],['wmma','CUDA: warp matrix functions','Further hardware reading: supported matrix operations cooperate across a warp.']],tasks:['tensor-precision','tensor-cores']},
   attention:{sources:[['softmax','PyTorch: torch.softmax','Follow its functional.softmax link to check what dim selects for normalisation.'],['torchMatmul','PyTorch: torch.matmul','Check the matrix products that form scores and combine values.'],['attention','PyTorch: scaled_dot_product_attention','Compare the manual calculation with the API’s dropout, masking and implementation rules.']],tasks:['attention','attention-backend']},
   inference:{sources:[['cat','PyTorch: torch.cat','Check how the opening example appends one token along the cache’s token dimension.'],['elementSize','PyTorch: Tensor.element_size','Check the byte unit used in tensor-payload estimates.'],['timing','PyTorch: asynchronous CUDA execution','For optional measurements, find why timing must account for queued GPU work.']],tasks:['inference-bytes','inference']},
-  'meet-gpu':{sources:[['scheduling','CUDA: hardware multithreading','Check SM, block and warp relationships shown in the map.'],['cudaSemantics','PyTorch: CUDA semantics','Connect CPU/GPU memory placement to tensor operations.']],tasks:['overview-placement','overview-memory']},
 };
 export function renderChapterReferences(slug) {
   const chapter=chapterReferences[slug];

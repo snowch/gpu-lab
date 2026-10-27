@@ -50,7 +50,6 @@ if(link&&!standalone){
   doc.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();close();}});
   doc.addEventListener('click',event=>{
    const a=event.target.closest('a');if(!a||event.defaultPrevented)return;
-   if(a.id==='map-return'){event.preventDefault();close();return;}
    const url=new URL(a.href);
    if(a.target==='_blank'||a.hasAttribute('download')||url.origin!==location.origin||!url.pathname.endsWith('.html')||url.pathname===mapURL.pathname)return;
    event.preventDefault();

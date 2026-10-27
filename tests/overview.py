@@ -23,6 +23,8 @@ def check_overview(browser,base_url,root,errors):
             assert page.locator('#gpu-map-frame').bounding_box()['width'] >= width-2
             expect(map_page.locator('.sidebar')).to_be_hidden()
             expect(map_page.locator('.topbar')).to_be_hidden()
+            expect(map_page.locator('h1')).to_have_text('GPU map')
+            expect(map_page.locator('.intro, .chapter-references, .documentation-exercises, .book-pager, #map-glossary, #map-return')).to_have_count(0)
             page.locator('#theme').click()
             expect(map_page.locator('html')).to_have_attribute('data-theme','dark' if theme=='light' else 'light')
             page.locator('#theme').click()
@@ -30,7 +32,7 @@ def check_overview(browser,base_url,root,errors):
             assert len(context.pages)==1
             expect(map_page.locator('#map-chapter')).to_have_value('hello')
             expect(map_page.locator('#gpu > summary')).to_contain_text('Related concepts inside')
-            expect(map_page.locator('#operation-panel')).to_be_hidden()
+            expect(map_page.locator('#operation-panel, [data-map-view]')).to_have_count(0)
             # All essential nodes are already in the document, not generated on expansion.
             expect(map_page.locator('#sm-0')).to_have_count(1)
             map_page.locator('#gpu > summary').focus();page.keyboard.press('Enter')
@@ -39,6 +41,13 @@ def check_overview(browser,base_url,root,errors):
             map_page.locator('#hardware-panel').screenshot(path=str(root/f'test-results/map-sm-{width}-{theme}.png'))
             page.screenshot(path=str(root/f'test-results/map-toggle-{width}-{theme}.png'))
             open_nodes(map_page,['sm-0','block-a','a-warp-1','a-w1-lane-7'])
+            left=map_page.locator('#sm-0').bounding_box()
+            right=map_page.locator('#sm-1').bounding_box()
+            if width>=820:
+                assert abs(left['y']-right['y'])<2, 'SMs should remain side by side when expanded'
+                assert right['x']>=left['x']+left['width'], 'SMs should occupy separate columns'
+            else:
+                assert right['y']>=left['y']+left['height'], 'SMs should stack on phones'
             expect(map_page.locator('#a-w1-lane-7')).to_contain_text('thread 39 within block A')
             expect(map_page.locator('#block-c > summary')).to_be_visible()
             expect(map_page.locator('#a-warp-0 > summary')).to_be_visible()
@@ -52,30 +61,24 @@ def check_overview(browser,base_url,root,errors):
             map_page.locator('#gpu > summary').click()
             expect(map_page.locator('#map-back')).to_be_disabled()
             expect(map_page.locator('#block-a')).not_to_have_attribute('open','')
-            # The second diagram and its traces use ordinary HTML disclosures too.
-            map_page.locator('[data-map-view=operation]').click()
-            open_nodes(map_page,['operation','launch','op-grid','op-thread-4','op-thread-7'])
-            expect(map_page.locator('#op-thread-4')).to_contain_text('write output[4] = 10')
-            expect(map_page.locator('#op-thread-7')).to_contain_text('skips the read and write')
-            assert map_page.locator('html').evaluate('el=>el.scrollWidth <= window.innerWidth')
-            map_page.locator('#operation-panel').screenshot(path=str(root/f'test-results/map-operation-{width}-{theme}.png'))
+            # Explore memory relationships without a second worked-example diagram.
+            open_nodes(map_page,['vram','memory-tensor','tensor-strides'])
+            expect(map_page.locator('#tensor-strides .map-chapter-links a').first).to_be_visible()
             map_page.locator('#map-reset').click()
-            expect(map_page.locator('#operation')).not_to_have_attribute('open','')
+            expect(map_page.locator('#vram')).not_to_have_attribute('open','')
             expect(map_page.locator('#map-back')).to_be_disabled()
-            map_page.locator('#map-chapter').select_option('attention')
-            expect(map_page.locator('#ai-operations > summary')).to_contain_text('Related concepts inside')
-            open_nodes(map_page,['ai-operations','ai-attention'])
-            expect(map_page.locator('#ai-attention a[href="attention.html"]').first).to_be_visible()
+            map_page.locator('#map-chapter').select_option('matmul')
+            open_nodes(map_page,['gpu','sm-0','block-a','shared-a'])
+            expect(map_page.locator('#shared-a a[href="matmul.html"]').first).to_be_visible()
             page.locator('#gpu-map-frame').evaluate('el=>el.contentWindow.location.reload()')
-            expect(map_page.locator('[data-map-view=operation]')).to_have_attribute('aria-current','true')
-            expect(map_page.locator('#map-chapter')).to_have_value('attention')
-            expect(map_page.locator('#ai-attention')).to_have_attribute('open','')
+            expect(map_page.locator('#map-chapter')).to_have_value('matmul')
+            expect(map_page.locator('#shared-a')).to_have_attribute('open','')
             page.locator('.gpu-map-link').click()
             expect(page.locator('#gpu-map-panel')).to_be_hidden()
             assert abs(page.evaluate('scrollY')-reading_y)<2
             page.locator('.gpu-map-link').click()
-            expect(map_page.locator('#ai-attention')).to_have_attribute('open','')
-            map_page.locator('#ai-attention > summary').focus();page.keyboard.press('Escape')
+            expect(map_page.locator('#shared-a')).to_have_attribute('open','')
+            map_page.locator('#shared-a > summary').focus();page.keyboard.press('Escape')
             expect(page.locator('#gpu-map-panel')).to_be_hidden()
             expect(page.locator('.gpu-map-link')).to_be_focused()
             expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
@@ -114,7 +117,16 @@ def check_overview(browser,base_url,root,errors):
     expect(page.locator('.restore-notice')).to_have_count(0)
     assert page.evaluate('sessionStorage.getItem(window.oldSnapshotKey) === null')
     context.close()
-    # Reproduce the HTML preview: scripts disabled, both maps must still be usable.
+    context=browser.new_context(service_workers='block')
+    page=context.new_page();page.goto(base_url+'lessons/meet-gpu.html?view=operation&open=operation,launch,op-thread-4')
+    expect(page.locator('#hardware-panel')).to_be_visible()
+    expect(page.locator('#operation-panel, [data-map-view]')).to_have_count(0)
+    page.goto(base_url+'lessons/meet-gpu.html?from=hello#concept-shared')
+    expect(page.locator('#shared-a > summary')).to_be_visible()
+    page.locator('.gpu-map-link').click()
+    expect(page).to_have_url(base_url+'lessons/hello.html')
+    context.close()
+    # Reproduce the HTML preview: scripts disabled, all hardware relationships must still be usable.
     for width in [360,820,1440]:
         context=browser.new_context(java_script_enabled=False,viewport={'width':width,'height':900})
         page=context.new_page();page.goto(base_url+'lessons/meet-gpu.html')
@@ -125,14 +137,8 @@ def check_overview(browser,base_url,root,errors):
         expect(page.locator('#sm-1 > summary')).to_be_visible()
         expect(page.locator('#a-w1-lane-7 .map-inside')).to_contain_text('thread 39')
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-        page.locator('[data-map-view=operation]').click()
-        open_nodes(page,['operation','launch','op-grid','op-thread-7'])
-        expect(page.locator('#op-thread-7 .map-inside')).to_contain_text('skips the read and write')
-        page.locator('#map-glossary > summary').click()
-        for concept in ['block','shared','attention']:
-            item=page.locator('#concept-'+concept);item.locator('summary').click()
-            expect(item.locator('p').first).to_be_visible()
-            expect(item.locator('.map-chapter-links a').first).to_be_visible()
+        open_nodes(page,['vram','memory-tensor','tensor-strides'])
+        expect(page.locator('#tensor-strides .map-chapter-links a').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         context.close()
     print('PASS: full-width map toggle, restored scroll/results, Escape, theme sync, chapter navigation, expandable GPU maps, native SM/block/warp/lane content, traces, keyboard, themes, responsive layouts, URL state, chapter highlights, return preserving work and JavaScript-disabled preview')
