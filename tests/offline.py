@@ -201,7 +201,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
                 expect(concept_map.locator('#a-w1-lane-7')).to_have_attribute('open','')
                 expect(concept_map.locator('#a-w1-lane-7')).to_contain_text('thread 39')
-                expect(concept_map.locator('#map-chapter')).to_have_value('matmul')
+                expect(concept_map.locator('#map-chapter, .map-match, .map-highlight')).to_have_count(0)
                 expect(concept_map.locator('#hardware-panel')).to_be_visible()
                 expect(concept_map.locator('#a-warp-1')).to_have_attribute('open','')
                 expect(page.locator('#gpu-map-panel')).to_be_visible()

@@ -30,8 +30,7 @@ def check_overview(browser,base_url,root,errors):
             page.locator('#theme').click()
             expect(map_page.locator('html')).to_have_attribute('data-theme',theme)
             assert len(context.pages)==1
-            expect(map_page.locator('#map-chapter')).to_have_value('hello')
-            expect(map_page.locator('#gpu > summary')).to_contain_text('Related concepts inside')
+            expect(map_page.locator('#map-chapter, .map-match, .map-highlight')).to_have_count(0)
             expect(map_page.locator('#operation-panel, [data-map-view]')).to_have_count(0)
             # All essential nodes are already in the document, not generated on expansion.
             expect(map_page.locator('#sm-0')).to_have_count(1)
@@ -75,11 +74,9 @@ def check_overview(browser,base_url,root,errors):
             map_page.locator('#map-reset').click()
             expect(map_page.locator('#vram')).not_to_have_attribute('open','')
             expect(map_page.locator('#map-back')).to_be_disabled()
-            map_page.locator('#map-chapter').select_option('matmul')
             open_nodes(map_page,['gpu','sm-0','block-a','shared-a'])
             expect(map_page.locator('#shared-a a[href="matmul.html"]').first).to_be_visible()
             page.locator('#gpu-map-frame').evaluate('el=>el.contentWindow.location.reload()')
-            expect(map_page.locator('#map-chapter')).to_have_value('matmul')
             expect(map_page.locator('#shared-a')).to_have_attribute('open','')
             page.locator('.gpu-map-link').click()
             expect(page.locator('#gpu-map-panel')).to_be_hidden()
@@ -106,7 +103,7 @@ def check_overview(browser,base_url,root,errors):
     expect(page).to_have_url(base_url+'lessons/devices.html')
     expect(page.locator('#gpu-map-panel')).to_be_hidden()
     page.locator('.gpu-map-link').click()
-    expect(page.frame_locator('#gpu-map-frame').locator('#map-chapter')).to_have_value('devices')
+    expect(page.frame_locator('#gpu-map-frame').locator('#hardware-panel')).to_be_visible()
     context.close()
     # A release update from the previous map keeps its saved concept, even though
     # the new map rewrites the URL and has a different disclosure structure.
@@ -123,6 +120,8 @@ def check_overview(browser,base_url,root,errors):
     expect(page.locator('#shared-a')).to_have_attribute('open','')
     expect(page.locator('#shared-a > summary')).to_be_visible()
     expect(page.locator('.restore-notice')).to_have_count(0)
+    expect(page.locator('#map-chapter, .map-match, .map-highlight')).to_have_count(0)
+    assert page.evaluate("!new URL(location).searchParams.has('chapter')")
     assert page.evaluate('sessionStorage.getItem(window.oldSnapshotKey) === null')
     context.close()
     context=browser.new_context(service_workers='block')
@@ -156,4 +155,4 @@ def check_overview(browser,base_url,root,errors):
         expect(page.locator('#tensor-strides .map-chapter-links a').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         context.close()
-    print('PASS: full-width map toggle, restored scroll/results, Escape, theme sync, chapter navigation, expandable GPU maps, native SM/block/warp/lane content, traces, keyboard, themes, responsive layouts, URL state, chapter highlights, return preserving work and JavaScript-disabled preview')
+    print('PASS: full-width map toggle, restored scroll/results, Escape, theme sync, chapter navigation, expandable GPU maps, native SM/block/warp/lane content, traces, keyboard, themes, responsive layouts, URL state, return preserving work and JavaScript-disabled preview')

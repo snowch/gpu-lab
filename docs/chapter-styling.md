@@ -46,3 +46,10 @@ Each `data-book-experiment` has its own configuration, Run feedback and result.
 Use `trace: false` when a result is a capacity/count comparison with no useful
 sequence to inspect; do not manufacture steps just because the underlying engine
 has a trace. New content must reuse `openingCode`, `definitions` and `readerTask`.
+
+The GPU map uses colour for containment levels: a pale yellow outer device and
+matching green chip/device-memory panels, with theme equivalents in dark mode.
+Components within the chip use neutral surfaces. Borders, nesting and explicit
+labels carry the hierarchy independently of colour; keyboard focus remains distinct.
+The map has no chapter filter, chapter highlights or related-concept badges. Keep
+Back one level, Reset diagram and chapter links inside the components.
