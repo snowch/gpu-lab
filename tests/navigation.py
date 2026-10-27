@@ -45,7 +45,7 @@ def check_navigation(browser, base_url, root, errors):
             page.set_viewport_size({'width': width, 'height': 850})
             expect(navigation).to_be_hidden()
             toggle.click()
-            navigation.get_by_role('link', name='Meet the GPU', exact=True).click()
+            navigation.get_by_role('link', name='GPU map', exact=True).click()
             expect(page).to_have_url(base_url + 'lessons/meet-gpu.html')
             expect(navigation).to_be_hidden()
             toggle.click()

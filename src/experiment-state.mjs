@@ -2,7 +2,7 @@
 // Per-tab restart snapshots; no localStorage.clear and no replay of user actions.
 const hooks = new Map();
 let composing = false, lock = null, unlockTimer;
-const key = 'gpu-lab:restart:' + location.pathname + location.search;
+const snapshotKey = () => 'gpu-lab:restart:' + location.pathname + location.search;
 export function registerExperiment(name, save, restore) { hooks.set(name, { save, restore }); }
 const controls = () => [...document.querySelectorAll('main input,main select,main textarea')];
 function formState() { return controls().map(el => ({ id: el.id, name: el.name, value: el.value, checked: el.checked })); }
@@ -19,7 +19,8 @@ function releaseLock() {
   for (const el of document.querySelectorAll('[data-update-locked]')) { el.inert = false; delete el.dataset.updateLocked; }
 }
 function snapshot() {
-  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('work-map') ? ['overview'] : [];
+  const key = snapshotKey();
+  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
   if (required.some(name => !hooks.has(name))) throw new Error('An experiment has not finished loading. Wait or reload that window before restarting.');
   if (composing || document.readyState !== 'complete' || document.querySelector('main [aria-busy="true"],main [contenteditable="true"]')) throw new Error('Finish the current input or operation in each GPU Lab window, then try again.');
   const guard = { reason: '' }; dispatchEvent(new CustomEvent('gpu-lab:before-restart', { detail: guard }));
@@ -44,10 +45,11 @@ navigator.serviceWorker?.addEventListener('message', ({ data, ports }) => {
       ports[0].postMessage({ ready: true });
     } catch (error) { ports[0].postMessage({ ready: false, error: error.message }); }
   }
-  if (data?.type === 'ABORT_RESTART' && data.token === lock) { releaseLock(); sessionStorage.removeItem(key); }
+  if (data?.type === 'ABORT_RESTART' && data.token === lock) { releaseLock(); sessionStorage.removeItem(snapshotKey()); }
   if (data?.type === 'COMMIT_RESTART' && data.token === lock) location.reload();
 });
 function restore() {
+  const key = snapshotKey();
   let stored;
   try {
     stored = sessionStorage.getItem(key); if (!stored) return;

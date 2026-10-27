@@ -81,6 +81,9 @@ second set of authoring requirements.
 - [ ] Check keyboard and touch operation, visible focus and labelled inputs. Selection
   and Run must not jump the page. Definitions and worked explanations remain readable
   without JavaScript; essential content is not hidden in hover-only controls.
+- [ ] Keep the GPU map catalogue in sync with concepts taught in a chapter. Give
+  each concept a plain definition, a book example and valid chapter links. Label
+  relationships explicitly; ownership, containment and data movement are different.
 - [ ] When moving or adding pages, update contents, chapter numbering, previous/next
   links, reference tasks, offline coverage and saved-state restoration checks.
   Preserve stable control IDs where possible; do not silently reuse an ID for a

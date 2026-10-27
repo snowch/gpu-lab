@@ -2,7 +2,16 @@
 
 Copyright © 2026 Christopher Snow.
 
-## Architecture overview diagrams
+## Concept relationship map
+
+`gpu-map-data.mjs` declares concepts, their chapter/view memberships and directed
+relationships. The map draws only the selected concept's immediate relationships;
+it does not simulate execution, placement or timing. A shared catalogue generates
+the desktop SVG, narrow-screen directed connections and JavaScript-free reference.
+Hardware terms follow NVIDIA CUDA conventions. Chapter links identify where the
+book teaches a concept, not a restriction on where it applies.
+
+## Architecture ownership diagrams (chapter 6)
 
 The introduction's ownership view and work map share a declared example: four blocks
 with 64 threads each, placed on two SMs by block index modulo two. This placement is

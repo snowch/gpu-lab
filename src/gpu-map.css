@@ -1,0 +1,42 @@
+/* Copyright © 2026 Christopher Snow. */
+.map-controls { display:flex; flex-wrap:wrap; align-items:end; gap:24px; padding:20px; background:var(--soft); border:1px solid var(--line); border-radius:8px; }
+.map-controls fieldset { margin:0; padding:0; border:0; flex:2 1 320px; }
+.map-controls legend,.map-controls label { font-weight:650; }
+.map-controls button { margin:8px 6px 0 0; }
+.map-controls label { flex:1 1 250px; min-width:0; }
+.map-controls select { margin-top:8px; width:100%; }
+#map-status { margin:20px 0 12px; color:var(--muted); }
+.map-palette { display:flex; flex-wrap:wrap; gap:8px; }
+.map-palette button { text-align:left; }
+.map-chapter-match { display:block; font-size:12px; font-weight:400; }
+.map-palette .chapter-match { border-style:dashed; border-width:2px; }
+#gpu-map button[aria-pressed="true"] { background:var(--accent-soft); border:2px solid var(--accent); font-weight:700; }
+.map-detail { margin:28px 0; padding:24px; border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; background:var(--panel); }
+.map-detail h2 { font-size:26px; margin-bottom:12px; }
+.map-detail p { max-width:740px; }
+.map-chapter-links { display:flex; flex-wrap:wrap; gap:12px 20px; margin:16px 0; }
+.map-chapter-links a { font-size:15px; }
+.map-diagram-wide { overflow:auto; border:1px solid var(--line); border-radius:8px; padding:16px; background:var(--panel); }
+.map-diagram-wide svg { display:block; width:100%; min-width:720px; }
+.map-node rect { fill:var(--soft); stroke:var(--line); stroke-width:2; }
+.map-node:hover rect,.map-node:focus rect { stroke:var(--accent); stroke-width:3; }
+.map-selected rect { fill:var(--accent-soft); stroke:var(--accent); stroke-width:3; }
+.map-diagram-wide text { fill:var(--ink); font:18px system-ui,sans-serif; }
+.map-selected text { font-weight:700; }
+.map-diagram-wide .map-edge-label { fill:var(--muted); font-size:16px; paint-order:stroke; stroke:var(--panel); stroke-width:5; stroke-linejoin:round; }
+.map-connector { stroke:var(--accent); stroke-width:2; fill:none; }
+#map-arrow path { fill:var(--accent); }
+.map-diagram-narrow { display:none; }
+.map-glossary { margin:36px 0; border-top:1px solid var(--line); }
+.map-glossary>summary { font-size:18px; }
+.map-glossary section { margin:24px 0; }
+.map-glossary section>details { border-bottom:1px solid var(--line); padding:8px 0; }
+.map-glossary p,.map-glossary li { font-size:16px; }
+@media(max-width:1000px) {
+ .map-diagram-wide { display:none; }
+ .map-diagram-narrow { display:grid; gap:16px; list-style:none; padding:0; }
+ .map-diagram-narrow li { display:grid; justify-items:stretch; padding:16px; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+ .map-diagram-narrow button { width:100%; }
+ .map-relation { display:block; text-align:center; padding:8px; color:var(--muted); }
+ .map-controls { padding:16px; }
+}

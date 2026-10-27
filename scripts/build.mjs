@@ -15,7 +15,7 @@ import {chapters,renderBookNav,renderRoadmap,renderBookPage} from '../content/bo
 import {renderDeviceSections,renderReadingSections} from '../src/foundations-view.mjs';
 import {continuationChapters,renderContinuation} from '../src/continuation-view.mjs';
 import { renderIntroSections, renderIntroTransfer } from '../src/hello-view.mjs';
-import { renderSmOverview, renderWorkMap } from '../src/overview-visuals.mjs';
+import {renderMap} from '../src/gpu-map-view.mjs';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 for (const path of ['index.html', 'src', 'examples', 'assets', 'manifest.webmanifest']) {
@@ -29,10 +29,7 @@ const dockerfile=await readFile('docker/cuda-sim.Dockerfile','utf8');
 const execution={revision:dockerfile.match(/ARG GPGPUSIM_REV=(\w+)/)[1],image:dockerfile.match(/^FROM (.+)$/m)[1]};
 await writeFile('dist/lessons/desktop.html',renderBookPage({slug:'desktop',appendix:true,title:'Run the examples on your desktop',lead:'Use real PyTorch or compile supported CUDA programs with GPGPU-Sim, with a clear check of what ran.',content:renderDesktop(desktopExamples,execution),previous:{href:'inference.html',title:'Chapter 12: What limits an inference step?'},next:{href:'../index.html',title:'Book contents'}}));
 
-await writeFile('dist/lessons/meet-gpu.html', (await readFile('content/gpu-reference.html','utf8'))
-  .replace('<!-- SM_OVERVIEW -->',renderSmOverview())
-  .replace('<!-- WORK_MAP -->',renderWorkMap())
-  .replace('<!-- REFERENCE_OVERVIEW -->',renderChapterReferences('meet-gpu')));
+await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',appendix:true,title:'Explore the GPU map',lead:'See how the book’s concepts fit together: work, memory and AI operations.',content:renderMap(),previous:{href:'../index.html',title:'Course overview'},next:{href:'hello.html',title:'Start chapter 1'}}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
   .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())
   .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer())
@@ -88,6 +85,7 @@ for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter
   const html = (await readFile(path, 'utf8'))
     .replace(/<nav class="(?:course-nav|lesson-nav)"[^>]*>[\s\S]*?<\/nav>/,renderBookNav(current))
     .replaceAll('EIGHT LABS · DRAFT','INTERACTIVE BOOK · DRAFT')
+    .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}&amp;chapter=${current}" target="gpu-lab-map" aria-label="GPU map (opens a separate tab)">GPU map</a>`))
     .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script></head>');
   await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
 }

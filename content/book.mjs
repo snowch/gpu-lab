@@ -2,27 +2,15 @@ import {desktopLinks} from '../src/desktop-links.mjs';
 // Copyright © 2026 Christopher Snow.
 import {renderChapterReferences} from '../src/reference-tasks.mjs';
 // Published chapters form one continuous learner journey.
-export const chapters=[
-  {title:'One operation, many numbers',slug:'hello',summary:'Follow five values from PyTorch to threads, indices and a small CUDA kernel.',opening:true},
-  {title:'Where do the numbers live?',slug:'devices',summary:'Copy inputs to the GPU, calculate there, and bring back a result.',opening:true},
-  {title:'How do we select values from a tensor?',slug:'reading',summary:'Select rows and columns, then multiply the chosen values.',opening:true},
-  {title:'How are tensor values arranged in memory?',slug:'layout',summary:'Follow values into storage, compare strides, then make a packed copy.',opening:true},
-  {title:'How do threads read those values?',slug:'requests',summary:'Follow five reads from one warp and compare the sectors they touch.',opening:true},
-  {title:'How can work continue during a wait?',slug:'scheduling',summary:'Follow a waiting warp, then see how another warp can make progress.',opening:true},
-  {title:'What if lanes need different calculations?',slug:'divergence',summary:'Follow active lanes through different calculations.',opening:true},
-  {title:'How do threads combine their results?',slug:'reduction',summary:'Build a sum using shared values and block barriers.',opening:true},
-  {title:'How can matrix multiplication reuse its inputs?',slug:'matmul',summary:'Compare repeated loads with shared tiles in matrix multiplication.',opening:true},
-  {title:'What changes when matrix inputs use fewer bits?',slug:'tensor-cores',summary:'Trace input rounding and accumulation, then connect them to matrix hardware.',opening:true},
-  {title:'How can attention store less?',slug:'attention',summary:'Build a weighted result, then compare full intermediates with tiles.',opening:true},
-  {title:'What limits an inference step?',slug:'inference',summary:'Follow the KV cache, then compare memory and compute bounds.',opening:true},
-];
+import {chapters} from '../src/book-chapters.mjs';
+export {chapters};
 export function renderBookNav(current='index') {
   const home=current==='index',base=home?'./lessons/':'',overview=home?'./index.html':'../index.html';
   const link=(href,label,active=false)=>`<a href="${href}"${active?' class="current" aria-current="page"':''}>${label}</a>`;
   const group=(id,title,links)=>`<section class="nav-section" aria-labelledby="${id}"><h2 class="nav-group" id="${id}">${title}</h2>${links}</section>`;
   return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}${link(overview+'#curriculum','Book roadmap')}
     ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug)).join(''))}
-    ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'meet-gpu.html','Meet the GPU',current==='meet-gpu'))}
+    ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'meet-gpu.html','GPU map',current==='meet-gpu'))}
     ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true):''))}</nav>`;
 
 }

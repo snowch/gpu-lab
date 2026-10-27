@@ -66,7 +66,8 @@ Keep a resource prominent only when it has a distinct learner outcome:
   rather than presenting the old lab as another course entry. Retain its route,
   recap and downloads for existing links and offline use. Show its current-page
   entry when visiting the explorer.
-- **Meet the GPU:** a reference map, grouped under Appendices.
+- **GPU map:** replaces Meet the GPU at the same URL. It connects work, memory
+  and AI concepts, grouped under Appendices and available from every chapter header.
 - **Run on your desktop:** an execution appendix, first under Appendices and
   separately linked beside downloadable examples.
 

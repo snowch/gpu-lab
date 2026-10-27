@@ -99,3 +99,6 @@ footer { flex-wrap:wrap; }
 .chapter-code-download [role=status]:empty { display:none; }
 .desktop-index details { margin-block:.75rem; }
 .desktop-index li { margin-block:.5rem; }
+
+/* Keep the concept map visible beside app controls, including on phones. */
+.top-actions .gpu-map-link { display:inline-flex; align-items:center; min-height:44px; padding:8px 12px; border:1px solid var(--accent); border-radius:6px; color:var(--accent); font-weight:650; }
