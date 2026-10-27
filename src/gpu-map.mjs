@@ -1,13 +1,12 @@
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
-import {conceptById,initialMap,mapConcepts} from './gpu-map-data.mjs';
+import {conceptById,mapConcepts} from './gpu-map-data.mjs';
 import {registerExperiment} from './experiment-state.mjs';
 const root=document.querySelector('#gpu-map');
 const $=s=>root.querySelector(s);
 const params=new URLSearchParams(location.search);
 if(params.get('embedded')==='1'&&window.parent!==window)document.documentElement.classList.add('map-embedded');
 const nodes=[...root.querySelectorAll('.map-node')];
-let chapter=initialMap(params.get('chapter')).chapter;
 let recent=[];
 let queued=false;
 const panel=()=>$('#hardware-panel');
@@ -15,16 +14,6 @@ const visible=node=>node.open&&!node.closest('.map-panel').hidden&&!node.parentE
 function openPath(node){
  for(let el=node;el&&el!==root;el=el.parentElement)if(el.matches('details'))el.open=true;
  recent=recent.filter(id=>id!==node.id);recent.push(node.id);
-}
-function highlight(){
- $('#map-chapter').value=chapter;
- for(const node of nodes){
-  const own=Boolean(chapter&&conceptById(node.dataset.mapConcept)?.chapters.includes(chapter));
-  const below=Boolean(chapter&&[...node.querySelectorAll('[data-map-concept]')].some(child=>conceptById(child.dataset.mapConcept)?.chapters.includes(chapter)));
-  node.classList.toggle('map-highlight',own);
-  const badge=node.querySelector(':scope > summary .map-match');
-  badge.hidden=!own&&!below;badge.textContent=own?'In highlighted chapter':'Related concepts inside';
- }
 }
 function sync(){
  const last=recent.map(id=>document.getElementById(id)).filter(node=>node&&visible(node)).at(-1);
@@ -36,7 +25,7 @@ function sync(){
  url.searchParams.set('view','hardware');url.searchParams.delete('concept');
  const opened=nodes.filter(n=>n.open).map(n=>n.id);
  if(opened.length)url.searchParams.set('open',opened.join(','));else url.searchParams.delete('open');
- if(chapter)url.searchParams.set('chapter',chapter);else url.searchParams.delete('chapter');
+ url.searchParams.delete('chapter');
  history.replaceState(null,'',url);
 }
 function scheduleSync(){if(queued)return;queued=true;queueMicrotask(()=>{queued=false;sync();});}
@@ -70,7 +59,6 @@ root.addEventListener('toggle',event=>{
  else for(const child of node.querySelectorAll('details[open]'))child.open=false;
  scheduleSync();
 },true);
-$('#map-chapter').addEventListener('change',event=>{chapter=initialMap(event.target.value).chapter;highlight();sync();});
 $('#map-back').addEventListener('click',()=>{
  const node=recent.map(id=>document.getElementById(id)).filter(n=>n&&visible(n)).at(-1);
  if(!node)return;
@@ -96,12 +84,11 @@ if(validPages.has(origin)){
  const close=document.querySelector('.top-actions .gpu-map-link');
  if(close)close.href=origin==='index'?'../index.html':origin+'.html';
 }
-registerExperiment('gpu-map',()=>({view:'hardware',chapter,open:nodes.filter(n=>n.open).map(n=>n.id),recent}),saved=>{
- chapter=initialMap(saved.chapter).chapter;
+registerExperiment('gpu-map',()=>({view:'hardware',open:nodes.filter(n=>n.open).map(n=>n.id),recent}),saved=>{
  for(const node of nodes)node.open=false;
  for(const id of Array.isArray(saved.open)?saved.open:[]){const node=nodes.find(n=>n.id===id);if(node)openPath(node);}
  if(saved.concept){const target=nodes.find(n=>n.dataset.mapConcept===saved.concept);if(target){openPath(target);}}
  recent=Array.isArray(saved.recent)?saved.recent.filter(id=>nodes.some(n=>n.id===id)):recent;
- highlight();sync();
+ sync();
 });
-highlight();sync();revealHash();
+sync();revealHash();

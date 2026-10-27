@@ -7,7 +7,7 @@ const chapterLinks=c=>`<div class="map-chapter-links">${c.chapters.map(slug=>`<a
 const info=id=>{const c=conceptById(id);return `<p>${escape(c.meaning)}</p><p><strong>Book example:</strong> ${escape(c.example)}</p>${chapterLinks(c)}`;};
 // These functions run during the build. Native disclosures work before any script loads.
 function node(id,concept,title,hint,body,kind=''){
- return `<details class="map-node ${kind}" id="${id}" data-map-concept="${concept}"><summary><span><strong>${title}</strong><span class="map-hint">${hint}</span><span class="map-match" hidden>In highlighted chapter</span></span></summary><div class="map-inside">${body}</div></details>`;
+ return `<details class="map-node ${kind}" id="${id}" data-map-concept="${concept}"><summary><span><strong>${title}</strong><span class="map-hint">${hint}</span></span></summary><div class="map-inside">${body}</div></details>`;
 }
 const concept=(id,prefix,children='',hint='Definition, book example and chapter links')=>node(`${prefix}-${id}`,id,escape(conceptById(id).title),hint,info(id)+children);
 export function renderWarp(block,w){
@@ -35,7 +35,7 @@ ${node('vram','gpu-memory','Device memory / VRAM','Inside the GPU device · sepa
 </section></div><p class="map-note">Illustrative placement: three blocks of 64 threads on two SMs. Each block stays on one SM; several blocks may share it. This is a relationship map, not a schedule or a promise that every thread executes at once. Integrated GPUs can share system memory; this picture shows a discrete GPU device.</p></section>`;
 }
 export function renderMap(){return `<div id="gpu-map">
-<div class="map-tools map-enhancement" hidden><label for="map-chapter">Highlight concepts from<select id="map-chapter"><option value="">All chapters</option>${chapters.map((c,i)=>`<option value="${c.slug}">Chapter ${i+1}: ${escape(c.title)}</option>`).join('')}${['memory','kernel','shared-memory'].map(s=>`<option value="${s}">${chapterName(s)}</option>`).join('')}</select></label><div><button type="button" id="map-back" disabled>← Back one level</button><button type="button" id="map-reset">Reset diagram</button></div></div>
+<div class="map-tools map-enhancement" hidden><div><button type="button" id="map-back" disabled>← Back one level</button><button type="button" id="map-reset">Reset diagram</button></div></div>
 <p id="map-status" class="map-enhancement" role="status" hidden></p>
 ${hardware()}
 </div>`;}

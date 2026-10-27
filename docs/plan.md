@@ -104,8 +104,7 @@ PyTorch choices from this book's illustrative implementation choices?
 ## Interactive GPU map
 
 The **GPU map** replaces Meet the GPU at its stable `lessons/meet-gpu.html` URL.
-A persistent header toggle opens it across the reading area, hiding the contents
-and highlighting the current chapter. Close map or Escape returns to the unchanged
+A persistent header toggle opens it across the reading area, hiding the contents. Close map or Escape returns to the unchanged
 chapter, scroll position and experiment. The map keeps its expanded components
 when reopened; direct map links also use the full width. The overview introduces
 this reference in one paragraph; it is not an additional prerequisite chapter.
@@ -121,10 +120,10 @@ SMs stay side by side when the GPU panel has enough space, including when expand
 narrow layouts stack them without reducing the text size.
 
 Native disclosures are rendered at build time, so the complete map works without
-JavaScript. Scripts add chapter highlighting, Back and Reset.
+JavaScript. Scripts add Back and Reset. Chapter links sit inside each component; the map has
+no chapter filter or chapter highlighting.
 Expanded components persist in the URL and across offline app
-updates; old concept links still reveal their corresponding component. Highlights use
-text as well as colour. The map is available offline after the book download.
+updates; old concept links still reveal their corresponding component. The map is available offline after the book download.
 
 Relationships distinguish ownership, grouping, scheduling and data movement. This
 is neither a chip floor plan nor a promise of simultaneous execution. Numerical
