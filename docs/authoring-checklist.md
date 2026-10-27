@@ -41,6 +41,12 @@ second set of authoring requirements.
 - [ ] Lead browser guidance with “no installation or GPU required”. Explain simulation
   versus local execution once at the appropriate point. State validation limits
   accurately; compiler/simulator checks are not physical GPU performance evidence.
+- [ ] Keep complete PyTorch examples in shared source templates. Generate desktop
+  downloads through `pythonProgram()` and exercise those same wrappers in
+  `tests/chapter_examples.py`. Provide a complete-program link for excerpts; keep
+  dynamic downloads aligned with current controls. Update the desktop appendix's
+  coverage table when adding programs. Test supported CUDA examples in the pinned
+  simulator workflow; label unsupported features and hardware execution separately.
 - [ ] Make visuals show a relationship or consequence. Generate values from the model.
   Distinguish values, indices, element offsets and byte offsets. A grouping diagram
   is not a chip floor plan or a promise of simultaneous execution.

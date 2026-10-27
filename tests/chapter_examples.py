@@ -5,12 +5,14 @@ import io
 import json
 from pathlib import Path
 import subprocess
+import sys
 import torch
 
 root=Path(__file__).resolve().parents[1]
 examples=json.loads(subprocess.check_output(['node','scripts/chapter-examples.mjs'],cwd=root,text=True))
 for example in examples:
-    source=example['source'].replace('device="cuda"','device="cpu"')
+    source=example['program']
+    sys.argv=[example['id'],'--device','cpu']
     namespace={}
     with contextlib.redirect_stdout(io.StringIO()):
         exec(compile(source,example['id'],'exec'),namespace)

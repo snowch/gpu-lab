@@ -78,7 +78,7 @@
         <details class="more-settings"><summary>Run this kernel on an NVIDIA GPU</summary>
         <p>Download a complete CUDA C++ program for 35 elements, including your kernel, allocation, launch and output read-back. Invalid accesses and duplicate writes must be repaired before download.</p>
         <pre><code id="cuda-source"></code></pre><button id="download-cuda" type="button">Download CUDA program</button>
-        <p>Requires an NVIDIA GPU, compatible driver, CUDA Toolkit and a host C++ compiler:</p><pre>nvcc -std=c++17 kernel.cu -o kernel
+        <p><a href="desktop.html#first-cuda">Run safe downloaded kernels with GPGPU-Sim</a> without a GPU. For native execution, use an NVIDIA GPU, compatible driver, CUDA Toolkit and host C++ compiler:</p><pre>nvcc -std=c++17 kernel.cu -o kernel
 ./kernel</pre><p>These new generated programs have not yet been compiled or tested on an NVIDIA GPU.</p></details>
         <details class="more-settings"><summary>Hint: where should the first thread write?</summary><p>The first output is <code>y[0]</code>. Work out <code>i</code> when <code>blockIdx.x * blockDim.x + threadIdx.x</code> is zero. Then check whether that expression still reaches the right elements in a second block.</p></details>
       </section>

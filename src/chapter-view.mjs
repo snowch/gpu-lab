@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function openingCode(source,extraClass='') {
-  return `<div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch</p><pre class="chapter-opening-code${extraClass?' '+extraClass:''}"><code>${escape(source)}</code></pre></div>`;
+  return `<div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch</p><pre class="chapter-opening-code${extraClass?' '+extraClass:''}"><code>${escape(source)}</code></pre>${source.trimStart().startsWith('import torch')?'<div class="chapter-code-download"><button type="button" data-download-python disabled>Download Python</button><a href="desktop.html#pytorch">Desktop setup</a><span data-download-status aria-live="polite"></span></div>':''}</div>`;
 }
 export function browserNotice() {
   return '<p class="chapter-browser-note">Run the examples below in your browser with no installation or GPU required. The browser simulates the calculation; it does not execute PyTorch or GPU code. To run the PyTorch snippet itself, use a Python environment with PyTorch and an NVIDIA GPU.</p>';

@@ -90,3 +90,11 @@ footer { flex-wrap:wrap; }
 .chapter-reference-list p { margin:4px 0 0; }
 .reference-version { color:var(--muted); font-size:14px; line-height:1.65; margin:20px 0; }
 .chapter-references a,.documentation-exercises a { overflow-wrap:anywhere; }
+
+/* Optional desktop actions remain beside the complete code they download. */
+.chapter-code-download { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem 1rem; padding:0 1.2rem 1rem; }
+.chapter-code-download button,.chapter-code-download a { font-size:.9rem; }
+.chapter-code-download [role=status] { flex-basis:100%; font-size:.9rem; }
+.chapter-code-download [role=status]:empty { display:none; }
+.desktop-index details { margin-block:.75rem; }
+.desktop-index li { margin-block:.5rem; }

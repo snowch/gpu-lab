@@ -59,6 +59,15 @@ See [the model contract](docs/model.md) and [course plan](docs/plan.md).
 dependency, sequence or data-flow diagram. Those diagrams are linked to model state and trace
 positions, alongside the existing experiment views.
 
+## Run examples on your desktop
+
+The [desktop appendix](https://snowch.github.io/gpu-lab/lessons/desktop.html) provides
+complete Python downloads for every chapter, CPU/CUDA setup, and a pinned GPGPU-Sim
+container for supported CUDA examples without a physical GPU. Complete PyTorch
+panels also have a Download Python button that preserves the current settings.
+PyTorch runs separately from GPGPU-Sim. CPU and functional simulator checks do not
+validate real GPU performance. See [setup and coverage](docs/run-cuda.md).
+
 ## Use offline
 
 Choose **Install** in the course header to add GPU Lab to your apps with its own GPU-chip

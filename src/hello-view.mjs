@@ -57,7 +57,7 @@ export function renderIntroSections() {
           <p><strong>With an NVIDIA GPU:</strong> install a compatible driver, CUDA Toolkit and host C++ compiler, then run:</p>
           <pre>nvcc -std=c++17 hello.cu -o hello\n./hello</pre>
           <p><strong>Without an NVIDIA GPU:</strong> use our GPGPU-Sim Docker container to compile and simulate the download on your desktop.</p>
-          <p><a href="https://github.com/snowch/gpu-lab/blob/main/docs/run-cuda.md" target="_blank" rel="noopener">Desktop setup and output checks (opens in a new tab)</a></p>
+          <p><a href="desktop.html#first-cuda">Desktop setup and output checks</a></p>
           <p>CI compiles generated chapter 1 examples with the CUDA Toolkit and checks their outputs in GPGPU-Sim. Physical NVIDIA GPU execution has not yet been validated.</p>
         </details>
 

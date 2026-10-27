@@ -11,7 +11,7 @@ test('reference exercises use official guides and retain local answer comparison
     for(const target of [task.page,task.solution].filter(Boolean)) {
       const url=new URL(guides[target]);
       assert.equal(url.protocol,'https:');
-      assert.ok(['docs.pytorch.org','docs.nvidia.com'].includes(url.hostname));
+      assert.ok(['docs.pytorch.org','docs.nvidia.com','github.com','pytorch.org'].includes(url.hostname));
       assert.ok(!url.pathname.includes('/cuda-c-programming-guide/'));
     }
     const html=renderReferenceTask(key);
@@ -28,7 +28,7 @@ test('reference exercises use official guides and retain local answer comparison
   assert.equal(referenceTasks['hello-pytorch'].code,pythonSource());
 });
 test('every published chapter and lab has annotated references before two or more exercises',()=>{
-  const pages=new Set([...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','meet-gpu']);
+  const pages=new Set([...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','meet-gpu','desktop']);
   assert.deepEqual(new Set(Object.keys(chapterReferences)),pages);
   for(const slug of pages){
     const entry=chapterReferences[slug],html=renderChapterReferences(slug);

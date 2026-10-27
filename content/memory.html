@@ -83,10 +83,7 @@
           <p>The <strong>shape</strong> tells PyTorch how to interpret those values as a grid: here it is <code>(2, 4)</code>. The <strong>strides</strong> tell it how many <em>element positions</em> to move when an index changes. Strides <code>(4, 1)</code> mean that moving down one row advances four elements (16 bytes), while moving right one column advances one element (4 bytes).</p>
           <p>Now imagine a batch of 32 examples with eight features each. We can make a larger tensor whose values are easy to follow:</p>
         </div>
-        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>import torch
-
-x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
-print(x.shape, x.stride())   # shape (32, 8), strides (8, 1)</code></pre></div>
+        <div class="code-panel" style="margin:20px 0"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code><!-- MEMORY_SETUP_CODE --></code></pre></div>
         <div class="prose">
           <p>This tensor has <strong>shape (32, 8)</strong>: 32 rows and eight columns. Its <strong>strides (8, 1)</strong> mean a move down one row advances 8 elements (32 bytes), and a move right one column advances 1 element (4 bytes).</p>
           <p>With <code>arange</code>, the values happen to match their <strong>element offsets</strong> (positions counted from the beginning of storage). This is a convenient coincidence, not a general property of tensors. <strong>Byte offsets</strong> are those positions multiplied by four; actual memory addresses are different and are not shown.</p>
@@ -108,18 +105,7 @@ print(x.shape, x.stride())   # shape (32, 8), strides (8, 1)</code></pre></div>
         <figure class="tensor-visual" aria-labelledby="tensor-slice-title"><h3 id="tensor-slice-title">A view keeps the original offsets; a packed copy changes them</h3><label>Compare storage<select id="tensor-slice-mode" disabled><option value="column">Column view · shared storage</option><option value="row">Row view · shared storage</option><option value="packed">Packed column · copied storage</option></select></label><div id="tensor-slice-diagram"><!-- TENSOR_SLICE_FIGURE --></div></figure>
         </details>
         <details class="more-settings"><summary>Full runnable example</summary>
-        <div class="code-panel"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code>import torch
-
-x = torch.arange(32 * 8, dtype=torch.float32).reshape(32, 8)
-row = x[0, :]       # features of example 0: 0, 1, ..., 7
-column = x[:, 0]   # feature 0 of each example: 0, 8, ..., 248
-
-print(x.shape, x.stride())   # shape [32, 8], strides (8, 1)
-print(row.stride())          # (1,)
-print(column.stride())       # (8,)
-
-packed_column = column.contiguous()
-print(packed_column.stride())  # (1,)</code></pre><div class="code-footer"><a href="../examples/tensor-layout.py" download>Download the self-checking PyTorch example ↓</a></div></div>
+        <div class="code-panel"><div class="code-title">Python · requires PyTorch · runs on CPU</div><pre><code><!-- MEMORY_FULL_CODE --></code></pre><div class="code-footer"><a href="../examples/tensor-layout.py" download>Download the self-checking PyTorch example ↓</a></div></div>
         </details>
         <div class="prose">
           <p>The buttons below map one participating lane to each selected value. The row has eight values, so its experiment uses eight active lanes. The column has 32 values and uses the full warp. Both start at offset zero.</p>
