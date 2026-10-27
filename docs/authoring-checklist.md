@@ -54,7 +54,9 @@ second set of authoring requirements.
   Distinguish values, indices, element offsets and byte offsets. A grouping diagram
   is not a chip floor plan or a promise of simultaneous execution. Distinguish the
   GPU device from its compute chip: caches belong on the chip; dedicated device
-  memory is separate from the compute chip. State the architecture scope.
+  memory is separate from the compute chip. CPU and system RAM are peers within
+  the CUDA host side; use Computer / system for the parent of host and GPU device.
+  State the architecture scope.
 - [ ] Avoid misleading small examples: a block may have several warps; unused lanes
   do not prevent another block from making progress. State simplifying assumptions
   beside the picture, and defer scheduling details until they are needed.

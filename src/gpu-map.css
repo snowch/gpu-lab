@@ -10,7 +10,7 @@
 #map-status { color:var(--muted); overflow-wrap:anywhere; }
 .map-panel { margin:24px 0; border:1px solid var(--line); border-radius:14px; padding:24px; background:var(--panel); }
 .map-panel>h2 { margin-top:0; }
-.map-machine { display:grid; grid-template-columns:minmax(110px,.7fr) 70px minmax(0,3fr); gap:8px; align-items:start; margin:28px 0; }
+.map-machine { display:grid; grid-template-columns:minmax(240px,1fr) 70px minmax(0,3fr); gap:8px; align-items:start; margin:28px 0; }
 .map-node { min-width:0; margin:12px 0; border:1px solid var(--line); border-radius:10px; background:var(--panel); }
 .map-node>summary { display:flex; align-items:center; justify-content:space-between; gap:12px; list-style:none; padding:16px; min-height:64px; cursor:pointer; }
 .map-node>summary::-webkit-details-marker { display:none; }
@@ -25,8 +25,9 @@
 .map-inside>p:first-child { margin-top:0; }
 .map-device-part { border:2px solid var(--accent); background:var(--accent-soft); }
 .map-device-part>summary strong { color:var(--accent); font-size:26px; }
-.map-device { container:gpu-device / inline-size; min-width:0; border:2px solid var(--map-device); border-radius:14px; padding:12px; background:var(--map-device-bg); }
-#gpu-device-title { margin:0; font-size:22px; color:var(--map-device); }
+.map-device { container:gpu-device / inline-size; }
+.map-system-group { min-width:0; border:2px solid var(--map-device); border-radius:14px; padding:12px; background:var(--map-device-bg); }
+#gpu-map .map-group-title { margin:0; font-size:22px; color:var(--map-device); }
 #gpu-map .map-device-note { margin:8px 0 16px; color:var(--muted); font-size:14px; }
 .map-sms { display:grid; gap:12px; align-items:start; }
 .map-sms>.map-sm { margin:0; }
@@ -62,7 +63,7 @@
  .map-transfer { padding:8px; }.map-transfer br { display:none; }.map-transfer span { transform:rotate(90deg); }
 }
 @media(max-width:600px) {
- .map-device { padding:8px; }
+ .map-system-group { padding:8px; }
  .map-panel { padding:16px 10px; }.map-node>summary { padding:12px; gap:6px; }
  .map-node>summary strong { font-size:17px; }.map-inside { padding:10px; }
  .map-lane>summary { padding:6px 2px; }.map-lane>summary strong { font-size:13px; }

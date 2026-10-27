@@ -63,7 +63,7 @@ try:
                 page.locator('.sidebar nav').get_by_role('link',name='GPU map',exact=True).click()
                 expect(page).to_have_url(URL+'lessons/meet-gpu.html')
                 expect(page.locator('#gpu-map')).to_be_visible()
-                expect(page.locator('#hardware-panel h2')).to_have_text('From the system to one thread')
+                expect(page.locator('#hardware-panel h2')).to_have_text('Computer / system')
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Concept map overflows"
                 page.screenshot(path=str(ROOT / f"test-results/intro-{width}-{theme}.png"), full_page=True)
                 page.goto(URL + "lessons/memory.html")
