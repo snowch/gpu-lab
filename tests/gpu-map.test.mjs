@@ -16,13 +16,17 @@ test('map distinguishes ownership, grouping and scheduling without false contain
  assert.ok(mapEdges.some(e=>e.from==='sm'&&e.to==='block'&&e.label==='hosts resident'));
  assert.ok(mapEdges.some(e=>e.from==='block'&&e.to==='shared'));
  assert.ok(mapEdges.some(e=>e.from==='scheduler'&&e.to==='warp'));
+ assert.ok(mapEdges.some(e=>e.from==='gpu'&&e.to==='cache'&&e.label==='contains'));
+ assert.ok(mapEdges.some(e=>e.from==='sm'&&e.to==='l1-cache'&&e.label==='contains'));
+ assert.ok(mapEdges.some(e=>e.from==='gpu'&&e.to==='memory-controllers'&&e.label==='contains'));
+ assert.match(conceptById('gpu-memory').meaning,/separate from the compute chip/);
  assert.match(conceptById('warp').example,/two warps/);
  assert.match(conceptById('block').example,/Several blocks/);
  assert.match(conceptById('sectors').example,/not a count of physical DRAM/);
 });
 test('hardware relationships are built into the HTML without duplicate lessons',()=>{
  const html=renderMap();
- for(const id of ['cpu','gpu','sm','block','warp','lane','shared','registers','tensor-cores','cache','gpu-memory','tensor','shape','strides','dtype','copy']){
+ for(const id of ['cpu','gpu','sm','block','warp','lane','shared','registers','tensor-cores','l1-cache','cache','memory-controllers','gpu-memory','tensor','shape','strides','dtype','copy']){
   assert.ok(html.includes(`data-map-concept="${id}"`),id);
  }
  assert.doesNotMatch(html,/operation-panel|map-glossary|data-map-view/);

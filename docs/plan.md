@@ -111,7 +111,7 @@ when reopened; direct map links also use the full width. The overview introduces
 this reference in one paragraph; it is not an additional prerequisite chapter.
 
 One expandable hardware diagram starts with the whole system. Readers open
-GPU → SM → block → warp → lane while the surrounding structure stays visible.
+GPU device → GPU chip → SM → block → warp → lane while the surrounding structure stays visible.
 Memory and execution concepts link to their chapters; worked tensor and AI operations
 stay in the chapters rather than being repeated in another map tab.
 The map has a
