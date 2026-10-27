@@ -23,6 +23,8 @@ def check_navigation(browser, base_url, root, errors):
             page.keyboard.press('Enter')
             expect(toggle).to_have_attribute('aria-expanded', 'true')
             expect(navigation).to_be_visible()
+            expect(navigation.get_by_role('heading')).to_have_text(['Chapters','Appendices','Extra practice'])
+            expect(navigation.get_by_role('link',name='Memory access explorer')).to_have_count(0)
             boxes = []
             for link in navigation.locator('a').all():
                 expect(link).to_be_visible()
@@ -47,8 +49,9 @@ def check_navigation(browser, base_url, root, errors):
             expect(page).to_have_url(base_url + 'lessons/meet-gpu.html')
             expect(navigation).to_be_hidden()
             toggle.click()
-            navigation.get_by_role('link', name='Memory access lab', exact=True).click()
-            expect(page.locator('h1')).to_have_text('Reading a tensor')
+            navigation.get_by_role('heading',name='Appendices',exact=True).scroll_into_view_if_needed()
+            navigation.locator('[aria-labelledby=nav-appendices]').get_by_role('link',name='Run on your desktop',exact=True).click()
+            expect(page.locator('h1')).to_have_text('Run the examples on your desktop')
             expect(page.locator('.sidebar nav')).to_be_hidden()
             # Generated lessons use the same navigation enhancement.
             page.goto(base_url + 'lessons/scheduling.html')

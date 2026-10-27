@@ -30,6 +30,9 @@ second set of authoring requirements.
 - [ ] Follow predict → run → change one variable → explain. Use `readerTask()` for
   explicit learner actions, with a visible label and decorative icon. Put feedback
   beside Run. Changing settings must invalidate that experiment’s old result.
+- [ ] Keep optional material only for a distinct learning outcome. Link deeper
+  experiment controls from the chapter that prepares the reader; group reference
+  maps and setup guides under Appendices, separately from Extra practice.
 - [ ] End with a small new case that applies the chapter’s idea and a local answer
   comparison. Keep optional extensions, such as transpose practice, clearly optional.
 

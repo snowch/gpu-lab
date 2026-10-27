@@ -19,10 +19,12 @@ export const chapters=[
 export function renderBookNav(current='index') {
   const home=current==='index',base=home?'./lessons/':'',overview=home?'./index.html':'../index.html';
   const link=(href,label,active=false)=>`<a href="${href}"${active?' class="current" aria-current="page"':''}>${label}</a>`;
-  return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}${chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug)).join('')}
-    <p class="nav-group">Optional labs and references</p>${[
-      ['memory','Memory access lab'],['shared-memory','Shared-memory banks'],['kernel','Repair a kernel'],['desktop','Appendix: run on your desktop'],
-    ].map(([slug,title])=>link(base+slug+'.html',title,current===slug)).join('')}${link(base+'meet-gpu.html','Meet the GPU',current==='meet-gpu')}${link(overview+'#curriculum','Book roadmap')}</nav>`;
+  const group=(id,title,links)=>`<section class="nav-section" aria-labelledby="${id}"><h2 class="nav-group" id="${id}">${title}</h2>${links}</section>`;
+  return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}${link(overview+'#curriculum','Book roadmap')}
+    ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug)).join(''))}
+    ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'meet-gpu.html','Meet the GPU',current==='meet-gpu'))}
+    ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true):''))}</nav>`;
+
 }
 export function renderRoadmap() {
   return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div><span class="tag live">${c.opening?'Read the chapter':'Explore existing lab'}</span></a>`).join('\n');
