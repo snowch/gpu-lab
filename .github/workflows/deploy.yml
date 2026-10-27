@@ -28,6 +28,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -r tests/requirements.txt
       - run: python -m playwright install --with-deps chromium
+        timeout-minutes: 10
       - run: python tests/browser.py
       - run: python tests/offline.py
       - uses: actions/upload-artifact@v4

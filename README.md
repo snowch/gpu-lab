@@ -47,7 +47,7 @@ and trace; static worked examples remain readable without JavaScript.
 [Memory access](https://snowch.github.io/gpu-lab/lessons/memory.html),
 [shared-memory banks](https://snowch.github.io/gpu-lab/lessons/shared-memory.html),
 [kernel repair](https://snowch.github.io/gpu-lab/lessons/kernel.html) and
-[Meet the GPU](https://snowch.github.io/gpu-lab/lessons/meet-gpu.html) remain optional
+[GPU map](https://snowch.github.io/gpu-lab/lessons/meet-gpu.html) remain optional
 labs and references. All published pages include documentation exercises with local
 answer comparisons. See [migration decisions](docs/chapter-migration.md).
 

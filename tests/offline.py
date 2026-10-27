@@ -151,6 +151,9 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 layout.locator('#reading-index-packed').select_option('2');layout.locator('#reading-run-packed').click()
                 requests=context.new_page();requests.goto(url+'lessons/requests.html')
                 requests.locator('#reading-pattern-sectors').select_option('column');requests.locator('#reading-run-sectors').click()
+                concept_map=context.new_page();concept_map.goto(url+'lessons/meet-gpu.html?chapter=matmul')
+                concept_map.locator('[data-palette=shared]').click()
+                concept_map.locator('#map-detail summary').click()
                 context.set_offline(False);CourseHandler.revision='two';check(page)
                 expect(page.locator('#version-status')).to_have_text('Update available')
                 expect(page.locator('#app-status-summary')).to_contain_text('Update available')
@@ -189,9 +192,13 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 blocked_cdp.detach();blocked.close()
                 # Activation works offline and restores each tab's independent work/route.
                 context.set_offline(True);page.locator('#restart-update').click()
-                for tab in [page,second,kernel,lesson,devices,reading,layout,requests]:
+                for tab in [page,second,kernel,lesson,devices,reading,layout,requests,concept_map]:
                     expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
+                expect(concept_map.locator('#map-detail h2')).to_have_text('Shared memory')
+                expect(concept_map.locator('#map-chapter')).to_have_value('matmul')
+                expect(concept_map.locator('[data-map-view=ai]')).to_have_attribute('aria-pressed','true')
+                expect(concept_map.locator('#map-detail details')).to_have_attribute('open','')
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
                 expect(page.locator('#hello-factor-1')).to_have_value('7')
                 expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')

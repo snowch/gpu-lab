@@ -101,13 +101,25 @@ They do not establish learner comprehension. Newcomer observations remain needed
 can readers trace a dependency, explain a changed result, and separate their
 PyTorch choices from this book's illustrative implementation choices?
 
-## Architecture introduction
+## Interactive GPU map
 
-The optional **Meet the GPU** reference (`lessons/meet-gpu.html`) is a five-minute map with
-three progressively disclosed layers: CPU/GPU memory, SM internals, and kernel/block/warp
-mapping. It introduces terms without requiring learners to memorise them. The map describes
-NVIDIA CUDA relationships rather than a simulated chip or performance measurement. Chapter 1 provides the first hands-on experience; the architecture map is optional. Native disclosure controls keep the map available
-without JavaScript and in the offline course.
+The **GPU map** replaces Meet the GPU at its stable `lessons/meet-gpu.html` URL.
+A persistent header link opens it in a separate tab, highlighting the current
+chapter while preserving the original page and experiment. The overview introduces
+this reference in one paragraph; it is not an additional prerequisite chapter.
+
+Three connected views cover work execution, data/memory and AI operations. Selecting
+a concept shows directed, labelled relationships, a definition, a book example and
+links to the relevant chapters. Shared concepts connect the views. Chapter highlights
+use visible text as well as colour; the chosen concept and view survive reload in
+the URL. Desktop diagrams show incoming and outgoing connections; phone and tablet
+layouts stack those same directed connections with readable text. A complete text
+reference remains available without JavaScript. The map is available offline after
+the book download, and explicit update/restart preserves its selection.
+
+Relationships distinguish ownership, grouping, scheduling and data movement. This
+is neither a chip floor plan nor a promise of simultaneous execution. Numerical
+experiments and the detailed ownership diagram remain beside their chapters.
 
 ## Hands-on prototype
 

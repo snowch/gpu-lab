@@ -1,53 +1,65 @@
 # Copyright © 2026 Christopher Snow.
-"""Follow blocks and warps through the architecture introduction."""
+"""Concept-map exploration, chapter context and return without losing work."""
 from playwright.sync_api import expect
-from version_check import mock_version
 
-
-def check_overview(browser, base_url, root, errors):
-    for width in [1440, 360]:
-        for theme in ['light', 'dark']:
-            context = browser.new_context(viewport={'width': width, 'height': 1000}, color_scheme=theme)
-            mock_version(context)
-            page = context.new_page()
-            page.on('pageerror', lambda error: errors.append(str(error)))
-            page.goto(base_url)
+def check_overview(browser,base_url,root,errors):
+    for width in [1440,820,360]:
+        for theme in ['light','dark']:
+            context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
+            page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)))
+            page.goto(base_url+'lessons/hello.html')
+            page.locator('#hello-factor-0').fill('3');page.locator('#hello-run-0').click()
+            with page.expect_popup() as popup:
+                page.locator('.gpu-map-link').click()
+            map_page=popup.value;map_page.on('pageerror',lambda error:errors.append(str(error)))
+            expect(map_page.locator('#map-chapter')).to_have_value('hello')
+            expect(map_page.locator('[data-palette=pytorch]')).to_have_attribute('aria-pressed','true')
+            expect(map_page.locator('.chapter-match').first).to_contain_text('In highlighted chapter')
+            # Keyboard exploration remains in place; chapter links describe where to read.
+            map_page.locator('[data-palette=block]').focus();map_page.keyboard.press('Enter')
+            expect(map_page.locator('#map-detail h2')).to_have_text('Thread block')
+            map_page.locator('#map-detail summary').click()
+            expect(map_page.locator('#map-detail')).to_contain_text('Several blocks can reside on one SM')
+            expect(map_page.locator('#map-detail a[href="reduction.html"]')).to_be_visible()
+            # Cross-view relationship selection and reload preserve the selected concept.
+            connected=map_page.locator('.map-diagram-wide [data-concept=shared]' if width>1000 else '.map-diagram-narrow [data-concept=shared]')
+            connected.click()
+            expect(map_page.locator('#map-detail h2')).to_have_text('Shared memory')
+            expect(map_page.locator('[data-map-view=memory]')).to_have_attribute('aria-pressed','true')
+            map_page.reload();expect(map_page.locator('#map-detail h2')).to_have_text('Shared memory')
+            for view in ['work','memory','ai']:
+                map_page.locator('[data-map-view='+view+']').click()
+                assert map_page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+                map_page.locator('#map-diagram').screenshot(path=str(root/f'test-results/map-{view}-{width}-{theme}.png'))
+            map_page.locator('#map-chapter').select_option('attention')
+            expect(map_page.locator('#map-detail h2')).to_have_text('Attention')
+            expect(map_page.locator('[data-map-view=ai]')).to_have_attribute('aria-pressed','true')
+            with map_page.expect_event('close'):map_page.locator('#map-return').click(no_wait_after=True)
+            expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
+            # Saved/bookmarked links and former overview anchors remain useful.
             page.goto(base_url+'#meet-gpu')
-            expect(page).to_have_url(base_url+'lessons/meet-gpu.html')
-            for layer in page.locator('.architecture-layer').all():
-                if layer.get_attribute('open') is None:
-                    layer.locator('summary').click()
-            expect(page.locator('.sm-block')).to_have_count(2)
-            expect(page.locator('.sm-registers')).to_have_count(4)
-            expect(page.locator('.sm-shared')).to_have_count(2)
-            page.locator('.sm-ownership').screenshot(path=str(root / f'test-results/sm-ownership-{width}-{theme}.png'), style='.topbar { visibility:hidden; }')
-            for block, sm in [('A', 0), ('B', 1), ('C', 0), ('D', 1)]:
-                page.locator('#map-block').select_option(block)
-                expect(page.locator(f'[data-map-block="{block}"].is-selected')).to_have_count(2)
-                expect(page.locator('.work-sm.is-selected')).to_have_attribute('data-map-sm', str(sm))
-                expect(page.locator('#work-map-selection')).to_contain_text(f'block {block} on SM {sm}')
-            page.locator('#map-warp').focus()
-            page.keyboard.press('ArrowDown')
-            expect(page.locator('#map-warp')).to_have_value('1')
-            expect(page.locator('.overview-lane')).to_have_count(32)
-            expect(page.locator('.overview-lane').first).to_have_attribute('aria-label', 'Lane 0, thread 32')
-            expect(page.locator('.overview-lane').last).to_have_attribute('aria-label', 'Lane 31, thread 63')
-            page.locator('#work-map').screenshot(path=str(root / f'test-results/work-map-{width}-{theme}.png'), style='.topbar,.work-map-controls { visibility:hidden; }')
-            page.locator('.overview-lanes').scroll_into_view_if_needed()
-            expect(page.locator('#work-map-controls')).to_be_in_viewport()
-            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), 'Overview diagram overflows'
-            assert page.locator('#work-map').evaluate('el => el.scrollWidth <= el.clientWidth')
+            expect(page.locator('#gpu-map')).to_be_visible()
             context.close()
-    context = browser.new_context(viewport={'width': 360, 'height': 800}, java_script_enabled=False)
-    page = context.new_page()
-    page.goto(base_url+'lessons/meet-gpu.html')
-    for layer in page.locator('.architecture-layer').all():
-        if layer.get_attribute('open') is None:
-            layer.locator('summary').click()
-    expect(page.locator('.sm-ownership')).to_be_visible()
-    expect(page.locator('#work-map')).to_be_visible()
-    expect(page.locator('.overview-lane')).to_have_count(32)
-    expect(page.locator('#work-map-controls')).to_be_hidden()
+    # Two source tabs each retain their own return destination.
+    context=browser.new_context(service_workers='block')
+    first=context.new_page();first.goto(base_url+'lessons/hello.html')
+    second=context.new_page();second.goto(base_url+'lessons/devices.html')
+    with first.expect_popup() as opened:first.locator('.gpu-map-link').click()
+    first_map=opened.value
+    with second.expect_popup() as opened:second.locator('.gpu-map-link').click()
+    second_map=opened.value
+    expect(second_map.locator('#map-chapter')).to_have_value('devices')
+    assert second_map.evaluate('window.opener.location.pathname.endsWith("devices.html")')
+    with second_map.expect_event('close'):second_map.locator('#map-return').click(no_wait_after=True)
+    assert not first_map.is_closed()
+    context.close()
+    context=browser.new_context(java_script_enabled=False,viewport={'width':360,'height':900})
+    page=context.new_page();page.goto(base_url+'lessons/meet-gpu.html')
+    expect(page.locator('#gpu-map')).to_be_hidden()
+    for concept in ['block','shared','attention']:
+        item=page.locator('#concept-'+concept);item.locator('summary').click()
+        expect(item.locator('p').first).to_be_visible()
+        expect(item.locator('.map-chapter-links a').first).to_be_visible()
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     context.close()
-    print('PASS: SM resources, block placement, keyboard warp selection, lane indices, both themes and no-JavaScript diagrams')
+    print('PASS: concept map views, directed relationships, chapter context, keyboard, cross-view selection, reload, return preserving work, phone/tablet/desktop, themes and static reference')
