@@ -40,6 +40,19 @@ def check_overview(browser,base_url,root,errors):
             page.goto(base_url+'#meet-gpu')
             expect(page.locator('#gpu-map')).to_be_visible()
             context.close()
+    # Two source tabs each retain their own return destination.
+    context=browser.new_context(service_workers='block')
+    first=context.new_page();first.goto(base_url+'lessons/hello.html')
+    second=context.new_page();second.goto(base_url+'lessons/devices.html')
+    with first.expect_popup() as opened:first.locator('.gpu-map-link').click()
+    first_map=opened.value
+    with second.expect_popup() as opened:second.locator('.gpu-map-link').click()
+    second_map=opened.value
+    expect(second_map.locator('#map-chapter')).to_have_value('devices')
+    assert second_map.evaluate('window.opener.location.pathname.endsWith("devices.html")')
+    with second_map.expect_event('close'):second_map.locator('#map-return').click(no_wait_after=True)
+    assert not first_map.is_closed()
+    context.close()
     context=browser.new_context(java_script_enabled=False,viewport={'width':360,'height':900})
     page=context.new_page();page.goto(base_url+'lessons/meet-gpu.html')
     expect(page.locator('#gpu-map')).to_be_hidden()
