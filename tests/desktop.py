@@ -34,8 +34,11 @@ def check_desktop(browser,url,root):
     page=context.new_page();page.goto(url+'lessons/divergence.html')
     experiment=page.locator('[data-book-experiment]').first
     panel=experiment.locator('.chapter-code-panel').filter(has=page.locator('[data-download-python]'))
+    expect(experiment.locator('[role=status]')).to_have_text('Predict the result, then Run to see it.')
+    experiment.locator('.continuation-code summary').click()
     before=panel.locator('code').inner_text()
     experiment.get_by_label('Input sign pattern').select_option('negative')
+    expect(panel.locator('code')).to_contain_text('values = [-2.] * 32')
     source=panel.locator('code').inner_text()
     assert source != before
     with page.expect_download() as download: panel.locator('[data-download-python]').click()
