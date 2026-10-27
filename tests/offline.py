@@ -66,7 +66,7 @@ def ready(page):
 
 def built(temp, name):
     source = temp / name; source.mkdir()
-    for path in ['scripts','src','content','assets','examples','index.html','manifest.webmanifest']:
+    for path in ['scripts','src','content','assets','docker','examples','index.html','manifest.webmanifest']:
         item = ROOT / path
         if item.is_dir(): shutil.copytree(item, source / path)
         else: shutil.copy2(item, source / path)

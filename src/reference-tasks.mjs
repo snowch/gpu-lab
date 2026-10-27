@@ -2,6 +2,9 @@
 import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
+  gpgpu: 'https://github.com/gpgpu-sim/gpgpu-sim_distribution',
+  docker: 'https://docs.docker.com/get-started/get-docker/',
+  pytorchInstall: 'https://pytorch.org/get-started/locally/',
   dispatcher: 'https://docs.pytorch.org/docs/2.14/notes/extending.html#extending-torch-native-api',
   compiler: 'https://docs.pytorch.org/docs/2.14/user_guide/torch_compiler/torch.compiler_get_started.html',
   cudaSemantics: 'https://docs.pytorch.org/docs/2.14/notes/cuda.html',
@@ -37,6 +40,9 @@ export const guides = {
   timing: 'https://docs.pytorch.org/docs/2.14/notes/cuda.html#asynchronous-execution',
 };
 export const referenceTasks = {
+  'desktop-simulator': {title:'Check what the simulator establishes',page:'gpgpu',label:'GPGPU-Sim README',prompt:'Find the distinction between functional and performance simulation. This book runs with PTX_SIM_MODE_FUNC=1. Does a matching output validate a GPU timing estimate?',answer:'Functional simulation checks execution and output for the selected simulator configuration. It does not validate measured latency, physical GPU performance, or the browser model’s counters. The toolchain and supported features still constrain which programs run.'},
+  'desktop-pytorch': {title:'Choose the Python execution path',page:'pytorchInstall',label:'PyTorch installation selector',prompt:'Use the installation selector to find a CPU installation for your platform. Which command runs a downloaded example without an NVIDIA GPU, and what does that leave untested?',answer:'Run python example.py --device cpu after installing PyTorch in a Python environment. This checks values, shapes and layouts. It does not perform CPU–GPU transfers or validate CUDA backend selection and timing. GPGPU-Sim does not execute these PyTorch downloads.'},
+
   'hello-pytorch': {
     title:'Where does this tensor live?', page:'tensor', label:'PyTorch: torch.tensor', code:pythonSource(),
     prompt:'In this snippet from the start of the chapter, find device="cuda". Use the torch.tensor reference to explain what it selects.',
@@ -221,7 +227,7 @@ export function renderReferenceTask(key) {
   if(!task) throw new Error('Unknown reference task: '+key);
   return `<aside class="reference-task" aria-labelledby="reference-${key}">
     <h3 id="reference-${key}"><svg class="reference-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Z"/><path d="M12 5v15"/></svg><span>${task.independent?'Find it in the guide':'Look it up'}: ${escape(task.title)}</span></h3>
-    ${task.code?`<pre class="reference-code"><code>${escape(task.code)}</code></pre>`:''}
+    ${task.code?`<p class="reference-note">Fixed excerpt for this question. <a href="desktop.html#examples">Complete programs and execution limits</a>.</p><pre class="reference-code"><code>${escape(task.code)}</code></pre>`:''}
     <p>${escape(task.prompt)}</p>
     ${task.followUp?`<p>${escape(task.followUp)}</p>`:''}
     <p>${link(task.page,task.label)}</p>
@@ -232,6 +238,7 @@ export function renderReferenceTask(key) {
 
 // Page-level coverage is explicit so a new chapter cannot silently omit its references.
 export const chapterReferences = {
+  desktop:{sources:[['docker','Docker installation','Install Docker with Linux-container support for the CUDA simulator path.'],['gpgpu','GPGPU-Sim README','Read supported toolchains and the distinction between functional and performance simulation.'],['pytorchInstall','PyTorch installation selector','Choose an installation for your operating system and CPU or CUDA execution.']],tasks:['desktop-simulator','desktop-pytorch']},
   hello: {
     sources:[['tensor','PyTorch: torch.tensor','Check device and dtype in the opening snippet.'],['dispatcher','PyTorch: selecting an implementation','Read the dispatcher paragraph under “Extending torch native API”; the rest is advanced.'],['launch','CUDA: writing and launching kernels','Recognise the complete GPU function and the <<<blocks, threads>>> launch syntax.']],
     tasks:['hello-pytorch','hello-dispatch','hello-indices'],

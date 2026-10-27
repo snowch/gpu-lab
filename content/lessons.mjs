@@ -90,14 +90,7 @@ if (i < n) {
     prediction: 'How many service rounds will this read need?', maxGuess: 32,
     figureTitle: 'Requests grouped by bank',
     figureHint: 'Select a round. Each bank card counts its distinct requested words; highlighted cards serve a word in this round. Select a lane to inspect its word and bank.',
-    code: `// One block with 32 threads; a column read from a tile.
-__shared__ float tile[32][33]; // 32 useful columns + padding
-int lane = threadIdx.x;
-for (int row = 0; row < 32; ++row) {
-    tile[row][lane] = input[row * 32 + lane];
-}
-__syncthreads();
-output[lane] = tile[lane][0];`,
+    code: '// Extracted from examples/shared-memory.cu by the build.',
     codeNote: `<p><code>__shared__</code> places an array in shared memory. The two array dimensions allocate rows with a pitch of 33 words. Each thread fills one column across all rows. After the barrier, the threads read the first column, which thread zero filled. This fragment assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
       <p><code>__syncthreads()</code> is a block barrier: every thread in the block must reach it before any proceeds past it. Prior shared-memory writes become visible to the block. Here it ensures that thread zero's writes are ready before the other threads read them. A barrier inside a condition taken by only some block threads can hang or behave incorrectly. The bank model covers the final read; it does not simulate the loop or barrier.</p>`,
     exercises: [
@@ -154,7 +147,7 @@ ${lesson.namedChoices ? `<form id="prediction" class="prediction"><fieldset clas
 <div id="lane-inspector" hidden><label for="lane">Inspect lane</label><select id="lane"></select><p id="lane-detail" aria-live="polite"></p></div>
 <div id="trace" class="trace" aria-label="Computed instruction trace"></div><p id="explanation" class="explanation"></p></div>
 <details class="model-note"><summary>Model assumptions and limits</summary><p>${lesson.limits}</p><a href="${lesson.source}">${lesson.sourceLabel} ↗</a></details></div></section>
-<section class="two-col section-space"><div><p class="eyebrow">CONNECT TO CUDA</p><h2>The programming connection</h2>${lesson.codeNote}</div><div class="code-panel"><div class="code-title">Illustrative CUDA · not executed in this page</div><pre><code>${escape(lesson.code)}</code></pre></div></section>
+<section class="two-col section-space"><div><p class="eyebrow">CONNECT TO CUDA</p><h2>The programming connection</h2>${lesson.codeNote}</div><div class="code-panel"><div class="code-title">${lesson.slug==='shared-memory'?'CUDA C++ · function from shared-memory.cu':'Illustrative CUDA · not executed in this page'}</div><pre><code>${escape(lesson.code)}</code></pre></div></section>
 <section class="challenge section-space"><p class="eyebrow">TRY IT YOURSELF</p><h2>Change one thing. Explain the result.</h2><ol>${lesson.exercises.map(x=>`<li>${x}</li>`).join('')}</ol><details><summary>Compare your explanation</summary>${lesson.takeaway}</details></section>
 ${renderChapterReferences(lesson.slug)}
 <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="${previous}">← Previous lesson</a><a href="${next}">${index + 1 < lessons.length ? 'Next lesson →' : 'Return to roadmap →'}</a></nav>

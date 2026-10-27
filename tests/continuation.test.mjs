@@ -31,7 +31,7 @@ test('published continuation has a continuous sequence and independent local exp
     const page=renderBookPage({...chapter,content:html,continuation:true,previous:{href:'previous.html',title:'Previous'},next:{href:'next.html',title:'Next'}});
     assert.match(page,/src\/continuation.mjs/);
     assert.ok(page.indexOf('continuation-transfer')<page.indexOf('chapter-references'));
-    assert.doesNotMatch(page,/Download the PyTorch companion/);
+    assert.match(page,/desktop.html#examples/);
     const attributes=[...page.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
     assert.equal(new Set(attributes).size,attributes.length,'duplicate HTML ids in '+chapter.slug);
   }

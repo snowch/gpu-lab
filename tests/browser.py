@@ -5,6 +5,7 @@ from kernel import check_kernel
 from hello import check_hello
 from book_opening import check_book_opening
 from reference_practice import check_reference_practice
+from desktop import check_desktop
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
 import os
@@ -238,6 +239,7 @@ try:
         check_hello(browser, URL, ROOT, errors)
         check_book_opening(browser, URL, ROOT, errors)
         check_reference_practice(browser, URL, ROOT)
+        check_desktop(browser, URL, ROOT)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

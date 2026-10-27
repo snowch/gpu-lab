@@ -3,9 +3,9 @@ name: CUDA examples in GPGPU-Sim
 on:
   push:
     branches: [main]
-    paths: ['examples/**', 'src/hello-model.mjs', 'src/cuda-program.mjs', 'scripts/*cuda*', 'tests/test_cuda_output.py', '.dockerignore', 'docker/cuda-sim.Dockerfile', '.github/workflows/cuda-sim.yml']
+    paths: ['examples/**', 'src/hello-model.mjs', 'src/cuda-program.mjs', 'src/kernel-model.mjs', 'scripts/export-desktop.mjs', 'content/desktop.mjs', 'scripts/*cuda*', 'tests/test_cuda_output.py', '.dockerignore', 'docker/cuda-sim.Dockerfile', '.github/workflows/cuda-sim.yml']
   pull_request:
-    paths: ['examples/**', 'src/hello-model.mjs', 'src/cuda-program.mjs', 'scripts/*cuda*', 'tests/test_cuda_output.py', '.dockerignore', 'docker/cuda-sim.Dockerfile', '.github/workflows/cuda-sim.yml']
+    paths: ['examples/**', 'src/hello-model.mjs', 'src/cuda-program.mjs', 'src/kernel-model.mjs', 'scripts/export-desktop.mjs', 'content/desktop.mjs', 'scripts/*cuda*', 'tests/test_cuda_output.py', '.dockerignore', 'docker/cuda-sim.Dockerfile', '.github/workflows/cuda-sim.yml']
   workflow_dispatch:
 
 permissions:
@@ -47,7 +47,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gather-gpgpu-sim
+          name: cuda-gpgpu-sim
           path: |
             test-results/cuda-sim/
             test-results/generated-cuda/

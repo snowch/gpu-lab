@@ -21,7 +21,7 @@ def check_reference_practice(browser,url,root):
         expect(task).to_contain_text('torch.float32')
         page.locator('#hello-factor-0').fill('3');page.locator('#hello-run-0').click()
         with page.expect_popup() as popup:
-            task.get_by_role('link').click()
+            task.locator('a[target="_blank"]').first.click()
         expect(popup.value.get_by_role('heading')).to_have_text('Official documentation')
         popup.value.close()
         expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
@@ -30,7 +30,7 @@ def check_reference_practice(browser,url,root):
         task.screenshot(path=str(root/f'test-results/reference-{width}-{theme}.png'))
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         context.set_offline(False)
-        for slug in ['devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','meet-gpu']:
+        for slug in ['devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','meet-gpu','desktop']:
             page.goto(url+'lessons/'+slug+'.html')
             expect(page.locator('.reference-task')).to_have_count(2)
             expect(page.locator('.chapter-references h2')).to_have_text('References')
@@ -51,7 +51,7 @@ def check_reference_practice(browser,url,root):
         context.close()
     context=browser.new_context(java_script_enabled=False)
     page=context.new_page()
-    for slug in ['hello','devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','meet-gpu']:
+    for slug in ['hello','devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','meet-gpu','desktop']:
         page.goto(url+'lessons/'+slug+'.html')
         expect(page.locator('.chapter-references')).to_be_visible()
         for task in page.locator('.reference-task').all():
