@@ -154,6 +154,10 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 concept_map=context.new_page();concept_map.goto(url+'lessons/meet-gpu.html?chapter=matmul')
                 for disclosure in ['gpu','sm-0','block-a','a-warp-1','a-w1-lane-7']:
                     concept_map.locator('#'+disclosure+' > summary').click()
+                page.locator('.gpu-map-link').click()
+                embedded=page.frame_locator('#gpu-map-frame')
+                for disclosure in ['gpu','sm-0','block-a','a-warp-1','a-w1-lane-7']:
+                    embedded.locator('#'+disclosure+' > summary').click()
                 context.set_offline(False);CourseHandler.revision='two';check(page)
                 expect(page.locator('#version-status')).to_have_text('Update available')
                 expect(page.locator('#app-status-summary')).to_contain_text('Update available')
@@ -200,6 +204,10 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(concept_map.locator('#map-chapter')).to_have_value('matmul')
                 expect(concept_map.locator('[data-map-view=hardware]')).to_have_attribute('aria-current','true')
                 expect(concept_map.locator('#a-warp-1')).to_have_attribute('open','')
+                expect(page.locator('#gpu-map-panel')).to_be_visible()
+                expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
+                page.locator('.gpu-map-link').click()
+                expect(page.locator('#gpu-map-panel')).to_be_hidden()
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
                 expect(page.locator('#hello-factor-1')).to_have_value('7')
                 expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')

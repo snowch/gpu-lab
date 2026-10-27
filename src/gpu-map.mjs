@@ -5,6 +5,7 @@ import {registerExperiment} from './experiment-state.mjs';
 const root=document.querySelector('#gpu-map');
 const $=s=>root.querySelector(s);
 const params=new URLSearchParams(location.search);
+if(params.get('embedded')==='1'&&window.parent!==window)document.documentElement.classList.add('map-embedded');
 const panels=['hardware','operation'];
 const nodes=[...root.querySelectorAll('.map-node')];
 let active=panels.includes(params.get('view'))?params.get('view'):params.get('view')==='ai'?'operation':'hardware';
@@ -101,6 +102,7 @@ const origin=params.get('from');
 const validPages=new Set(['index','desktop','memory','kernel','shared-memory',...mapConcepts.flatMap(c=>c.chapters)]);
 if(validPages.has(origin)){
  const back=$('#map-return');back.href=origin==='index'?'../index.html':origin+'.html';back.textContent='Return to where you were reading';
+ const close=document.querySelector('.top-actions .gpu-map-link');if(close)close.href=back.href;
  back.addEventListener('click',event=>{if(window.opener&&!window.opener.closed){event.preventDefault();window.opener.focus();window.close();}});
 }
 registerExperiment('gpu-map',()=>({view:active,chapter,open:nodes.filter(n=>n.open).map(n=>n.id),recent}),saved=>{

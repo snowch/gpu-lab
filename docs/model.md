@@ -15,6 +15,10 @@ Neither view simulates scheduling, placement, cache behaviour or timing.
 Build-time renderers emit all SMs, blocks, warps, lanes and worked traces as native HTML
 disclosures. JavaScript enhances navigation and persistence without creating essential
 content. The text reference retains all directed relationships and book examples.
+The header toggle keeps the reading document in place and loads the map in a same-origin
+frame across the reading area. It hides both contents lists, shares the theme, restores
+reading position on close, and includes frame state in the release-update protocol.
+Map chapter links navigate the reading window. Direct map routes also use the full width.
 Hardware terms follow NVIDIA CUDA conventions; boxes distinguish resident work from
 physical resources and do not imply a chip floor plan or simultaneous execution.
 
