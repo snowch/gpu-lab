@@ -75,8 +75,9 @@ footer { flex-wrap:wrap; }
 .reference-goal { max-width:760px; margin-top:24px; }
 @media(max-width:760px) { .reference-task { padding:16px; } }
 
-/* Group the book opening separately from the existing deeper labs. */
-.nav-group { margin:20px 12px 6px; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+/* Chapters, appendices and practice have distinct, accessible contents headings. */
+.nav-section { display:grid; gap:6px; margin-top:14px; padding-top:16px; border-top:1px solid var(--line); }
+.sidebar .nav-group { margin:0 10px 6px; color:var(--ink); font-size:13px; font-weight:700; line-height:1.5; text-transform:uppercase; letter-spacing:.08em; }
 
 .reference-icon { width:22px; height:22px; flex:none; margin-top:1px; }
 .reference-code { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; margin:0 0 16px; font:16px/1.7 ui-monospace,monospace; }

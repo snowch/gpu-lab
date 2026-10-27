@@ -51,3 +51,24 @@ mobile/tablet/desktop layouts, static content and offline restart. These are not
 newcomer usability observations. Learner trials should check whether readers can
 explain a dependency, predict a changed output/count, and distinguish a framework
 operation from a chosen teaching implementation.
+
+## Optional resources after the chapter rewrite
+
+Keep a resource prominent only when it has a distinct learner outcome:
+
+- **Repair a kernel:** apply chapter 1 by diagnosing indexing and bounds mistakes.
+  Keep it under Extra practice and link it from chapter 1.
+- **Shared-memory banks:** explore conflicts, broadcasts and padding beyond the
+  reduction and matrix-reuse chapters. Keep it under Extra practice, linked from
+  chapter 8.
+- **Memory access explorer:** its introductory prose overlaps chapters 3–5.
+  Link directly to its flexible stride/offset/active-lane controls from chapter 5,
+  rather than presenting the old lab as another course entry. Retain its route,
+  recap and downloads for existing links and offline use. Show its current-page
+  entry when visiting the explorer.
+- **Meet the GPU:** a reference map, grouped under Appendices.
+- **Run on your desktop:** an execution appendix, first under Appendices and
+  separately linked beside downloadable examples.
+
+Contents headings separate Chapters, Appendices and Extra practice. Optional
+material must not look like another required sequence after the twelve chapters.

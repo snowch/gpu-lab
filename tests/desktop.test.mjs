@@ -23,7 +23,7 @@ test('every chapter has a complete source-generated Python download and setup li
   assert.throws(()=>pythonProgram('y = x * 2'),/imports and setup/);
   const nav=renderBookNav('desktop');
   assert.equal([...nav.matchAll(/aria-current="page"/g)].length,1);
-  assert.match(nav,/Appendix: run on your desktop/);
+  assert.match(nav,/Run on your desktop/);
 });
 
 test('download wrapper selects CUDA requests without silently moving explicit CPU arithmetic',()=>{
