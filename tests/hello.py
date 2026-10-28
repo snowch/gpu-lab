@@ -22,11 +22,24 @@ def hello_flow(page, url):
     visible=page.locator('#idea-1').inner_text()
     assert '__global__' not in visible and 'blockIdx' not in visible and 'float*' not in visible
     expect(page.locator('#hello-map-0 .hello-thread')).to_have_count(5)
+    for stage in range(5):
+        outputs=page.locator(f'#hello-map-{stage} .hello-thread strong:last-child')
+        expect(outputs).to_have_text(['?'] * outputs.count())
+        page.locator(f'#hello-run-{stage}').click()
+        expect(page.locator(f'#hello-output-{stage}')).to_have_text('Output: [2, 4, 6, 8, 10]')
+        if stage:
+            page.locator(f'#hello-map-{stage} [data-thread="1"]').click()
+            expect(page.locator(f'#hello-output-{stage}')).to_have_text('Output: [2, 4, 6, 8, 10]')
+        page.locator(f'#hello-factor-{stage}').fill('3')
+        expect(outputs).to_have_text(['?'] * outputs.count())
+        expect(page.locator(f'#hello-output-{stage}')).to_contain_text('Settings changed')
+        page.locator(f'#hello-factor-{stage}').fill('2')
+
     page.locator('#hello-factor-0').fill('3')
     page.locator('#hello-run-0').click()
     expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
     expect(page.locator('#hello-factor-1')).to_have_value('2')
-    expect(page.locator('#hello-output-1')).to_have_text('Example output: [2, 4, 6, 8, 10]')
+    expect(page.locator('#hello-output-1')).to_contain_text('press Run')
     page.locator('#hello-map-1 button').nth(2).focus()
     page.keyboard.press('Enter')
     expect(page.locator('#hello-index-1')).to_contain_text('i = 2')
@@ -111,6 +124,14 @@ def check_old_hello_snapshot(browser,url):
     expect(page.locator('#hello-map-1 .hello-thread')).to_have_count(5)
     expect(page.locator('#hello-map-1 [data-thread="2"]')).to_have_attribute('aria-pressed','true')
     expect(page.locator('.restore-notice')).to_have_count(0)
+    for ran,message in [(True,'Example output: [2, 4, 6, 8, 10]'),(False,'Settings changed—predict again, then press Run.')]:
+        page.evaluate('''([ran,message]) => {
+          const controls=[...document.querySelectorAll('main input,main select,main textarea')].map(el=>({id:el.id,name:el.name,value:el.value,checked:el.checked}));
+          sessionStorage.setItem('gpu-lab:restart:'+location.pathname+location.search,JSON.stringify({schema:1,controls,experiments:{'hello-1':{selected:2,ran,message}},details:[],messages:{},scroll:[0,0]}));
+        }''',[ran,message])
+        page.reload()
+        expect(page.locator('#hello-map-1 .hello-thread strong:last-child')).to_have_text(['?']*5)
+        expect(page.locator('#hello-output-1')).to_have_text('Predict the outputs, then press Run.')
     context.close()
 
 def check_hello(browser,url,root,errors):
@@ -130,9 +151,11 @@ def check_hello(browser,url,root,errors):
     page=context.new_page();page.goto(url+'lessons/hello.html')
     expect(page.locator('.hello-section')).to_have_count(5)
     expect(page.locator('.hello-thread')).to_have_count(34)
-    expect(page.locator('#hello-output-4')).to_have_text('Example output: [2, 4, 6, 8, 10]')
+    expect(page.locator('#hello-output-4')).to_have_text('Predict the outputs, then press Run.')
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
     expect(page.locator('#hello-map-2 [data-thread="5"]')).to_contain_text('No calculation')
     expect(page.locator('.hello-section-end noscript p')).to_contain_text('Indices 6 and 7 skip')
+    page.locator('#idea-5 noscript summary').click()
+    expect(page.locator('#idea-5 noscript p')).to_have_text('Output: [2, 4, 6, 8, 10].')
     context.close()
     print('PASS: continuous intro, independent state, no scroll jumps, keyboard selection, CUDA download and static diagrams')

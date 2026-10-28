@@ -7,7 +7,7 @@ import {renderIntroMap} from './hello-view.mjs';
 for (const section of document.querySelectorAll('.hello-section')) {
 const stage=Number(section.dataset.stage);
 const $=id=>document.getElementById(id+'-'+stage);
-let selected=0,result=simulateIntro(stage,2);
+let selected=0,result=null;
 function factor(){
   if($('hello-factor').value.trim()==='') throw new Error('Enter a multiplier first.');
   const value=Number($('hello-factor').value);simulateIntro(stage,value);return value;
@@ -32,7 +32,7 @@ function draw(){
   inspect(state.threads[selected]??state.threads[0]);
 }
 function invalidate(){
-  result=null;$('hello-output').textContent='Run to see the results.';code();draw();
+  result=null;$('hello-output').textContent='Settings changed—predict again, then press Run.';code();draw();
 }
 function resultText(){return result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';}
 $('hello-map').addEventListener('click',event=>{
@@ -54,10 +54,10 @@ $('hello-run').addEventListener('click',()=>{
   }catch(error){result=null;$('hello-output').textContent=error.message;}
 });
 $('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
-code();draw();
+code();draw();$('hello-run').disabled=false;
 registerExperiment('hello-'+stage,()=>({selected,ran:result!==null,length:steps[stage].length,message:$('hello-output').textContent}),state=>{
-  selected=state.selected;result=state.ran?model():null;code();draw();
-  $('hello-output').textContent=state.length===steps[stage].length&&typeof state.message==='string'?state.message:result?resultText():'Run to see the results.';
+  selected=state.selected;result=state.ran===true&&!state.message?.startsWith('Example output:')?model():null;code();draw();
+  $('hello-output').textContent=result?resultText():'Predict the outputs, then press Run.';
 });
 }
 

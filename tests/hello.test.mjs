@@ -60,3 +60,11 @@ test('concepts precede CUDA and the first CUDA panel contains a complete kernel'
   assert.ok(html.indexOf('__global__')<html.indexOf('id="hello-launch-4"'));
   assert.doesNotMatch(html,/hello-relationships|hello-selected-code|hello-line-/);
 });
+
+
+test('initial experiment HTML withholds output before scripts run',()=>{
+ const html=renderIntroSections().split('<section class="hello-section"').slice(1).join('');
+ assert.equal((html.match(/<small>Output<\/small><strong>\?<\/strong>/g)||[]).length,34);
+ assert.equal((html.match(/Predict the outputs, then press Run\./g)||[]).length,5);
+ assert.doesNotMatch(html,/Example output:/);
+});

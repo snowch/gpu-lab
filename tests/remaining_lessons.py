@@ -34,8 +34,7 @@ def check_remaining(browser,base_url,root,errors):
                     assert experiment.locator('[data-visual-output]').inner_text()!=output,slug+' trace did not change'
                     experiment.locator('[data-back]').click()
                     expect(experiment.locator('[data-visual-output]')).to_have_text(output,use_inner_text=True)
-                if experiment.locator('select').count():
-                    control=experiment.locator('select').first
+                for control in experiment.locator('select').all():
                     options=control.locator('option').evaluate_all('(els)=>els.map(el=>el.value)')
                     control.select_option(next(value for value in options if value!=control.input_value()))
                     expect(experiment.locator('[data-results]')).to_be_hidden()
@@ -54,8 +53,12 @@ def check_remaining(browser,base_url,root,errors):
     context=browser.new_context(java_script_enabled=False,viewport={'width':360,'height':900});page=context.new_page()
     for slug in SLUGS:
         page.goto(base_url+'lessons/'+slug+'.html')
-        for result in page.locator('[data-visual-output]').all():
-            expect(result).to_be_visible();assert len(result.inner_text())>80
+        for experiment in page.locator('[data-book-experiment]').all():
+            expect(experiment.locator('[data-results]')).to_be_hidden()
+            expect(experiment.locator('[data-run]')).to_be_disabled()
+            experiment.locator('noscript > details > summary').click()
+            expect(experiment.locator('noscript > details')).to_have_attribute('open','')
+            assert len(experiment.locator('noscript > details').inner_text())>80
         expect(page.locator('.chapter-definition').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     context.close()
