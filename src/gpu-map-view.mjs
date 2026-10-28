@@ -5,9 +5,21 @@ const escape=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replace
 const chapterName=slug=>{const index=chapters.findIndex(c=>c.slug===slug);return index>=0?`Chapter ${index+1}: ${chapters[index].title}`:({'shared-memory':'Extra practice: shared-memory banks',kernel:'Extra practice: repair a kernel',memory:'Memory access explorer'}[slug]??slug);};
 const chapterLinks=c=>`<div class="map-chapter-links">${c.chapters.map(slug=>`<a href="${slug}.html">${escape(chapterName(slug))}</a>`).join('')}</div>`;
 const info=id=>{const c=conceptById(id);return `<p>${escape(c.meaning)}</p><p><strong>Book example:</strong> ${escape(c.example)}</p>${chapterLinks(c)}`;};
+// Use the catalogue's direct teaching links, rather than incidental mentions.
+export function chapterLabel(id){
+ const numbers=[...new Set(conceptById(id).chapters.map(slug=>chapters.findIndex(c=>c.slug===slug)+1).filter(n=>n>0))].sort((a,b)=>a-b);
+ if(!numbers.length)return '<span class="map-chapter-label">(Extra practice)</span>';
+ const ranges=[];
+ for(let i=0;i<numbers.length;i++){
+  const first=numbers[i];let last=first;
+  while(numbers[i+1]===last+1)last=numbers[++i];
+  ranges.push(first===last?String(first):`${first}–${last}`);
+ }
+ return `<span class="map-chapter-label">(Ch. ${ranges.join(', ')})</span>`;
+}
 // These functions run during the build. Native disclosures work before any script loads.
 function node(id,concept,title,hint,body,kind=''){
- return `<details class="map-node ${kind}" id="${id}" data-map-concept="${concept}"><summary><span><strong>${title}</strong><span class="map-hint">${hint}</span></span></summary><div class="map-inside">${body}</div></details>`;
+ return `<details class="map-node ${kind}" id="${id}" data-map-concept="${concept}"><summary><span><strong>${title} ${chapterLabel(concept)}</strong><span class="map-hint">${hint}</span></span></summary><div class="map-inside">${body}</div></details>`;
 }
 const concept=(id,prefix,children='',hint='Definition, book example and chapter links')=>node(`${prefix}-${id}`,id,escape(conceptById(id).title),hint,info(id)+children);
 export function renderWarp(block,w){
