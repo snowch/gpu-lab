@@ -22,7 +22,7 @@ function inspect(t){
   if(stage===0)return;
   $('hello-index').textContent=stage===1
     ? 'Thread '+t.i+': i = '+t.i+'. Read the input at index '+t.i+', multiply it, then write the output at index '+t.i+'.'
-    : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips array access.':t.invalid?' No element '+t.i+' exists: this access is invalid.':'');
+    : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips the read, multiplication and write.':t.invalid?' No element '+t.i+' exists: without the check, the read is invalid and there is no valid result.':'');
 
 }
 function draw(){

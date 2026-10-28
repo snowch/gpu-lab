@@ -32,5 +32,5 @@
 .book-warp-lanes { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:5px; margin-bottom:12px; }
 .book-warp-lanes span { border:1px solid var(--accent); border-radius:4px; text-align:center; padding:4px 0; }
 .book-warp-lanes .used { background:var(--accent-soft); font-weight:700; }
-.book-warp-lanes .unused { border-style:dashed; color:var(--muted); }
+.book-warp-lanes .unused { border-style:dashed; background:var(--idle-bg); color:var(--idle-ink); }
 .book-warp p { margin:0; }

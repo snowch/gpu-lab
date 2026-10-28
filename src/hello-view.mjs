@@ -6,8 +6,10 @@ export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   const groups=stage>=2?Array.from({length:state.blocks},(_,i)=>i):[null];
   return groups.map(group=>`<div class="hello-group">${group===null?'':`<h3>Block ${group}</h3>`}<div class="hello-threads">${state.threads.filter(t=>group===null||t.block===group).map(t=>{
     const tag=stage===0?'div':'button';
-    const values=[['Input',t.input===null?'No element':t.input],[stage===0?'Calculation':'Thread '+t.i,'× '+state.factor],['Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':t.output]];
-    return `<${tag} class="hello-thread" ${stage===0?'':`type="button" data-thread="${t.i}" aria-pressed="${t.i===selected}"`} ${showOutput&&(t.skipped||t.invalid)?`data-state="${t.skipped?'skip':'invalid'}"`:''}>${values.map(([label,value])=>`<small>${escape(label)}</small><strong>${escape(value)}</strong>`).join('')}</${tag}>`;
+    const calculation=t.skipped?'No calculation':t.invalid?(showOutput?'Invalid read':'Run to check'):'× '+state.factor;
+    const cardState=t.skipped?'skip':t.invalid?(showOutput?'invalid':'pending'):null;
+    const values=[['Input',t.input===null?'No element':t.input],[stage===0?'Calculation':'Thread '+t.i,calculation],['Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':t.output]];
+    return `<${tag} class="hello-thread" ${stage===0?'':`type="button" data-thread="${t.i}" aria-pressed="${t.i===selected}"`} ${cardState?`data-state="${cardState}"`:''}>${values.map(([label,value])=>`<small>${escape(label)}</small><strong>${escape(value)}</strong>`).join('')}</${tag}>`;
   }).join('')}</div></div>`).join('');
 }
 export function renderIntroSections() {
@@ -29,11 +31,12 @@ export function renderIntroSections() {
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
+      ${step.leadIn?`<p>${step.leadIn}</p>`:''}
       ${definitions(step.definitions)}
       <p class="hello-concept">${step.concept}</p>
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>
-      ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The extra three threads have no input; the next experiment lets you explore that case.</p>':''}
-      ${stage===3?'<p>Here, the bounds check asks whether a thread’s index is smaller than the number of inputs. Indices 0–4 pass; indices 5–7 skip the read and write. Turn the check off below to see why it matters.</p>':''}
+      ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The extra three threads still exist, but have no input. A check makes them skip the read, multiplication and write. Their cards are grey and say “No calculation”; select one to inspect its index. The next experiment lets you turn that check off.</p>':''}
+      ${stage===3?'<p>Here, the bounds check asks whether a thread’s index is smaller than the number of inputs. Indices 0–4 pass; indices 5–7 skip the read, multiplication and write. Turn the check off below to see why it matters.</p>':''}
       ${stage===4?`<p>PyTorch selects an optimised implementation and handles its launch; <code>y = x * 2</code> does not choose blocks or threads. CUDA lets us write the GPU function and choose those settings ourselves. The compiler also optimises our code. Our <code>runKernel</code> is a separate teaching function; PyTorch does not call it when evaluating this expression. The example makes the work visible and is not intended to outperform PyTorch.</p>
       ${pre('hello-full',kernelSource(2),'CUDA C++ · complete GPU function (kernel)')}
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}

@@ -16,6 +16,7 @@
 .continuation-section .lane-grid { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .3rem; }
 .continuation-section .lane-grid > * { padding: .35rem .1rem; text-align: center; border: 1px solid var(--line); border-radius: .25rem; font-size: .8em; overflow-wrap: anywhere; }
 .continuation-section .lane-grid .selected { background: var(--accent-soft); border-color: var(--accent); }
+.continuation-section .lane-grid .unused { background:var(--idle-bg); color:var(--idle-ink); border-style:dashed; }
 .continuation-section .muted { color: var(--muted); }
 .continuation-transfer details { margin-block: 1.2rem; }
 @media(max-width: 500px) { .continuation-section .lane-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } }

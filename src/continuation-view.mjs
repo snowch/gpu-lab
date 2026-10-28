@@ -33,6 +33,6 @@ export function renderContinuation(chapter){
       <p id="${section.id}-feedback" class="continuation-feedback" role="status">Predict the result, then run. The worked example below uses the initial settings.</p>
       <div data-results><div class="continuation-steps" data-steps${steps<=1?' hidden':''}><button type="button" data-back disabled>Previous step</button><button type="button" data-next${steps<=1?' disabled':''}>Next step</button><output data-position>Step 1 of ${steps}</output></div><div data-visual-output>${experimentResult(experiment,result)}</div></div></div>`;
     }
-    return `<section class="book-section continuation-section" id="${section.id}"><p class="eyebrow">Idea ${index+1} of ${chapter.sections.length}</p><h2>${section.title}</h2>${definitions(section.terms)}${section.body}${section.task?readerTask(section.task):''}${interactive}${section.after||''}</section>`;
+    return `<section class="book-section continuation-section" id="${section.id}"><p class="eyebrow">Idea ${index+1} of ${chapter.sections.length}</p><h2>${section.title}</h2>${section.leadIn?`<p>${escape(section.leadIn)}</p>`:''}${definitions(section.terms)}${section.body}${section.task?readerTask(section.task):''}${interactive}${section.after||''}</section>`;
   }).join('')+`${chapter.optionalHTML||''}<section class="book-section continuation-transfer"><h2>Try a new case</h2>${readerTask(chapter.transfer.prompt,'Apply it')}<details><summary>Compare your answer</summary><div>${chapter.transfer.answer}</div></details></section>`;
 }
