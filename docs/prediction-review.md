@@ -40,6 +40,8 @@ unrun row examples across a real release update, alongside completed results.
 
 The first browser attempt found an ambiguous test selector for nested fallback
 summaries; the test now selects the outer comparison disclosure explicitly.
+A later desktop-download assertion still expected the former pending-message text;
+it now checks the new wording. Neither failure identified a numerical regression.
 Visual review inspected actual pending/running chapter 1 and pending chapter 4
 screenshots, including phone and tablet layouts. This was an author review and
 automated verification, not independent learner testing.
