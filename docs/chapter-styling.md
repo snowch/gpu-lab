@@ -59,3 +59,8 @@ Map tile headings include compact chapter numbers from the concept catalogue,
 using smaller readable text and ranges for consecutive chapters. Supplementary
 concepts without a numbered chapter say Extra practice. Full chapter links remain
 inside the disclosure; the title and its annotation share the expansion target.
+
+Collapsed parent tiles also show an Inside line aggregating the chapters of their
+actual rendered descendants, with duplicates removed and optional practice noted.
+It hides on expansion, when child headings provide their own references. Leaf tiles
+have no Inside line. Containment comes from the rendered tree, not catalogue edges.

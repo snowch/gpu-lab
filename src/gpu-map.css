@@ -80,3 +80,6 @@
 /* Chapter numbers supplement the title; the whole header remains a disclosure. */
 .map-node>summary>span { min-width:0; }
 .map-chapter-label { display:inline; color:var(--muted); font-size:14px; line-height:1.5; font-weight:400; }
+
+.map-inside-chapters { display:block; margin-top:5px; color:var(--muted); font-size:14px; line-height:1.5; font-weight:400; }
+.map-node[open]>summary .map-inside-chapters { display:none; }
