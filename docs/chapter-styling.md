@@ -54,3 +54,8 @@ Components within the chip use neutral surfaces. Borders, nesting and explicit
 labels carry the hierarchy independently of colour; keyboard focus remains distinct.
 The map has no chapter filter, chapter highlights or related-concept badges. Keep
 Back one level, Reset diagram and chapter links inside the components.
+
+Map tile headings include compact chapter numbers from the concept catalogue,
+using smaller readable text and ranges for consecutive chapters. Supplementary
+concepts without a numbered chapter say Extra practice. Full chapter links remain
+inside the disclosure; the title and its annotation share the expansion target.
