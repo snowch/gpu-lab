@@ -126,6 +126,8 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                         tab.close()
                 assets=page.evaluate('''async files => {for (const f of files) { const r=await fetch(new URL(f.path, new URL(document.querySelector('meta[name="gpu-base"]').content,location.href))); if(!r.ok || (await r.arrayBuffer()).byteLength!==f.bytes) return f.path;} return null;}''',releases['one']['files'])
                 assert assets is None, assets
+                expect(page.locator('#hello-map-0 .hello-thread strong:last-child')).to_have_text(['?']*5)
+                page.locator('#hello-factor-0').fill('3')
                 page.locator('#hello-factor-1').fill('7'); page.locator('#hello-run-1').click()
                 page.locator('#hello-map-1 button[data-thread="2"]').click()
                 expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')
@@ -209,6 +211,11 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 page.locator('.gpu-map-link').click()
                 expect(page.locator('#gpu-map-panel')).to_be_hidden()
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
+                expect(page.locator('#hello-factor-0')).to_have_value('3')
+                expect(page.locator('#hello-map-0 .hello-thread strong:last-child')).to_have_text(['?']*5)
+                expect(page.locator('#hello-output-0')).not_to_contain_text('Output:')
+                expect(reading.locator('#reading-map-row .book-reads li>span:last-child strong')).to_have_text(['?']*5)
+                expect(layout.locator('#reading-map-row .book-storage')).to_be_hidden()
                 expect(page.locator('#hello-factor-1')).to_have_value('7')
                 expect(page.locator('#hello-output-1')).to_have_text('Output: [7, 14, 21, 28, 35]')
                 expect(page.locator('#hello-map-1 button[data-thread="2"]')).to_have_attribute('aria-pressed','true')
@@ -238,6 +245,11 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(page.locator('#offline-status')).to_have_text('Not saved for offline use')
                 assert page.evaluate('caches.keys()') == ['sibling-app:keep']
                 assert page.evaluate("localStorage.getItem('user-content')") == 'keep'
+                expect(page.locator('#hello-factor-0')).to_have_value('3')
+                expect(page.locator('#hello-map-0 .hello-thread strong:last-child')).to_have_text(['?']*5)
+                expect(page.locator('#hello-output-0')).not_to_contain_text('Output:')
+                expect(reading.locator('#reading-map-row .book-reads li>span:last-child strong')).to_have_text(['?']*5)
+                expect(layout.locator('#reading-map-row .book-storage')).to_be_hidden()
                 expect(page.locator('#hello-factor-1')).to_have_value('7')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
                 assert not errors,errors

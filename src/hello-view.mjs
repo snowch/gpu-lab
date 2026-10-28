@@ -48,10 +48,11 @@ export function renderIntroSections() {
       ${readerTask(step.instruction)}
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?'<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>':''}
-      <button id="hello-run-${stage}" type="button" class="primary">Run</button>
+      <button id="hello-run-${stage}" type="button" class="primary" disabled>Run</button>
       <p class="hello-note">Browser simulation · this example has its own controls</p>
-      <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state)}</div>
-      <p id="hello-output-${stage}" class="hello-output" role="status">Example output: [${state.output.join(', ')}]</p>
+      <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,0,false)}</div>
+      <p id="hello-output-${stage}" class="hello-output" role="status">Predict the outputs, then press Run.</p>
+      <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.join(', ')}].</p></details></noscript>
       ${stage>0?`<p id="hello-index-${stage}" role="status">Select a thread to follow its input and output.</p>`:''}
       ${stage===4?`<div class="hello-complete">
         <details class="more-settings"><summary>Run the CUDA example on your computer</summary>

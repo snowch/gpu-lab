@@ -13,7 +13,7 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
   const key=device?section.dataset.deviceStage:section.dataset.reading;
   const prefix=device?'device':'reading';
   const $=name=>document.getElementById(`${prefix}-${name}-${key}`);
-  let ran=false;
+  let ran=false,changed=false;
   function config() {
     return device?{stage:Number(key),count:number($('count'),5),factor:number($('factor'),2)}:
       {pattern:$('pattern')?.value??key,index:number($('index'),0),factor:number($('factor'),2)};
@@ -24,10 +24,10 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
       if(device) {
         const source=journeyCode(c);$('setup').textContent=source.setup;$('code').textContent=source.operation;
         $('map').innerHTML=renderDeviceMap(s,ran);
-        $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).join(', ')}].`:'Run to inspect the result.';
+        $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).join(', ')}].`:(changed?'Settings changed—predict again, then press Run.':'Predict the result, then press Run.');
       } else {
         $('code').textContent=readingCode(c);$('map').innerHTML=renderReadMap(s,ran,{sectors:key==='sectors',mode:section.dataset.readingMode});
-        let feedback=ran?'Output: ['+s.output.join(', ')+'].':'Run to inspect the output.';
+        let feedback=ran?'Output: ['+s.output.join(', ')+'].':(changed?'Settings changed—predict again, then press Run.':'Predict the outputs, then press Run.');
         if(ran&&key==='sectors') {
           const raw=$('guess').value;
           feedback+=` ${s.load.sectors.length} sector${s.load.sectors.length===1?'':'s'} for ${s.load.usefulBytes} useful bytes.`;
@@ -39,7 +39,7 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
       ran=false;$('map').textContent='Enter valid settings to see the diagram.';$('feedback').textContent=error.message;
     }
   }
-  for(const control of section.querySelectorAll('input,select')) control.addEventListener(control.tagName==='INPUT'?'input':'change',()=>{ran=false;render();});
+  for(const control of section.querySelectorAll('input,select')) control.addEventListener(control.tagName==='INPUT'?'input':'change',()=>{ran=false;changed=true;render();});
   $('run').addEventListener('click',()=>{ran=true;render();});
   render();
   $('run').disabled=false;section.dataset.ready='true';

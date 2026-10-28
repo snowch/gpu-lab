@@ -16,7 +16,10 @@ test('published continuation has a continuous sequence and independent local exp
     assert.match(html,/no installation or GPU required/);
     assert.match(html,/import torch/);
     assert.ok(html.indexOf('chapter-opening-code')<html.indexOf('continuation-section'));
-    assert.ok(chapter.sections.filter(s=>s.experiment).length>=2);
+    const count=chapter.sections.filter(s=>s.experiment).length;
+    assert.ok(count>=2);
+    assert.equal((html.match(/<div data-results hidden>/g)||[]).length,count);
+    assert.equal((html.match(/data-run disabled/g)||[]).length,count);
     for(const section of chapter.sections){
       assert.ok(!ids.has(section.id),section.id);ids.add(section.id);
       if(!section.experiment)continue;

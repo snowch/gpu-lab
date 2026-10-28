@@ -369,8 +369,9 @@ The new pages are included in offline release generation and update restoration 
 
 The continuation uses the unchanged architecture and AI engines above. Each local
 experiment fixes most settings and exposes only those needed for its question.
-The build renders a default worked result; JavaScript replaces that with an
-explicit Run flow and invalidates only the changed example. Trace navigation is
+The build hides experiment results before scripts load. Run reveals the computed
+result; changing settings invalidates only that example. With JavaScript disabled,
+a labelled comparison disclosure offers the default worked result. Trace navigation is
 omitted for summary-only capacity/storage comparisons. Existing engine tests
 remain authoritative for numerical invariants; chapter checks additionally verify
 configuration coverage and model-derived presentation. The earlier Lab numbers in

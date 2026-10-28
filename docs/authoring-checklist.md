@@ -32,7 +32,12 @@ second set of authoring requirements.
   back up the page. Each experiment owns its controls and results.
 - [ ] Follow predict → run → change one variable → explain. Use `readerTask()` for
   explicit learner actions, with a visible label and decorative icon. Put feedback
-  beside Run. Changing settings must invalidate that experiment’s old result.
+  beside Run. Show `?` for unknown output values until Run; hide derived counts, traces and
+  answer diagrams until then, including in the initial HTML before scripts load.
+  Keep inputs and clearly labelled worked examples visible. Changing calculation
+  settings must invalidate only that experiment’s old result; inspecting a thread
+  or stepping an existing trace must preserve it. Cover first load, changed settings
+  and restart restoration in browser checks.
 - [ ] Keep optional material only for a distinct learning outcome. Link deeper
   experiment controls from the chapter that prepares the reader; group reference
   maps and setup guides under Appendices, separately from Extra practice.

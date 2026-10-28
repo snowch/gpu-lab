@@ -38,6 +38,6 @@ for(const section of chapter.sections.filter(section=>section.experiment)){
   $('[data-run]').addEventListener('click',run);
   $('[data-back]').addEventListener('click',()=>{cursor--;draw();});
   $('[data-next]').addEventListener('click',()=>{cursor++;draw();});
-  draw();$('[role="status"]').textContent='Predict the result, then Run to see it.';
+  draw();$('[data-run]').disabled=false;$('[role="status"]').textContent='Predict the result, then press Run.';
   registerExperiment(section.id,()=>({cursor,revealed}),state=>{cursor=state.cursor;revealed=state.revealed;code();if(revealed)result=computeExperiment(experiment,configuration());draw();});
 }
