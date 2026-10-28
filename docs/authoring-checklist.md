@@ -20,6 +20,9 @@ second set of authoring requirements.
   next example needs. Do not begin with a broken kernel or unexplained CUDA fragment.
   When CUDA first appears, show a complete kernel and its launch together, then
   explain their parts. Label later excerpts as excerpts of an already-seen function.
+- [ ] Before a new mechanism, explain the problem it solves in the current example.
+  A definition tells the reader what a term means; a short bridge tells them why
+  they need it. Connect the last observable result to the next question.
 - [ ] Define new terms before using them in prose, diagrams or controls. Use the
   shared `definitions()` callout: bold term, brief meaning, visible Definition label.
   Group related terms, remove duplicate explanations, and leave later mentions plain.
@@ -57,6 +60,10 @@ second set of authoring requirements.
   memory is separate from the compute chip. CPU and system RAM are peers within
   the CUDA host side; use Computer / system for the parent of host and GPU device.
   State the architecture scope.
+- [ ] Match the picture to the work actually performed. Give skipped work a readable
+  neutral treatment and an explicit label; do not draw arithmetic that a guard skips.
+  Keep inspectable threads selectable, distinguish invalid accesses from safe skips,
+  and distinguish threads with no input from unused warp positions and other-path lanes.
 - [ ] Avoid misleading small examples: a block may have several warps; unused lanes
   do not prevent another block from making progress. State simplifying assumptions
   beside the picture, and defer scheduling details until they are needed.

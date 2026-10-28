@@ -67,6 +67,7 @@ export const chapters = [
       },
       {
         id: 'scheduling-ready', title: 'Give the scheduler another ready warp',
+        leadIn: 'One warp left gaps while waiting for data. Could the SM use those gaps for another warp? That requires other work already on the SM and ready to continue.',
         terms: [
           ['Resident warp', 'A warp already assigned resources on an SM. Every warp in this experiment is resident from the start.'],
           ['Instruction issue', 'Selecting a ready warp and starting its next instruction. An issue slot is one opportunity to do that; this teaching machine has one per cycle.'],
@@ -155,6 +156,7 @@ export const chapters = [
     sections: [
       {
         id: 'reduction-tree', title: 'Build a safe tree of partial sums',
+        leadIn: 'Multiplication gave each thread an independent output. A sum is different: values handled by different threads must meet. We need somewhere to exchange partial results and a way to wait until those results are ready.',
         terms: [
           ['Reduction', 'Combining many values into fewer values using an operation such as addition; here all inputs become one sum.'],
           ['Shared memory', 'Storage that threads in the same block can read and write. In this model thread i first writes input i into shared word i.'],
@@ -228,7 +230,7 @@ function renderDivergence(result, cursor, focus) {
   const introductory = focus === 'uniform';
   const lanes = result.lanes.map(lane => {
     const state = !lane.active ? 'Unused' : event.mask.includes(lane.id) ? 'Now' : 'Other path';
-    return `<div class="continuation-card${event.mask.includes(lane.id) ? ' selected' : ''}"><strong>Lane ${lane.id}</strong><p>${lane.active ? `${lane.input} → ${lane.output}` : '—'}<br>${state}</p></div>`;
+    return `<div class="continuation-card${!lane.active ? ' unused' : event.mask.includes(lane.id) ? ' selected' : ''}"><strong>Lane ${lane.id}</strong><p>${lane.active ? `${lane.input} → ${lane.output}` : '—'}<br>${state}</p></div>`;
   }).join('');
   return `<div class="continuation-visual" aria-label="Computed branch masks and lane outputs">
     ${metrics(introductory ? [['Paths used', result.paths], ['Path operations', result.instructions]] : [['Paths used', result.paths], ['Path operations', result.instructions], ['Useful lane slots', result.usefulSlots], ['Lane-slot use', percent(result.utilisation)]])}

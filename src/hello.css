@@ -20,6 +20,9 @@
 .hello-thread strong { font-size:20px; font-weight:600; overflow-wrap:anywhere; max-width:100%; }
 .hello-thread strong:not(:last-child)::after { content:'↓'; display:block; color:var(--muted); font-size:14px; padding:3px 0; }
 .hello-thread[aria-pressed="true"] { outline:2px solid var(--accent); background:var(--accent-soft); }
+.hello-thread[data-state="skip"] { background:var(--idle-bg); color:var(--idle-ink); border-style:dashed; }
+.hello-thread[data-state="skip"] strong:not(:last-child)::after { visibility:hidden; }
+.hello-thread[data-state="skip"] small { color:var(--idle-ink); }
 .hello-thread[data-state="invalid"] { border:2px dashed var(--accent); }
 .hello-thread[data-state] strong { font-size:14px; }
 [id^="hello-output-"] { padding:14px; background:var(--soft); border-left:3px solid var(--accent); overflow-wrap:anywhere; }
