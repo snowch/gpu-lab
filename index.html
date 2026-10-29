@@ -39,8 +39,19 @@
         <p><a class="start-course" href="./lessons/hello.html">Start chapter 1: One operation, many numbers →</a></p>
         <p><a href="#curriculum">Browse the book →</a></p>
         <p class="prose">Use the <a href="./lessons/meet-gpu.html">GPU map</a> whenever you want to see how concepts fit together. Open the GPU chip, then an SM, block or warp to see how work fits inside the machine. Each concept links to its chapter. The GPU map button opens the map across the reading area, with the contents hidden. Close it to return to the same place and experiment.</p>
-        <p>Start with five numbers, follow them into GPU memory, then explore how their layout changes the work. You need some Python and tensor familiarity; no CUDA or hardware knowledge is assumed.</p>
-        <div class="intro-meta"><span>Predict → inspect → experiment</span><span>Some Python and tensor familiarity</span></div>
+        <p>Start with five numbers, follow them into GPU memory, then explore how their layout changes the work.</p>
+        <div class="intro-meta"><span>Predict → inspect → experiment</span></div>
+      </section>
+      <section id="audience" class="section-space prose" aria-labelledby="audience-title">
+        <h2 id="audience-title">Who this book is for</h2>
+        <p>You’re familiar with machine learning and want to understand what happens on the GPU when you run a tensor operation: how work is divided among threads, where data lives and moves, and what affects performance.</p>
+        <p>The book connects familiar ML operations to GPU architecture through small examples you can inspect and change in your browser.</p>
+      </section>
+      <section id="prerequisites" class="section-space prose" aria-labelledby="prerequisites-title">
+        <h2 id="prerequisites-title">Before you start</h2>
+        <p>Be comfortable reading Python and working with lists or arrays, including indexing, loops and conditions. Later examples use slices and nested list comprehensions. Some experience with PyTorch is helpful.</p>
+        <p>We introduce GPU architecture and the CUDA concepts used in the chapters. C++ familiarity helps with the optional CUDA programs, but isn’t needed for the browser exercises.</p>
+        <p>All interactive examples run in your browser. No installation or GPU is required; running the downloadable programs is optional.</p>
       </section>
       <section id="curriculum" class="section-space">
         <p class="eyebrow">THE BOOK AHEAD</p><h2>From tensor operations to the hardware.</h2><p class="prose">Follow twelve chapters from a tensor operation to GPU execution and AI workloads. Each starts with a small example, then asks you to predict, run and explain. Extra practice is optional. The appendices provide desktop setup and the interactive GPU map.</p>
