@@ -52,6 +52,9 @@ second set of authoring requirements.
 - [ ] Lead browser guidance with “no installation or GPU required”. Explain simulation
   versus local execution once at the appropriate point. State validation limits
   accurately; compiler/simulator checks are not physical GPU performance evidence.
+- [ ] Use one local-execution section per page through `desktopLinks()`. Keep
+  installation steps in the desktop appendix and browser requirements at the opening.
+  Link contextual code downloads beside their code without repeating setup guidance.
 - [ ] Keep complete PyTorch examples in shared source templates. Generate desktop
   downloads through `pythonProgram()` and exercise those same wrappers in
   `tests/chapter_examples.py`. Provide a complete-program link for excerpts; keep
