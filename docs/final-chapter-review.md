@@ -15,6 +15,9 @@ indices. Inspection also made the hardware-comparison boundary explicit: the
 PyTorch download does not select our teaching tile widths. Distinct CUDA/Triton
 implementations would be required for that comparison on hardware.
 
+The local download is integrated into Where next rather than repeating a second
+local-execution section after it.
+
 The chapter reuses the common controls, prediction gating, independent state,
 references and accessible styling. Navigation, the desktop index/downloads,
 map chapter references and global chapter counts include chapter 13. The offline
