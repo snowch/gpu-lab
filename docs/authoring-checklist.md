@@ -48,7 +48,9 @@ second set of authoring requirements.
 
 - [ ] Use shared opening-code, code-language, definition, action and browser-notice
   components. Keep code legible on phones; label PyTorch versus CUDA C++ in text as
-  well as colour. Do not shrink code to make a long line fit.
+  well as colour. Do not shrink code to make a long line fit. Use short source lines and explicit
+  continuation in Python; preserve indentation and keep any horizontal scrolling
+  inside the code panel. Check complete programs and dynamic excerpts alike.
 - [ ] Lead browser guidance with “no installation or GPU required”. Explain simulation
   versus local execution once at the appropriate point. State validation limits
   accurately; compiler/simulator checks are not physical GPU performance evidence.

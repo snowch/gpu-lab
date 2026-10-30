@@ -1,5 +1,5 @@
 /* Copyright © 2026 Christopher Snow. */
-.book-code { padding:18px; border:1px solid var(--line); border-radius:6px; background:var(--panel); white-space:pre-wrap; overflow-wrap:anywhere; font:16px/1.7 ui-monospace,monospace; }
+.book-code { padding:18px; border:1px solid var(--line); border-radius:6px; background:var(--panel); white-space:pre; overflow-wrap:normal; font:16px/1.7 ui-monospace,monospace; }
 .book-code code { font:inherit; }
 .book-note { font-size:14px; color:var(--muted); }
 .book-controls { display:flex; gap:16px; flex-wrap:wrap; margin:20px 0; }

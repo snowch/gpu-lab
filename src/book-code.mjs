@@ -1,6 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 import {tensorSetup} from './foundations-model.mjs';
-export const deviceOpening='import torch\nx_cpu = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], dtype=torch.float32)\nx_gpu = x_cpu.to("cuda")\ny_gpu = x_gpu * 2\ny_cpu = y_gpu.cpu()';
+export const deviceOpening='import torch\nx_cpu = torch.tensor(\n    [1.0, 2.0, 3.0, 4.0, 5.0],\n    dtype=torch.float32,\n)\nx_gpu = x_cpu.to("cuda")\ny_gpu = x_gpu * 2\ny_cpu = y_gpu.cpu()';
 export const readingOpening=part=>tensorSetup+(part==='selection'?'\ny = x[0, :] * 2':'\nvalues = x[:, 0]\ny = values * 2');
 export const memorySetup=`import torch
 

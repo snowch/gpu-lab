@@ -23,11 +23,13 @@ export function simulateIntro(stage,factor,guard=true) {
 const literal=factor=>Number.isInteger(Math.fround(factor))?Math.fround(factor)+'.0f':String(Math.fround(factor))+'f';
 export function pythonSource(factor=2) {
   const {input}=simulateIntro(0,factor);
-  return `import torch\nx = torch.tensor([${input.map(x=>x.toFixed(1)).join(', ')}], device="cuda")\ny = x * ${factor}`;
+  return `import torch\nx = torch.tensor(\n    [${input.map(x=>x.toFixed(1)).join(', ')}],\n    device="cuda",\n)\ny = x * ${factor}`;
 }
 export function lineFor(factor){return `output[i] = input[i] * ${literal(factor)};`;}
 export function kernelSource(factor) {
-  return `__global__ void runKernel(const float* input, float* output, int n) {
+  return `__global__ void runKernel(
+    const float* input, float* output, int n
+) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i < n) {
         ${lineFor(factor)}

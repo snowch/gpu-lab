@@ -7,7 +7,10 @@ Use the same components when extending the book rather than copying a chapter's
 colours, type sizes or spacing into another stylesheet.
 
 - Opening example: `openingCode(source)` renders the green panel with a left accent,
-  18px code, consistent padding and wrapping. Use it once in the opening section.
+  18px code and consistent padding. Preserve source line breaks and indentation;
+  long code scrolls inside its panel instead of wrapping mid-statement. Format
+  Python calls with explicit parenthesised continuation and short lines (aim for
+  60 columns), including dynamic examples. Do not reduce the font size to fit. Use it once in the opening section.
 - Code language: label PyTorch and CUDA C++ explicitly. Green identifies PyTorch;
   blue identifies CUDA, with suitable accents in both themes. Colour supplements
   the language label. Use `codePanel()` for labelled explanatory code.
