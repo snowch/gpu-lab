@@ -15,7 +15,7 @@ export function renderBookNav(current='index') {
 
 }
 export function renderRoadmap() {
-  return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div><span class="tag live">${c.opening?'Read the chapter':'Explore existing lab'}</span></a>`).join('\n');
+  return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div></a>`).join('\n');
 }
 export function renderBookPage({slug,number,title,lead,content,previous,next,continuation=false,appendix=false,map=false}) {
   return `<!doctype html>
