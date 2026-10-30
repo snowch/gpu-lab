@@ -8,7 +8,7 @@ export function renderBookNav(current='index') {
   const home=current==='index',base=home?'./lessons/':'',overview=home?'./index.html':'../index.html';
   const link=(href,label,active=false)=>`<a href="${href}"${active?' class="current" aria-current="page"':''}>${label}</a>`;
   const group=(id,title,links)=>`<section class="nav-section" aria-labelledby="${id}"><h2 class="nav-group" id="${id}">${title}</h2>${links}</section>`;
-  return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}${link(overview+'#curriculum','Book roadmap')}
+  return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}
     ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug)).join(''))}
     ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'meet-gpu.html','GPU map',current==='meet-gpu'))}
     ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true):''))}</nav>`;
