@@ -157,3 +157,11 @@ describes per-SM unified L1/shared-memory capacity, the shared L2 cache, and
 HBM2 device memory. These are hardware resources, distinct from CUDA’s
 block-scoped programming model. Packaging and cache details vary by architecture;
 the map does not represent an integrated GPU with shared system memory.
+
+## Final investigation
+
+Chapter 13 combines the existing matrix-reuse model and its synthetic resource
+budgets; its numerical scope is unchanged. Where next links to the official
+PyTorch profiler recipe, CUDA kernel programming and Triton tutorials. These are
+optional external learning paths, not features executed by the browser. Its
+reference tasks apply Tensor.contiguous and asynchronous CUDA execution rules.

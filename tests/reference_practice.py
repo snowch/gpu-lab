@@ -30,7 +30,7 @@ def check_reference_practice(browser,url,root):
         task.screenshot(path=str(root/f'test-results/reference-{width}-{theme}.png'))
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         context.set_offline(False)
-        for slug in ['devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','desktop']:
+        for slug in ['devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','putting-it-together','desktop']:
             page.goto(url+'lessons/'+slug+'.html')
             expect(page.locator('.reference-task')).to_have_count(2)
             expect(page.locator('.chapter-references h2')).to_have_text('References')
@@ -51,7 +51,7 @@ def check_reference_practice(browser,url,root):
         context.close()
     context=browser.new_context(java_script_enabled=False)
     page=context.new_page()
-    for slug in ['hello','devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','desktop']:
+    for slug in ['hello','devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','putting-it-together','desktop']:
         page.goto(url+'lessons/'+slug+'.html')
         expect(page.locator('.chapter-references')).to_be_visible()
         for task in page.locator('.reference-task').all():

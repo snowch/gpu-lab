@@ -63,9 +63,9 @@ Reference exercises introduce `torch.tensor`, `Tensor.to`, indexing and strides
 beside the operations that need them. Version guidance remains beside the first
 lookup task.
 
-## Continuing the journey: chapters 6–12
+## Continuing the journey: chapters 6–13
 
-All twelve chapters are published working drafts in the common book navigation.
+All thirteen chapters are published working drafts in the common book navigation.
 The remaining chapters reuse tested numerical engines and replace the legacy
 single-dashboard teaching flow with local, independent experiments:
 
@@ -90,6 +90,12 @@ single-dashboard teaching flow with local, independent experiments:
 12. **What limits an inference step?** (`inference.html`): a real small
     cache example motivates separate cache-capacity, phase-budget and batch-reuse
     experiments. Synthetic rates produce lower bounds, never fabricated timings.
+
+13. **Putting it together** (`putting-it-together.html`): use the tested 4 × 4
+    matmul engine as a final independent investigation. Establish a baseline,
+    compare reuse with per-block resources, defend a hypothesis, then design a
+    hardware measurement. Finish with PyTorch profiling, CUDA/Triton and local
+    execution paths. No new timing or GPU execution is claimed.
 
 The optional memory-access lab, shared-memory banks lab, repair workshop and GPU
 map remain supplementary resources. Existing chapter URLs stay valid. Each new

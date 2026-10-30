@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {tiledMatmul} from './ai-models.mjs';
 import {pythonSource} from './hello-model.mjs';
 import {deviceOpening,readingOpening,memorySetup,memoryExample} from './book-code.mjs';
 import {tensorSetup,journeyCode,readingCode,deviceJourney,readTensor} from './foundations-model.mjs';
@@ -9,7 +10,7 @@ export function desktopExamples(){
     {slug:'devices',id:'opening',source:deviceOpening,expected:{y_cpu:[2,4,6,8,10]}},
     ...['reading','layout','requests'].map((slug,i)=>({slug,id:'opening',source:readingOpening(i===0?'selection':'layout'),expected:{y:readTensor({pattern:i===0?'row':'column'}).output}})),
     {slug:'memory',id:'opening',source:memoryExample},
-    ...continuationChapters.map(chapter=>({slug:chapter.slug,id:'opening',source:chapter.source})),
+    ...continuationChapters.map(chapter=>({slug:chapter.slug,id:'opening',source:chapter.source,expected:chapter.slug==='putting-it-together'?{c:tiledMatmul({n:4}).output}:undefined})),
   ];
   for(let stage=0;stage<3;stage++){
     const code=journeyCode({stage}),result=deviceJourney({stage});

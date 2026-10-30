@@ -4,7 +4,7 @@ import {escape, fmt, metrics, table} from './continuation-ui.mjs';
 
 const matmulDefaults = {n:8, tile:2, sharedBudget:512, registers:16};
 const precisionDefaults = {format:'fp16', pattern:'cancellation'};
-const matrixCode = ({n=8}={}) => `import torch
+export const matrixCode = ({n=8}={}) => `import torch
 
 n = ${n}
 a = torch.tensor([[(r + k) % 5 - 2 for k in range(n)]

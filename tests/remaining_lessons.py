@@ -3,7 +3,7 @@
 from playwright.sync_api import expect
 from version_check import mock_version
 
-SLUGS=['scheduling','divergence','reduction','matmul','tensor-cores','attention','inference']
+SLUGS=['scheduling','divergence','reduction','matmul','tensor-cores','attention','inference','putting-it-together']
 
 def check_remaining(browser,base_url,root,errors):
     for width,theme in [(360,'light'),(360,'dark'),(820,'light'),(820,'dark'),(1440,'light'),(1440,'dark')]:
@@ -62,4 +62,4 @@ def check_remaining(browser,base_url,root,errors):
         expect(page.locator('.chapter-definition').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     context.close()
-    print('PASS: chapters 6–12, independent runs, invalidation, keyboard stepping, mobile/tablet/desktop, themes and static examples')
+    print('PASS: chapters 6–13, independent runs, invalidation, keyboard stepping, mobile/tablet/desktop, themes and static examples')

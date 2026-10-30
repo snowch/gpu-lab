@@ -376,3 +376,12 @@ omitted for summary-only capacity/storage comparisons. Existing engine tests
 remain authoritative for numerical invariants; chapter checks additionally verify
 configuration coverage and model-derived presentation. The earlier Lab numbers in
 this document identify engine provenance, not the current chapter numbering.
+
+## Final investigation (chapter 13)
+
+The capstone reuses tiledMatmul unchanged with N=4, shared budget=128 bytes and
+64 registers per output thread. Tile widths 1, 2 and 4 count 128, 64 and 32
+input loads and 16 output stores. Their resident-block capacities are 8, 4 and 1.
+The output is identical. These are per-SM resource bounds, not simulated schedules.
+The transfer exercise uses N=8/T=2: 512 loads, 64 stores and capacity 4.
+Complete Python downloads reuse matrixCode and CI checks C against the engine.
