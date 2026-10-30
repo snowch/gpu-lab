@@ -29,7 +29,9 @@ second set of authoring requirements.
   Do not introduce substitute jargon such as “worker” for an already-defined thread.
 - [ ] Keep each explanation, code, controls, diagram and result together in a
   downward reading flow. Repeat a needed diagram locally rather than sending readers
-  back up the page. Each experiment owns its controls and results.
+  back up the page. Each experiment owns its controls and results. Keep that
+  implementation detail out of reader-facing prose; explain interface behaviour
+  only when it helps the reader carry out a specific action.
 - [ ] Follow predict → run → change one variable → explain. Use `readerTask()` for
   explicit learner actions, with a visible label and decorative icon. Put feedback
   beside Run. Show `?` for unknown output values until Run; hide derived counts, traces and
