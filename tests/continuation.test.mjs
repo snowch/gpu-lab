@@ -6,7 +6,7 @@ import {chapters,renderBookNav,renderBookPage} from '../content/book.mjs';
 import {chapterReferences} from '../src/reference-tasks.mjs';
 
 test('published continuation has a continuous sequence and independent local experiments',()=>{
-  assert.deepEqual(continuationChapters.map(c=>c.number),[6,7,8,9,10,11,12]);
+  assert.deepEqual(continuationChapters.map(c=>c.number),[6,7,8,9,10,11,12,13]);
   const ids=new Set();
   for(const chapter of continuationChapters){
     assert.equal(chapters[chapter.number-1].slug,chapter.slug);

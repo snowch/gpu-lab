@@ -12,4 +12,5 @@ export const chapters=[
   {title:'What changes when matrix inputs use fewer bits?',slug:'tensor-cores',summary:'Trace input rounding and accumulation, then connect them to matrix hardware.',opening:true},
   {title:'How can attention store less?',slug:'attention',summary:'Build a weighted result, then compare full intermediates with tiles.',opening:true},
   {title:'What limits an inference step?',slug:'inference',summary:'Follow the KV cache, then compare memory and compute bounds.',opening:true},
+  {title:'Putting it together',slug:'putting-it-together',summary:'Investigate one workload, defend a change with evidence, and choose your next step.',opening:true},
 ];

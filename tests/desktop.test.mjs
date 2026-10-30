@@ -68,5 +68,5 @@ test('CUDA suite covers safe workshop templates and independent references',asyn
 test('appendix covers setup, expected output, provenance and explicit unsupported paths',()=>{
   const html=renderDesktop(desktopExamples(),{revision:'test-revision',image:'test-image'});
   for(const text of ['test-revision','test-image','PTX_SIM_MODE_FUNC=1','SM7_QV100','compute_70','PASS: verified 5','--network none','--device cpu','Tensor-core/WMMA','not a runnable language model'])assert.ok(html.includes(text),text);
-  assert.equal([...html.matchAll(/<th scope="row">/g)].length,13);
+  assert.equal([...html.matchAll(/<th scope="row">/g)].length,14);
 });

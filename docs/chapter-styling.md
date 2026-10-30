@@ -41,7 +41,7 @@ Browser checks compare computed styles across all five chapters at phone, tablet
 and desktop widths in both themes, and record opening screenshots. Review those
 screenshots as well as checking for overflow.
 
-Chapters 6–12 use `continuation-view.mjs` and `continuation.mjs` for local experiments.
+Chapters 6–13 use `continuation-view.mjs` and `continuation.mjs` for local experiments.
 Each `data-book-experiment` has its own configuration, Run feedback and result.
 Use `trace: false` when a result is a capacity/count comparison with no useful
 sequence to inspect; do not manufacture steps just because the underlying engine

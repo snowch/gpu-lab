@@ -144,6 +144,9 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 lesson.locator('#scheduling-ready-warps').select_option('4');lesson.locator('#scheduling-ready [data-run]').click()
                 lesson_trace=lesson.locator('#scheduling-wait [data-visual-output]').inner_text()
                 ready_trace=lesson.locator('#scheduling-ready [data-visual-output]').inner_text()
+                final=context.new_page();final.goto(url+'lessons/putting-it-together.html')
+                final.locator('#capstone-choice-tile').select_option('4');final.locator('#capstone-choice [data-run]').click()
+                final_result=final.locator('#capstone-choice [data-visual-output]').inner_text()
                 devices=context.new_page();devices.goto(url+'lessons/devices.html')
                 devices.locator('#device-count-0').select_option('8');devices.locator('#device-run-0').click()
                 devices.locator('#device-factor-1').fill('3');devices.locator('#device-run-1').click()
@@ -198,7 +201,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 blocked_cdp.detach();blocked.close()
                 # Activation works offline and restores each tab's independent work/route.
                 context.set_offline(True);page.locator('#restart-update').click()
-                for tab in [page,second,kernel,lesson,devices,reading,layout,requests,concept_map]:
+                for tab in [page,second,kernel,lesson,devices,reading,layout,requests,concept_map,final]:
                     expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
                 expect(concept_map.locator('#a-w1-lane-7')).to_have_attribute('open','')
@@ -227,6 +230,9 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(lesson.locator('#scheduling-ready [data-visual-output]')).to_have_text(ready_trace,use_inner_text=True)
                 expect(lesson.locator('#scheduling-wait-latency')).to_have_value('3')
                 expect(lesson.locator('#scheduling-ready-warps')).to_have_value('4')
+                expect(final.locator('#capstone-choice-tile')).to_have_value('4')
+                expect(final.locator('#capstone-choice [data-visual-output]')).to_have_text(final_result,use_inner_text=True)
+                expect(final.locator('#capstone-baseline [data-results]')).to_be_hidden()
                 expect(devices.locator('#device-feedback-0')).to_contain_text('32 bytes copied')
                 expect(devices.locator('#device-feedback-1')).to_contain_text('[3, 6, 9, 12, 15]')
                 expect(reading.locator('#reading-feedback-column')).to_contain_text('[4, 14, 24, 34, 44]')
