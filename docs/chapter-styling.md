@@ -11,6 +11,13 @@ colours, type sizes or spacing into another stylesheet.
   long code scrolls inside its panel instead of wrapping mid-statement. Format
   Python calls with explicit parenthesised continuation and short lines (aim for
   60 columns), including dynamic examples. Do not reduce the font size to fit. Use it once in the opening section.
+- Code explanations: `code-explanation-data.mjs` supplies curated fragments and
+  meanings for the teaching examples. The build renders compact bullets directly
+  after their code; `code-explanations.mjs` adds keyboard/touch highlighting and
+  refreshes dynamic snippets. Keep each fragment tied to actual source. Preserve
+  essential explanations without JavaScript and exclude reference-question snippets.
+  Mark other prediction-only code with `data-code-question` to avoid giving its answer.
+  Use 1.5 line spacing in code, 1.45 in explanation lists and 6px list-item padding.
 - Code language: label PyTorch and CUDA C++ explicitly. Green identifies PyTorch;
   blue identifies CUDA, with suitable accents in both themes. Colour supplements
   the language label. Use `codePanel()` for labelled explanatory code.

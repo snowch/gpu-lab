@@ -1,0 +1,22 @@
+/* Copyright © 2026 Christopher Snow. */
+/* Compact reading rhythm, including the chapter-specific code panels. */
+body pre,body pre.chapter-opening-code,body pre.hello-operation,body .book-code,body .hello-complete pre,body .chapter-code-panel>pre,body.book-chapter .chapter-code-panel[data-language="cuda"]>pre { line-height:1.5; }
+[data-code-line] { display:inline-block; min-width:100%; width:max-content; border-radius:3px; }
+[data-code-line].is-code-highlighted { background:var(--accent-soft); box-shadow:inset 3px 0 var(--accent); }
+.chapter-code-panel[data-language="pytorch"] .is-code-highlighted { background:color-mix(in srgb,var(--accent) 16%,transparent); }
+.chapter-code-panel[data-language="cuda"] .is-code-highlighted { background:color-mix(in srgb,var(--cuda-ink) 16%,transparent); box-shadow:inset 3px 0 var(--cuda-ink); }
+.code-explanations { margin:16px 0 24px; color:var(--ink); font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.code-explanation-heading { margin:0 0 5px; font-weight:650; }
+.code-explanation-hint { margin:0 0 6px; font-size:14px; color:var(--muted); }
+.code-explanations ul { margin:0; padding-left:22px; }
+.code-explanations li { padding-left:2px; margin:0; }
+.code-explanations li::marker { color:var(--accent); }
+.code-explanations button { display:block; width:100%; min-height:44px; padding:6px 8px; border:0; border-radius:4px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
+.code-explanations button:disabled { cursor:default; opacity:1; }
+.code-explanations button[aria-pressed="true"] { background:var(--accent-soft); }
+.code-explanations button:hover code { text-decoration:underline; text-underline-offset:3px; }
+.code-explanations code { font-weight:600; overflow-wrap:anywhere; }
+.code-panel>.code-explanations { margin:0; padding:14px 16px; background:var(--bg); border-top:1px solid var(--line); }
+.chapter-code-panel[data-language="pytorch"] .code-explanations code { color:var(--accent); }
+.chapter-code-panel[data-language="cuda"] .code-explanations code { color:var(--cuda-ink); }
+@media(max-width:500px) { .code-explanations ul { padding-left:18px; } .code-explanations button { padding-inline:5px; } }

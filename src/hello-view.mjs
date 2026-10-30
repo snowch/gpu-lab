@@ -16,9 +16,8 @@ export function renderIntroSections() {
   const start=simulateIntro(0,2);
   return `<section class="hello-start" aria-labelledby="hello-start-title">
     <h2 id="hello-start-title">Start with a PyTorch operation</h2>
+    <p>Let’s double five numbers. We’ll store them in a <strong>tensor</strong>: a collection of numbers arranged in one or more dimensions.</p>
     ${openingCode(pythonSource(),'hello-start-code')}
-    ${definitions([['Tensor','A collection of numbers arranged in one or more dimensions. Here, our tensor is a one-dimensional list of five numbers.']])}
-    <p><code>import torch</code> loads PyTorch. Here <code>x</code> holds five inputs. <code>device="cuda"</code> places them on an NVIDIA GPU, and <code>y = x * 2</code> multiplies each number by two to produce <code>y</code>.</p>
     <dl class="hello-start-values">
       <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
       <div><dt>Result <code>y</code></dt><dd><code>[${start.output.join(', ')}]</code></dd></div>
@@ -40,11 +39,7 @@ export function renderIntroSections() {
       ${stage===4?`<p>PyTorch selects an optimised implementation and handles its launch; <code>y = x * 2</code> does not choose blocks or threads. CUDA lets us write the GPU function and choose those settings ourselves. The compiler also optimises our code. Our <code>runKernel</code> is a separate teaching function; PyTorch does not call it when evaluating this expression. The example makes the work visible and is not intended to outperform PyTorch.</p>
       ${pre('hello-full',kernelSource(2),'CUDA C++ · complete GPU function (kernel)')}
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}
-      <ol><li><strong>Find the input.</strong> <code>blockIdx.x</code> is the block number, <code>blockDim.x</code> is its size, and <code>threadIdx.x</code> is the position within it. Their calculation gives the integer index <code>i</code>. The <code>.x</code> selects the first dimension of our one-dimensional launch.</li>
-      <li><strong>Check the index.</strong> <code>n</code> is the input count. <code>if (i &lt; n)</code> lets only existing elements reach the calculation.</li>
-      <li><strong>Calculate one result.</strong> The assignment reads <code>input[i]</code>, multiplies it and writes <code>output[i]</code>. <code>2.0f</code> is a floating-point number; <code>;</code> ends the statement.</li></ol>
-      <p>The launch’s <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code> starts two blocks of four threads. <code>d_input</code> and <code>d_output</code> refer to arrays already allocated in GPU memory; the final <code>5</code> supplies <code>n</code>. The download below includes that allocation and the copies.</p>
-      <details><summary>Read the function declaration</summary><p><code>__global__</code> marks a GPU kernel. <code>void</code> means it writes results through <code>output</code> rather than returning a value. <code>float*</code> passes the location of an array of floating-point values; <code>const</code> means this function does not change the input. <code>int</code> declares an integer.</p></details>`:''}
+      <p>This one-dimensional launch uses the <code>.x</code> components. In <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code>, two blocks of four threads provide eight threads. The final argument <code>5</code> supplies the input count <code>n</code>. The download includes the GPU allocations and copies.</p>`:''}
       ${readerTask(step.instruction)}
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?'<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>':''}

@@ -91,8 +91,8 @@ if (i < n) {
     figureTitle: 'Requests grouped by bank',
     figureHint: 'Select a round. Each bank card counts its distinct requested words; highlighted cards serve a word in this round. Select a lane to inspect its word and bank.',
     code: '// Extracted from examples/shared-memory.cu by the build.',
-    codeNote: `<p><code>__shared__</code> places an array in shared memory. The two array dimensions allocate rows with a pitch of 33 words. Each thread fills one column across all rows. After the barrier, the threads read the first column, which thread zero filled. This fragment assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
-      <p><code>__syncthreads()</code> is a block barrier: every thread in the block must reach it before any proceeds past it. Prior shared-memory writes become visible to the block. Here it ensures that thread zero's writes are ready before the other threads read them. A barrier inside a condition taken by only some block threads can hang or behave incorrectly. The bank model covers the final read; it does not simulate the loop or barrier.</p>`,
+    codeNote: `<p>This fragment assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
+      <p>Every thread in the block must reach the barrier. A barrier inside a condition taken by only some block threads can hang or behave incorrectly. The bank model covers the final read; it does not simulate the loop or barrier.</p>`,
     exercises: [
       'Predict the rounds for a column read with pitch 32. Select lanes 0 and 1. They read different words: which banks receive them?',
       'Switch to a padded column with pitch 33. Explain why adding a padding word changes the bank mapping while preserving the useful column.',
