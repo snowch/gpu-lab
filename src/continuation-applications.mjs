@@ -5,12 +5,21 @@ import {escape, fmt, metrics, table} from './continuation-ui.mjs';
 const attentionCode = ({n = 8, scale = 1} = {}) => `import torch
 
 n, d = ${n}, 4
-q = torch.tensor([[(i + j) % 5 - 2 for j in range(d)]
-                  for i in range(n)], dtype=torch.float32, device="cuda") * ${scale}
-k = torch.tensor([[((2 * i + j) % 7 - 3) / 2 for j in range(d)]
-                  for i in range(n)], dtype=torch.float32, device="cuda")
-v = torch.tensor([[(i + j) % 9 - 4 for j in range(d)]
-                  for i in range(n)], dtype=torch.float32, device="cuda")
+q = torch.tensor(
+    [[(i + j) % 5 - 2 for j in range(d)]
+     for i in range(n)],
+    dtype=torch.float32, device="cuda",
+) * ${scale}
+k = torch.tensor(
+    [[((2 * i + j) % 7 - 3) / 2 for j in range(d)]
+     for i in range(n)],
+    dtype=torch.float32, device="cuda",
+)
+v = torch.tensor(
+    [[(i + j) % 9 - 4 for j in range(d)]
+     for i in range(n)],
+    dtype=torch.float32, device="cuda",
+)
 scores = q @ k.T / d**0.5
 weights = torch.softmax(scores, dim=-1)
 out = weights @ v
@@ -20,11 +29,24 @@ const cacheCode = `import torch
 import torch.nn.functional as F
 
 # Three cached tokens, each with four components.
-k_cache = torch.arange(12, dtype=torch.float32, device="cuda").reshape(3, 4) / 10
-v_cache = torch.arange(12, dtype=torch.float32, device="cuda").reshape(3, 4)
-q_new = torch.tensor([[1., 0., -1., 0.]], dtype=torch.float32, device="cuda")
-k_new = torch.tensor([[0.2, 0.3, 0.4, 0.5]], dtype=torch.float32, device="cuda")
-v_new = torch.tensor([[12., 13., 14., 15.]], dtype=torch.float32, device="cuda")
+k_cache = torch.arange(
+    12, dtype=torch.float32, device="cuda",
+).reshape(3, 4) / 10
+v_cache = torch.arange(
+    12, dtype=torch.float32, device="cuda",
+).reshape(3, 4)
+q_new = torch.tensor(
+    [[1., 0., -1., 0.]],
+    dtype=torch.float32, device="cuda",
+)
+k_new = torch.tensor(
+    [[0.2, 0.3, 0.4, 0.5]],
+    dtype=torch.float32, device="cuda",
+)
+v_new = torch.tensor(
+    [[12., 13., 14., 15.]],
+    dtype=torch.float32, device="cuda",
+)
 k_cache = torch.cat((k_cache, k_new), dim=-2)
 v_cache = torch.cat((v_cache, v_new), dim=-2)
 out = F.scaled_dot_product_attention(

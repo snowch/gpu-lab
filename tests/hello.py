@@ -6,7 +6,7 @@ from version_check import mock_version
 def hello_flow(page, url):
     page.goto(url + 'lessons/hello.html')
     expect(page.locator('.hello-section')).to_have_count(5)
-    expect(page.locator('.hello-start-code')).to_have_text('import torch\nx = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0], device="cuda")\ny = x * 2')
+    expect(page.locator('.hello-start-code')).to_have_text('import torch\nx = torch.tensor(\n    [1.0, 2.0, 3.0, 4.0, 5.0],\n    device="cuda",\n)\ny = x * 2')
     expect(page.locator('.hello-start-values')).to_contain_text('[2, 4, 6, 8, 10]')
     assert page.locator('.hello-start').evaluate('el=>el.getBoundingClientRect().top') < page.locator('#idea-1').evaluate('el=>el.getBoundingClientRect().top')
     for i in range(1,6):

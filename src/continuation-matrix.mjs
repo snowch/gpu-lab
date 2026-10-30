@@ -7,10 +7,16 @@ const precisionDefaults = {format:'fp16', pattern:'cancellation'};
 export const matrixCode = ({n=8}={}) => `import torch
 
 n = ${n}
-a = torch.tensor([[(r + k) % 5 - 2 for k in range(n)]
-                  for r in range(n)], dtype=torch.float32, device="cuda")
-b = torch.tensor([[(k + c) % 3 - 1 for c in range(n)]
-                  for k in range(n)], dtype=torch.float32, device="cuda")
+a = torch.tensor(
+    [[(r + k) % 5 - 2 for k in range(n)]
+     for r in range(n)],
+    dtype=torch.float32, device="cuda",
+)
+b = torch.tensor(
+    [[(k + c) % 3 - 1 for c in range(n)]
+     for k in range(n)],
+    dtype=torch.float32, device="cuda",
+)
 c = a @ b
 print(c.cpu())`;
 
@@ -22,8 +28,10 @@ const patternCode = {
 const dtype = {fp32:'torch.float32', fp16:'torch.float16', bf16:'torch.bfloat16'};
 const precisionCode = ({format='fp16', pattern='cancellation'}={}) => `import torch
 
-row = torch.tensor(${patternCode[pattern]},
-                   dtype=torch.float32, device="cuda")
+row = torch.tensor(
+    ${patternCode[pattern]},
+    dtype=torch.float32, device="cuda",
+)
 a = row.repeat(16, 1).to(${dtype[format]})
 b = torch.ones((16, 16), dtype=${dtype[format]}, device="cuda")
 c = a @ b
@@ -32,8 +40,10 @@ print(c[0, 0].float().item())`;
 // CPU PyTorch makes this a runnable arithmetic explanation without selecting a GPU kernel.
 const accumulationCode = ({format='fp16', pattern='cancellation'}={}) => `import torch
 
-row = torch.tensor(${patternCode[pattern]},
-                   dtype=torch.float32)
+row = torch.tensor(
+    ${patternCode[pattern]},
+    dtype=torch.float32,
+)
 converted = row.to(${dtype[format]}).float()
 total = torch.zeros((), dtype=torch.float32)
 reference = torch.zeros((), dtype=torch.float32)

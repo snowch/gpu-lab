@@ -30,13 +30,13 @@ export function readTensor({pattern='row',index=0,factor=2}={}) {
   return {pattern,index,factor,matrix,sourceOffsets,offsets,values,output,stride,byteStride:stride*4,
     shared:pattern!=='packed',copyBytes:pattern==='packed'?20:0,load};
 }
-export const tensorSetup = 'import torch\nx = torch.arange(1, 26, dtype=torch.float32, device="cuda").reshape(5, 5)';
+export const tensorSetup = 'import torch\nx = torch.arange(\n    1, 26, dtype=torch.float32, device="cuda",\n).reshape(5, 5)';
 export function readingCode({pattern='row',index=0,factor=2}={}) {
   readTensor({pattern,index,factor});
   return pattern==='packed'?`column = x[:, ${index}]\npacked = column.contiguous()\ny = packed * ${factor}`:`values = x[${pattern==='row'?`${index}, :`:`:, ${index}`}]\ny = values * ${factor}`;
 }
 export function journeyCode({stage=0,count=5,factor=2}={}) {
   const s=deviceJourney({stage,count,factor});
-  const lines=['import torch',`x_cpu = torch.tensor([${s.input.map(n=>n+'.0').join(', ')}], dtype=torch.float32)`,'x_gpu = x_cpu.to("cuda")',`y_gpu = x_gpu * ${factor}`,'y_cpu = y_gpu.cpu()'];
+  const lines=['import torch',`x_cpu = torch.tensor(\n    [${s.input.map(n=>n+'.0').join(', ')}],\n    dtype=torch.float32,\n)`,'x_gpu = x_cpu.to("cuda")',`y_gpu = x_gpu * ${factor}`,'y_cpu = y_gpu.cpu()'];
   return {setup:lines.slice(0,stage+2).join('\n'),operation:lines[stage+2]};
 }
