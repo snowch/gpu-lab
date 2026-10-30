@@ -53,6 +53,13 @@ second set of authoring requirements.
   well as colour. Do not shrink code to make a long line fit. Use short source lines and explicit
   continuation in Python; preserve indentation and keep any horizontal scrolling
   inside the code panel. Check complete programs and dynamic excerpts alike.
+- [ ] Explain unfamiliar code with compact bullets in source order, starting each
+  point with the actual fragment it describes. Keep explanations immediately after
+  the snippet, before downloads or other callouts. Use the shared walkthrough
+  renderer for optional code highlighting; preserve copyable source, keyboard
+  operation, static explanations and current values in dynamic examples. Remove
+  duplicate syntax prose; familiar one-line operations and documentation questions
+  do not need another walkthrough.
 - [ ] Lead browser guidance with “no installation or GPU required”. Explain simulation
   versus local execution once at the appropriate point. State validation limits
   accurately; compiler/simulator checks are not physical GPU performance evidence.

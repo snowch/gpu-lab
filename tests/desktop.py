@@ -36,10 +36,10 @@ def check_desktop(browser,url,root):
     panel=experiment.locator('.chapter-code-panel').filter(has=page.locator('[data-download-python]'))
     expect(experiment.locator('[role=status]')).to_have_text('Predict the result, then press Run.')
     experiment.locator('.continuation-code summary').click()
-    before=panel.locator('code').inner_text()
+    before=panel.locator('pre code').inner_text()
     experiment.get_by_label('Input sign pattern').select_option('negative')
-    expect(panel.locator('code')).to_contain_text('values = [-2.] * 32')
-    source=panel.locator('code').inner_text()
+    expect(panel.locator('pre code')).to_contain_text('values = [-2.] * 32')
+    source=panel.locator('pre code').inner_text()
     assert source != before
     with page.expect_download() as download: panel.locator('[data-download-python]').click()
     assert source in Path(download.value.path()).read_text().replace('device=_lab_device','device="cuda"')

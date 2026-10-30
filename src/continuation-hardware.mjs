@@ -47,7 +47,7 @@ export const chapters = [
     slug: 'scheduling', number: 6, title: 'How can work continue during a wait?',
     lead: 'Trace a load dependency, then see when another ready warp can start its next instruction.',
     source: scaleSource,
-    openingHTML: `<p>The five inputs from the opening chapters are scaled twice: <code>y</code> contains the first products and <code>z</code> the second. You choose the tensors and operations; PyTorch selects implementations, allocates the results and arranges their launches. Copying <code>z</code> to the CPU lets Python print its values.</p>
+    openingHTML: `<p>The five inputs from the opening chapters are scaled twice. You choose the tensors and operations; PyTorch selects implementations, allocates the results and arranges their launches.</p>
       <p>A calculation may have to wait for a loaded input. We will model that dependency with two repetitions of <code>LD → MUL → ST</code>: load, multiply, store. This is a deliberately chosen instruction stream, not a compiler trace of the PyTorch program. The model does not compute its tensor values or infer how PyTorch assigns them to warps.</p>`,
     sections: [
       {
@@ -94,7 +94,7 @@ export const chapters = [
     slug: 'divergence', number: 7, title: 'What if lanes need different calculations?',
     lead: 'Follow an elementwise condition from input signs to participating lanes, then separate different paths from an incomplete warp.',
     source: branchSource(),
-    openingHTML: `<p>This small activation-like operation doubles positive inputs and negates negative inputs. <code>torch.where(condition, a, b)</code> selects an output value from <code>a</code> where the condition is true and from <code>b</code> otherwise. The opening has 32 inputs so we can inspect one full warp.</p>
+    openingHTML: `<p>This small activation-like operation doubles positive inputs and negates negative inputs. The opening has 32 inputs so we can inspect one full warp.</p>
       <p>You choose the condition and expressions; PyTorch chooses its implementations and launches. Python evaluates the two expressions supplied to <code>torch.where</code>, so this source is not evidence of a GPU branch. Our browser model assigns one input to each participating lane and explicitly runs the non-empty paths. It illustrates lane participation, not PyTorch compiler output.</p>`,
     sections: [
       {
@@ -151,7 +151,7 @@ export const chapters = [
     slug: 'reduction', number: 8, title: 'How do threads combine their results?',
     lead: 'Trace a small sum through shared partial results, then explain the ordering that makes each read safe.',
     source: sumSource(),
-    openingHTML: `<p><code>x.sum()</code> combines all inputs into one scalar tensor. <code>torch.arange(1, 5)</code> gives values 1 through 4: its endpoint is excluded. <code>dtype=torch.float32</code> requests 32-bit floating-point values. PyTorch chooses the reduction implementation and arranges the necessary storage and launches.</p>
+    openingHTML: `<p>A sum combines many inputs into one result. PyTorch chooses the reduction implementation and arranges the necessary storage and launches.</p>
       <p>We use four values, then eight, so the pairwise combination repeatedly halves the number of partial sums. Earlier five-value examples made an incomplete group visible; a power of two keeps this first cooperation example free of extra boundary rules. The browser’s one-block tree is a chosen algorithm, not a trace of <code>torch.sum</code>.</p>`,
     sections: [
       {

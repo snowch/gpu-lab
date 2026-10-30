@@ -16,6 +16,7 @@ import {renderDeviceSections,renderReadingSections} from '../src/foundations-vie
 import {continuationChapters,renderContinuation} from '../src/continuation-view.mjs';
 import { renderIntroSections, renderIntroTransfer } from '../src/hello-view.mjs';
 import {renderMap} from '../src/gpu-map-view.mjs';
+import {explainHTML} from '../src/code-explanations-view.mjs';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 for (const path of ['index.html', 'src', 'examples', 'assets', 'manifest.webmanifest']) {
@@ -82,13 +83,14 @@ try {
 }
 for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter(name => name.endsWith('.html')).map(name => `dist/lessons/${name}`)]) {
   const current=path==='dist/index.html'?'index':path.split('/').at(-1).replace('.html','');
-  const html = (await readFile(path, 'utf8'))
+  const html = explainHTML(await readFile(path, 'utf8'))
     .replace(/<nav class="(?:course-nav|lesson-nav)"[^>]*>[\s\S]*?<\/nav>/,renderBookNav(current))
     .replaceAll('EIGHT LABS · DRAFT','INTERACTIVE BOOK · DRAFT')
     .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'<a class="gpu-map-link" href="../index.html">Close map</a>':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}">GPU map</a>`))
     .replace('<body class="',current==='meet-gpu'?'<body class="gpu-map-page ':'<body class="')
     .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/map-toggle.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/map-toggle.mjs"></script></head>')
-    .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script></head>');
+    .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script></head>')
+    .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/code-explanations.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/code-explanations.mjs"></script></head>');
   await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
 }
 await buildOffline('dist', identity);
