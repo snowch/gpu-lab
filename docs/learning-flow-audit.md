@@ -62,7 +62,9 @@ the reader identified it in both the source comparison and the worked sentence.
   in integer notation. A shared-memory **word index** is not a tensor data value.
 - Preserve existing rounding in precision/attention tables; keep the opening browser
   exercises’ actual calculated values. This is presentation, not conversion to a
-  new dtype or a change to arithmetic. Python/CUDA source stays unchanged.
+  new dtype or a change to arithmetic. Python/CUDA source stays unchanged. Actual
+  terminal-output examples retain the programs’ print format, including omitted
+  decimal zeros; they are not replaced with fabricated console output.
 - Check first-load, Run, changed multiplier, selection and restored-result feedback.
   The value formatter and thread-card checks cover fractional values, whole-valued
   floats, zero, small values and unrevealed outputs.

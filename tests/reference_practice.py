@@ -24,7 +24,7 @@ def check_reference_practice(browser,url,root):
             task.locator('a[target="_blank"]').first.click()
         expect(popup.value.get_by_role('heading')).to_have_text('Official documentation')
         popup.value.close()
-        expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
+        expect(page.locator('#hello-output-0')).to_have_text('Output: [3.0, 6.0, 9.0, 12.0, 15.0]')
         context.set_offline(True)
         expect(task).to_contain_text('torch.float32')
         task.screenshot(path=str(root/f'test-results/reference-{width}-{theme}.png'))

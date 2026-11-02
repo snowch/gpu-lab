@@ -73,6 +73,8 @@ second set of authoring requirements.
   Match the displayed source and dtype: a scalar multiplier written as `2` does not
   turn a floating-point tensor’s results into integer data. Preserve values and
   calculations rather than changing the example to hide a formatting mismatch.
+  Quote actual external-tool output faithfully; its print format may omit `.0`
+  without changing the tensor’s dtype.
 - [ ] Explain unfamiliar code with compact bullets in source order, starting each
   point with the actual fragment it describes. Keep explanations immediately after
   the snippet, before downloads or other callouts. Use the shared walkthrough
