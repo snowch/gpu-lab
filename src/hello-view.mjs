@@ -42,11 +42,12 @@ export function renderIntroSections() {
       ${pre('hello-full',kernelSource(2),'CUDA C++ · complete GPU function (kernel)')}
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}
       <p>This one-dimensional launch uses the <code>.x</code> components. In <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code>, two blocks of four threads provide eight threads. The final argument <code>5</code> supplies the input count <code>n</code>. The download includes the GPU allocations and copies.</p>`:''}
-      ${readerTask(step.instruction)}
+      ${stage===1?'':readerTask(step.instruction)}
       <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each value by <input id="hello-factor-${stage}" type="number" value="${state.factor}" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?'<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>':''}
       <button id="hello-run-${stage}" type="button" class="primary" disabled>Run</button>
       <p class="hello-note">Browser simulation</p>
+      ${stage===1?readerTask(step.instruction):''}
       <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,0,false)}</div>
       <p id="hello-output-${stage}" class="hello-output" role="status">${introPrompt(stage)}</p>
       <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.join(', ')}].</p></details></noscript>
