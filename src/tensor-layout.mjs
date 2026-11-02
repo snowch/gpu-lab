@@ -1,3 +1,4 @@
+import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 export function strideExample(direction='row') {
   if (!['row','column'].includes(direction)) throw new RangeError('Choose row or column.');
@@ -20,10 +21,10 @@ export function renderStrideExample(direction='row') {
     <h4>Example: ${label}</h4>
     <div class="stride-diagrams">
       <div><p class="stride-subtitle">Tensor view: x[row, column]</p>
-        <div class="tensor-grid stride-grid">${s.gridRows.map(row=>row.map(c=>`<span class="tensor-cell${state(c.index)}" aria-label="x[${c.row}, ${c.col}] = ${c.index}${c.index===s.start?', start':c.index===s.end?', destination':''}">${c.index}</span>`).join('')).join('')}</div>
+        <div class="tensor-grid stride-grid">${s.gridRows.map(row=>row.map(c=>`<span class="tensor-cell${state(c.index)}" aria-label="x[${c.row}, ${c.col}] = ${tensorValue(c.index)}${c.index===s.start?', start':c.index===s.end?', destination':''}">${tensorValue(c.index)}</span>`).join('')).join('')}</div>
         <p class="tensor-axis">… 32 rows in total · 8 columns across →</p></div>
       <div><p class="stride-subtitle">Storage order (row-major)</p>
-        <div class="storage-strip stride-strip">${s.storage.map(c=>`<span class="storage-cell${state(c.index)}${c.index>s.start&&c.index<s.end?' crossed':''}"><strong>${c.index}</strong><span>${c.byte}&nbsp;B</span></span>`).join('')}</div>
+        <div class="storage-strip stride-strip">${s.storage.map(c=>`<span class="storage-cell${state(c.index)}${c.index>s.start&&c.index<s.end?' crossed':''}"><strong>${tensorValue(c.index)}</strong><span>${c.byte}&nbsp;B</span></span>`).join('')}</div>
         <p class="stride-arrow">${s.start} → ${s.end} · <strong>+${s.delta} ${s.delta===1?'element':'elements'} = +${s.byteDelta} bytes</strong></p></div>
     </div>
     <figcaption class="stride-summary">x[0, 0] → x[${s.targetRow}, ${s.targetCol}]: ${idxLabel}. Storage offset ${s.start} → ${s.end}: +${s.delta} ${s.delta===1?'element':'elements'} × 4 bytes = <strong>+${s.byteDelta} bytes</strong>.</figcaption>
@@ -40,18 +41,18 @@ export function viewCopyComparison() {
     <div class="view-copy-diagrams">
       <div class="view-copy-panel">
         <p class="stride-subtitle">x: original storage (first 4 rows)</p>
-        <div class="tensor-grid stride-grid">${gridCells.map(c=>`<span class="tensor-cell${c.inColumn?' destination':''}" aria-label="x element ${c.index}${c.inColumn?', in column 0':''}">${c.index}</span>`).join('')}</div>
+        <div class="tensor-grid stride-grid">${gridCells.map(c=>`<span class="tensor-cell${c.inColumn?' destination':''}" aria-label="x element ${c.index}${c.inColumn?', in column 0':''}">${tensorValue(c.index)}</span>`).join('')}</div>
         <p class="tensor-axis">… 32 rows in total · 8 columns across →</p>
       </div>
       <div class="view-copy-panel">
         <p class="stride-subtitle">Column view: x[:, 0] · stride 8 · shares x's storage</p>
-        <div class="slice-slots">${columnOffsets.slice(0,4).map((off,i)=>`<div class="slice-slot"><strong>${off}</strong><span>value ${off} at slot ${off}</span>${i<3?'<small>next: +8 elements</small>':''}</div>`).join('')}</div>
-        <p class="visual-caption">Values 0, 8, 16, 24 … point into x's existing storage at offsets 0, 8, 16, 24 … No copy is made; the slice is a view with stride 8.</p>
+        <div class="slice-slots">${columnOffsets.slice(0,4).map((off,i)=>`<div class="slice-slot"><strong>${tensorValue(off)}</strong><span>value ${tensorValue(off)} at slot ${off}</span>${i<3?'<small>next: +8 elements</small>':''}</div>`).join('')}</div>
+        <p class="visual-caption">Values 0.0, 8.0, 16.0, 24.0 … point into x's existing storage at offsets 0, 8, 16, 24 … No copy is made; the slice is a view with stride 8.</p>
       </div>
       <div class="view-copy-panel">
         <p class="stride-subtitle">Packed copy: x[:, 0].contiguous() · stride 1 · new storage</p>
-        <div class="slice-slots">${packedOffsets.slice(0,4).map((off,i)=>`<div class="slice-slot"><strong>${off*8}</strong><span>value ${off*8} at slot ${off}</span>${i<3?'<small>next: +1 element</small>':''}</div>`).join('')}</div>
-        <p class="visual-caption">The <em>same values</em> 0, 8, 16, 24 … are copied into new storage at offsets 0, 1, 2, 3 … The copy has stride 1. <code>.contiguous()</code> on an already-contiguous tensor may return the same tensor without copying.</p>
+        <div class="slice-slots">${packedOffsets.slice(0,4).map((off,i)=>`<div class="slice-slot"><strong>${tensorValue(off*8)}</strong><span>value ${tensorValue(off*8)} at slot ${off}</span>${i<3?'<small>next: +1 element</small>':''}</div>`).join('')}</div>
+        <p class="visual-caption">The <em>same values</em> 0.0, 8.0, 16.0, 24.0 … are copied into new storage at offsets 0, 1, 2, 3 … The copy has stride 1. <code>.contiguous()</code> on an already-contiguous tensor may return the same tensor without copying.</p>
       </div>
     </div>
   </figure>`;
@@ -91,12 +92,12 @@ export function renderTensorStep(config) {
   const state=index=>index===s.start?' origin':index===s.end?' destination':'';
   return `<div class="tensor-diagrams">
     <div><h3>Tensor view: 32 rows × 8 columns</h3><p class="tensor-caption">Showing rows ${s.firstRow}–${s.firstRow+3}; each cell shows x[row, column].</p>
-      <div class="tensor-grid">${s.cells.map(c=>`<span class="tensor-cell${state(c.index)}" aria-label="x[${c.row}, ${c.col}] = ${c.index}${c.index===s.start?', start':c.index===s.end?', destination':''}">${c.index}</span>`).join('')}</div>
+      <div class="tensor-grid">${s.cells.map(c=>`<span class="tensor-cell${state(c.index)}" aria-label="x[${c.row}, ${c.col}] = ${tensorValue(c.index)}${c.index===s.start?', start':c.index===s.end?', destination':''}">${tensorValue(c.index)}</span>`).join('')}</div>
       <p class="tensor-axis">← 8 columns across · 32 rows down ↓</p></div>
     <div><h3>The same values in storage order</h3><p class="tensor-caption">A window starting at element ${s.start}. Neighbouring boxes are neighbouring stored elements.</p>
-      <div class="storage-strip">${s.storage.map(c=>`<span class="storage-cell${state(c.index)}${c.index>s.start&&c.index<s.end?' crossed':''}"><strong>${c.index}</strong><span>${c.byte} B</span></span>`).join('')}</div>
+      <div class="storage-strip">${s.storage.map(c=>`<span class="storage-cell${state(c.index)}${c.index>s.start&&c.index<s.end?' crossed':''}"><strong>${tensorValue(c.index)}</strong><span>${c.byte} B</span></span>`).join('')}</div>
       <p class="stride-arrow">${s.start} → ${s.end}<br><strong>+${s.delta} ${s.delta===1?'element':'elements'} = +${s.byteDelta} bytes</strong></p>
-      <p class="tensor-caption">Top number: element offset and value in this <code>arange</code> example. Bottom: byte offset from x’s storage base.</p></div>
+      <p class="tensor-caption">Top number: stored floating-point value. Here <code>arange</code> makes each value numerically equal to its element offset. Bottom: byte offset from x’s storage base.</p></div>
     </div><p id="tensor-step-summary" class="tensor-summary" role="status">x[${s.row}, ${s.col}] → x[${s.targetRow}, ${s.targetCol}]: increase the ${s.direction} index by one. Storage offset ${s.start} → ${s.end}; ${s.delta} ${s.delta===1?'element':'elements'} × 4 bytes = ${s.byteDelta} bytes.</p>`;
 }
 
@@ -110,8 +111,8 @@ export function tensorSlice(mode='column') {
 }
 export function renderTensorSlice(mode='column') {
   const s=tensorSlice(mode);
-  const slots=(offsets,title)=>`<div class="slice-storage"><h4>${title}</h4><div class="slice-slots">${s.values.slice(0,4).map((value,i)=>`<div class="slice-slot"><strong>${value}</strong><span>slot ${offsets[i]}</span>${i<3?`<small>next: +${offsets[i+1]-offsets[i]}</small>`:''}</div>`).join('')}</div><p>First four reads shown; ${s.length} values in the complete slice.</p></div>`;
-  return `<div class="slice-diagram"><div><h3>x: original storage</h3><div class="tensor-grid">${Array.from({length:32},(_,i)=>`<span class="tensor-cell${s.offsets.includes(i)?' destination':''}">${i}</span>`).join('')}</div><p class="tensor-caption">First four rows of x. Highlighted values belong to the selected slice.</p></div>
+  const slots=(offsets,title)=>`<div class="slice-storage"><h4>${title}</h4><div class="slice-slots">${s.values.slice(0,4).map((value,i)=>`<div class="slice-slot"><strong>${tensorValue(value)}</strong><span>slot ${offsets[i]}</span>${i<3?`<small>next: +${offsets[i+1]-offsets[i]}</small>`:''}</div>`).join('')}</div><p>First four reads shown; ${s.length} values in the complete slice.</p></div>`;
+  return `<div class="slice-diagram"><div><h3>x: original storage</h3><div class="tensor-grid">${Array.from({length:32},(_,i)=>`<span class="tensor-cell${s.offsets.includes(i)?' destination':''}">${tensorValue(i)}</span>`).join('')}</div><p class="tensor-caption">First four rows of x. Highlighted values belong to the selected slice.</p></div>
   <div><h3>${mode==='row'?'x[0, :]':mode==='column'?'x[:, 0]':'x[:, 0].contiguous()'}</h3>${slots(s.offsets,mode==='packed'?'Read from x’s original slots':'View points into x’s same storage')}${mode==='packed'?'<p class="slice-copy-arrow">↓ allocate new storage and copy values ↓</p>'+slots(s.destinationOffsets,'Packed copy: different storage, same values'):''}
   <p class="tensor-summary">${s.sharesStorage?'Storage is shared: no values are copied to make this view.':'Storage is separate: the strided column is copied.'} The resulting slice has stride ${s.stride}.</p></div></div>`;
 }

@@ -1,3 +1,4 @@
+import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
 import {registerExperiment} from './experiment-state.mjs';
@@ -24,10 +25,10 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
       if(device) {
         const source=journeyCode(c);$('setup').textContent=source.setup;$('code').textContent=source.operation;
         $('map').innerHTML=renderDeviceMap(s,ran);
-        $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).join(', ')}].`:(changed?'Settings changed—predict again, then press Run.':devicePrompt(Number(key),c.count,c.factor));
+        $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).map(tensorValue).join(', ')}].`:(changed?'Settings changed—predict again, then press Run.':devicePrompt(Number(key),c.count,c.factor));
       } else {
         $('code').textContent=readingCode(c);$('map').innerHTML=renderReadMap(s,ran,{sectors:key==='sectors',mode:section.dataset.readingMode});
-        let feedback=ran?'Output: ['+s.output.join(', ')+'].':(changed?'Settings changed—predict again, then press Run.':readingPrompt(section.dataset.readingMode,key,c.index,c.factor));
+        let feedback=ran?'Output: ['+s.output.map(tensorValue).join(', ')+'].':(changed?'Settings changed—predict again, then press Run.':readingPrompt(section.dataset.readingMode,key,c.index,c.factor));
         if(ran&&key==='sectors') {
           const raw=$('guess').value;
           feedback+=` ${s.load.sectors.length} sector${s.load.sectors.length===1?'':'s'} for ${s.load.usefulBytes} useful bytes.`;

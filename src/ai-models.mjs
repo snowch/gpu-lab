@@ -139,7 +139,7 @@ export function reduceBlock({size=8,synchronised=true}={}) {
   const levels=[inputs.map((value,index)=>({value,index,threads:[index]}))];
   const record=(label,hazard=false,reads=[])=>trace.push({label,hazard,reads,shared:[...shared],level:levels.length-1});
   if(synchronised) {
-    for(let lane=0;lane<size;lane++){shared[lane]=inputs[lane];record(`Thread ${lane} writes input ${inputs[lane]}`);}
+    for(let lane=0;lane<size;lane++){shared[lane]=inputs[lane];record(`Thread ${lane} writes its input`);}
     record('All threads pass the initial barrier');
     for(let stride=size/2;stride>=1;stride/=2){
       const before=[...shared];

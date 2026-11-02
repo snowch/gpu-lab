@@ -3,6 +3,10 @@
 Copyright © 2026 Christopher Snow.
 
 Use the [chapter authoring checklist](docs/authoring-checklist.md) for every new or revised chapter.
+Complete its required reading-order review for every learner-facing edit, including
+small copy changes: review the preceding, changed and following sections in the built
+page before marking the change complete. Passing automated checks does not replace
+that review.
 
 Read `docs/plan.md`, `docs/model.md` and `docs/sources.md` before extending the course.
 
