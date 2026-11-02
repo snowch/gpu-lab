@@ -66,10 +66,10 @@ const transferCacheB = inferenceBudget({batch:1,sequence:512});
 
 export const chapters = [
   {
-    slug:'attention', number:11, title:'How can attention store less?',
-    lead:'How can attention combine the same values without storing two full intermediate matrices?',
+    slug:'attention', number:11, title:'How can attention use less memory?',
+    lead:'Compute attention’s weighted sums, then compare storing full score and weight matrices with processing keys in tiles.',
     source:attentionCode(),
-    openingHTML:`<p>Each row of <code>q</code> is a <strong>query</strong>: what one token looks for. Each row of <code>k</code> is a <strong>key</strong>: what another token offers for comparison. The matching row of <code>v</code> is its <strong>value</strong>: the numbers to combine. Here each has eight rows of four numbers.</p><p>Each output combines value rows using weights obtained from query–key comparisons. There is no masking or dropout in this example.</p><p>You choose the tensors and operations. PyTorch selects implementations, allocates results and launches GPU work if the tensors are on a CUDA device. This complete opening puts its tensors on an NVIDIA GPU with <code>device="cuda"</code>. The browser computes the same mathematical example in JavaScript double precision; the PyTorch code uses FP32, so small numerical differences are expected.</p>`,
+    openingHTML:`<p>Each row of <code>q</code> is a <strong>query</strong>: what one token looks for. Each row of <code>k</code> is a <strong>key</strong>: what another token offers for comparison. The matching row of <code>v</code> is its <strong>value</strong>: the values to combine. Here each has eight rows of four components.</p><p>Each output combines value rows using weights obtained from query–key comparisons. There is no masking or dropout in this example.</p><p>You choose the tensors and operations. PyTorch selects implementations, allocates results and launches GPU work if the tensors are on a CUDA device. This complete opening puts its tensors on an NVIDIA GPU with <code>device="cuda"</code>. The browser computes the same mathematical example in JavaScript double precision; the PyTorch code uses FP32, so small numerical differences are expected.</p>`,
     sections:[
       {
         id:'attention-weighted', title:'Follow one weighted result',
@@ -80,7 +80,7 @@ export const chapters = [
         after:`<p>Softmax is evaluated stably by subtracting the largest score before exponentiating. This preserves the normalised weights and avoids exponentiating a large positive score. Larger scores do not make the weighted result grow by the same multiplier.</p>`,
       },
       {
-        id:'attention-storage', title:'Count the matrices between input and output',
+        id:'attention-storage', title:'Count bytes for the score and weight matrices',
         body:`<p>The straightforward expression stores an N × N score matrix and an N × N weight matrix. For each matrix this accounting counts one write and one later read. It assumes <strong>four-byte FP32 storage</strong>, even though browser arithmetic uses JavaScript doubles.</p><p>The two matrices therefore account for 4N² value transfers × 4 bytes = 16N² bytes. These are selected intermediate reads and writes, excluding Q, K, V, output, caching and all other traffic. They are not measured DRAM transfers.</p>`,
         terms:[['Materialised intermediate','A temporary result stored in full so that a later operation can read it.']],
         task:'Predict what doubling N from 8 to 16 does to the intermediate byte count. Run at 8, change only N to 16, and explain the factor using rows and columns.',
@@ -100,7 +100,7 @@ export const chapters = [
   },
   {
     slug:'inference',number:12,title:'What limits an inference step?',
-    lead:'How do a growing cache, the invocation phase and batch size change an inference budget?',
+    lead:'Count cached keys and values, then compare ideal time limits from data transfers and arithmetic during prefill and decode.',
     source:cacheCode,
     openingHTML:`<p>A decoder reuses keys and values from earlier tokens. This complete CUDA-device PyTorch example starts with three cached tokens, appends one new key and value, and computes one new query's weighted result over all four tokens. Each row is one token and each column is one component, as in the previous chapter.</p><p>The sole query is the newest token, so all four supplied keys are permitted. For a multi-query prompt, a causal mask is needed to hide future tokens. This example receives Q/K/V directly; it contains no model weights, projections or token generator.</p><p><code>torch.cat</code> creates new tensors and copies existing entries. Production caches can instead reserve storage and write new positions. The small code illustrates cache contents, not efficient cache management. PyTorch handles allocation and implementation selection. The browser budgets below use a separate, explicitly synthetic decoder; they do not estimate this four-component PyTorch example.</p>`,
     sections:[
@@ -112,7 +112,7 @@ export const chapters = [
         experiment:{model:'inference',defaults:inferenceDefaults,focus:'inference-capacity',trace:false,controls:[sequenceControl]},
       },
       {
-        id:'inference-phase',title:'Compare two invocation phases',
+        id:'inference-phase',title:'Compare prefill with decode',
         body:`<p>Now keep batch = 1 and S = 512. For prefill, S means the number of prompt tokens processed from an empty cache. For decode, S means the number already cached, followed by one new token. These invocations do different amounts of work.</p>${budgetAssumptions}<p>Decode reads the S-token cache and writes one new entry per sequence. Prefill writes the full S-token cache; this model counts no previous-cache read. The prefill operation estimate uses full square attention, without causal triangular savings. Dense-weight work is approximately 2 × parameters × tokens; attention adds 4 × layers × batch × S × hidden width for decode, and another factor S for prefill.</p>${rateAssumptions}`,
         terms:[['Prefill','Processing the prompt tokens and building their cache entries.'],['Lower bound','An ideal minimum implied by the counted work and assumed rate; it is not a prediction of measured elapsed time.'],['FLOP','One floating-point arithmetic operation in the work estimate.']],
         task:'Predict which bound is larger for decode, then run. Change only phase to prefill. Explain why the compute work changes even though the model reads the same weight payload per invocation.',

@@ -15,8 +15,8 @@ export function renderIntroMap(stage,state,selected=0,showOutput=true) {
 export function renderIntroSections() {
   const start=simulateIntro(0,2);
   return `<section class="hello-start" aria-labelledby="hello-start-title">
-    <h2 id="hello-start-title">Start with a PyTorch operation</h2>
-    <p>Let’s double five numbers. We’ll store them in a <strong>tensor</strong>: a collection of numbers arranged in one or more dimensions.</p>
+    <h2 id="hello-start-title">Double five values with PyTorch</h2>
+    <p>We’ll store the five input values in a <strong>tensor</strong>: a collection of values arranged in one or more dimensions.</p>
     ${openingCode(pythonSource(),'hello-start-code')}
     <dl class="hello-start-values">
       <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
@@ -41,7 +41,7 @@ export function renderIntroSections() {
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}
       <p>This one-dimensional launch uses the <code>.x</code> components. In <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code>, two blocks of four threads provide eight threads. The final argument <code>5</code> supplies the input count <code>n</code>. The download includes the GPU allocations and copies.</p>`:''}
       ${readerTask(step.instruction)}
-      <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each number by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
+      <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each value by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?'<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>':''}
       <button id="hello-run-${stage}" type="button" class="primary" disabled>Run</button>
       <p class="hello-note">Browser simulation</p>

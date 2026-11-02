@@ -89,9 +89,9 @@ export function codeExplanations(source) {
       match(/y = (?:x\[0, :\]|values) \* [^\n]+/, 'Multiplies each selected value, producing a new result tensor without changing the input values.');
     } else if(source.includes('torch.tensor(')) {
       add('import torch', 'Makes PyTorch available to this program under the name torch.');
-      add('x = torch.tensor(', 'Creates a tensor containing the numbers in the list. x is the name we use to refer to it.');
+      add('x = torch.tensor(', 'Creates a tensor containing the input values in the list. x is the name we use to refer to it.');
       add('device="cuda"', 'Asks PyTorch to store that tensor on an NVIDIA GPU.');
-      match(/y = x \* [^\n]+/, 'Multiplies every number in x by this amount and stores the results in a new tensor, y. The numbers in x stay the same.');
+      match(/y = x \* [^\n]+/, 'Multiplies every value in x by this amount and stores the results in a new tensor, y. The numbers in x stay the same.');
       match(/z = y \* [^\n]+/, 'Applies a second multiplication to y, producing a new GPU tensor z.');
       add('print(z.cpu())', 'Waits for the needed GPU work, copies z to CPU memory and prints it.');
     }

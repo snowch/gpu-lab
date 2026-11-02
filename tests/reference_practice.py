@@ -13,7 +13,7 @@ def check_reference_practice(browser,url,root):
         task=page.locator('aside[aria-labelledby="reference-hello-pytorch"]')
         expect(task.locator('.reference-code')).to_contain_text('device="cuda"')
         expect(task).to_contain_text('does not specify dtype')
-        expect(task.get_by_role('heading')).to_have_text('Look it up: Where does this tensor live?')
+        expect(task.get_by_role('heading')).to_have_text('Look it up: Where are this tensor’s values stored?')
         expect(task.locator('svg')).to_have_attribute('aria-hidden','true')
         expect(task.locator('details')).not_to_have_attribute('open','')
         task.locator('summary').focus();page.keyboard.press('Enter')

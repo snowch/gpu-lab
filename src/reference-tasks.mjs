@@ -46,7 +46,7 @@ export const referenceTasks = {
   'desktop-pytorch': {title:'Choose the Python execution path',page:'pytorchInstall',label:'PyTorch installation selector',prompt:'Use the installation selector to find a CPU installation for your platform. Which command runs a downloaded example without an NVIDIA GPU, and what does that leave untested?',answer:'Run python example.py --device cpu after installing PyTorch in a Python environment. This checks values, shapes and layouts. It does not perform CPU–GPU transfers or validate CUDA backend selection and timing. GPGPU-Sim does not execute these PyTorch downloads.'},
 
   'hello-pytorch': {
-    title:'Where does this tensor live?', page:'tensor', label:'PyTorch: torch.tensor', code:pythonSource(),
+    title:'Where are this tensor’s values stored?', page:'tensor', label:'PyTorch: torch.tensor', code:pythonSource(),
     prompt:'In this snippet from the start of the chapter, find device="cuda". Use the torch.tensor reference to explain what it selects.',
     followUp:'The snippet does not specify dtype. Find that argument in the reference: what does it control, and what number type does PyTorch infer from these floating-point inputs?',
     answer:'device selects the storage device: "cuda" places this tensor on an NVIDIA GPU. dtype selects the numerical representation. With PyTorch’s usual default settings, these floating-point inputs produce torch.float32. Changing the default floating-point dtype can change that inference. Choosing a dtype alone does not move a tensor between CPU and GPU.',
@@ -136,7 +136,7 @@ export const referenceTasks = {
     answer:'A GPU call can enqueue work before it finishes. Use appropriate synchronisation at timing boundaries or CUDA events and wait for completion; a model bound is not a measurement.',
   },
   'devices-result': {
-    title:'Where does the result live?', page:'cudaSemantics', label:'PyTorch: CUDA semantics',
+    title:'Where is the result stored?', page:'cudaSemantics', label:'PyTorch: CUDA semantics',
     code:'y_gpu = x_gpu * 2\ny_cpu = y_gpu.cpu()',
     prompt:'Read the opening device rules. Where is y_gpu created? Use the Tensor.cpu reference above to explain what the second line adds.',
     answer:'The multiplication result stays on the CUDA tensor’s device. .cpu() gives us a CPU copy so the values are also available in system memory. It does not move or delete the original GPU result.',
