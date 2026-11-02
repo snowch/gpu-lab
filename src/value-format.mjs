@@ -3,7 +3,7 @@
 const floatingText=text=>/[.e]/i.test(text)?text:text+'.0';
 export function tensorValue(value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return String(value);
-  return Object.is(value,-0)?'-0.0':floatingText(String(value));
+  return floatingText(String(value));
 }
 // Precision/attention tables already round displayed values, independently of arithmetic.
 export function roundedTensorValue(value) {

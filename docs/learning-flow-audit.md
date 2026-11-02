@@ -65,7 +65,7 @@ the reader identified it in both the source comparison and the worked sentence.
   new dtype or a change to arithmetic. Python/CUDA source stays unchanged.
 - Check first-load, Run, changed multiplier, selection and restored-result feedback.
   The value formatter and thread-card checks cover fractional values, whole-valued
-  floats, negative zero, small values and unrevealed outputs.
+  floats, zero, small values and unrevealed outputs.
 
 The authoritative checklist now includes this distinction for future edits, as part
 of both code/visual review and the required reading-order review.
@@ -81,7 +81,7 @@ of both code/visual review and the required reading-order review.
   ensure this editorial pass has not changed programs or their arithmetic.
 - Inspect screenshots of the affected sequences before and after interaction.
 
-The numerical engines, example calculations and measurement boundaries are unchanged.
+The example calculations and measurement boundaries are unchanged. The reduction trace now names an input write without duplicating its value in integer-looking text; the shared-memory card supplies that value.
 Automated verification and editorial inspection are not learner testing. This audit
 reduces identifiable reading-order problems; observations from actual learners can
 still reveal gaps.

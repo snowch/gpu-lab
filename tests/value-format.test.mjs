@@ -6,7 +6,7 @@ import {renderIntroMap} from '../src/hello-view.mjs';
 import {simulateIntro} from '../src/hello-model.mjs';
 
 test('floating-point data remains recognisable for whole and fractional values',()=>{
-  assert.deepEqual([1,1.5,-2,0,-0].map(tensorValue),['1.0','1.5','-2.0','0.0','-0.0']);
+  assert.deepEqual([1,1.5,-2,0,-0].map(tensorValue),['1.0','1.5','-2.0','0.0','0.0']);
   assert.equal(tensorValue(1e-8),'1e-8');
   assert.equal(tensorValue(1000),'1000.0');
 });
