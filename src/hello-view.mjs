@@ -26,11 +26,13 @@ export function renderIntroSections() {
     <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
   </section>`+steps.map((step,stage)=>{
     const state=simulateIntro(stage,step.factor??2);
+    const worked=stage===1?simulateIntro(stage,2):null;
     const pre=(id,source,label)=>codePanel({id:id+'-'+stage,source,label});
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
       <h2 id="hello-title-${stage}">${step.title}</h2>
       ${step.leadIn?`<p>${step.leadIn}</p>`:''}
+      ${worked?`<ul class="hello-thread-examples">${worked.threads.slice(0,2).map(thread=>`<li>Thread ${thread.i} reads <strong>${thread.input}</strong>, multiplies it by <strong>${worked.factor}</strong>, and writes <strong>${thread.output}</strong>.</li>`).join('')}<li>Threads ${worked.threads[2].i}–${worked.threads.at(-1).i} do the same for the remaining inputs.</li></ul><p>Each thread follows the same instructions using a different input value. Threads can execute in parallel.</p>`:''}
       ${definitions(step.definitions)}
       <p class="hello-concept">${step.concept}</p>
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * ${state.factor}</code></pre></div>
