@@ -35,13 +35,13 @@
         <p class="eyebrow">EXTRA PRACTICE / AFTER CHAPTER 5</p>
         <h1>Reading a tensor</h1>
         <p class="lead">Follow a warp’s addresses from tensor elements to memory sectors.</p>
-        <p class="prerequisite"><strong>Before you start:</strong> Complete <a href="requests.html">chapter 5: How do threads read those values?</a> first, then <a href="#lab">go straight to the memory access controls</a>. The explanations below recap storage and strides if you need them.</p>
+        <p class="prerequisite"><strong>Before you start:</strong> Complete <a href="requests.html">chapter 5: How do threads read tensor values?</a> first, then <a href="#lab">go straight to the memory access controls</a>. The explanations below recap storage and strides if you need them.</p>
       </section>
       <section id="pytorch" class="section-space">
         <p class="eyebrow">START WITH A PYTORCH TENSOR</p>
-        <h2>Where does a tensor keep its numbers?</h2>
+        <h2>Where are a tensor’s values stored?</h2>
         <div class="prose">
-          <p>PyTorch calls the memory holding a tensor’s numbers its <strong>storage</strong>. A tensor on the CPU normally uses system RAM; a CUDA tensor (on an NVIDIA GPU) normally uses GPU memory, also called VRAM. Here, <strong>storage means memory, not a saved file on an SSD or disk</strong>.</p>
+          <p>PyTorch calls the memory holding a tensor’s values its <strong>storage</strong>. A tensor on the CPU normally uses system RAM; a CUDA tensor (on an NVIDIA GPU) normally uses GPU memory, also called VRAM. Here, <strong>storage means memory, not a saved file on an SSD or disk</strong>.</p>
           <p>We often draw a tensor as a grid. In a <strong>contiguous, row-major</strong> tensor, its values occupy neighbouring positions in memory: all the values of the first row, then the second row, and so on. Each number in this example is FP32 (32-bit floating point), occupying four bytes.</p>
         </div>
         <figure class="storage-primer" aria-labelledby="storage-primer-title">

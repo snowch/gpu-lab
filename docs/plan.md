@@ -36,12 +36,12 @@ Build the book from familiar operations: see the operation, predict, run, change
 one thing, explain, inspect the code, and apply the idea to a new case. Keep each
 experiment and visual beside its own explanation in a continuous downward flow.
 
-1. **One operation, many numbers** (`hello.html`): open with the three-line PyTorch
+1. **How does a GPU double five values?** (`hello.html`): open with the short PyTorch
    example and five values. Introduce threads, indices, blocks and bounds checks
    as needed; assemble the CUDA kernel at the end. Show no CUDA fragments before the complete function and its launch. SMs, warps
    and shared memory belong in later mechanism lessons; the ownership diagram lives
    in the scheduling lab. Finish with an input-count prediction exercise and the optional repair workshop.
-2. **Where do the numbers live?** (`devices.html`): follow the same five inputs
+2. **Where are tensor values stored?** (`devices.html`): follow the same five inputs
    through a CPU-to-GPU copy, multiplication in GPU memory, and a result copy back.
    Each action has its own setup, prediction prompt, control, diagram and result.
    Compare five/eight-input copy sizes and change the multiplier. Explain allocation
@@ -52,7 +52,7 @@ experiment and visual beside its own explanation in a continuous downward flow.
 4. **How are tensor values arranged in memory?** (`layout.html`): follow the same
    values into a memory strip, introduce views and strides, then compare a column
    with a packed copy. Transpose is optional practice after those ideas.
-5. **How do threads read those values?** (`requests.html`): introduce a warp and its
+5. **How do threads read tensor values?** (`requests.html`): introduce a warp and its
    lanes visually, then sectors. Compare five-value row, column and packed reads;
    finish with a row crossing a sector boundary. Counts are not timing claims.
 
@@ -69,13 +69,13 @@ All thirteen chapters are published working drafts in the common book navigation
 The remaining chapters reuse tested numerical engines and replace the legacy
 single-dashboard teaching flow with local, independent experiments:
 
-6. **How can work continue during a wait?** (`scheduling.html`): follow one load
+6. **What runs while a warp waits for data?** (`scheduling.html`): follow one load
    dependency, then compare ready warps. Introduce resident work and issue slots
    when needed. More warps also add work; model cycles are not hardware timings.
 7. **What if lanes need different calculations?** (`divergence.html`): begin with
    uniform signs, then mixed masks, then five active inputs. Distinguish a chosen
    branch model from PyTorch's evaluation of tensor expressions in `torch.where`.
-8. **How do threads combine their results?** (`reduction.html`): start with a safe
+8. **How do threads add values together?** (`reduction.html`): start with a safe
    four-input sum, extend to eight, then diagnose missing ordering. Shared memory
    and barriers serve a visible dependency; no invented result is given for a race.
 9. **How can matrix multiplication reuse its inputs?** (`matmul.html`): build one
@@ -84,14 +84,14 @@ single-dashboard teaching flow with local, independent experiments:
 10. **What changes when matrix inputs use fewer bits?** (`tensor-cores.html`):
     inspect conversion before FP32 accumulation. Connect this to cooperative
     matrix hardware without representing the sequential model as tensor-core execution.
-11. **How can attention store less?** (`attention.html`): scores, weights and a
+11. **How can attention use less memory?** (`attention.html`): scores, weights and a
     weighted result come before full-intermediate accounting and online tiles.
     The recurrence is optional after its purpose is understood.
 12. **What limits an inference step?** (`inference.html`): a real small
     cache example motivates separate cache-capacity, phase-budget and batch-reuse
     experiments. Synthetic rates produce lower bounds, never fabricated timings.
 
-13. **Putting it together** (`putting-it-together.html`): use the tested 4 × 4
+13. **Investigate a matrix multiplication** (`putting-it-together.html`): use the tested 4 × 4
     matmul engine as a final independent investigation. Establish a baseline,
     compare reuse with per-block resources, defend a hypothesis, then design a
     hardware measurement. Finish with PyTorch profiling, CUDA/Triton and local

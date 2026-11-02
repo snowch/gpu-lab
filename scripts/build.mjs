@@ -28,14 +28,14 @@ await mkdir('dist/lessons', { recursive: true });
 const desktopExamples=await exportDesktop('dist/examples/desktop');
 const dockerfile=await readFile('docker/cuda-sim.Dockerfile','utf8');
 const execution={revision:dockerfile.match(/ARG GPGPUSIM_REV=(\w+)/)[1],image:dockerfile.match(/^FROM (.+)$/m)[1]};
-await writeFile('dist/lessons/desktop.html',renderBookPage({slug:'desktop',appendix:true,title:'Run the examples on your desktop',lead:'Use real PyTorch or compile supported CUDA programs with GPGPU-Sim, with a clear check of what ran.',content:renderDesktop(desktopExamples,execution),previous:{href:'putting-it-together.html',title:'Chapter 13: Putting it together'},next:{href:'../index.html',title:'Book contents'}}));
+await writeFile('dist/lessons/desktop.html',renderBookPage({slug:'desktop',appendix:true,title:'Run the examples on your desktop',lead:'Use real PyTorch or compile supported CUDA programs with GPGPU-Sim, with a clear check of what ran.',content:renderDesktop(desktopExamples,execution),previous:{href:'putting-it-together.html',title:'Chapter 13: Investigate a matrix multiplication'},next:{href:'../index.html',title:'Book contents'}}));
 
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
   .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())
   .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer())
   .replace('<!-- REFERENCE_HELLO -->',desktopLinks('hello')+renderChapterReferences('hello')));
-await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where do the numbers live?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: One operation, many numbers'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
+await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where are tensor values stored?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: How does a GPU double five values?'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
 for(const [i,part] of ['selection','layout','requests'].entries()) {
   const chapter=chapters[i+2],previous=chapters[i+1],next=chapters[i+3];
   await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({slug:chapter.slug,number:i+3,title:chapter.title,lead:chapter.summary,content:renderReadingSections(part),previous:{href:previous.slug+'.html',title:`Chapter ${i+2}: ${previous.title}`},next:{href:next.slug+'.html',title:`Chapter ${i+4}: ${next.title}`}}));

@@ -62,7 +62,7 @@ const list = values => values.map(fmt).join(', ');
 export const chapters = [
   {
     slug:'matmul',number:9,title:'How can matrix multiplication reuse its inputs?',
-    lead:'Trace one output as a row meets a column, then compute the same matrix with fewer repeated input loads.',
+    lead:'Multiply matching entries of a row and a column, add their products, then reuse input values across several outputs.',
     source:matrixCode(matmulDefaults),
     openingHTML:`<p>A matrix is a two-dimensional tensor. In a neural-network layer, matrix multiplication combines many inputs with learned weights. Here <code>@</code> multiplies two ${basicMatmul.n} × ${basicMatmul.n} matrices. It produces a new ${basicMatmul.output.length} × ${basicMatmul.output[0].length} matrix, C.</p><p>A’s first row is [${escape(list(basicMatmul.a[0]))}]; B’s first column is [${escape(list(basicMatmul.b.map(row=>row[0])))}]. You choose the matrices and operation. PyTorch selects the implementation, allocates the result and launches the GPU work; this code does not choose a tile size.</p>`,
     sections:[
@@ -88,12 +88,12 @@ export const chapters = [
   },
   {
     slug:'tensor-cores',number:10,title:'What changes when matrix inputs use fewer bits?',
-    lead:'Separate input rounding from accumulation, then explain how this connects to cooperative matrix hardware.',
+    lead:'Convert FP32 inputs to FP16 or BF16, compare the resulting sums, then connect matrix operations to tensor cores.',
     source:precisionCode(precisionDefaults),
     openingHTML:`<p>A matrix multiplication in a neural network can store inputs in a smaller number format. <code>torch.float16</code> stores each input in two bytes instead of FP32’s four. The conversion with <code>.to(...)</code> may round a value before <code>@</code> uses it. Converting the result to FP32 for printing cannot restore discarded input information.</p><p>All rows of A are identical and all entries of B are one. Every output is therefore the same row–column dot product. The row starts with eight values written as 1.0003 and ends with eight −1 values. They first enter FP32 storage, then convert to FP16. You choose the inputs and format; PyTorch chooses the matrix implementation. The browser uses a declared arithmetic order to isolate conversion and accumulation.</p>`,
     sections:[
       {
-        id:'precision-conversion',title:'Inspect what reaches the multiplication',
+        id:'precision-conversion',title:'Compare values before and after conversion',
         terms:[['Number format','A rule for representing numbers with a fixed set of bits. FP32 uses 32 bits, while FP16 and BF16 use 16.'],['Rounding','Replace a number by a nearby value that the chosen format can represent.'],['Fraction precision','How finely a format distinguishes nearby numbers at a given magnitude.'],['Range','The magnitudes a format can represent, from tiny non-zero values to large values.']],
         body:`<p>FP16 distinguishes fewer nearby values than FP32. BF16 has fewer fraction bits than FP16, but a much wider range, similar to FP32. The two small formats therefore make different trade-offs. In this first experiment, keep the near-one inputs fixed and inspect the value before and after conversion.</p><p>Indices begin at zero: positions 0–7 contain the near-one input and 8–15 contain −1. Stepping selects an input position. B’s corresponding input is exactly one in every supported format.</p><p class="muted">Model assumptions: conversion rounds to the nearest representable value, with ties to an even last bit, including tiny values near zero. The trace is a CPU teaching calculation, with no hardware execution, performance or tensor-core mapping.</p>`,
         task:'Predict which of the 16 row values change in FP16. Run and compare original and converted values. Change only the input format to BF16, then FP32; explain why −1 behaves differently from the near-one value.',
@@ -104,7 +104,7 @@ export const chapters = [
         id:'precision-accumulation',title:'Add products into an FP32 running sum',
         terms:[['FP32 accumulator','A running sum stored and rounded in FP32 after each addition in this model.'],['Cancellation','Adding values with opposite signs can leave a result much smaller than the individual inputs.']],
         body:`<p>Each product here is the converted A input times one. Compare two FP32 running sums: one receives converted inputs; the reference receives original FP32 inputs. In the near-one pattern, eight negative ones cancel most of the positive sum. A small discarded input difference can then dominate the final answer.</p><p>Next try the small positive inputs to test range. Finally use alternating 1 and −0.5 to test values represented exactly in all three formats. The complete PyTorch example below uses an explicit loop on the CPU to match the model’s chosen order; it is an arithmetic explanation, not a GPU matrix implementation.</p><p class="muted">Model assumptions: each addition rounds to FP32 and K advances from 0 to 15. All A rows are identical and all B entries are one, so this one trace explains every C entry. Actual matrix kernels may use a different accumulation order or numeric rules.</p>`,
-        task:'Predict whether FP32 accumulation recovers the near-one input difference after FP16 conversion. Run, then step across K = 7 and K = 15 to compare sums before and after cancellation. Change only the pattern to small positive values and compare FP16 with BF16. Use the exact pattern as a final control.',
+        task:'Predict whether FP32 accumulation recovers the near-one input difference after FP16 conversion. Run, then step across K = 7 and K = 15 to compare sums before and after cancellation. Change only the pattern to small positive values and compare FP16 with BF16. Finally, select the alternating 1 and −0.5 inputs and compare all three formats.',
         experiment:{model:'tensor-cores',defaults:{...precisionDefaults},focus:'accumulation',controls:[formatControl,patternControl],code:accumulationCode},
         after:'<p>Agreement on the exact pattern does not establish accuracy for every input. A useful accuracy check needs the values and formats that the real workload uses, as well as an appropriate reference.</p>',
       },

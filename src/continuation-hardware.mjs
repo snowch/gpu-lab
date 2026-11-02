@@ -44,14 +44,14 @@ const patternControl = {
 
 export const chapters = [
   {
-    slug: 'scheduling', number: 6, title: 'How can work continue during a wait?',
-    lead: 'Trace a load dependency, then see when another ready warp can start its next instruction.',
+    slug: 'scheduling', number: 6, title: 'What runs while a warp waits for data?',
+    lead: 'Follow a warp waiting for an input value, then see when another ready warp can run.',
     source: scaleSource,
-    openingHTML: `<p>The five inputs from the opening chapters are scaled twice. You choose the tensors and operations; PyTorch selects implementations, allocates the results and arranges their launches.</p>
+    openingHTML: `<p>Each of the five input values is multiplied by two, then multiplied by two again. You choose the tensors and operations; PyTorch selects implementations, allocates the results and arranges their launches.</p>
       <p>A calculation may have to wait for a loaded input. We will model that dependency with two repetitions of <code>LD → MUL → ST</code>: load, multiply, store. This is a deliberately chosen instruction stream, not a compiler trace of the PyTorch program. The model does not compute its tensor values or infer how PyTorch assigns them to warps.</p>`,
     sections: [
       {
-        id: 'scheduling-wait', title: 'Follow one warp through a load wait',
+        id: 'scheduling-wait', title: 'Wait for an input value to load',
         terms: [
           ['Streaming multiprocessor (SM)', 'A GPU unit on which a block’s threads run, grouped into warps. This model begins with warps assigned to one SM.'],
           ['Cycle', 'One discrete step of this teaching machine, not a measured duration on a GPU.'],
@@ -67,7 +67,7 @@ export const chapters = [
       },
       {
         id: 'scheduling-ready', title: 'Give the scheduler another ready warp',
-        leadIn: 'One warp left gaps while waiting for data. Could the SM use those gaps for another warp? That requires other work already on the SM and ready to continue.',
+        leadIn: 'One warp left gaps while waiting for data. Could the SM use those gaps for another warp? That requires another warp already on the SM with an instruction ready to start.',
         terms: [
           ['Resident warp', 'A warp already assigned resources on an SM. Every warp in this experiment is resident from the start.'],
           ['Instruction issue', 'Selecting a ready warp and starting its next instruction. An issue slot is one opportunity to do that; this teaching machine has one per cycle.'],
@@ -77,7 +77,7 @@ export const chapters = [
         body: `<p>All resident warps begin ready at cycle zero. After each issue, the scheduler searches from the next warp, skipping waiting and completed warps. When one waits for its load, another may have an instruction ready. The cards show each warp immediately before the selected cycle issues.</p>
           <p>Keep latency fixed and change only the number of resident warps. Each extra warp adds another six instructions, so the total work changes too. Compare idle slots and issue-slot use; elapsed cycles for these different workloads do not give a speedup.</p>
           <p>This teaching SM starts with its warps already resident and does not calculate resource limits or competition for memory bandwidth. Its single issue slot and fixed load latency describe this experiment, rather than a particular GPU.</p>`,
-        task: 'Predict whether two ready warps can fill every wait at latency 6. Run, inspect an idle cycle if one remains, then change only the warp count to 4. Explain the difference using readiness and the extra work.',
+        task: 'Predict whether two ready warps can fill every wait at latency 6. Run, inspect an idle cycle if one remains, then change only the warp count to 4. Explain the difference using which warps are ready and how many instructions each adds.',
         experiment: {
           model: 'scheduling', defaults: { warps: 2, latency: 6 }, focus: 'ready',
           controls: [{ key: 'warps', label: 'Resident warps · six instructions each', options: [[1, '1'], [2, '2'], [4, '4'], [8, '8']] }],
@@ -88,13 +88,13 @@ export const chapters = [
       prompt: 'A resident warp is waiting on a load, and another resident warp is ready. Must the next issue slot be idle? Explain what this model can tell you, and whether doubling the resident warp count proves a speedup.',
       answer: '<p>The ready warp can issue: the scheduler skips the waiting warp. Adding resident warps also adds six instructions per warp in this experiment. Compare issue-slot use and idle slots, but do not turn the elapsed cycles of different workloads into a speedup. Actual residency and performance need resource and hardware evidence beyond this model.</p>',
     },
-    optionalHTML: `<section class="book-section"><h2>Optional: place the warps in the bigger picture</h2><p>The experiments began with warps already resident. This separate ownership map puts their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Inspect the block with two warps: warp membership follows thread indices, while available resources constrain which blocks can reside on an SM.</p>${renderSchedulingRelationships()}</section>`,
+    optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Inspect the block with two warps: warp membership follows thread indices, while available resources constrain which blocks can reside on an SM.</p>${renderSchedulingRelationships()}</section>`,
   },
   {
     slug: 'divergence', number: 7, title: 'What if lanes need different calculations?',
-    lead: 'Follow an elementwise condition from input signs to participating lanes, then separate different paths from an incomplete warp.',
+    lead: 'Double positive inputs and negate negative inputs, then compare lanes taking different paths with lanes that have no input.',
     source: branchSource(),
-    openingHTML: `<p>This small activation-like operation doubles positive inputs and negates negative inputs. The opening has 32 inputs so we can inspect one full warp.</p>
+    openingHTML: `<p>The operation doubles positive inputs and negates negative inputs, a simple conditional calculation like those used in activation functions. The opening has 32 inputs so we can inspect one full warp.</p>
       <p>You choose the condition and expressions; PyTorch chooses its implementations and launches. Python evaluates the two expressions supplied to <code>torch.where</code>, so this source is not evidence of a GPU branch. Our browser model assigns one input to each participating lane and explicitly runs the non-empty paths. It illustrates lane participation, not PyTorch compiler output.</p>`,
     sections: [
       {
@@ -148,14 +148,14 @@ export const chapters = [
     },
   },
   {
-    slug: 'reduction', number: 8, title: 'How do threads combine their results?',
-    lead: 'Trace a small sum through shared partial results, then explain the ordering that makes each read safe.',
+    slug: 'reduction', number: 8, title: 'How do threads add values together?',
+    lead: 'Add four input values using shared partial sums, then check which writes must finish before another thread reads them.',
     source: sumSource(),
     openingHTML: `<p>A sum combines many inputs into one result. PyTorch chooses the reduction implementation and arranges the necessary storage and launches.</p>
       <p>We use four values, then eight, so the pairwise combination repeatedly halves the number of partial sums. Earlier five-value examples made an incomplete group visible; a power of two keeps this first cooperation example free of extra boundary rules. The browser’s one-block tree is a chosen algorithm, not a trace of <code>torch.sum</code>.</p>`,
     sections: [
       {
-        id: 'reduction-tree', title: 'Build a safe tree of partial sums',
+        id: 'reduction-tree', title: 'Combine four inputs into one sum',
         leadIn: 'Multiplication gave each thread an independent output. A sum is different: values handled by different threads must meet. We need somewhere to exchange partial results and a way to wait until those results are ready.',
         terms: [
           ['Reduction', 'Combining many values into fewer values using an operation such as addition; here all inputs become one sum.'],
@@ -169,7 +169,7 @@ export const chapters = [
         experiment: { model: 'reduction', defaults: { size: 4, synchronised: true }, controls: [], focus: 'tree', code: sumSource },
       },
       {
-        id: 'reduction-size', title: 'Add another level without losing inputs',
+        id: 'reduction-size', title: 'Extend the sum to eight inputs',
         body: `<p>The synchronised algorithm starts at partner distance <code>N / 2</code>, then halves the distance down to 1. Each new partial sum combines disjoint sets of input contributions. The final node should contain every input index exactly once.</p>
           <p>Change from four to eight inputs. Follow the same write, barrier and combine sequence, now with one more arithmetic stage. Both examples use one block with one partially filled warp. The small input count does not remove the need to express the required ordering.</p>`,
         task: 'Predict how the partner distances change for eight inputs. Run with four, then change only the size to eight and run again. Inspect the final contribution list and explain why every original value is included once.',
@@ -179,7 +179,7 @@ export const chapters = [
         },
       },
       {
-        id: 'reduction-order', title: 'Diagnose a missing ordering guarantee',
+        id: 'reduction-order', title: 'Find a read before its write',
         terms: [['Data race', 'Conflicting accesses to the same storage by different threads without the required ordering, with at least one write. A useful numeric outcome is not guaranteed.']],
         body: `<p>Start with the safe eight-input sum. Then select the diagnostic without synchronisation. The model deliberately lets thread 0 read its first partner before that partner writes. This shows one missing ordering guarantee; it does not enumerate every possible interleaving.</p>
           <p>The later partner write cannot repair the earlier read. The diagnostic therefore reports the unwritten access and assigns no numeric output to the racy program. Seeing a plausible sum in some other execution would not establish safety. The PyTorch example still expresses the safe sum; the diagnostic is a change to our teaching algorithm, not a PyTorch option.</p>`,

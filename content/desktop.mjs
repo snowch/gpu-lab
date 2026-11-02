@@ -1,9 +1,10 @@
 // Copyright © 2026 Christopher Snow.
 import {codePanel,readerTask} from '../src/chapter-view.mjs';
 import {escape,table} from '../src/continuation-ui.mjs';
+import {chapters} from '../src/book-chapters.mjs';
 const shell=(id,source)=>codePanel({id,source,language:'shell',label:'Terminal · shell commands'});
 const cudaLinks={'putting-it-together':['ai-kernels.cu','Self-checking naive and tiled matrix products'],hello:['desktop/hello.cu','Five-input kernel; eight launched threads'],reduction:['ai-kernels.cu','Self-checking eight-input reduction'],matmul:['ai-kernels.cu','Self-checking naive and tiled matrix products'],memory:['gather.cu','Self-checking gather; configurable stride, offset and count'],'shared-memory':['shared-memory.cu','Self-checking padded column read'],kernel:['desktop/kernel-scale.cu','Safe repaired scale kernel; vector addition also available below']};
-const titles={hello:'1. One operation, many numbers',devices:'2. Where do the numbers live?',reading:'3. Selecting values',layout:'4. Tensor storage',requests:'5. Memory requests',scheduling:'6. Work during waits',divergence:'7. Different calculations',reduction:'8. Cooperation',matmul:'9. Matrix reuse','tensor-cores':'10. Precision',attention:'11. Attention',inference:'12. Inference','putting-it-together':'13. Putting it together',memory:'Optional memory-access lab'};
+const titles=Object.fromEntries([...chapters.map((chapter,i)=>[chapter.slug,`${i+1}. ${chapter.title}`]),['memory','Optional memory-access lab']]);
 export function renderDesktop(examples,{revision,image}) {
   const grouped=Object.entries(titles).map(([slug,title])=>{
     const files=examples.filter(example=>example.slug===slug),opening=files.find(example=>example.id==='opening');

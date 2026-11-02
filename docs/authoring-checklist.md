@@ -10,6 +10,13 @@ second set of authoring requirements.
 
 ## Learning journey
 
+- [ ] Name the calculation, inputs, destination or comparison in titles and instructions:
+  “double five input values”, “copy the results to CPU memory”, or “compare tile widths
+  2 and 4”. Use “tensor” for the container and “values” for its data. Keep established
+  terms such as stride, warp and number format, explaining them at first use. Replace
+  vague references such as “the work” when the actual instruction, count or action
+  can be named; avoid mechanical word substitution.
+
 - [ ] Give the chapter one question and an observable outcome: what can the reader
   trace, predict or explain at the end? Split a chapter when it introduces separate
   learning goals. Carry the same small dataset and calculation into the next chapter.
