@@ -1,3 +1,4 @@
+import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
@@ -10,7 +11,7 @@ let activeChallenge = null, predicted = false;
 let program = { ...STARTER }, models = [], selected = 0, position = 0, busy = false, restored = false;
 try { const stored = localStorage.getItem(storageKey); if (stored) { program = { ...validateProgram(JSON.parse(stored)) }; restored = true; } } catch { /* Storage is optional. */ }
 const inputs = CASE_LENGTHS.map(inputFor);
-function format(value) { return value === null || value === undefined || Number.isNaN(value) ? '—' : String(value); }
+function format(value) { return value === null || value === undefined || Number.isNaN(value) ? '—' : tensorValue(value); }
 function setStatus(message, state = '') { byId('kernel-status').textContent = message; byId('kernel-status').dataset.state = state; }
 function applyControls() {
   try { localStorage.setItem(storageKey, JSON.stringify(program)); } catch { /* Storage is optional. */ }
@@ -19,7 +20,7 @@ function applyControls() {
   byId('kernel-index').value = program.index;
   byId('kernel-guard').value = program.guard ? 'yes' : 'no';
   byId('kernel-operation').value = program.operation;
-  byId('task-description').textContent = program.task === 'vector-add' ? 'Write y[i] = x[i] + b[i]. The second input repeats −2.25, −1.25, −0.25, 0.75, 1.75. Check lengths 8, 32 and 35; the transfer assessment also checks other lengths and block sizes.' : 'For x = [0.5, −1, 1.5, −2, …], output must start [1, −2, 3, −4, …]. Check lengths 8, 32 and 35, including the final element.';
+  byId('task-description').textContent = program.task === 'vector-add' ? 'Write y[i] = x[i] + b[i]. The second input repeats −2.25, −1.25, −0.25, 0.75, 1.75. Check lengths 8, 32 and 35; the transfer assessment also checks other lengths and block sizes.' : 'For x = [0.5, −1.0, 1.5, −2.0, …], output must start [1.0, −2.0, 3.0, −4.0, …]. Check lengths 8, 32 and 35, including the final element.';
   byId('kernel-source').textContent = kernelBody(program);
   byId('cuda-source').textContent = kernelBody(program);
   byId('kernel-pytorch').textContent = program.task === 'vector-add' ? 'y = x + b' : 'y = 2 * x';
@@ -50,7 +51,7 @@ function explanation(result) {
   if (result.blocked) return result.message;
   if (result.hazards?.length) return result.hazards[0];
   const failure = result.failures?.[0];
-  return failure ? `y[${failure.index}]: expected ${failure.expected}, got ${format(failure.actual)}${failure.actual == null || Number.isNaN(failure.actual) ? ' (unwritten)' : ''}` : 'Every output matches.';
+  return failure ? `y[${failure.index}]: expected ${tensorValue(failure.expected)}, got ${format(failure.actual)}${failure.actual == null || Number.isNaN(failure.actual) ? ' (unwritten)' : ''}` : 'Every output matches.';
 }
 function showCases() {
   const tbody = byId('kernel-cases'); tbody.replaceChildren();
@@ -89,10 +90,10 @@ function renderTrace() {
   const descriptions = {
     index: `Compute i = ${event.i} from ${program.index === 'local' ? 'the local ID' : program.index === 'next' ? 'the global ID plus one' : 'the global ID'}.`,
     guard: `Check ${event.i} < ${result.input.length}: ${event.allowed ? 'true; continue to memory access.' : 'false; this thread skips the arrays.'}`,
-    'load-b': `Read b[${event.i}] = ${event.value} at byte offset ${event.byteOffset}.`,
-    load: `Read x[${event.i}] = ${event.value} at byte offset ${event.byteOffset}.`,
-    arithmetic: `${event.loaded} ${program.operation === 'multiply' ? '×' : '+'} ${event.operand} = ${event.value} in FP32.`,
-    store: `Write y[${event.i}] = ${event.value} at byte offset ${event.byteOffset}.`,
+    'load-b': `Read b[${event.i}] = ${tensorValue(event.value)} at byte offset ${event.byteOffset}.`,
+    load: `Read x[${event.i}] = ${tensorValue(event.value)} at byte offset ${event.byteOffset}.`,
+    arithmetic: `${tensorValue(event.loaded)} ${program.operation === 'multiply' ? '×' : '+'} ${tensorValue(event.operand)} = ${tensorValue(event.value)} in FP32.`,
+    store: `Write y[${event.i}] = ${tensorValue(event.value)} at byte offset ${event.byteOffset}.`,
     fault: event.message,
   };
   byId('kernel-event').textContent = descriptions[event.op];
@@ -151,7 +152,7 @@ function renderMap(result, event) {
     container.append(box);
   }
   const missing = Array.from({length:result.input.length},(_,i)=>i).filter(i=>!targets.has(i));
-  byId('mapping-summary').textContent = missing.length ? 'Outputs with no thread: ' + missing.join(', ') + '.' : 'Every output has an thread targeting it. Checks also verify values and unique writes.';
+  byId('mapping-summary').textContent = missing.length ? 'Outputs with no thread: ' + missing.join(', ') + '.' : 'Every output has a thread targeting it. Checks also verify values and unique writes.';
 }
 challenges.forEach((challenge, index) => {
   const option = document.createElement('option'); option.value = index; option.textContent = challenge.title; byId('challenge-choice').append(option);
@@ -168,7 +169,7 @@ function startChallenge() {
   const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Choose your explanation'; byId('challenge-answer').append(empty);
   activeChallenge.answers.forEach((answer, index) => { const option = document.createElement('option'); option.value = index; option.textContent = answer; byId('challenge-answer').append(option); });
   setStatus('Record your prediction before repairing this starter.');
-  setBusy(false); byId('challenge-prediction').focus();
+  setBusy(false); byId('kernel-source-panel').focus();
 }
 byId('start-challenge').addEventListener('click', startChallenge);
 byId('check-prediction').addEventListener('click', () => {

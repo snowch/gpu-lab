@@ -29,7 +29,7 @@ test('static introduction includes all worked diagrams with unique control IDs',
  const html=renderIntroSections();
  assert.equal(pythonSource(),'import torch\nx = torch.tensor(\n    [1.0, 2.0, 3.0, 4.0, 5.0],\n    device="cuda",\n)\ny = x * 2');
  assert.ok(html.indexOf('import torch') < html.indexOf('Idea 1 of 5'));
- assert.match(html,/Result <code>y<\/code><\/dt><dd><code>\[2, 4, 6, 8, 10\]/);
+ assert.match(html,/Result <code>y<\/code><\/dt><dd><code>\[2\.0, 4\.0, 6\.0, 8\.0, 10\.0\]/);
  assert.equal((html.match(/import torch\nx = /g)||[]).length,1);
  assert.match(html,/How does the GPU calculate these results/);
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
@@ -76,7 +76,7 @@ test('first prediction uses a different multiplier from the opening worked examp
  assert.notDeepEqual(simulateIntro(0,steps[0].factor).output,simulateIntro(0,2).output);
  assert.match(first,/id="hello-factor-0"[^>]*value="3"/);
  assert.match(first,/id="hello-operation-0">y = x \* 3/);
- assert.doesNotMatch(first.replace(/<noscript>[\s\S]*?<\/noscript>/g,''),/\[3, 6, 9, 12, 15\]/);
+ assert.doesNotMatch(first.replace(/<noscript>[\s\S]*?<\/noscript>/g,''),/\[3\.0, 6\.0, 9\.0, 12\.0, 15\.0\]/);
  assert.ok(introPrompt(0).startsWith('Predict'));
  for(let stage=1;stage<5;stage++)assert.ok(introPrompt(stage).startsWith('Run'));
 });

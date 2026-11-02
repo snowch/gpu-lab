@@ -1,3 +1,4 @@
+import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import { escape, fmt, metrics, table } from './continuation-ui.mjs';
 import { renderSchedulingRelationships } from './scheduling-relationships.mjs';
@@ -55,9 +56,9 @@ export const chapters = [
         terms: [
           ['Streaming multiprocessor (SM)', 'A GPU unit on which a block’s threads run, grouped into warps. This model begins with warps assigned to one SM.'],
           ['Cycle', 'One discrete step of this teaching machine, not a measured duration on a GPU.'],
-          ['Load latency', 'The number of model cycles from issuing a load until its value is ready for the dependent multiply.'],
+          ['Load latency', 'The number of model cycles from starting a load until its value is ready for the dependent multiply.'],
         ],
-        body: `<p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. In the diagram, ready means the next instruction can start; waiting means its input is still unavailable.</p>
+        body: `<p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
           <p>The chosen sequence is <code>LD, MUL, ST, LD, MUL, ST</code>. The teaching machine starts at most one instruction each cycle; an idle cycle starts none. A latency of 6 means a load started at cycle 0 becomes usable at cycle 6. Watch what can happen between those two events. The model ends when the last store starts; it does not model a later wait for the store to complete.</p>`,
         task: 'With one warp, predict where idle cycles appear. Run and step past the first load. Change only load latency to 1, run again, and explain what happened to the waits.',
         experiment: {
@@ -66,7 +67,7 @@ export const chapters = [
         },
       },
       {
-        id: 'scheduling-ready', title: 'Give the scheduler another ready warp',
+        id: 'scheduling-ready', title: 'Run another warp while one waits',
         leadIn: 'One warp left gaps while waiting for data. Could the SM use those gaps for another warp? That requires another warp already on the SM with an instruction ready to start.',
         terms: [
           ['Resident warp', 'A warp already assigned resources on an SM. Every warp in this experiment is resident from the start.'],
@@ -74,7 +75,7 @@ export const chapters = [
           ['Scheduler', 'The mechanism that chooses which ready resident warp issues next. This teaching scheduler searches in round-robin order after the last warp selected.'],
           ['Issue-slot use', 'Issued instructions divided by elapsed model cycles. This describes how many teaching issue slots were used.'],
         ],
-        body: `<p>All resident warps begin ready at cycle zero. After each issue, the scheduler searches from the next warp, skipping waiting and completed warps. When one waits for its load, another may have an instruction ready. The cards show each warp immediately before the selected cycle issues.</p>
+        body: `<p>All resident warps begin ready at cycle zero. After each issue, the scheduler searches from the next warp, skipping waiting and completed warps. When one waits for its load, another may have an instruction ready. After Run, the warp cards show each warp immediately before the selected cycle’s instruction starts.</p>
           <p>Keep latency fixed and change only the number of resident warps. Each extra warp adds another six instructions, so the total work changes too. Compare idle slots and issue-slot use; elapsed cycles for these different workloads do not give a speedup.</p>
           <p>This teaching SM starts with its warps already resident and does not calculate resource limits or competition for memory bandwidth. Its single issue slot and fixed load latency describe this experiment, rather than a particular GPU.</p>`,
         task: 'Predict whether two ready warps can fill every wait at latency 6. Run, inspect an idle cycle if one remains, then change only the warp count to 4. Explain the difference using which warps are ready and how many instructions each adds.',
@@ -88,23 +89,23 @@ export const chapters = [
       prompt: 'A resident warp is waiting on a load, and another resident warp is ready. Must the next issue slot be idle? Explain what this model can tell you, and whether doubling the resident warp count proves a speedup.',
       answer: '<p>The ready warp can issue: the scheduler skips the waiting warp. Adding resident warps also adds six instructions per warp in this experiment. Compare issue-slot use and idle slots, but do not turn the elapsed cycles of different workloads into a speedup. Actual residency and performance need resource and hardware evidence beyond this model.</p>',
     },
-    optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Inspect the block with two warps: warp membership follows thread indices, while available resources constrain which blocks can reside on an SM.</p>${renderSchedulingRelationships()}</section>`,
+    optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Compare blocks A and C on SM 0 with block B on SM 1. Each block has two warps; available resources constrain which blocks can share an SM.</p>${renderSchedulingRelationships()}</section>`,
   },
   {
     slug: 'divergence', number: 7, title: 'What if lanes need different calculations?',
     lead: 'Double positive inputs and negate negative inputs, then compare lanes taking different paths with lanes that have no input.',
     source: branchSource(),
     openingHTML: `<p>The operation doubles positive inputs and negates negative inputs, a simple conditional calculation like those used in activation functions. The opening has 32 inputs so we can inspect one full warp.</p>
-      <p>You choose the condition and expressions; PyTorch chooses its implementations and launches. Python evaluates the two expressions supplied to <code>torch.where</code>, so this source is not evidence of a GPU branch. Our browser model assigns one input to each participating lane and explicitly runs the non-empty paths. It illustrates lane participation, not PyTorch compiler output.</p>`,
+      <p>You choose the condition and expressions; PyTorch chooses its implementations and launches. Python evaluates the two expressions supplied to <code>torch.where</code>, so this source is not evidence of a GPU branch. Our browser model assigns one input to each participating lane and runs the positive and negative calculations separately, skipping a calculation when no lane needs it. It illustrates lane participation, not PyTorch compiler output.</p>`,
     sections: [
       {
-        id: 'divergence-uniform', title: 'Start with every lane on the same path',
+        id: 'divergence-uniform', title: 'Give every lane inputs with the same sign',
         terms: [
           ['Path', 'The sequence of operations chosen by one outcome of a condition. Here the positive path doubles an input; the negative path negates it.'],
           ['Lane mask', 'The set of lanes participating in one issued operation. A lane outside that mask does no work for that operation.'],
         ],
         body: `<p>All 32 lanes begin with the same sign. A non-empty path issues its operations; an empty path is skipped. In this first experiment each path has one operation, so changing from all positive to all negative changes the selected arithmetic without creating mixed participation.</p>
-          <p>The dynamic PyTorch example follows the sign control. The diagram highlights the selected operation’s mask; the lane cards include final outputs for checking the calculation.</p>`,
+          <p>Open “Inspect the PyTorch example for these settings” to see the chosen inputs and expressions. After Run, the lane cards highlight the selected operation’s mask and show each input’s final output.</p>`,
         task: 'Predict how many paths are needed when all inputs are positive. Run and inspect the mask. Change only the signs to all negative, run again, and explain whether two paths are now needed.',
         experiment: {
           model: 'divergence', defaults: { pattern: 'positive', activeLanes: 32, negativeOps: 1 }, focus: 'uniform',
@@ -149,17 +150,17 @@ export const chapters = [
   },
   {
     slug: 'reduction', number: 8, title: 'How do threads add values together?',
-    lead: 'Add four input values using shared partial sums, then check which writes must finish before another thread reads them.',
+    lead: 'Add four input values, then check which writes must finish before another thread reads them.',
     source: sumSource(),
-    openingHTML: `<p>A sum combines many inputs into one result. PyTorch chooses the reduction implementation and arranges the necessary storage and launches.</p>
-      <p>We use four values, then eight, so the pairwise combination repeatedly halves the number of partial sums. Earlier five-value examples made an incomplete group visible; a power of two keeps this first cooperation example free of extra boundary rules. The browser’s one-block tree is a chosen algorithm, not a trace of <code>torch.sum</code>.</p>`,
+    openingHTML: `<p>A sum combines many inputs into one result. PyTorch chooses the implementation for the sum and arranges the necessary storage and launches.</p>
+      <p>We use four values, then eight: add pairs, then add those results until one sum remains. Earlier five-value examples made an incomplete group visible; a power of two keeps this first cooperation example free of extra boundary rules. The browser’s one-block tree is a chosen algorithm, not a trace of <code>torch.sum</code>.</p>`,
     sections: [
       {
         id: 'reduction-tree', title: 'Combine four inputs into one sum',
         leadIn: 'Multiplication gave each thread an independent output. A sum is different: values handled by different threads must meet. We need somewhere to exchange partial results and a way to wait until those results are ready.',
         terms: [
           ['Reduction', 'Combining many values into fewer values using an operation such as addition; here all inputs become one sum.'],
-          ['Shared memory', 'Storage that threads in the same block can read and write. In this model thread i first writes input i into shared word i.'],
+          ['Shared memory', 'Storage that threads in the same block can read and write. Each FP32 storage position is called a word. In this model thread i first writes input i into shared word i.'],
           ['Partial sum', 'A sum containing only some of the original inputs. The diagram lists those input indices beside each partial sum.'],
           ['Block barrier', 'A point that all threads in the block must reach before any continues. It also makes preceding shared-memory writes visible to participating threads after the barrier.'],
         ],
@@ -230,7 +231,7 @@ function renderDivergence(result, cursor, focus) {
   const introductory = focus === 'uniform';
   const lanes = result.lanes.map(lane => {
     const state = !lane.active ? 'Unused' : event.mask.includes(lane.id) ? 'Now' : 'Other path';
-    return `<div class="continuation-card${!lane.active ? ' unused' : event.mask.includes(lane.id) ? ' selected' : ''}"><strong>Lane ${lane.id}</strong><p>${lane.active ? `${lane.input} → ${lane.output}` : '—'}<br>${state}</p></div>`;
+    return `<div class="continuation-card${!lane.active ? ' unused' : event.mask.includes(lane.id) ? ' selected' : ''}"><strong>Lane ${lane.id}</strong><p>${lane.active ? `${tensorValue(lane.input)} → ${tensorValue(lane.output)}` : '—'}<br>${state}</p></div>`;
   }).join('');
   return `<div class="continuation-visual" aria-label="Computed branch masks and lane outputs">
     ${metrics(introductory ? [['Paths used', result.paths], ['Path operations', result.instructions]] : [['Paths used', result.paths], ['Path operations', result.instructions], ['Useful lane slots', result.usefulSlots], ['Lane-slot use', percent(result.utilisation)]])}
@@ -244,21 +245,21 @@ function renderDivergence(result, cursor, focus) {
 
 function renderReduction(result, cursor) {
   const event = eventAt(result, cursor);
-  const memory = event.shared.map((value, index) => card(`Shared word ${index}${event.reads.includes(index) ? ' · partner read' : ''}`, value === null ? 'Unwritten' : `Value ${value}`, event.reads.includes(index))).join('');
+  const memory = event.shared.map((value, index) => card(`Shared word ${index}${event.reads.includes(index) ? ' · partner read' : ''}`, value === null ? 'Unwritten' : `Value ${tensorValue(value)}`, event.reads.includes(index))).join('');
   // A diagnostic trace has no valid arithmetic levels beyond the initial inputs.
   const levels = result.hazard ? '' : table(
     ['Arithmetic level', 'Shared word receiving partial sum', 'Input indices contributing', 'Partial sum'],
-    result.levels.slice(0, event.level + 1).flatMap((level, depth) => level.map(node => [depth === 0 ? 'Inputs' : depth, node.index, node.threads.join(', '), node.value])),
+    result.levels.slice(0, event.level + 1).flatMap((level, depth) => level.map(node => [depth === 0 ? 'Inputs' : depth, node.index, node.threads.join(', '), tensorValue(node.value)])),
     'Contribution tree through the selected arithmetic stage. Input indices start at zero; each tree edge combines two preceding contribution sets.',
   );
   const diagnostic = event.hazard
     ? `<p><strong>Unwritten read detected:</strong> thread 0 reads shared word ${event.reads[0]} before its input write. No numeric result is assigned.</p>`
     : result.hazard ? '<p>This diagnostic run contains an unwritten read. Later writes cannot repair the earlier missing ordering; no numeric result is assigned.</p>' : '';
   return `<div class="continuation-visual" aria-label="Computed shared-memory state and reduction contributions">
-    ${metrics([['Inputs', result.size], ['Ordering hazard', result.hazard ? 'Detected' : 'None'], ['Final valid sum', result.hazard ? 'No numeric result' : result.result]])}
+    ${metrics([['Inputs', result.size], ['Ordering hazard', result.hazard ? 'Detected' : 'None'], ['Final valid sum', result.hazard ? 'No numeric result' : tensorValue(result.result)]])}
     <p><strong>${escape(event.label)}</strong></p>${diagnostic}
     <div class="continuation-cards">${memory}</div>${levels}
-    <p>${result.hazard ? 'This is one diagnostic interleaving, not a prediction of the numeric outcome of a racy CUDA program.' : escape(`The complete synchronised tree combines all ${result.size} inputs into ${result.result}. Shared-memory values above are the snapshot after the selected event; the final sum metric describes the whole run.`)}</p>
+    <p>${result.hazard ? 'This is one diagnostic interleaving, not a prediction of the numeric outcome of a racy CUDA program.' : escape(`The complete synchronised tree combines all ${result.size} inputs into ${tensorValue(result.result)}. Shared-memory values above are the snapshot after the selected event; the final sum metric describes the whole run.`)}</p>
   </div>`;
 }
 

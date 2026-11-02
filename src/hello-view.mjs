@@ -1,3 +1,4 @@
+import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {openingCode,browserNotice,codePanel,definitions,readerTask} from './chapter-view.mjs';
 import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,introPrompt} from './hello-model.mjs';
@@ -8,7 +9,7 @@ export function renderIntroMap(stage,state,selected=0,showOutput=true) {
     const tag=stage===0?'div':'button';
     const calculation=t.skipped?'No calculation':t.invalid?(showOutput?'Invalid read':'Run to check'):'× '+state.factor;
     const cardState=t.skipped?'skip':t.invalid?(showOutput?'invalid':'pending'):null;
-    const values=[['Input',t.input===null?'No element':t.input],[stage===0?'Calculation':'Thread '+t.i,calculation],['Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':t.output]];
+    const values=[['Input',t.input===null?'No element':tensorValue(t.input)],[stage===0?'Calculation':'Thread '+t.i,calculation],['Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':tensorValue(t.output)]];
     return `<${tag} class="hello-thread" ${stage===0?'':`type="button" data-thread="${t.i}" aria-pressed="${t.i===selected}"`} ${cardState?`data-state="${cardState}"`:''}>${values.map(([label,value])=>`<small>${escape(label)}</small><strong>${escape(value)}</strong>`).join('')}</${tag}>`;
   }).join('')}</div></div>`).join('');
 }
@@ -18,9 +19,10 @@ export function renderIntroSections() {
     <h2 id="hello-start-title">Double five values with PyTorch</h2>
     <p>We’ll store the five input values in a <strong>tensor</strong>: a collection of values arranged in one or more dimensions.</p>
     ${openingCode(pythonSource(),'hello-start-code')}
+    ${definitions([['Float (floating-point value)','A value stored in a format that can represent fractional amounts. The .0 literals create floating-point inputs: 1.0 has a whole-number value, but is still stored as a float. Multiplying this tensor by 2 keeps its floating-point type.']])}
     <dl class="hello-start-values">
-      <div><dt>Input <code>x</code></dt><dd><code>[${start.input.join(', ')}]</code></dd></div>
-      <div><dt>Result <code>y</code></dt><dd><code>[${start.output.join(', ')}]</code></dd></div>
+      <div><dt>Input <code>x</code></dt><dd><code>[${start.input.map(tensorValue).join(', ')}]</code></dd></div>
+      <div><dt>Result <code>y</code></dt><dd><code>[${start.output.map(tensorValue).join(', ')}]</code></dd></div>
     </dl>
     ${browserNotice()}
     <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
@@ -33,7 +35,7 @@ export function renderIntroSections() {
       <h2 id="hello-title-${stage}">${step.title}</h2>
       ${step.leadIn?`<p>${step.leadIn}</p>`:''}
       ${definitions(step.definitions)}
-      ${worked?`<p>Here, each thread handles one input value:</p><ul class="hello-thread-examples">${worked.threads.slice(0,2).map(thread=>`<li>Thread ${thread.i} reads <strong>${thread.input}</strong>, multiplies it by <strong>${worked.factor}</strong>, and writes <strong>${thread.output}</strong>.</li>`).join('')}<li>Threads ${worked.threads[2].i}–${worked.threads.at(-1).i} do the same for the remaining inputs.</li></ul><p>Each thread follows the same instructions using a different input value. The GPU is built to run many threads at the same time. It schedules threads in groups, so launching many threads does not mean they all run at once.</p>`:''}
+      ${worked?`<p>Here, each thread handles one input value:</p><ul class="hello-thread-examples">${worked.threads.slice(0,2).map(thread=>`<li>Thread ${thread.i} reads <strong>${tensorValue(thread.input)}</strong>, multiplies it by <strong>${worked.factor}</strong>, and writes <strong>${tensorValue(thread.output)}</strong>.</li>`).join('')}<li>Threads ${worked.threads[2].i}–${worked.threads.at(-1).i} do the same for the remaining inputs.</li></ul><p>Each thread follows the same instructions using a different input value. The GPU is built to run many threads at the same time. It schedules threads in groups, so launching many threads does not mean they all run at once.</p>`:''}
       <p class="hello-concept">${step.concept}</p>
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * ${state.factor}</code></pre></div>
       ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The extra three threads still exist, but have no input. A check makes them skip the read, multiplication and write. Their cards are grey and say “No calculation”; select one to inspect its index. The next experiment lets you turn that check off.</p>':''}
@@ -50,7 +52,7 @@ export function renderIntroSections() {
       ${stage===1?readerTask(step.instruction):''}
       <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,0,false)}</div>
       <p id="hello-output-${stage}" class="hello-output" role="status">${introPrompt(stage)}</p>
-      <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.join(', ')}].</p></details></noscript>
+      <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.map(tensorValue).join(', ')}].</p></details></noscript>
       ${stage>0?`<p id="hello-index-${stage}" role="status">Select a thread to follow its input and output.</p>`:''}
       ${stage===4?`<div class="hello-complete">
         <details class="more-settings"><summary>Run the CUDA example on your computer</summary>

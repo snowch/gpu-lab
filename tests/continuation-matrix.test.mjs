@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {chapters,renderResult} from '../src/continuation-matrix.mjs';
 import {tiledMatmul,precisionMatmul} from '../src/ai-models.mjs';
-import {fmt} from '../src/continuation-ui.mjs';
+import {roundedTensorValue as tensorValue} from '../src/value-format.mjs';
 
 test('matrix chapters keep independent, valid focused experiments',()=>{
   assert.deepEqual(chapters.map(chapter=>[chapter.number,chapter.slug]),[[9,'matmul'],[10,'tensor-cores']]);
@@ -44,8 +44,8 @@ test('dot rendering follows the current output pair and its actual K contributio
   const html=renderResult('matmul',result,cursor,'dot');
   assert.ok(html.includes(`C[${step.row},${step.col}]`));
   assert.ok(html.includes(`K = ${step.k0}`));
-  assert.ok(html.includes(`<dd>${fmt(step.cCells[0][2])}</dd>`));
-  assert.ok(html.includes(`<dd>${fmt(result.output[step.row][step.col])}</dd>`));
+  assert.ok(html.includes(`<dd>${tensorValue(step.cCells[0][2])}</dd>`));
+  assert.ok(html.includes(`<dd>${tensorValue(result.output[step.row][step.col])}</dd>`));
 });
 
 test('reuse rendering distinguishes current partial tiles from complete C',()=>{
@@ -65,8 +65,8 @@ test('precision rendering separates conversion and accumulation without a hardwa
     assert.ok(conversion.includes(`<dd>${result.changed}</dd>`));
     assert.ok(conversion.includes(`Input position K = 15`));
     const accumulation=renderResult('tensor-cores',result,15,'accumulation');
-    assert.ok(accumulation.includes(`<dd>${fmt(result.result)}</dd>`));
-    assert.ok(accumulation.includes(`<dd>${fmt(result.reference)}</dd>`));
+    assert.ok(accumulation.includes(`<dd>${tensorValue(result.result)}</dd>`));
+    assert.ok(accumulation.includes(`<dd>${tensorValue(result.reference)}</dd>`));
     assert.match(accumulation,/not a tensor-core trace/);
   }
   assert.equal(renderResult('attention',{}),null);

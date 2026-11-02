@@ -69,17 +69,17 @@ export function codeExplanations(source) {
       match(/y = torch\.where\([^\n]+/, 'Selects the positive expression where x > 0 and the other expression elsewhere. Python evaluates both supplied expressions; this does not establish that a GPU branch is used.');
       add('print(y.cpu())', 'Copies the selected results to CPU memory and prints them.');
     } else if(source.includes('total = x.sum()')) {
-      match(/torch\.arange\(1, \d+/, 'Creates consecutive input values starting at 1. The second argument is an excluded endpoint.');
+      match(/torch\.arange\(1, \d+/, 'Creates consecutive input values starting at 1.0. The second argument is an excluded endpoint.');
       add('dtype=torch.float32', 'Uses four-byte FP32 inputs.');
       add('device="cuda"', 'Places the input tensor on an NVIDIA GPU.');
-      add('total = x.sum()', 'Combines all input values into one scalar tensor on the GPU. PyTorch chooses the reduction algorithm and launches.');
+      add('total = x.sum()', 'Combines all input values into one scalar tensor on the GPU. PyTorch chooses the algorithm for the sum and handles its launches.');
       add('print(total.cpu())', 'Copies the scalar result to CPU memory so Python can print it.');
     } else if(source.includes('torch.arange')) {
-      match(/torch\.arange\((?:1, 26|32 \* 8)/, m=>m[0].includes('1, 26')?'Creates values 1 through 25. The endpoint 26 is excluded.':'Creates 256 consecutive values, starting at zero.');
+      match(/torch\.arange\((?:1, 26|32 \* 8)/, m=>m[0].includes('1, 26')?'Creates the FP32 values 1.0 through 25.0. The endpoint 26 is excluded.':'Creates 256 consecutive FP32 values, starting at 0.0.');
       add('dtype=torch.float32', 'Stores each value in four-byte FP32 format.');
       add('device="cuda"', 'Places the tensor in NVIDIA GPU memory.');
       match(/\.reshape\((?:5, 5|32, 8)\)/, 'Interprets the same values as the requested rows and columns. In this setup the reshape shares the original storage.');
-      add('x[0, :]', 'Selects every column of row 0. The result is a view sharing x’s storage.');
+      add('x[0, :]', 'Selects every column of row 0. The selected values stay in x’s existing storage.');
       add('x[:, 0]', 'Selects row 0 through the last row in column 0. These selected values are separated in the original storage.');
       add('column.contiguous()', 'Makes a packed copy when the column is strided, so successive selected values become neighbours in the new storage.');
       add('packed_column.stride()', 'Reports element steps in the packed copy. A step of one means neighbouring values.');
@@ -96,7 +96,7 @@ export function codeExplanations(source) {
       add('print(z.cpu())', 'Waits for the needed GPU work, copies z to CPU memory and prints it.');
     }
   } else if(source.includes('__global__')||source.includes('<<<')) {
-    add('__global__ void', 'Declares a GPU kernel. Each launched thread executes this function. void means the function writes results through its output array instead of returning a value.');
+    add('__global__ void', 'Declares a GPU kernel. Each launched thread executes this function. void means the function returns no value; this example writes results into output arrays.');
     if(!source.includes('tile[32][33]')) {
       add('const float*', 'Passes the location of an array of FP32 values. const prevents this function from changing values through that input pointer.');
       match(/int i = [^\n;]+;/, 'Declares an integer i and calculates the array index used below. blockIdx.x is the block number, blockDim.x its size, and threadIdx.x the position in the block. Check which terms this example uses.');

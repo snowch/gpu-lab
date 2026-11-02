@@ -66,6 +66,13 @@ second set of authoring requirements.
   well as colour. Do not shrink code to make a long line fit. Use short source lines and explicit
   continuation in Python; preserve indentation and keep any horizontal scrolling
   inside the code panel. Check complete programs and dynamic excerpts alike.
+- [ ] Keep tensor values distinct from indices and counts in **prose, worked examples,
+  diagrams, feedback and answer comparisons**. Whole-valued floating-point data must
+  retain `.0` or floating-point scientific notation; thread IDs, indices, dimensions,
+  counts and byte offsets remain integers. Explain floating-point inputs at first use.
+  Match the displayed source and dtype: a scalar multiplier written as `2` does not
+  turn a floating-point tensor’s results into integer data. Preserve values and
+  calculations rather than changing the example to hide a formatting mismatch.
 - [ ] Explain unfamiliar code with compact bullets in source order, starting each
   point with the actual fragment it describes. Keep explanations immediately after
   the snippet, before downloads or other callouts. Use the shared walkthrough
@@ -115,6 +122,43 @@ second set of authoring requirements.
 - [ ] Say that browser exercises have no installed PyTorch/CUDA documentation version;
   matching installed versions applies to optional local execution. External links
   open in a labelled new tab so readers retain their experiment.
+
+## Required reading-order review
+
+Apply this to every learner-facing edit, including a one-sentence correction. Review
+**the preceding section → the changed section → the following section** in the built
+page. Expand the review to the chapter opening or previous chapter when the edit
+changes what the reader must already know. Use the stated prerequisites, not the
+author’s knowledge of later chapters.
+
+1. **Knowledge before use:** identify each new term and the first sentence, code
+   explanation or definition that explains it. Include headings, figure labels and
+   controls in the review. A heading may announce a topic; the opening must establish
+   its purpose and meaning before an example or question relies on it. Check terms
+   inside definitions too. Do not fix a missing introduction by adding another term.
+2. **Reason for the next idea:** connect the previous calculation or observation to
+   the mechanism now needed. A definition on its own is not that connection.
+3. **A visible, named target:** resolve every “this”, “picture”, “diagram”, “above” or
+   “below” that carries an instruction. Name the actual card, figure, code panel or
+   control; keep selection instructions adjacent to their targets. If a result only
+   appears after Run or inside a disclosure, say how to reveal it first.
+4. **Enough information to act:** before Run, verify that inputs and rules needed for
+   a prediction are available, without revealing the answer. If the relevant source
+   is collapsed, name the disclosure to open. Check the initial case, a changed case
+   and the worked comparison separately. Compare the data type and value notation
+   across source, explanatory prose, cards and feedback; distinguish data from indices
+   and counts. Label an already-shown answer as inspection;
+   ask for a fresh case when requesting a new prediction.
+5. **Read the revised sequence again:** inspect it at phone and desktop sizes, before
+   and after Run, including any affected disclosure, selection or saved state.
+   Check that moving an explanation has not created a new undefined term, distant
+   reference, duplicate explanation or jump in the next section.
+
+Record the reviewed sequence and relevant interaction states briefly in the PR’s
+validation notes. Automated tests can protect structural requirements such as
+source-before-prediction order and hidden results; they cannot establish that the
+prose prepares a newcomer. Do not claim learner testing without learner observations.
+For the whole-book baseline, see [the learning-flow audit](learning-flow-audit.md).
 
 ## Acceptance checks
 

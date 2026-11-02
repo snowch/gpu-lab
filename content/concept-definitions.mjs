@@ -12,8 +12,9 @@ export const conceptsByLesson = {
     {term:'Active-lane mask',definition:'The set of lanes that participate in a particular instruction.'},
   ],
   'shared-memory': [
-    {term:'Shared memory',definition:'Fast, programmer-managed memory accessible to threads of the same block.'},
+    {term:'Word',definition:'One four-byte FP32 value in this shared-memory model.'},
     {term:'Bank',definition:'One independently serviced part of shared memory.'},
+    {term:'Service round',definition:'One model step in which each bank reads at most one distinct word. Rounds count service, not GPU clock cycles.'},
     {term:'Bank conflict',definition:'Different words requested from the same bank need separate service rounds in this model.'},
     {term:'Broadcast',definition:'Multiple lanes requesting the same shared-memory word can be served together on a read.'},
   ],

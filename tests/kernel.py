@@ -16,7 +16,7 @@ def check_kernel(browser, base_url, root, errors):
             page.locator('#reset-kernel').click()
             page.locator('#run-model').click()
             expect(page.locator('#kernel-status')).to_contain_text('0 of 3')
-            expect(page.locator('#kernel-cases')).to_contain_text('expected 1, got — (unwritten)')
+            expect(page.locator('#kernel-cases')).to_contain_text('expected 1.0, got — (unwritten)')
             page.locator('#kernel-index').select_option('global')
             expect(page.locator('#kernel-results')).to_be_hidden()
             expect(page.locator('#kernel-source')).to_contain_text('int i = blockIdx.x * blockDim.x + threadIdx.x;')
@@ -56,6 +56,10 @@ def check_kernel(browser, base_url, root, errors):
             expect(page.locator('#kernel-status')).to_contain_text('0 of 3')
             page.locator('#challenge-choice').select_option('3')
             page.locator('#start-challenge').click()
+            expect(page.locator('#kernel-source-panel')).to_be_focused()
+            assert page.locator('#kernel-source-panel').evaluate(
+                "el => !!(el.compareDocumentPosition(document.querySelector('#challenge-prediction')) & Node.DOCUMENT_POSITION_FOLLOWING)"
+            ), 'The challenge source must precede its prediction'
             page.locator('#check-challenge').click()
             expect(page.locator('#challenge-feedback')).to_contain_text('prediction first')
             page.locator('#challenge-prediction').fill('40')

@@ -91,7 +91,7 @@ def check_overview(browser,base_url,root,errors):
             map_page.locator('#shared-a > summary').focus();page.keyboard.press('Escape')
             expect(page.locator('#gpu-map-panel')).to_be_hidden()
             expect(page.locator('.gpu-map-link')).to_be_focused()
-            expect(page.locator('#hello-output-0')).to_have_text('Output: [3, 6, 9, 12, 15]')
+            expect(page.locator('#hello-output-0')).to_have_text('Output: [3.0, 6.0, 9.0, 12.0, 15.0]')
             page.goto(base_url+'lessons/meet-gpu.html?view=memory&concept=shared')
             expect(page.locator('#shared-a')).to_have_attribute('open','')
             expect(page.locator('#shared-a > summary')).to_be_visible()

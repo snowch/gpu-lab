@@ -102,13 +102,13 @@ export const referenceTasks = {
   divergence: {
     title:'Check the divergence rule', page:'divergence', label:'CUDA Best Practices: branching and divergence',
     prompt:'Find the scope of divergence. In one warp, compare alternating positive and negative inputs with the same counts grouped into two halves. Does merely grouping signs inside that warp remove either path?',
-    answer:'The relevant scope is a warp. Both arrangements still contain lanes taking each path, so both masks remain non-empty in our model. Grouping signs within that warp does not remove a path. The guide also explains that a compiler can use predication, so the model’s path-operation counts are not measured GPU instructions. torch.where selects 4 for +2 and 2 for −2 in the expression given; its value-selection rule does not prescribe these CUDA paths.',
-    followUp:'Use the torch.where reference above to interpret torch.where(x > 0, x * 2, -x). Which values are selected for x = +2 and x = −2?',
+    answer:'The relevant scope is a warp. Both arrangements still contain lanes taking each path, so both masks remain non-empty in our model. Grouping signs within that warp does not remove a path. The guide also explains that a compiler can use predication, so the model’s path-operation counts are not measured GPU instructions. torch.where selects 4.0 for +2.0 and 2.0 for −2.0 in the expression given; its value-selection rule does not prescribe these CUDA paths.',
+    followUp:'Use the torch.where reference above to interpret torch.where(x > 0, x * 2, -x). Which values are selected for x = +2.0 and x = −2.0?',
   },
   'shared-memory': {
     title:'Who reaches the barrier?', page:'shared', label:'CUDA: thread block synchronisation',
     prompt:'Find __syncthreads(). Which threads wait for one another? Does this barrier also synchronise other blocks?',
-    answer:'It coordinates threads in the same block, not the whole grid. This bank experiment models reads; the reduction workshop below explores ordering hazards.',
+    answer:'It coordinates threads in the same block, not the whole grid. This bank experiment models reads; chapter 8, “How do threads add values together?”, explores ordering hazards.',
   },
   reduction: {
     title:'Find the barrier contract', independent:true, page:'cuda', label:'CUDA Programming Guide', solution:'barriers',
@@ -155,7 +155,7 @@ export const referenceTasks = {
   },
   'requests-warp': {
     title:'Distinguish a block from a warp', page:'scheduling', label:'CUDA: hardware multithreading',
-    prompt:'Find how blocks are divided into warps. How many warps does a 64-thread block contain? Does our picture of five participating threads establish the size of every block?',
+    prompt:'Find how blocks are divided into warps. How many warps does a 64-thread block contain? Does the “One warp: five participating threads” figure establish the size of every block?',
     answer:'On NVIDIA GPUs a 64-thread block contains two 32-thread warps. Our five-thread read is a small teaching example; blocks can have more threads and multiple warps. A warp does not combine threads from different blocks.',
   },
   'memory-copy': {
@@ -186,8 +186,8 @@ export const referenceTasks = {
   'reduction-order': {
     title:'Explain the unsafe reduction', page:'barriers', label:'CUDA: synchronisation functions',
     prompt:'Thread zero reads a partner’s shared word before that partner writes it. Why does a later write fail to repair the earlier read? Would one successful run without the barrier establish that the program is correct?',
-    answer:'A later write does not establish the missing ordering before an earlier read. The exposed interleaving shows that the required value is not guaranteed to be ready. A successful run would show only one execution, not make the unsynchronised program correct. The model reports a hazard instead of assigning a numerical result to this race. For the four values [1, 2, 3, 4], x.sum() returns a scalar tensor containing 10.',
-    followUp:'Use Tensor.sum and its linked torch.sum reference above. What should x.sum() return for [1, 2, 3, 4], regardless of which correct implementation PyTorch selects?',
+    answer:'A later write does not establish the missing ordering before an earlier read. The exposed interleaving shows that the required value is not guaranteed to be ready. A successful run would show only one execution, not make the unsynchronised program correct. The model reports a hazard instead of assigning a numerical result to this race. For the four values [1.0, 2.0, 3.0, 4.0], x.sum() returns a scalar tensor containing 10.0.',
+    followUp:'Use Tensor.sum and its linked torch.sum reference above. What should x.sum() return for [1.0, 2.0, 3.0, 4.0], regardless of which correct implementation PyTorch selects?',
   },
   'matmul-shape': {
     title:'Connect the tile experiment to PyTorch', page:'torchMatmul', label:'PyTorch: torch.matmul',

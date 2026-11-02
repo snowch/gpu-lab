@@ -84,17 +84,17 @@ if (i < n) {
     prerequisite: 'Chapters 5 and 8: warps, active lanes, shared memory and block barriers. This optional lab explores the layout of that shared workspace.',
     intro: `<p>A tiled tensor operation can load data once and reuse it across threads in the same block. The layout of that reusable data matters.</p><!-- NEW_CONCEPTS --><p>This model uses 32 banks. Successive four-byte words map to successive banks, wrapping around at bank zero. For word index <code>w</code>, the bank is <code>w % 32</code>, where <code>%</code> means remainder.</p><p>These bank rules describe reads; broadcasting a word does not make simultaneous writes safe.</p>`,
     setup: `<p>Imagine a square tile with 32 rows and 32 useful columns. Threads read one column, so successive lanes are separated by the row pitch: the number of allocated words per row. A pitch of 33 adds one unused padding word to each row.</p>
-      <p>Each round serves at most one distinct word from each bank. Banks work in parallel; the busiest bank determines the number of rounds. Try a row read, a column read, a padded column, and a broadcast.</p>`,
+      <p>Each round serves at most one distinct word from each bank. Banks work in parallel; the busiest bank determines the number of rounds. The worked example already compares the full-warp column and padded reads. Inspect those cases, then choose 8 active lanes for a new round-count prediction. Compare a row read and a broadcast afterward.</p>`,
     controls: `<label>Access pattern<select id="bankPattern"><option value="row">Row · stride 1</option><option value="column" selected>Column · stride 32</option><option value="padded">Padded column · stride 33</option><option value="stride2">Every other word · stride 2</option><option value="broadcast">Same word · broadcast</option></select></label>
       <label>Active lanes<select id="activeLanes"><option value="32">32 lanes</option><option value="16">First 16 lanes</option><option value="8">First 8 lanes</option></select></label>`,
     prediction: 'How many service rounds will this read need?', maxGuess: 32,
     figureTitle: 'Requests grouped by bank',
     figureHint: 'Select a round. Each bank card counts its distinct requested words; highlighted cards serve a word in this round. Select a lane to inspect its word and bank.',
     code: '// Extracted from examples/shared-memory.cu by the build.',
-    codeNote: `<p>This fragment assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
+    codeNote: `<p>This function assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
       <p>Every thread in the block must reach the barrier. A barrier inside a condition taken by only some block threads can hang or behave incorrectly. The bank model covers the final read; it does not simulate the loop or barrier.</p>`,
     exercises: [
-      'Predict the rounds for a column read with pitch 32. Select lanes 0 and 1. They read different words: which banks receive them?',
+      'For a new prediction, choose 8 active lanes and a column read with pitch 32. Then select lanes 0 and 1. They read different words: which banks receive them?',
       'Switch to a padded column with pitch 33. Explain why adding a padding word changes the bank mapping while preserving the useful column.',
       'Compare the unpadded column with a broadcast. Both use one bank. Why does only one of them need repeated service rounds?',
       'Choose every other word and reduce the active lanes to sixteen. Can this subset avoid the conflict that appears with a full warp?',

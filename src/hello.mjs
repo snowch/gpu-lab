@@ -1,3 +1,4 @@
+import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
@@ -34,7 +35,7 @@ function draw(){
 function invalidate(){
   result=null;$('hello-output').textContent='Settings changed—predict again, then press Run.';code();draw();
 }
-function resultText(){return result.safe?'Output: ['+result.output.join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';}
+function resultText(){return result.safe?'Output: ['+result.output.map(tensorValue).join(', ')+']':result.threads.filter(t=>t.invalid).length+' threads would access outside the arrays. Enable the bounds check to keep them safe.';}
 $('hello-map').addEventListener('click',event=>{
   const button=event.target.closest('button[data-thread]');
   if(!button)return;
