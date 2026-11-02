@@ -52,7 +52,7 @@
       </section>
       <section class="section-space" aria-labelledby="build-title">
         <h2 id="build-title">1. Build your kernel</h2>
-        <p>A <strong>block</strong> is a group of threads. <code>threadIdx.x</code> is a thread’s index within its block, <code>blockIdx.x</code> identifies the block, and <code>blockDim.x</code> is the number of threads per block. Combining them gives an index across blocks.</p><p class="kernel-note">Choose CUDA C++ statements. The browser simulates these supported choices on the CPU; it does not compile CUDA or execute GPU code.</p>
+        <p>A <strong>block</strong> is a group of threads. <code>threadIdx.x</code> is a thread’s index within its block, <code>blockIdx.x</code> identifies the block, and <code>blockDim.x</code> is the number of threads per block. Combining them gives an index across blocks.</p><p>For each test length, the model launches enough whole blocks to cover the inputs: divide the input count by the threads per block and round up. Each block still contains the chosen number of threads; the bounds check lets extra threads skip the arrays.</p><p class="kernel-note">Choose CUDA C++ statements. The browser simulates these supported choices on the CPU; it does not compile CUDA or execute GPU code.</p>
         <fieldset id="kernel-editor" class="kernel-editor"><legend>Editable statements</legend>
           <label for="kernel-index">Element index, <code>i</code><select id="kernel-index"><option value="next">blockIdx.x * blockDim.x + threadIdx.x + 1</option><option value="global">blockIdx.x * blockDim.x + threadIdx.x</option><option value="local">threadIdx.x</option></select></label>
           <label for="kernel-guard">Before accessing the arrays<select id="kernel-guard"><option value="yes">Only if i &lt; n</option><option value="no">Always access them</option></select></label>
@@ -89,7 +89,7 @@
       <section id="kernel-inspector" class="section-space" hidden aria-labelledby="inspect-title">
         <h2 id="inspect-title">3. Explain the result</h2>
         <h3>Blocks → threads → output elements</h3>
-        <p class="kernel-note">Select a thread to inspect its operations. These groups show membership, not execution order or physical GPU placement. “Duplicate” means multiple threads target the same element.</p>
+        <p class="kernel-note">Select a thread to inspect its operations. These groups show membership, not execution order or physical GPU placement. “Duplicate” means multiple threads target the same element. A card’s ID is its thread’s position across all blocks; the arrow shows which output it targets or whether it skips.</p>
         <div id="thread-map"></div><p id="mapping-summary"></p>
         <p id="inspection-case"></p>
         <p class="kernel-note">This is a replay of the <strong>browser model</strong>, not a captured GPU trace. It visits threads by global ID for inspection; real threads can run in a different order. Each step is a source operation, not a GPU instruction or clock cycle.</p>
