@@ -29,7 +29,9 @@ second set of authoring requirements.
   explain their parts. Label later excerpts as excerpts of an already-seen function.
 - [ ] Before a new mechanism, explain the problem it solves in the current example.
   A definition tells the reader what a term means; a short bridge tells them why
-  they need it. Connect the last observable result to the next question.
+  they need it. Connect the last observable result to the next question. Ground
+  execution terms in a specific input, calculation and output before generalising
+  about many executions or parallel progress.
 - [ ] Define new terms before using them in prose, diagrams or controls. Use the
   shared `definitions()` callout: bold term, brief meaning, visible Definition label.
   Group related terms, remove duplicate explanations, and leave later mentions plain.
