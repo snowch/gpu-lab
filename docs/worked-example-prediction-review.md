@@ -26,6 +26,8 @@ Reviewed the prediction targets across all thirteen chapters:
 Static HTML and live feedback use the same inspection/prediction prompts. Existing
 experiment IDs and settings remain valid. A completed ×2 snapshot from an older
 release keeps that multiplier and its result; the new default must not overwrite it.
+The task explicitly asks for multiplier 3 or another multiplier besides 2, so an
+older saved ×2 setting can be changed without discarding it.
 Unknown outputs stay hidden until Run, and changing one experiment leaves the
 others intact. Python/CUDA programs and model arithmetic are unchanged.
 
