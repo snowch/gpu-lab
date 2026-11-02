@@ -15,7 +15,7 @@ def check_book_opening(browser,url,root,errors):
         expect(page.locator('[data-book-experiment]')).to_have_count(3)
         expect(page.locator('#device-run-0')).to_be_enabled()
         for stage,buffers in [(0,1),(1,2),(2,3)]:
-            expect(page.locator(f'#device-feedback-{stage}')).to_contain_text('then press Run')
+            expect(page.locator(f'#device-feedback-{stage}')).to_contain_text('Run')
             expect(page.locator(f'#device-map-{stage} .device-buffer')).to_have_count(buffers)
         page.locator('#device-run-0').evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-400,behavior:'instant'})")
         page.locator('#device-run-0').focus();page.keyboard.press('Enter')
@@ -42,6 +42,7 @@ def check_book_opening(browser,url,root,errors):
         expect(page.locator('[data-book-experiment]')).to_have_count(2)
         run=page.locator('#reading-run-row')
         expect(run).to_be_enabled()
+        expect(page.locator('#reading-feedback-row')).to_contain_text('familiar row')
         for key in ['row','column']:
             expect(page.locator(f'#reading-map-{key} .book-reads li>span:last-child strong')).to_have_text(['?']*5)
         run.evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-400,behavior:'instant'})")

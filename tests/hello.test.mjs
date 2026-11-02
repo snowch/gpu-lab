@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,simulateIntro,kernelSource,pythonSource,launchPlan} from '../src/hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,introPrompt} from '../src/hello-model.mjs';
 test('intro diagram and outputs derive from thread indices and selected multiplier',()=>{
  for(let stage=0;stage<steps.length;stage++)for(const factor of [-10,-0.5,0,2,3,10]){
   const r=simulateIntro(stage,factor);
@@ -65,6 +65,18 @@ test('concepts precede CUDA and the first CUDA panel contains a complete kernel'
 test('initial experiment HTML withholds output before scripts run',()=>{
  const html=renderIntroSections().split('<section class="hello-section"').slice(1).join('');
  assert.equal((html.match(/<small>Output<\/small><strong>\?<\/strong>/g)||[]).length,34);
- assert.equal((html.match(/Predict the outputs, then press Run\./g)||[]).length,5);
+ assert.equal((html.match(/Predict the outputs for this multiplier, then press Run\./g)||[]).length,1);
+ assert.match(html,/id="hello-output-1"[^>]*>Run to follow/);
  assert.doesNotMatch(html,/Example output:/);
+});
+
+test('first prediction uses a different multiplier from the opening worked example',()=>{
+ const html=renderIntroSections(),first=html.split('id="idea-1"')[1].split('id="idea-2"')[0];
+ assert.equal(steps[0].factor,3);
+ assert.notDeepEqual(simulateIntro(0,steps[0].factor).output,simulateIntro(0,2).output);
+ assert.match(first,/id="hello-factor-0"[^>]*value="3"/);
+ assert.match(first,/id="hello-operation-0">y = x \* 3/);
+ assert.doesNotMatch(first.replace(/<noscript>[\s\S]*?<\/noscript>/g,''),/\[3, 6, 9, 12, 15\]/);
+ assert.ok(introPrompt(0).startsWith('Predict'));
+ for(let stage=1;stage<5;stage++)assert.ok(introPrompt(stage).startsWith('Run'));
 });

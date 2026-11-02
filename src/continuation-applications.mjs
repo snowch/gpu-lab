@@ -73,9 +73,10 @@ export const chapters = [
     sections:[
       {
         id:'attention-weighted', title:'Follow one weighted result',
+        initialPrompt:'Run to inspect the scores, weights and result.',
         body:`<p>Start with query zero. A high score gives a key more weight, but the output still combines its value with the others. The table shows how the score row becomes weights. Each output component adds those weights multiplied by the corresponding component of every value row; the four-component result is shown beside it.</p><p>Run, then step from scores to weights to the result. Increasing the query multiplier multiplies all scores in this example. It makes the largest-score keys more influential; tied largest scores can share the weight.</p>`,
         terms:[['Score','A query–key dot product divided by the square root of their width.'],['Softmax','A conversion from scores to non-negative weights that sum to one along a chosen dimension.']],
-        task:'Predict whether the weights sum to one. Run and follow the three steps. Change only the query multiplier to 1,000: which keys now supply almost all the result, and why are there two?',
+        task:'Run and follow scores, weights and the result. Then change only the query multiplier to 1,000. Before running again, predict which keys will receive most of the weight and how that changes the output.',
         experiment:{model:'attention',defaults:attentionDefaults,focus:'attention-weighted',controls:[{key:'scale',label:'Query multiplier',options:[[1,'1 × query values'],[1000,'1,000 × query values']]}],code:attentionCode},
         after:`<p>Softmax is evaluated stably by subtracting the largest score before exponentiating. This preserves the normalised weights and avoids exponentiating a large positive score. Larger scores do not make the weighted result grow by the same multiplier.</p>`,
       },
