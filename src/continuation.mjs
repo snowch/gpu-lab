@@ -31,13 +31,13 @@ for(const section of chapter.sections.filter(section=>section.experiment)){
     $('[data-position]').textContent=`Step ${cursor+1} of ${steps}`;
   }
   function run(){
-    try{result=computeExperiment(experiment,configuration());cursor=0;revealed=true;draw();$('[role="status"]').textContent=traceLength(experiment,result)<=1?'Run complete. Compare the result below with your prediction.':'Run complete. Inspect the result below, then follow the steps.';}
+    try{result=computeExperiment(experiment,configuration());cursor=0;revealed=true;draw();$('[role="status"]').textContent=section.initialPrompt?'Run complete. Inspect the result below.':traceLength(experiment,result)<=1?'Run complete. Compare the result below with your prediction.':'Run complete. Inspect the result below, then follow the steps.';}
     catch(error){revealed=false;draw();$('[role="status"]').textContent=error.message;}
   }
   for(const control of root.querySelectorAll('[data-setting]'))control.addEventListener('change',()=>{revealed=false;cursor=0;code();draw();$('[role="status"]').textContent='Settings changed. Predict again, then Run to update this example.';});
   $('[data-run]').addEventListener('click',run);
   $('[data-back]').addEventListener('click',()=>{cursor--;draw();});
   $('[data-next]').addEventListener('click',()=>{cursor++;draw();});
-  draw();$('[data-run]').disabled=false;$('[role="status"]').textContent='Predict the result, then press Run.';
+  draw();$('[data-run]').disabled=false;$('[role="status"]').textContent=section.initialPrompt||'Predict the result, then press Run.';
   registerExperiment(section.id,()=>({cursor,revealed}),state=>{cursor=state.cursor;revealed=state.revealed;code();if(revealed)result=computeExperiment(experiment,configuration());draw();});
 }

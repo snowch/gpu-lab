@@ -1,6 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 import {openingCode,browserNotice,codePanel,definitions,readerTask} from './chapter-view.mjs';
-import {steps,simulateIntro,kernelSource,pythonSource,launchPlan} from './hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,introPrompt} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   const groups=stage>=2?Array.from({length:state.blocks},(_,i)=>i):[null];
@@ -25,7 +25,7 @@ export function renderIntroSections() {
     ${browserNotice()}
     <p class="hello-question"><strong>How does the GPU calculate these results?</strong></p>
   </section>`+steps.map((step,stage)=>{
-    const state=simulateIntro(stage,2);
+    const state=simulateIntro(stage,step.factor??2);
     const pre=(id,source,label)=>codePanel({id:id+'-'+stage,source,label});
     return `<section class="hello-section" data-stage="${stage}" id="idea-${stage+1}" aria-labelledby="hello-title-${stage}">
       <p class="eyebrow">Idea ${stage+1} of ${steps.length}</p>
@@ -33,7 +33,7 @@ export function renderIntroSections() {
       ${step.leadIn?`<p>${step.leadIn}</p>`:''}
       ${definitions(step.definitions)}
       <p class="hello-concept">${step.concept}</p>
-      <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * 2</code></pre></div>
+      <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * ${state.factor}</code></pre></div>
       ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The extra three threads still exist, but have no input. A check makes them skip the read, multiplication and write. Their cards are grey and say “No calculation”; select one to inspect its index. The next experiment lets you turn that check off.</p>':''}
       ${stage===3?'<p>Here, the bounds check asks whether a thread’s index is smaller than the number of inputs. Indices 0–4 pass; indices 5–7 skip the read, multiplication and write. Turn the check off below to see why it matters.</p>':''}
       ${stage===4?`<p>PyTorch selects an optimised implementation and handles its launch; <code>y = x * 2</code> does not choose blocks or threads. CUDA lets us write the GPU function and choose those settings ourselves. The compiler also optimises our code. Our <code>runKernel</code> is a separate teaching function; PyTorch does not call it when evaluating this expression. The example makes the work visible and is not intended to outperform PyTorch.</p>
@@ -41,12 +41,12 @@ export function renderIntroSections() {
       ${pre('hello-launch','runKernel<<<2, 4>>>(d_input, d_output, 5);','CUDA C++ · launch from the CPU')}
       <p>This one-dimensional launch uses the <code>.x</code> components. In <code>&lt;&lt;&lt;2, 4&gt;&gt;&gt;</code>, two blocks of four threads provide eight threads. The final argument <code>5</code> supplies the input count <code>n</code>. The download includes the GPU allocations and copies.</p>`:''}
       ${readerTask(step.instruction)}
-      <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each value by <input id="hello-factor-${stage}" type="number" value="2" min="-10" max="10" step="any" inputmode="decimal"></label>
+      <label class="hello-factor-label" for="hello-factor-${stage}">Multiply each value by <input id="hello-factor-${stage}" type="number" value="${state.factor}" min="-10" max="10" step="any" inputmode="decimal"></label>
       ${stage===3?'<div class="hello-guard-section"><label><input id="hello-guard-3" type="checkbox" checked> Only access elements that exist</label></div>':''}
       <button id="hello-run-${stage}" type="button" class="primary" disabled>Run</button>
       <p class="hello-note">Browser simulation</p>
       <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,0,false)}</div>
-      <p id="hello-output-${stage}" class="hello-output" role="status">Predict the outputs, then press Run.</p>
+      <p id="hello-output-${stage}" class="hello-output" role="status">${introPrompt(stage)}</p>
       <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.join(', ')}].</p></details></noscript>
       ${stage>0?`<p id="hello-index-${stage}" role="status">Select a thread to follow its input and output.</p>`:''}
       ${stage===4?`<div class="hello-complete">

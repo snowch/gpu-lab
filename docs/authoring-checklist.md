@@ -39,6 +39,10 @@ second set of authoring requirements.
   back up the page. Each experiment owns its controls and results. Keep that
   implementation detail out of reader-facing prose; explain interface behaviour
   only when it helps the reader carry out a specific action.
+- [ ] A worked example and the next prediction must ask different questions. Use a
+  new multiplier, row or other case for prediction; label revisiting a known result
+  as inspection or confirmation. A definition such as “softmax weights sum to one”
+  should be checked or applied, not presented as an unseen answer to guess.
 - [ ] Follow predict → run → change one variable → explain. Use `readerTask()` for
   explicit learner actions, with a visible label and decorative icon. Put feedback
   beside Run. Show `?` for unknown output values until Run; hide derived counts, traces and

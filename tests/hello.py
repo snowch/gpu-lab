@@ -22,15 +22,18 @@ def hello_flow(page, url):
     visible=page.locator('#idea-1').inner_text()
     assert '__global__' not in visible and 'blockIdx' not in visible and 'float*' not in visible
     expect(page.locator('#hello-map-0 .hello-thread')).to_have_count(5)
+    expect(page.locator('#hello-factor-0')).to_have_value('3')
+    expect(page.locator('#hello-operation-0')).to_have_text('y = x * 3')
+    expect(page.locator('#hello-output-1')).to_have_text('Run to follow each thread’s input and output.')
     for stage in range(5):
         outputs=page.locator(f'#hello-map-{stage} .hello-thread strong:last-child')
         expect(outputs).to_have_text(['?'] * outputs.count())
         page.locator(f'#hello-run-{stage}').click()
-        expect(page.locator(f'#hello-output-{stage}')).to_have_text('Output: [2, 4, 6, 8, 10]')
+        expect(page.locator(f'#hello-output-{stage}')).to_have_text('Output: [3, 6, 9, 12, 15]' if stage==0 else 'Output: [2, 4, 6, 8, 10]')
         if stage:
             page.locator(f'#hello-map-{stage} [data-thread="1"]').click()
             expect(page.locator(f'#hello-output-{stage}')).to_have_text('Output: [2, 4, 6, 8, 10]')
-        page.locator(f'#hello-factor-{stage}').fill('3')
+        page.locator(f'#hello-factor-{stage}').fill('4' if stage==0 else '3')
         expect(outputs).to_have_text(['?'] * outputs.count())
         expect(page.locator(f'#hello-output-{stage}')).to_contain_text('Settings changed')
         page.locator(f'#hello-factor-{stage}').fill('2')
@@ -131,7 +134,17 @@ def check_old_hello_snapshot(browser,url):
         }''',[ran,message])
         page.reload()
         expect(page.locator('#hello-map-1 .hello-thread strong:last-child')).to_have_text(['?']*5)
-        expect(page.locator('#hello-output-1')).to_have_text('Predict the outputs, then press Run.')
+        expect(page.locator('#hello-output-1')).to_have_text('Run to follow each thread’s input and output.')
+    # A completed ×2 experiment from an older release must keep its input and result.
+    page.locator('#hello-factor-0').fill('2');page.locator('#hello-run-0').click()
+    page.evaluate("""() => {
+      const controls=[...document.querySelectorAll('main input,main select,main textarea')].map(el=>({id:el.id,name:el.name,value:el.value,checked:el.checked}));
+      sessionStorage.setItem('gpu-lab:restart:'+location.pathname+location.search,JSON.stringify({schema:1,controls,experiments:{'hello-0':{selected:0,ran:true,length:5}},details:[],messages:{},scroll:[0,0]}));
+    }""")
+    page.reload()
+    expect(page.locator('#hello-factor-0')).to_have_value('2')
+    expect(page.locator('#hello-operation-0')).to_have_text('y = x * 2')
+    expect(page.locator('#hello-output-0')).to_have_text('Output: [2, 4, 6, 8, 10]')
     context.close()
 
 def check_hello(browser,url,root,errors):
@@ -151,7 +164,7 @@ def check_hello(browser,url,root,errors):
     page=context.new_page();page.goto(url+'lessons/hello.html')
     expect(page.locator('.hello-section')).to_have_count(5)
     expect(page.locator('.hello-thread')).to_have_count(34)
-    expect(page.locator('#hello-output-4')).to_have_text('Predict the outputs, then press Run.')
+    expect(page.locator('#hello-output-4')).to_have_text('Run to compare the kernel’s result with the PyTorch example.')
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
     expect(page.locator('#hello-map-2 [data-thread="5"]')).to_contain_text('No calculation')
     expect(page.locator('.hello-section-end noscript p')).to_contain_text('Indices 6 and 7 skip')

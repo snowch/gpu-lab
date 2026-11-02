@@ -2,7 +2,7 @@
 import './theme.mjs';
 import {registerExperiment} from './experiment-state.mjs';
 import {deviceJourney,readTensor,journeyCode,readingCode} from './foundations-model.mjs';
-import {renderDeviceMap,renderReadMap} from './foundations-view.mjs';
+import {renderDeviceMap,renderReadMap,devicePrompt,readingPrompt} from './foundations-view.mjs';
 function number(input,fallback) {
   if(!input) return fallback;
   if(input.value.trim()==='') throw new Error('Enter a multiplier first.');
@@ -24,10 +24,10 @@ for(const section of document.querySelectorAll('[data-book-experiment]')) {
       if(device) {
         const source=journeyCode(c);$('setup').textContent=source.setup;$('code').textContent=source.operation;
         $('map').innerHTML=renderDeviceMap(s,ran);
-        $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).join(', ')}].`:(changed?'Settings changed—predict again, then press Run.':'Predict the result, then press Run.');
+        $('feedback').textContent=ran?`${s.transferBytes} bytes copied between devices. ${s.allocated} contains [${(s.stage===0?s.input:s.output).join(', ')}].`:(changed?'Settings changed—predict again, then press Run.':devicePrompt(Number(key),c.count,c.factor));
       } else {
         $('code').textContent=readingCode(c);$('map').innerHTML=renderReadMap(s,ran,{sectors:key==='sectors',mode:section.dataset.readingMode});
-        let feedback=ran?'Output: ['+s.output.join(', ')+'].':(changed?'Settings changed—predict again, then press Run.':'Predict the outputs, then press Run.');
+        let feedback=ran?'Output: ['+s.output.join(', ')+'].':(changed?'Settings changed—predict again, then press Run.':readingPrompt(section.dataset.readingMode,key,c.index,c.factor));
         if(ran&&key==='sectors') {
           const raw=$('guess').value;
           feedback+=` ${s.load.sectors.length} sector${s.load.sectors.length===1?'':'s'} for ${s.load.usefulBytes} useful bytes.`;

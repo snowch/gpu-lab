@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
-import {steps,simulateIntro,kernelSource,runnableSource,launchPlan} from './hello-model.mjs';
+import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,introPrompt} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
 import {renderIntroMap} from './hello-view.mjs';
 for (const section of document.querySelectorAll('.hello-section')) {
@@ -57,7 +57,7 @@ $('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSour
 code();draw();$('hello-run').disabled=false;
 registerExperiment('hello-'+stage,()=>({selected,ran:result!==null,length:steps[stage].length,message:$('hello-output').textContent}),state=>{
   selected=state.selected;result=state.ran===true&&!state.message?.startsWith('Example output:')?model():null;code();draw();
-  $('hello-output').textContent=result?resultText():'Predict the outputs, then press Run.';
+  $('hello-output').textContent=result?resultText():introPrompt(stage);
 });
 }
 
