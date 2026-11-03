@@ -102,6 +102,9 @@ footer { flex-wrap:wrap; }
 
 /* Keep the concept map visible beside app controls, including on phones. */
 .top-actions .gpu-map-link { display:inline-flex; align-items:center; min-height:44px; padding:8px 12px; border:1px solid var(--accent); border-radius:6px; color:var(--accent); font-weight:650; }
+.top-actions .github-star { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 12px; border:1px solid var(--line); border-radius:6px; color:var(--ink); font-weight:650; white-space:nowrap; }
+.github-star svg { flex:none; }
+.github-star:hover { background:var(--accent-soft); border-color:var(--accent); }
 
 @media (hover:hover) { .roadmap>a:hover { background:var(--soft); } }
 
