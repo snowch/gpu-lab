@@ -11,7 +11,16 @@ export function codeExplanations(source) {
   };
   const match=(pattern,meaning)=>{const m=source.match(pattern);if(m)add(m[0].trim(),typeof meaning==='function'?meaning(m):meaning);};
   const python=/^import torch\b/.test(source.trimStart());
-  if(python){
+  if(source.includes('prof.export_chrome_trace("trace.json")')) {
+    add('print("PyTorch:", torch.__version__)', 'Records the installed PyTorch version. The following prints record its CUDA build and the actual GPU model.');
+    add('x = torch.arange(\n    1, 4097, dtype=torch.float32, device="cuda",\n)', 'Creates 4,096 FP32 inputs, from 1.0 to 4096.0, on the NVIDIA GPU. The endpoint 4097 is excluded.');
+    add('for _ in range(5):', 'Runs five warm-up multiplications before capture. The underscore is a loop variable whose value is unused.');
+    add('torch.cuda.synchronize()', 'Waits for earlier CUDA work to finish. The later synchronisation inside capture also waits for the recorded multiplication.');
+    add('activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA]', 'Requests CPU events and supported CUDA activity from the profiler.');
+    add('with profile(activities=activities) as prof:', 'Records events within this context; exiting ends capture.');
+    add('with record_function("gpu_lab_multiply"):', 'Names the enclosed CPU range so it can be found on the timeline. Its y = x * 2 is the multiplication being inspected.');
+    add('prof.export_chrome_trace("trace.json")', 'Writes the captured events to a Chrome JSON trace for a timeline viewer or the supplied reader.');
+  } else if(python){
     if(source.includes('x_cpu =')) {
       add('x_cpu = torch.tensor(', 'Creates the input tensor in CPU memory. The list supplies its values; x_cpu is the name we use to refer to it.');
       add('dtype=torch.float32', 'Stores each number as FP32, a 32-bit floating-point value taking four bytes.');

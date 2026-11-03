@@ -2,6 +2,11 @@
 import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
+  profiler: 'https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html',
+  nsysCli: 'https://docs.nvidia.com/nsight-systems/UserGuide/index.html',
+  kineto: 'https://github.com/pytorch/kineto/blob/main/libkineto/src/CuptiActivity.h',
+  nsys: 'https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html#cuda-gpu-trace-nvtx-name-base-mangled-cuda-gpu-trace',
+  ncu: 'https://docs.nvidia.com/nsight-compute/NsightComputeCli/index.html',
   gpgpu: 'https://github.com/gpgpu-sim/gpgpu-sim_distribution',
   docker: 'https://docs.docker.com/get-started/get-docker/',
   pytorchInstall: 'https://pytorch.org/get-started/locally/',
@@ -40,6 +45,8 @@ export const guides = {
   timing: 'https://docs.pytorch.org/docs/2.14/notes/cuda.html#asynchronous-execution',
 };
 export const referenceTasks = {
+  'profiling-events':{title:'Connect an operator to its kernels',page:'profiler',label:'PyTorch: profiler recipe',prompt:'Find the Chrome trace export example. Why should you inspect individual GPU kernel events rather than assume one row in key_averages().table() describes one launch?',answer:'The table aggregates operator statistics. The Chrome trace records individual CPU and GPU events when supported. One operator may launch several kernels, and compiled execution can combine operations. Inspect event arguments and correlation information to identify the launches in the captured run.'},
+  'profiling-dimensions':{title:'Interpret a launch report',page:'nsys',label:'Nsight Systems: CUDA GPU Trace',prompt:'Find the GrdX/Y/Z and BlkX/Y/Z columns. For a new case, the grid is [4, 1, 1] and the block is [16, 2, 1]. How many threads are launched? Does that reveal which SM each block uses?',answer:'Multiply the grid dimensions to get 4 blocks and the block dimensions to get 32 threads per block: 128 launched threads. These fields do not specify block-to-SM placement or simultaneous execution, useful element count, or speed.'},
   'capstone-copy':{title:'Check whether packing does work',page:'contiguous',label:'PyTorch: Tensor.contiguous',prompt:'The opening A is contiguous. Does a.contiguous() necessarily create a new allocation? What changes if A is a strided column view?',answer:'For an already-contiguous tensor, contiguous() returns the tensor itself. For a non-contiguous view it makes a contiguous copy. Include that copy cost if packing is part of the workload you time.'},
   'capstone-measure':{title:'Design a fair timing comparison',page:'timing',label:'PyTorch: asynchronous CUDA execution',prompt:'Why can timing only the Python call to a @ b miss GPU work? State how you would define and finish the timed interval before claiming a faster implementation.',answer:'CUDA operations can be queued asynchronously. Use appropriate CUDA events or synchronisation around the defined interval, warm up, and repeat. State whether copies and allocation are included, keep inputs and dtype comparable, and verify outputs. Browser load counts cannot establish GPU speed.'},
   'desktop-simulator': {title:'Check what the simulator establishes',page:'gpgpu',label:'GPGPU-Sim README',prompt:'Find the distinction between functional and performance simulation. This book runs with PTX_SIM_MODE_FUNC=1. Does a matching output validate a GPU timing estimate?',answer:'Functional simulation checks execution and output for the selected simulator configuration. It does not validate measured latency, physical GPU performance, or the browser model’s counters. The toolchain and supported features still constrain which programs run.'},
@@ -230,6 +237,7 @@ export function renderReferenceTask(key) {
 
 // Page-level coverage is explicit so a new chapter cannot silently omit its references.
 export const chapterReferences = {
+  profiling:{sources:[['profiler','PyTorch: profiler recipe','Export and inspect an event trace, rather than only aggregated operator statistics.'],['nsys','Nsight Systems: CUDA GPU Trace','Check the grid, block and correlation columns in a real CUDA launch report.'],['ncu','Nsight Compute: command-line guide','Check NVTX filtering, launch statistics and profiling overhead.']],optional:[['nsysCli','Nsight Systems: user guide','Check installation support and the profile/stats command options.'],['kineto','Kineto: CUDA activity metadata source','Implementation detail: inspect how grid and block dimensions enter kernel-event metadata.']],tasks:['profiling-events','profiling-dimensions']},
   'putting-it-together':{sources:[['contiguous','PyTorch: Tensor.contiguous','Check whether a layout change makes a copy.'],['matmul','CUDA Best Practices: shared tile reuse','Check the mechanism behind the model’s reduced input loads.'],['timing','PyTorch: asynchronous CUDA execution','Define the boundary of an optional GPU timing comparison.']],tasks:['capstone-copy','capstone-measure']},
   desktop:{sources:[['docker','Docker installation','Install Docker with Linux-container support for the CUDA simulator path.'],['gpgpu','GPGPU-Sim README','Read supported toolchains and the distinction between functional and performance simulation.'],['pytorchInstall','PyTorch installation selector','Choose an installation for your operating system and CPU or CUDA execution.']],tasks:['desktop-simulator','desktop-pytorch']},
   hello: {

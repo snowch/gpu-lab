@@ -11,7 +11,7 @@ export function renderBookNav(current='index') {
   const group=(id,title,links)=>`<section class="nav-section" aria-labelledby="${id}"><h2 class="nav-group" id="${id}">${title}</h2>${links}</section>`;
   return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}
     ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug,c.slug)).join(''))}
-    ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'meet-gpu.html','GPU map',current==='meet-gpu'))}
+    ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'profiling.html','Inspect PyTorch launches',current==='profiling')+link(base+'meet-gpu.html','GPU map',current==='meet-gpu'))}
     ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel','kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory','shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true,'memory'):''))}</nav>`;
 
 }

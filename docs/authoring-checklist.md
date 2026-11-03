@@ -85,6 +85,11 @@ second set of authoring requirements.
 - [ ] Lead browser guidance with “no installation or GPU required”. Explain simulation
   versus local execution once at the appropriate point. State validation limits
   accurately; compiler/simulator checks are not physical GPU performance evidence.
+- [ ] When connecting a model to a real profiler, link the optional profiling appendix.
+  Keep launch dimensions, operation/kernel correlation and measured performance
+  distinct. Missing trace fields are unknown, not zero or the model's settings.
+  Ordinary PyTorch expressions choose implementations internally; custom kernels
+  permit direct launch control. Do not imply that PyTorch programs cannot be optimised.
 - [ ] Use one local-execution section per page through `desktopLinks()`. Keep
   installation steps in the desktop appendix and browser requirements at the opening.
   Link contextual code downloads beside their code without repeating setup guidance.
