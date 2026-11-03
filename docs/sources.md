@@ -165,3 +165,26 @@ budgets; its numerical scope is unchanged. Where next links to the official
 PyTorch profiler recipe, CUDA kernel programming and Triton tutorials. These are
 optional external learning paths, not features executed by the browser. Its
 reference tasks apply Tensor.contiguous and asynchronous CUDA execution rules.
+
+## Inspecting PyTorch launches
+
+The optional profiling appendix follows the official
+[PyTorch profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html)
+for CPU/CUDA activity capture and Chrome JSON export. Kineto's
+[CUDA activity metadata](https://github.com/pytorch/kineto/blob/main/libkineto/src/CuptiActivity.h)
+records three-dimensional grid/block values; the reader treats absent or malformed
+fields as unavailable rather than inferring a launch. Trace export support varies
+by PyTorch build and CUDA/CUPTI setup.
+
+The [Nsight Systems user guide](https://docs.nvidia.com/nsight-systems/UserGuide/index.html)
+documents `profile`/`stats`; its
+[CUDA GPU Trace report](https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html#cuda-gpu-trace-nvtx-name-base-mangled-cuda-gpu-trace)
+documents GrdX/Y/Z, BlkX/Y/Z and correlation IDs. The
+[Nsight Compute CLI guide](https://docs.nvidia.com/nsight-compute/NsightComputeCli/index.html)
+documents NVTX push/pop range filtering, LaunchStats/Occupancy sections and raw CSV
+output. Commands were checked against these guides, not executed on GPU hardware.
+
+`examples/profile-pytorch.py` is separate from the CPU/simulator example catalogue:
+it requires a physical NVIDIA GPU. Its syntax and the standard-library trace
+reader's synthetic schema fixtures are checked in CI. These checks do not validate
+CUPTI capture, Nsight execution, a PyTorch launch configuration or GPU performance.

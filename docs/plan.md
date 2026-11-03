@@ -107,6 +107,16 @@ They do not establish learner comprehension. Newcomer observations remain needed
 can readers trace a dependency, explain a changed result, and separate their
 PyTorch choices from this book's illustrative implementation choices?
 
+## Inspecting real PyTorch launches
+
+The optional `profiling.html` appendix connects chapter 1's multiplication to a
+real PyTorch CUDA trace. Readers capture the operation, view the timeline and
+inspect grid/block dimensions, with Nsight Systems/Compute as follow-up tools.
+It requires physical NVIDIA hardware for capture and is separate from the browser
+models and functional GPGPU-Sim checks. A standard-library reader can inspect a
+saved trace on a CPU-only machine; absence of kernel events or dimensions remains
+explicitly unknown. Chapter 1 and the final chapter link to this guide.
+
 ## Interactive GPU map
 
 The **GPU map** replaces Meet the GPU at its stable `lessons/meet-gpu.html` URL.
