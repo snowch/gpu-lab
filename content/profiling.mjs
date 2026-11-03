@@ -2,9 +2,11 @@
 import {codePanel,definitions,readerTask} from '../src/chapter-view.mjs';
 const shell=(id,source)=>codePanel({id,source,language:'shell',label:'Terminal · shell commands'});
 export function renderProfiling(source) {
-  // Display the capture path from the downloadable program, without its CLI/external-tool branch.
+  // Assemble a standalone capture program from the download's imports and shared code.
+  const imports=source.slice(source.indexOf('import torch\n'),source.indexOf('\nparser =')).trimEnd();
   const setup=source.slice(source.indexOf('print("PyTorch:"'),source.indexOf('\nif args.external:')).trimEnd();
   const capture=source.slice(source.indexOf('    activities ='),source.indexOf('\n    print("Saved trace.json")')).split('\n').map(line=>line.slice(4)).join('\n');
+  const check=source.slice(source.indexOf('torch.testing.assert_close')).trimEnd();
   return `<section class="book-section"><h2>See the launch behind a multiplication</h2>
   <p>Chapter 1 uses <code>y = x * 2</code> to explain threads and blocks. PyTorch chooses the implementation for that expression. A <strong>profiler</strong> records the CPU calls and GPU activity from a real run, so you can inspect which kernels were launched and how their threads were grouped.</p>
   <p>Reading this appendix needs no installation. <strong>Capturing a CUDA trace requires an NVIDIA GPU, a compatible driver and CUDA-enabled PyTorch with CUDA profiling support.</strong> Follow the <a href="desktop.html#pytorch">PyTorch desktop setup</a> first. The browser simulations and our GPGPU-Sim functional checks cannot capture PyTorch’s actual GPU launches.</p>
@@ -13,8 +15,8 @@ export function renderProfiling(source) {
 
   <section class="book-section" id="capture"><h2>1. Capture one PyTorch operation</h2>
   <p><a href="../examples/profile-pytorch.py" download>Download profile-pytorch.py</a>. It keeps the chapter’s multiplication and uses 4,096 FP32 input values to give PyTorch a larger array. The program checks CUDA availability, prints the PyTorch version and GPU name, and runs five warm-up multiplications before recording one more.</p>
-  <p>The capture path below comes from that complete download. Its imports are <code>import torch</code> and <code>from torch.profiler import ProfilerActivity, profile, record_function</code>.</p>
-  ${codePanel({id:'profiling-capture',source:setup+'\n\n'+capture,language:'pytorch',label:'PyTorch · capture path from profile-pytorch.py'})}
+  <p>You can copy this complete capture example into a Python file. It shares its imports, calculation, capture and output check with the download; the download also checks the CUDA setup and provides a mode for external profiling tools.</p>
+  ${codePanel({id:'profiling-capture',source:[imports,setup,capture,check].join('\n\n'),language:'pytorch',label:'PyTorch · complete capture example'})}
   <p>In a terminal in the download folder, run:</p>${shell('profiling-run','python profile-pytorch.py')}
   <p>The program writes <code>trace.json</code> and checks the multiplication result. Allocation and warm-up are outside the recorded interval; synchronisation inside it waits for the captured GPU operation to finish. The range also includes CPU overhead and that wait, so its duration is not the kernel’s execution time.</p>
   <p>This is an inspection example, not a benchmark. We have checked the trace-reader logic and Python syntax; this capture program has not yet been validated on an NVIDIA GPU.</p></section>

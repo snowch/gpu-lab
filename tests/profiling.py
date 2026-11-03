@@ -26,7 +26,7 @@ def check_profiling(browser, url, root, errors):
             panel = page.locator('#profiling-capture')
             list_ = panel.locator('xpath=following-sibling::*[1]')
             expect(list_).to_have_class('code-explanations')
-            button = list_.get_by_role('button').last
+            button = list_.get_by_role('button').filter(has_text='prof.export_chrome_trace')
             button.focus()
             expect(panel.locator('.is-code-highlighted')).to_contain_text('prof.export_chrome_trace')
             expect(page.locator('.lesson-nav a[aria-current="page"]')).to_have_attribute('href', 'profiling.html')
