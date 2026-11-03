@@ -10,6 +10,16 @@ const nodes=[...root.querySelectorAll('.map-node')];
 let recent=[];
 let queued=false;
 const panel=()=>$('#hardware-panel');
+const toolbar=$('.map-tools');
+const header=document.querySelector('.topbar');
+document.documentElement.style.scrollBehavior='auto';
+const sizeToolbar=()=>{
+ const top=header.getBoundingClientRect().height;
+ root.style.setProperty('--map-toolbar-top',`${top}px`);
+ document.documentElement.style.scrollPaddingTop=`${top+toolbar.getBoundingClientRect().height+12}px`;
+};
+const toolbarObserver=new ResizeObserver(sizeToolbar);
+toolbarObserver.observe(header);toolbarObserver.observe(toolbar);
 const visible=node=>node.open&&!node.closest('.map-panel').hidden&&!node.parentElement.closest('details:not([open])');
 function openPath(node){
  for(let el=node;el&&el!==root;el=el.parentElement)if(el.matches('details'))el.open=true;
@@ -18,9 +28,13 @@ function openPath(node){
 function sync(){
  const last=recent.map(id=>document.getElementById(id)).filter(node=>node&&visible(node)).at(-1);
  const chain=[];
- for(let el=last;el&&el!==root;el=el.parentElement)if(el.matches('.map-node'))chain.unshift(el.querySelector(':scope > summary strong').textContent);
+ for(let el=last;el&&el!==root;el=el.parentElement)if(el.matches('.map-node')){
+  const title=el.querySelector(':scope > summary strong').cloneNode(true);
+  title.querySelectorAll('.map-chapter-label').forEach(label=>label.remove());
+  chain.unshift(title.textContent.trim());
+ }
  $('#map-back').disabled=!last;
- $('#map-status').textContent=chain.length?`You are looking at ${chain.join(' › ')}`:'You are looking at the whole system';
+ $('#map-status').textContent=chain.length?chain.join(' › '):'Whole system';
  const url=new URL(location);
  url.searchParams.set('view','hardware');url.searchParams.delete('concept');
  const opened=nodes.filter(n=>n.open).map(n=>n.id);
@@ -91,4 +105,4 @@ registerExperiment('gpu-map',()=>({view:'hardware',open:nodes.filter(n=>n.open).
  recent=Array.isArray(saved.recent)?saved.recent.filter(id=>nodes.some(n=>n.id===id)):recent;
  sync();
 });
-sync();revealHash();
+sync();sizeToolbar();revealHash();

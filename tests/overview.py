@@ -61,6 +61,15 @@ def check_overview(browser,base_url,root,errors):
             else:
                 assert right['y']>=left['y']+left['height'], 'SMs should stack on phones'
             expect(map_page.locator('#a-w1-lane-7')).to_contain_text('thread 39 within block A')
+            expect(map_page.locator('#map-status')).to_contain_text('SM 0 › Block A › Warp 1')
+            expect(map_page.locator('#map-status')).not_to_contain_text('Ch.')
+            expect(map_page.locator('.map-tools')).to_be_in_viewport()
+            expect(map_page.locator('#a-w1-lane-7 > summary .map-chapter-label')).to_be_visible()
+            expect(map_page.locator('#a-w1-lane-8 > summary .map-chapter-label')).to_be_hidden()
+            chapter_link=map_page.locator('#a-w1-lane-7 .map-chapter-links a').first
+            chapter_link.focus()
+            expect(chapter_link).to_be_in_viewport()
+            assert chapter_link.evaluate('el=>el.getBoundingClientRect().top >= document.querySelector(".map-tools").getBoundingClientRect().bottom')
             expect(map_page.locator('#block-c > summary')).to_be_visible()
             expect(map_page.locator('#a-warp-0 > summary')).to_be_visible()
             assert map_page.locator('html').evaluate('el=>el.scrollWidth <= window.innerWidth')
