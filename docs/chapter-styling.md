@@ -86,6 +86,6 @@ accessible “done” text. Completion does not change navigation or grade exerc
 Marks use a separate local-storage key per lesson, following Assembly Lab’s manual
 completion approach. They synchronise across tabs and survive offline-file removal
 and app updates. Experiment snapshots exclude the checkbox so an older tab snapshot
-cannot undo a durable mark. An actual save failure keeps the choice in this tab and
+cannot undo a durable mark. An actual save failure keeps the choice on the current page and
 reports it beside the checkbox; an unsaved change blocks an app restart until saved
 or undone.

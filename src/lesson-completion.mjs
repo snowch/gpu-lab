@@ -17,7 +17,7 @@ function render(){
     input.checked=store.isDone(input.dataset.completionLesson);
     input.closest('.lesson-completion').dataset.done=String(input.checked);
     note.textContent=store.unsaved.has(input.dataset.completionLesson)
-      ?'This mark could not be saved. It will be lost when you reload or close this tab.'
+      ?'This mark could not be saved. Leaving or reloading this page may lose it.'
       :'Marks are saved in this browser.';
   }
 }
