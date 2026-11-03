@@ -90,6 +90,7 @@ for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter
     .replace(/<nav class="(?:course-nav|lesson-nav)"[^>]*>[\s\S]*?<\/nav>/,renderBookNav(current))
     .replace('<!-- LESSON_COMPLETION -->',renderLessonCompletion(current))
     .replaceAll('EIGHT LABS · DRAFT','INTERACTIVE BOOK · DRAFT')
+    .replace('<a href="https://github.com/snowch/gpu-lab">Source ↗</a>','<a class="github-star" href="https://github.com/snowch/gpu-lab" target="_blank" rel="noopener noreferrer" aria-label="Star on GitHub (opens in a new tab)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="m12 3 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3L12 17.4l-5.6 3 1.1-6.3L3 9.6l6.2-.9Z"/></svg><span>Star on GitHub</span></a>')
     .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'<a class="gpu-map-link" href="../index.html">Close map</a>':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}">GPU map</a>`))
     .replace('<body class="',current==='meet-gpu'?'<body class="gpu-map-page ':'<body class="')
     .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/map-toggle.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/map-toggle.mjs"></script></head>')
