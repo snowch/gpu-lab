@@ -1,3 +1,4 @@
+from lesson_completion import check_lesson_completion
 from version_check import mock_version, check_version
 from navigation import check_navigation
 from overview import check_overview
@@ -229,6 +230,7 @@ try:
         check_remaining(browser, URL, ROOT, errors)
         check_version(browser, URL)
         check_navigation(browser, URL, ROOT, errors)
+        check_lesson_completion(browser, URL, ROOT, errors)
         check_overview(browser, URL, ROOT, errors)
         check_kernel(browser, URL, ROOT, errors)
         check_hello(browser, URL, ROOT, errors)

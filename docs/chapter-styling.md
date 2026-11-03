@@ -74,3 +74,18 @@ Collapsed parent tiles also show an Inside line aggregating the chapters of thei
 actual rendered descendants, with duplicates removed and optional practice noted.
 It hides on expansion, when child headings provide their own references. Leaf tiles
 have no Inside line. Containment comes from the rendered tree, not catalogue edges.
+
+## Manual lesson completion
+
+Published chapters and practice pages place a native “Mark lesson as done” checkbox
+beside the next-page link, using `renderLessonForward`. Raw page templates use the
+`LESSON_COMPLETION` build placeholder. Reference appendices and the GPU map have no mark.
+Sidebar and overview links use the same stable lesson slugs and show a tick plus
+accessible “done” text. Completion does not change navigation or grade exercises.
+
+Marks use a separate local-storage key per lesson, following Assembly Lab’s manual
+completion approach. They synchronise across tabs and survive offline-file removal
+and app updates. Experiment snapshots exclude the checkbox so an older tab snapshot
+cannot undo a durable mark. An actual save failure keeps the choice on the current page and
+reports it beside the checkbox; an unsaved change blocks an app restart until saved
+or undone.

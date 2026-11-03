@@ -104,3 +104,19 @@ footer { flex-wrap:wrap; }
 .top-actions .gpu-map-link { display:inline-flex; align-items:center; min-height:44px; padding:8px 12px; border:1px solid var(--accent); border-radius:6px; color:var(--accent); font-weight:650; }
 
 @media (hover:hover) { .roadmap>a:hover { background:var(--soft); } }
+
+/* Manual reading marks sit with Next, independent of experiment results. */
+.lesson-forward { display:flex; flex:1 1 18rem; flex-direction:column; align-items:flex-end; gap:10px; min-width:0; }
+.book-pager>.lesson-forward>a,.lesson-pagination>.lesson-forward>a { max-width:100%; justify-content:flex-end; text-align:right; }
+.book-pager:has(.lesson-forward)>a,.lesson-pagination:has(.lesson-forward)>a { flex:1 1 14rem; align-self:flex-end; }
+.lesson-completion label { display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); cursor:pointer; }
+.lesson-completion[data-done="true"] label { background:var(--accent-soft); border-color:var(--accent); }
+.lesson-completion input[type="checkbox"] { flex:none; width:20px; height:20px; min-height:20px; margin:0; padding:0; accent-color:var(--accent); }
+.lesson-completion p { margin:5px 0 0; max-width:28rem; color:var(--muted); font-size:12px; text-align:right; }
+.lesson-link-title { flex:1; min-width:0; }
+.lesson-done-tick { flex:none; margin-left:auto; color:var(--accent); font-size:18px; font-weight:750; }
+.completion-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:760px) {
+  .lesson-forward { flex-basis:100%; align-items:stretch; }
+  .lesson-completion p { text-align:left; }
+}

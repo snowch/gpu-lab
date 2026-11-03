@@ -1,3 +1,4 @@
+import {completionAttribute,completionIndicator,renderLessonForward} from '../src/lesson-completion-view.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 // Copyright © 2026 Christopher Snow.
 import {renderChapterReferences} from '../src/reference-tasks.mjs';
@@ -6,16 +7,16 @@ import {chapters} from '../src/book-chapters.mjs';
 export {chapters};
 export function renderBookNav(current='index') {
   const home=current==='index',base=home?'./lessons/':'',overview=home?'./index.html':'../index.html';
-  const link=(href,label,active=false)=>`<a href="${href}"${active?' class="current" aria-current="page"':''}>${label}</a>`;
+  const link=(href,label,active=false,id='')=>`<a href="${href}"${completionAttribute(id)}${active?' class="current" aria-current="page"':''}><span class="lesson-link-title">${label}</span>${completionIndicator(id)}</a>`;
   const group=(id,title,links)=>`<section class="nav-section" aria-labelledby="${id}"><h2 class="nav-group" id="${id}">${title}</h2>${links}</section>`;
   return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}
-    ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug)).join(''))}
+    ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug,c.slug)).join(''))}
     ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'meet-gpu.html','GPU map',current==='meet-gpu'))}
-    ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true):''))}</nav>`;
+    ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel','kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory','shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true,'memory'):''))}</nav>`;
 
 }
 export function renderRoadmap() {
-  return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div></a>`).join('\n');
+  return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"${completionAttribute(c.slug)}><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div>${completionIndicator(c.slug)}</a>`).join('\n');
 }
 export function renderBookPage({slug,number,title,lead,content,previous,next,continuation=false,appendix=false,map=false}) {
   return `<!doctype html>
@@ -26,5 +27,5 @@ export function renderBookPage({slug,number,title,lead,content,previous,next,con
 ${content}
 ${appendix||map?'':desktopLinks(slug)}
 ${map?'':renderChapterReferences(slug)}
-${map?'':`<nav class="book-pager" aria-label="Chapter sequence"><a href="${previous.href}">← ${previous.title}</a><a href="${next.href}">${next.title} →</a></nav>`}<footer${map?' hidden':''}><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
+${map?'':`<nav class="book-pager" aria-label="Chapter sequence"><a href="${previous.href}">← ${previous.title}</a>${renderLessonForward(slug,`<a href="${next.href}">${next.title} →</a>`)}</nav>`}<footer${map?' hidden':''}><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
 }
