@@ -65,10 +65,21 @@ labels carry the hierarchy independently of colour; keyboard focus remains disti
 The map has no chapter filter, chapter highlights or related-concept badges. Keep
 Back one level, Reset diagram and chapter links inside the components.
 
+Map boundaries carry the hierarchy: a quiet system outline, gold host/device groups,
+green component headers and neutral SM resources. Resource disclosures share one
+compact list; dashed borders distinguish assigned blocks and warps. Keep body text
+at 16px and recover space through padding and grouping rather than shrinking it.
+The current path and Back/Reset share a sticky toolbar. Its offset follows the
+actual app-header height, including the embedded map's hidden header, so controls
+remain available without covering focused disclosures.
+
 Map tile headings include compact chapter numbers from the concept catalogue,
 using smaller readable text and ranges for consecutive chapters. Supplementary
 concepts without a numbered chapter say Extra practice. Full chapter links remain
 inside the disclosure; the title and its annotation share the expansion target.
+Lane grids omit the repeated chapter annotation while collapsed; opening a lane
+shows its annotation and chapter links. The warp header retains its chapter coverage.
+The current-path text omits chapter annotations to keep the hierarchy easy to scan.
 
 Collapsed parent tiles also show an Inside line aggregating the chapters of their
 actual rendered descendants, with duplicates removed and optional practice noted.

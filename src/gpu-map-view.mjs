@@ -44,7 +44,7 @@ function block(name){
 }
 function sm(n,names){
  return node(`sm-${n}`,'sm',`SM ${n}`,`Streaming multiprocessor · ${names.length} block${names.length===1?'':'s'} assigned here`,
- `<p>An SM is a part of the GPU that executes instructions for threads assigned to it. A block is resident here when its resources are allocated on this SM. Several blocks can reside here when resources allow.</p><div class="map-resources">${concept('scheduler',`sm${n}`,'','Selects ready instructions from warps')}${concept('registers',`sm${n}`,'','Working values private to each thread')}${concept('l1-cache',`sm${n}`,'','On-chip cache local to this SM')}${concept('tensor-cores',`sm${n}`,'','Specialised units for supported matrix operations')}</div><p class="map-label">Work assigned to this SM</p>${names.map(block).join('')}<p class="map-note">A block’s threads do not necessarily execute all at once. Ready work from other resident blocks may proceed while threads wait or lanes are unused. Unused lanes cannot be filled by another block’s threads.</p>${chapterLinks(conceptById('sm'))}`,'map-sm');
+ `<p>An SM is a part of the GPU that executes instructions for threads assigned to it. A block is resident here when its resources are allocated on this SM. Several blocks can reside here when resources allow.</p><div class="map-resources">${concept('scheduler',`sm${n}`,'','Selects ready instructions from warps')}${concept('registers',`sm${n}`,'','Working values private to each thread')}${concept('l1-cache',`sm${n}`,'','On-chip cache local to this SM')}${concept('tensor-cores',`sm${n}`,'','Specialised units for supported matrix operations')}</div><p class="map-label">Blocks assigned to this SM</p>${names.map(block).join('')}<p class="map-note">A block’s threads do not necessarily execute all at once. Ready work from other resident blocks may proceed while threads wait or lanes are unused. Unused lanes cannot be filled by another block’s threads.</p>${chapterLinks(conceptById('sm'))}`,'map-sm');
 }
 function hardware(){
  return `<section id="hardware-panel" class="map-panel" aria-label="Computer / system"><h2>Computer / system</h2><p>Open the GPU chip, then an SM. Keep opening components to see blocks, warps and threads.</p><div class="map-machine">
@@ -64,7 +64,6 @@ ${node('vram','gpu-memory','Device memory / VRAM','Inside the GPU device · sepa
 </section></div><p class="map-note">Illustrative placement: three blocks of 64 threads on two SMs. Each block stays on one SM; several blocks may share it. This is a relationship map, not a schedule or a promise that every thread executes at once. Integrated GPUs can share system memory; this picture shows a discrete GPU device.</p></section>`;
 }
 export function renderMap(){return `<div id="gpu-map">
-<div class="map-tools map-enhancement" hidden><div><button type="button" id="map-back" disabled>← Back one level</button><button type="button" id="map-reset">Reset diagram</button></div></div>
-<p id="map-status" class="map-enhancement" role="status" hidden></p>
+<div class="map-tools map-enhancement" hidden><p id="map-status" role="status" aria-label="Current map location"></p><div class="map-tool-actions"><button type="button" id="map-back" disabled>← Back one level</button><button type="button" id="map-reset">Reset diagram</button></div></div>
 ${hardware()}
 </div>`;}
