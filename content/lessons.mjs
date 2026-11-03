@@ -1,3 +1,4 @@
+import {renderLessonForward} from '../src/lesson-completion-view.mjs';
 // Copyright © 2026 Christopher Snow.
 import { renderChapterReferences, guides } from '../src/reference-tasks.mjs';
 import { remainingLessons } from './remaining-lessons.mjs';
@@ -150,6 +151,6 @@ ${lesson.namedChoices ? `<form id="prediction" class="prediction"><fieldset clas
 <section class="two-col section-space"><div><p class="eyebrow">CONNECT TO CUDA</p><h2>The programming connection</h2>${lesson.codeNote}</div><div class="code-panel"><div class="code-title">${lesson.slug==='shared-memory'?'CUDA C++ · function from shared-memory.cu':'Illustrative CUDA · not executed in this page'}</div><pre><code>${escape(lesson.code)}</code></pre></div></section>
 <section class="challenge section-space"><p class="eyebrow">TRY IT YOURSELF</p><h2>Change one thing. Explain the result.</h2><ol>${lesson.exercises.map(x=>`<li>${x}</li>`).join('')}</ol><details><summary>Compare your explanation</summary>${lesson.takeaway}</details></section>
 ${renderChapterReferences(lesson.slug)}
-<nav class="lesson-pagination" aria-label="Lesson sequence"><a href="${previous}">← Previous lesson</a><a href="${next}">${index + 1 < lessons.length ? 'Next lesson →' : 'Return to roadmap →'}</a></nav>
+<nav class="lesson-pagination" aria-label="Lesson sequence"><a href="${previous}">← Previous lesson</a>${renderLessonForward(lesson.slug,`<a href="${next}">${index + 1 < lessons.length ? 'Next lesson →' : 'Return to roadmap →'}</a>`)}</nav>
 <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
 }

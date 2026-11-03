@@ -165,7 +165,7 @@
         <details><summary>Explain the result in your own words, then compare</summary><p>Each sector holds eight FP32 values. Neighbouring lanes can use different values in the same sector. With a stride of eight elements, each lane reaches a different sector. Shifting a consecutive range by one element can make it cross an extra sector boundary.</p><p>In an AI workload, changing how threads map onto tensor dimensions can change this access pattern. A transpose or a different tensor layout may help one operation and add costs elsewhere. Count the work across the whole operation before choosing a layout.</p></details>
       </section>
       <!-- REFERENCE_MEMORY -->
-      <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><a href="scheduling.html">Next lesson →</a></nav>
+      <nav class="lesson-pagination" aria-label="Lesson sequence"><a href="../index.html">← Course overview</a><div class="lesson-forward"><!-- LESSON_COMPLETION --><a href="scheduling.html">Next lesson →</a></div></nav>
       <footer><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer>
     </main>
   </div>

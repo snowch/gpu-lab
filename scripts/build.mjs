@@ -1,3 +1,4 @@
+import {renderLessonCompletion} from '../src/lesson-completion-view.mjs';
 // Copyright © 2026 Christopher Snow.
 import {exportDesktop} from './export-desktop.mjs';
 import {renderDesktop} from '../content/desktop.mjs';
@@ -85,6 +86,7 @@ for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter
   const current=path==='dist/index.html'?'index':path.split('/').at(-1).replace('.html','');
   const html = explainHTML(await readFile(path, 'utf8'))
     .replace(/<nav class="(?:course-nav|lesson-nav)"[^>]*>[\s\S]*?<\/nav>/,renderBookNav(current))
+    .replace('<!-- LESSON_COMPLETION -->',renderLessonCompletion(current))
     .replaceAll('EIGHT LABS · DRAFT','INTERACTIVE BOOK · DRAFT')
     .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'<a class="gpu-map-link" href="../index.html">Close map</a>':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}">GPU map</a>`))
     .replace('<body class="',current==='meet-gpu'?'<body class="gpu-map-page ':'<body class="')

@@ -6,10 +6,12 @@ const snapshotKey = () => 'gpu-lab:restart:' + location.pathname + location.sear
 // Read the incoming route before a page migrates its URL; saves still use the live route.
 const incomingSnapshotKey = snapshotKey();
 export function registerExperiment(name, save, restore) { hooks.set(name, { save, restore }); }
-const controls = () => [...document.querySelectorAll('main input,main select,main textarea')];
+const controls = () => [...document.querySelectorAll('main input:not([data-lesson-completion]),main select,main textarea')];
 function formState() { return controls().map(el => ({ id: el.id, name: el.name, value: el.value, checked: el.checked })); }
 function restoreForm(values) {
   for (const [index, value] of values.entries()) {
+    // Completion is shared durable state, not a per-tab experiment snapshot.
+    if (value.id === 'lesson-complete') continue;
     const el = value.id ? document.getElementById(value.id) : controls()[index];
     if (!el) throw new Error('An experiment control changed');
     el.value = value.value;
