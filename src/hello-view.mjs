@@ -19,7 +19,7 @@ export function renderIntroSections() {
     <h2 id="hello-start-title">Double five values with PyTorch</h2>
     <p>We’ll store the five input values in a <strong>tensor</strong>: a collection of values arranged in one or more dimensions.</p>
     ${openingCode(pythonSource(),'hello-start-code')}
-    ${definitions([['Float (floating-point value)','A value stored in a format that can represent fractional amounts. The .0 literals create floating-point inputs: 1.0 has a whole-number value, but is still stored as a float. Multiplying this tensor by 2 keeps its floating-point type.']])}
+    <p class="hello-note"><strong>Note:</strong> Multiplying this floating-point tensor by <code>2</code> keeps its results floating-point too.</p>
     <dl class="hello-start-values">
       <div><dt>Input <code>x</code></dt><dd><code>[${start.input.map(tensorValue).join(', ')}]</code></dd></div>
       <div><dt>Result <code>y</code></dt><dd><code>[${start.output.map(tensorValue).join(', ')}]</code></dd></div>
