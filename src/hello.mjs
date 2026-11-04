@@ -2,13 +2,13 @@ import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
-import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,introPrompt} from './hello-model.mjs';
+import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,launchSource,introPrompt} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
-import {renderIntroMap} from './hello-view.mjs';
+import {renderIntroMap,renderCudaTrace} from './hello-view.mjs';
 for (const section of document.querySelectorAll('.hello-section')) {
 const stage=Number(section.dataset.stage);
 const $=id=>document.getElementById(id+'-'+stage);
-let selected=0,result=null;
+let selected=stage===4?4:0,result=null;
 function factor(){
   if($('hello-factor').value.trim()==='') throw new Error('Enter a multiplier first.');
   const value=Number($('hello-factor').value);simulateIntro(stage,value);return value;
@@ -24,11 +24,15 @@ function inspect(t){
   $('hello-index').textContent=stage===1
     ? 'Thread '+t.i+': i = '+t.i+'. Read the input at index '+t.i+', multiply it, then write the output at index '+t.i+'.'
     : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips the read, multiplication and write.':t.invalid?' No element '+t.i+' exists: without the check, the read is invalid and there is no valid result.':'');
-
+  if(stage===4) {
+    const state=model();
+    document.getElementById('hello-cuda-trace')?.remove();
+    $('hello-index').insertAdjacentHTML('afterend',renderCudaTrace(t,state,result!==null));
+  }
 }
 function draw(){
   const container=$('hello-map');container.replaceChildren();
-  let state;try{state=model();}catch{return;}
+  let state;try{state=model();}catch{if(stage===4)document.getElementById('hello-cuda-trace').textContent='Enter a valid multiplier to inspect the CUDA trace.';return;}
   container.innerHTML=renderIntroMap(stage,state,selected,result!==null);
   inspect(state.threads[selected]??state.threads[0]);
 }
@@ -71,3 +75,48 @@ function showTransfer(){
 count.addEventListener('change',()=>{revealed=false;showTransfer();});
 document.getElementById('hello-transfer-run').addEventListener('click',()=>{revealed=true;showTransfer();});
 registerExperiment('hello-transfer',()=>({revealed}),state=>{revealed=Boolean(state.revealed);showTransfer();});
+
+// The regrouping activity has its own controls and reveal state.
+const launchSize=document.getElementById('hello-launch-size');
+const launchGuess=document.getElementById('hello-launch-guess');
+const launchFeedback=document.getElementById('hello-launch-feedback');
+const launchAnswer=document.getElementById('hello-launch-answer');
+const launchMap=document.getElementById('hello-launch-map');
+let launchRevealed=false,launchSelected=4;
+function inspectLaunch(){
+  const state=simulateIntro(4,2,true,Number(launchSize.value));
+  const t=state.threads[launchSelected];
+  document.getElementById('hello-launch-index').textContent=`Thread ${t.i}: block ${t.block} × ${state.size} + position ${t.local} = index ${t.i}. `+(t.skipped?'No element exists here; the check skips the calculation.':`Input ${tensorValue(t.input)} → output ${tensorValue(t.output)}.`);
+}
+function showLaunch(){
+  launchAnswer.hidden=!launchRevealed;
+  if(!launchRevealed){launchFeedback.textContent='Predict the block count, then check.';return;}
+  const state=simulateIntro(4,2,true,Number(launchSize.value));
+  const correct=Number(launchGuess.value)===state.blocks;
+  launchFeedback.textContent=`${correct?'Correct.':'You need '+state.blocks+' block'+(state.blocks===1?'':'s')+'.'} ${state.blocks} × ${state.size} = ${state.threads.length} threads covers five inputs. `+(state.blocks===1?'One block is enough; a second would add unneeded threads.':'One block of four would leave the fifth input without a thread.');
+  document.getElementById('hello-launch-example').textContent=launchSource(state.blocks,state.size);
+  launchMap.innerHTML=renderIntroMap(4,state,launchSelected,true);
+  document.getElementById('hello-launch-output').textContent='Output: ['+state.output.map(tensorValue).join(', ')+']';
+  inspectLaunch();
+}
+launchSize.addEventListener('change',()=>{launchRevealed=false;launchGuess.value='';showLaunch();});
+launchGuess.addEventListener('change',()=>{launchRevealed=false;showLaunch();});
+launchMap.addEventListener('click',event=>{
+  const button=event.target.closest('[data-thread]');if(!button)return;
+  launchSelected=Number(button.dataset.thread);
+  for(const card of launchMap.querySelectorAll('[data-thread]'))card.setAttribute('aria-pressed',String(card===button));
+  inspectLaunch();
+});
+document.getElementById('hello-launch-run').addEventListener('click',()=>{
+  if(!launchGuess.value){launchFeedback.textContent='Choose your predicted block count first.';launchGuess.focus();return;}
+  launchRevealed=true;showLaunch();
+});
+document.getElementById('hello-launch-download').addEventListener('click',()=>{
+  if(launchRevealed)downloadCuda(runnableSource(2,Number(launchSize.value)),'hello-grouping.cu');
+});
+document.getElementById('hello-launch-run').disabled=false;
+registerExperiment('hello-launch',()=>({revealed:launchRevealed,selected:launchSelected}),state=>{
+  launchRevealed=state.revealed===true&&launchGuess.value!=='';
+  launchSelected=Number.isInteger(state.selected)&&state.selected>=0&&state.selected<8?state.selected:4;
+  showLaunch();
+});

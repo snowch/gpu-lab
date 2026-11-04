@@ -10,6 +10,10 @@ for(const [name,factor] of [['double',2],['negative',-0.5],['zero',0],['fraction
   await writeFile(`${destination}/${name}.json`,JSON.stringify([1,2,3,4,5].map(x=>x*factor)));
 }
 
+// Match the chapter's one-block/eight-thread regrouping download.
+await writeFile(`${destination}/double-eight.cu`,runnableSource(2,8));
+await writeFile(`${destination}/double-eight.json`,JSON.stringify([2,4,6,8,10]));
+
 // Guarded global indexing covers every output once, including the partial block.
 // Derive references directly from the documented input formulae, without taking
 // expected values from the browser model or its task-correctness assessment.

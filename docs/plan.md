@@ -38,7 +38,9 @@ experiment and visual beside its own explanation in a continuous downward flow.
 
 1. **How does a GPU double five values?** (`hello.html`): open with the short PyTorch
    example and five values. Introduce threads, indices, blocks and bounds checks
-   as needed; assemble the CUDA kernel at the end. Show no CUDA fragments before the complete function and its launch. SMs, warps
+   as needed; assemble the CUDA kernel at the end. Preserve the thread and block visuals, repeat
+   the block view beside a selected-thread CUDA trace, then predict and compare four
+   versus eight threads per block. Show no CUDA fragments before the complete function and its launch. SMs, warps
    and shared memory belong in later mechanism lessons; the ownership diagram lives
    in the scheduling lab. Finish with an input-count prediction exercise and the optional repair workshop.
 2. **Where are tensor values stored?** (`devices.html`): follow the same five inputs

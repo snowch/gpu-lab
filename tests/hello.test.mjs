@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,introPrompt} from '../src/hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,introPrompt} from '../src/hello-model.mjs';
 test('intro diagram and outputs derive from thread indices and selected multiplier',()=>{
  for(let stage=0;stage<steps.length;stage++)for(const factor of [-10,-0.5,0,2,3,10]){
   const r=simulateIntro(stage,factor);
@@ -79,4 +79,26 @@ test('first prediction uses a different multiplier from the opening worked examp
  assert.doesNotMatch(first.replace(/<noscript>[\s\S]*?<\/noscript>/g,''),/\[3\.0, 6\.0, 9\.0, 12\.0, 15\.0\]/);
  assert.ok(introPrompt(0).startsWith('Predict'));
  for(let stage=1;stage<5;stage++)assert.ok(introPrompt(stage).startsWith('Run'));
+});
+
+
+test('regrouping preserves outputs and array indices while changing block membership',()=>{
+ const four=simulateIntro(4,2,true,4),eight=simulateIntro(4,2,true,8);
+ assert.deepEqual(four.output,eight.output);
+ assert.equal(four.blocks,2);assert.equal(eight.blocks,1);
+ assert.equal(four.threads[4].block,1);assert.equal(eight.threads[4].block,0);
+ assert.equal(four.threads[4].local,0);assert.equal(eight.threads[4].local,4);
+ for(const size of [4,8]){
+  const state=simulateIntro(4,2,true,size),plan=launchPlan(5,size);
+  assert.equal(state.blocks,plan.blocks);
+  assert.deepEqual(state.threads.filter(t=>t.skipped).map(t=>t.i),plan.skipped);
+  for(const t of state.threads)assert.equal(t.block*size+t.local,t.i);
+ }
+ for(const size of [0,1.5,33,NaN]){
+  assert.throws(()=>simulateIntro(4,2,true,size));
+  assert.throws(()=>launchPlan(5,size));
+ }
+ assert.match(launchSource(1,8),/int threadsPerBlock = 8;/);
+ assert.match(launchSource(1,8),/int blocks = 1;/);
+ assert.match(launchSource(1,8),/runKernel<<<blocks, threadsPerBlock>>>/);
 });

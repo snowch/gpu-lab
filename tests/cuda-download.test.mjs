@@ -10,6 +10,7 @@ test('intro download uses the final guarded example and current multiplier',()=>
   assert.match(source,/cudaDeviceSynchronize/);
   assert.match(source,/cudaMemcpyDeviceToHost/);
   assert.match(source,/cudaFree/);
+  assert.ok(runnableSource(2,8).includes('runKernel<<<(n + 8 - 1) / 8, 8>>>(d_x, d_y, n);'));
   assert.throws(()=>runnableSource(Infinity));
 });
 test('workshop downloads refuse invalid accesses and write races',()=>{

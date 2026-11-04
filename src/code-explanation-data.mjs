@@ -123,7 +123,9 @@ export function codeExplanations(source) {
       add('__syncthreads();', 'Makes all threads in the block wait until the shared tile has been filled, before any starts the column read.');
       add('output[lane] = tile[lane][0];', 'Reads row lane of shared column 0 and writes that value to the output. Thread 0 filled this column before the barrier.');
     }
-    match(/\w+<<<[^\n]+;/, 'Launches the kernel from the CPU. Between <<< and >>> are the block count and threads per block; arguments in parentheses are passed to the kernel. Device arrays must already be allocated.');
+    match(/int threadsPerBlock = \d+;/, 'Sets the number of threads in each block. threadsPerBlock is a variable name we chose.');
+    match(/int blocks = \d+;/, 'Sets the number of blocks. blocks is a variable name we chose.');
+    match(/\w+<<<[\s\S]*?;/, 'Launches the kernel from the CPU. Between <<< and >>> are the block count and threads per block; arguments in parentheses are passed to the kernel. Device arrays must already be allocated.');
   } else if(/^(?:values = |column = |packed = |transposed = )/.test(source)) {
     match(/x\[\d+, :\]/, 'Selects all columns of the chosen row. The row number starts at zero; the result shares x’s storage.');
     match(/x\[:, \d+\]/, 'Selects the chosen column across all rows. Its values remain separated in x’s original storage.');
