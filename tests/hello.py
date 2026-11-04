@@ -14,7 +14,7 @@ def hello_flow(page, url):
     expect(page.locator('.hello-relationships')).to_have_count(0)
     for i in range(1,5):
         expect(page.locator(f'#idea-{i} [data-language="cuda"]')).to_have_count(0)
-    expect(page.locator('#hello-launch-4')).to_have_text('runKernel<<<2, 4>>>(d_input, d_output, 5);')
+    expect(page.locator('#hello-launch-4')).to_have_text('int threadsPerBlock = 4;\nint blocks = 2;\n\nrunKernel<<<blocks, threadsPerBlock>>>(\n    d_input, d_output, 5\n);')
     assert page.locator('#hello-full-4').evaluate('el=>el.getBoundingClientRect().top') < page.locator('#hello-launch-4').evaluate('el=>el.getBoundingClientRect().top')
     assert page.locator('#hello-next, #hello-back').count() == 0
     ys=page.locator('.hello-section').evaluate_all('(els)=>els.map(el=>el.getBoundingClientRect().top)')
@@ -92,6 +92,42 @@ def hello_flow(page, url):
     expect(page.locator('#hello-output-4')).to_have_text('Output: [4.0, 8.0, 12.0, 16.0, 20.0]')
     expect(page.locator('#hello-full-4')).to_contain_text('input[i] * 4.0f')
     expect(page.locator('#hello-operation-4')).to_contain_text('y = x * 4')
+    page.locator('#hello-map-4 [data-thread="4"]').click()
+    expect(page.locator('#hello-cuda-trace')).to_contain_text('i = 1 × 4 + 0 = 4')
+    expect(page.locator('#hello-cuda-trace')).to_contain_text('Input 5.0 → output 20.0')
+    expect(page.locator('.hello-cuda-variables dd')).to_have_text(['1','4','0'])
+    page.locator('#hello-map-4 [data-thread="5"]').focus()
+    page.keyboard.press('Enter')
+    expect(page.locator('#hello-cuda-trace')).to_contain_text('No calculation · no output written')
+    page.locator('#hello-factor-4').fill('3')
+    expect(page.locator('#hello-cuda-trace')).to_contain_text('Output: ?')
+    expect(page.locator('#hello-launch-answer')).to_be_hidden()
+    page.locator('#hello-launch-run').click()
+    expect(page.locator('#hello-launch-feedback')).to_contain_text('Choose your predicted block count')
+    page.locator('#hello-launch-guess').select_option('2')
+    page.locator('#hello-launch-run').click()
+    expect(page.locator('#hello-launch-feedback')).to_contain_text('You need 1 block.')
+    expect(page.locator('#hello-launch-map .hello-group')).to_have_count(1)
+    expect(page.locator('#hello-launch-map [data-state="skip"]')).to_have_count(3)
+    page.locator('#hello-launch-map [data-thread="4"]').click()
+    expect(page.locator('#hello-launch-index')).to_contain_text('block 0 × 8 + position 4 = index 4')
+    expect(page.locator('#hello-launch-output')).to_contain_text('[2.0, 4.0, 6.0, 8.0, 10.0]')
+    expect(page.locator('#hello-full-4')).to_contain_text('input[i] * 3.0f')
+    with page.expect_download() as grouping_download:
+        page.locator('#hello-launch-download').click()
+    grouping_source=Path(grouping_download.value.path()).read_text()
+    assert 'runKernel<<<(n + 8 - 1) / 8, 8>>>' in grouping_source
+    assert 'input[i] * 2.0f' in grouping_source
+    page.locator('#hello-launch-size').select_option('4')
+    expect(page.locator('#hello-launch-answer')).to_be_hidden()
+    expect(page.locator('#hello-launch-guess')).to_have_value('')
+    page.locator('#hello-launch-guess').select_option('2')
+    page.locator('#hello-launch-run').click()
+    expect(page.locator('#hello-launch-feedback')).to_contain_text('Correct.')
+    expect(page.locator('#hello-launch-map .hello-group')).to_have_count(2)
+    expect(page.locator('#hello-launch-example')).to_contain_text('threadsPerBlock = 4')
+    page.locator('#hello-factor-4').fill('4')
+    page.locator('#hello-run-4').click()
     page.get_by_text('Run the CUDA example on your computer',exact=True).click()
     with page.expect_download() as downloaded:
         page.locator('#hello-download-4').click()
@@ -145,6 +181,24 @@ def check_old_hello_snapshot(browser,url):
     expect(page.locator('#hello-factor-0')).to_have_value('2')
     expect(page.locator('#hello-operation-0')).to_have_text('y = x * 2')
     expect(page.locator('#hello-output-0')).to_have_text('Output: [2.0, 4.0, 6.0, 8.0, 10.0]')
+    page.locator('#hello-launch-guess').select_option('1')
+    page.locator('#hello-launch-run').click()
+    page.locator('#hello-launch-map [data-thread="6"]').click()
+    def save_launch(revealed):
+        page.evaluate("""revealed=>{
+          const controls=[...document.querySelectorAll('main input:not([data-lesson-completion]),main select,main textarea')].map(el=>({id:el.id,name:el.name,value:el.value,checked:el.checked}));
+          sessionStorage.setItem('gpu-lab:restart:'+location.pathname+location.search,JSON.stringify({schema:1,controls,experiments:{'hello-launch':{revealed,selected:6}},details:[],messages:{},scroll:[0,0]}));
+        }""",revealed)
+        page.reload()
+    save_launch(True)
+    expect(page.locator('#hello-launch-answer')).to_be_visible()
+    expect(page.locator('#hello-launch-map [data-thread="6"]')).to_have_attribute('aria-pressed','true')
+    expect(page.locator('#hello-launch-index')).to_contain_text('skips the calculation')
+    page.locator('#hello-launch-size').select_option('4')
+    save_launch(False)
+    expect(page.locator('#hello-launch-answer')).to_be_hidden()
+    expect(page.locator('#hello-launch-size')).to_have_value('4')
+    expect(page.locator('.restore-notice')).to_have_count(0)
     context.close()
 
 def check_hello(browser,url,root,errors):
@@ -156,7 +210,7 @@ def check_hello(browser,url,root,errors):
             page.on('pageerror',lambda e:errors.append(str(e)))
             hello_flow(page,url)
             page.locator('.hello-start').screenshot(path=str(root/f'test-results/hello-pytorch-{width}-{theme}.png'),style='.topbar {position:static!important}')
-            for i in [1,2,3,4]:
+            for i in [1,2,3,4,5]:
                 page.locator(f'#idea-{i}').screenshot(path=str(root/f'test-results/hello-idea-{i}-{width}-{theme}.png'),style='.topbar {position:static!important}')
             context.close()
     check_old_hello_snapshot(browser,url)

@@ -99,6 +99,10 @@ second set of authoring requirements.
   dynamic downloads aligned with current controls. Update the desktop appendix's
   coverage table when adding programs. Test supported CUDA examples in the pinned
   simulator workflow; label unsupported features and hardware execution separately.
+- [ ] Preserve visual scaffolding when introducing code: show what a thread does,
+  then add block boundaries, then connect a local copy of the block view to CUDA.
+  A code walkthrough must not replace a diagram that explains a different relationship.
+  Ask for launch-count predictions before revealing calculated launch settings.
 - [ ] Make visuals show a relationship or consequence. Generate values from the model.
   Distinguish values, indices, element offsets and byte offsets. A grouping diagram
   is not a chip floor plan or a promise of simultaneous execution. Distinguish the

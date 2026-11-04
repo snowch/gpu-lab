@@ -5,7 +5,7 @@ export const steps = [
   {title:'How does the GPU divide the calculation?', leadIn:'We have five input values to double. The GPU can divide that calculation by running the same small program for each value: read it, multiply it by 2, and write the result.', definitions:[['Thread','One execution of a GPU program.'],['Array','An ordered collection of values.'],['Index','A number that identifies a position in an array, starting at zero.']], concept:'Each thread uses its index to choose an input value and an output position. This is a teaching mapping; PyTorch chooses the actual implementation.', instruction:'Run, then select a thread card below to follow its input, calculation and output.', length:5,size:5},
   {title:'Threads are organised into blocks', leadIn:'How do we ask the GPU to start those threads? We specify groups rather than starting each thread separately. The GPU can distribute these groups, and threads within a group can cooperate when an algorithm needs them to.', definitions:[['Launch','Starting a GPU function with a chosen number of blocks and threads per block.'],['Block','A group of threads in a launch. Threads in the same block can share a workspace and wait for one another when their calculation needs it.']], concept:'Here each thread multiplies its own input independently, so it needs no cooperation. Threads in a block do not necessarily all execute at once. Later, we will use cooperation to add many inputs into one result.', instruction:'Select thread 4 in the second block to follow the fifth input and see how its index is calculated. The three extra threads skip the arrays; we will explore that check next.', length:5,size:4},
   {title:'More threads than input values', definitions:[['Bounds check','A check that an index refers to an element that exists before accessing it.']], concept:'Keep the same five inputs and two blocks of four threads. The extra three threads must skip the arrays because their indices have no input or output element.', instruction:'Run with the check enabled. Then turn it off and see which threads would access beyond the arrays.', length:5,size:4},
-  {title:'From Python to a GPU kernel', leadIn:'We have followed the work in pictures. Now we can write the small program each thread follows and show the code that starts the groups.', definitions:[['Kernel','A GPU function executed by the threads in a launch.']], concept:'Each thread executes the complete function below with its own index. Here is a CUDA kernel and the launch that starts it, putting together the index, calculation and bounds check you have just explored.', instruction:'Run once more, then compare the Python operation with the complete CUDA example.', length:5,size:4},
+  {title:'From Python to a GPU kernel', leadIn:'We have followed the work in pictures. Now we can write the small program each thread follows and show the code that starts the groups.', definitions:[['Kernel','A GPU function executed by the threads in a launch.']], concept:'Each thread executes the complete function below with its own index. Here is a CUDA kernel and the launch that starts it, putting together the index, calculation and bounds check you have just explored.', instruction:'Run, then select thread 4 in Block 1. Follow its CUDA variables into the index calculation below the cards. Select a grey thread to inspect the bounds check.', length:5,size:4},
 ];
 export function introPrompt(stage) {
   return [
@@ -16,18 +16,19 @@ export function introPrompt(stage) {
     'Run to compare the kernel’s result with the PyTorch example.',
   ][stage];
 }
-export function simulateIntro(stage,factor,guard=true) {
+export function simulateIntro(stage,factor,guard=true,size=steps[stage]?.size) {
   const step=steps[stage];
   if(!step) throw new RangeError('Unknown step');
+  if(!Number.isInteger(size)||size<1||size>32) throw new RangeError('Choose 1–32 threads per block.');
   if(typeof factor!=='number'||!Number.isFinite(factor)||factor < -10 || factor > 10) throw new RangeError('Choose a multiplier from −10 to 10.');
   if(typeof guard!=='boolean') throw new TypeError('Expected a bounds-check choice');
   const input=Array.from({length:step.length},(_,i)=>i+1),output=Array(step.length).fill(null);
-  const threads=Array.from({length:Math.ceil(step.length/step.size)*step.size},(_,i)=>{
+  const threads=Array.from({length:Math.ceil(step.length/size)*size},(_,i)=>{
     const valid=i<input.length, skipped=!valid && guard, invalid=!valid && !guard;
     if(valid) output[i]=Math.fround(input[i]*Math.fround(factor));
-    return {i,block:Math.floor(i/step.size),local:i%step.size,input:valid?input[i]:null,output:valid?output[i]:null,skipped,invalid};
+    return {i,block:Math.floor(i/size),local:i%size,input:valid?input[i]:null,output:valid?output[i]:null,skipped,invalid};
   });
-  return {input,output,threads,factor:Math.fround(factor),size:step.size,blocks:Math.ceil(step.length/step.size),safe:threads.every(t=>!t.invalid)};
+  return {input,output,threads,factor:Math.fround(factor),size,blocks:Math.ceil(step.length/size),safe:threads.every(t=>!t.invalid)};
 }
 const literal=factor=>Number.isInteger(Math.fround(factor))?Math.fround(factor)+'.0f':String(Math.fround(factor))+'f';
 export function pythonSource(factor=2) {
@@ -45,13 +46,24 @@ export function kernelSource(factor) {
     }
 }`;
 }
-export function runnableSource(factor) {
-  const result=simulateIntro(4,factor);
+export function runnableSource(factor,size=4) {
+  const result=simulateIntro(4,factor,true,size);
   return cudaProgram({kernel:kernelSource(factor),input:result.input,size:result.size,args:'d_x, d_y, n'});
 }
 
-export function launchPlan(count) {
+export function launchPlan(count,size=4) {
   if(!Number.isInteger(count)||count<1||count>32) throw new RangeError('Choose 1–32 inputs.');
-  const size=4,blocks=Math.ceil(count/size),threads=blocks*size;
+  if(!Number.isInteger(size)||size<1||size>32) throw new RangeError('Choose 1–32 threads per block.');
+  const blocks=Math.ceil(count/size),threads=blocks*size;
   return {count,size,blocks,threads,skipped:Array.from({length:threads-count},(_,i)=>count+i)};
+}
+
+export function launchSource(blocks=2,size=4) {
+  if(!Number.isInteger(blocks)||blocks<1||!Number.isInteger(size)||size<1||size>32) throw new RangeError('Invalid launch settings');
+  return `int threadsPerBlock = ${size};
+int blocks = ${blocks};
+
+runKernel<<<blocks, threadsPerBlock>>>(
+    d_input, d_output, 5
+);`;
 }

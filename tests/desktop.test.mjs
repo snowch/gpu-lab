@@ -51,7 +51,9 @@ test('CUDA suite covers safe workshop templates and independent references',asyn
   const dir=await mkdtemp(join(tmpdir(),'gpu-cuda-cases-'));
   try{
     execFileSync('node',['scripts/generate-cuda-cases.mjs',dir]);
-    assert.equal((await readdir(dir)).filter(f=>f.endsWith('.cu')).length,16);
+    assert.equal((await readdir(dir)).filter(f=>f.endsWith('.cu')).length,17);
+    assert.match(await readFile(join(dir,'double-eight.cu'),'utf8'),/runKernel<<<\(n \+ 8 - 1\) \/ 8, 8>>>/);
+    assert.deepEqual(JSON.parse(await readFile(join(dir,'double-eight.json'),'utf8')),[2,4,6,8,10]);
     for(const op of ['multiply','add','vector-add'])for(const size of [8,16,32,64]){
       const name=`workshop-${op}-${size}`;
       const expected=Array.from({length:35},(_,i)=>{const x=(i%2?-1:1)*(i+1)/2;return op==='multiply'?x*2:op==='add'?x+2:x+(i%5)-2.25;});
