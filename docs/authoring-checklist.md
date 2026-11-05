@@ -66,7 +66,11 @@ second set of authoring requirements.
   or stepping an existing trace must preserve it. Cover first load, changed settings
   and restart restoration in browser checks.
 - [ ] Keep optional material only for a distinct learning outcome. Link deeper
-  experiment controls from the chapter that prepares the reader; group reference
+  experiment controls from the chapter that prepares the reader. Keep the relationships
+  required for a later exercise visible beside that exercise, even when a detailed
+  explorer is optional. An interaction must reveal values, dependencies or consequences
+  beyond changing the colour of an existing static picture. Preserve the reader’s
+  inputs, result and position when returning from an optional detour. Group reference
   maps and setup guides under Appendices, separately from Extra practice.
 - [ ] End with a small new case that applies the chapter’s idea and a local answer
   comparison. Keep optional extensions, such as transpose practice, clearly optional.

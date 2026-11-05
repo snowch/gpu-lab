@@ -2,6 +2,7 @@ import {renderLessonCompletion} from '../src/lesson-completion-view.mjs';
 // Copyright © 2026 Christopher Snow.
 import {exportDesktop} from './export-desktop.mjs';
 import {renderDesktop} from '../content/desktop.mjs';
+import {renderInsideSm} from '../content/inside-sm.mjs';
 import {renderProfiling} from '../content/profiling.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 import {memorySetup,memoryExample} from '../src/book-code.mjs';
@@ -32,6 +33,8 @@ const dockerfile=await readFile('docker/cuda-sim.Dockerfile','utf8');
 const execution={revision:dockerfile.match(/ARG GPGPUSIM_REV=(\w+)/)[1],image:dockerfile.match(/^FROM (.+)$/m)[1]};
 await writeFile('dist/lessons/desktop.html',renderBookPage({slug:'desktop',appendix:true,title:'Run the examples on your desktop',lead:'Use real PyTorch or compile supported CUDA programs with GPGPU-Sim, with a clear check of what ran.',content:renderDesktop(desktopExamples,execution),previous:{href:'putting-it-together.html',title:'Chapter 13: Investigate a matrix multiplication'},next:{href:'../index.html',title:'Book contents'}}));
 await writeFile('dist/lessons/profiling.html',renderBookPage({slug:'profiling',appendix:true,title:'Inspect PyTorch GPU launches',lead:'Capture a multiplication on an NVIDIA GPU, view its timeline and inspect the grid and block dimensions.',content:renderProfiling(await readFile('examples/profile-pytorch.py','utf8')),previous:{href:'desktop.html',title:'Desktop setup'},next:{href:'../index.html',title:'Book contents'}}));
+
+await writeFile('dist/lessons/inside-sm.html',renderBookPage({slug:'inside-sm',appendix:true,title:'Inside an SM: how threads share hardware',lead:'Follow working values through registers, arithmetic units and memory instructions.',content:renderInsideSm(),previous:{href:'hello.html#hello-sm-title',title:'Chapter 1: threads and blocks'},next:{href:'scheduling.html',title:'Chapter 6: ready and waiting warps'}}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-hardware.css"><script type="module" src="../src/sm-hardware.mjs"></script></head>'));
 
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
@@ -65,7 +68,7 @@ for(const chapter of continuationChapters) {
   const previous=chapters[chapter.number-2],next=chapters[chapter.number];
   await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({...chapter,content:renderContinuation(chapter),continuation:true,
     previous:{href:previous.slug+'.html',title:`Chapter ${chapter.number-1}: ${previous.title}`},
-    next:next?{href:next.slug+'.html',title:`Chapter ${chapter.number+1}: ${next.title}`}:{href:'../index.html#curriculum',title:'Return to the book contents'}}));
+    next:next?{href:next.slug+'.html',title:`Chapter ${chapter.number+1}: ${next.title}`}:{href:'../index.html#curriculum',title:'Return to the book contents'}}).replace('</head>',chapter.slug==='scheduling'?'<link rel="stylesheet" href="../src/sm-hardware.css"></head>':'</head>'));
 }
 // Stamp the checked-out source revision before fingerprinting the offline files.
 // The commit date is stable across rebuilds of the same revision.
@@ -94,7 +97,7 @@ for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter
     .replace('<div class="top-actions">','<div class="top-actions">'+(current==='meet-gpu'?'<a class="gpu-map-link" href="../index.html">Close map</a>':`<a class="gpu-map-link" href="${current==='index'?'./lessons/':''}meet-gpu.html?from=${current}">GPU map</a>`))
     .replace('<body class="',current==='meet-gpu'?'<body class="gpu-map-page ':'<body class="')
     .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/map-toggle.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/map-toggle.mjs"></script></head>')
-    .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script></head>')
+    .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script><script type="module" src="'+(current==='index'?'./':'../')+'src/reading-links.mjs"></script></head>')
     .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/code-explanations.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/code-explanations.mjs"></script></head>');
   await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
 }

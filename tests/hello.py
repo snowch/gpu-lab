@@ -30,26 +30,8 @@ def hello_flow(page, url):
     expect(page.locator('#hello-title-1')).to_have_text('One multiplication per thread')
     expect(page.locator('#hello-sm-title')).to_have_text('Where do these threads run?')
     expect(page.locator('.hello-sm .chapter-definition')).to_contain_text('Streaming multiprocessor (SM)')
-    expect(page.locator('#hello-sm-details')).not_to_have_attribute('open','')
-    page.locator('#hello-sm-details summary').click()
-    expect(page.locator('.hello-sm-machine .hello-thread')).to_have_count(4)
-    expect(page.locator('.hello-sm-machine button')).to_have_count(0)
-    expect(page.locator('.hello-sm-machine .hello-thread strong:last-child')).to_have_text(['2.0','4.0','6.0','8.0'])
-    expect(page.locator('#hello-sm-read')).to_be_checked()
-    def highlight(phase):
-        return page.locator('.hello-sm-machine .hello-thread').first.evaluate('(el,n)=>getComputedStyle(el.querySelectorAll("strong")[n-1]).borderTopColor',phase)
-    assert highlight(1)!=highlight(2)
-    page.locator('#hello-sm-multiply').check()
-    assert highlight(2)!=highlight(1)
-    page.locator('#hello-sm-multiply').focus();page.keyboard.press('ArrowRight')
-    expect(page.locator('#hello-sm-write')).to_be_checked()
-    assert highlight(3)!=highlight(2)
-    page.locator('#hello-factor-2').fill('3')
-    expect(page.locator('.hello-sm-machine .hello-thread strong:last-child')).to_have_text(['2.0','4.0','6.0','8.0'])
-    expect(page.locator('#hello-map-2 .hello-thread strong:last-child')).to_have_text(['?']*8)
-    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-    page.locator('#hello-factor-2').fill('2')
-    page.locator('#hello-sm-details summary').click()
+    expect(page.locator('.hello-sm a[data-reading-link]')).to_have_attribute('href','inside-sm.html?from=hello')
+    expect(page.locator('#hello-sm-details')).to_have_count(0)
     expect(page.locator('[role=tablist]')).to_have_count(0)
     for stage in [2,3]:
         # Sample both rectangles together: a click can leave scrolling in flight,
@@ -202,6 +184,7 @@ def check_old_hello_snapshot(browser,url):
     page.locator('#hello-factor-1').fill('7')
     page.evaluate("""() => {
       const controls=[...document.querySelectorAll('main input,main select,main textarea')].map(el=>({id:el.id,name:el.name,value:el.value,checked:el.checked}));
+      controls.push({id:'hello-sm-read',value:'read',checked:true});
       sessionStorage.setItem('gpu-lab:restart:'+location.pathname+location.search,JSON.stringify({
         schema:1,controls,experiments:{'hello-1':{selected:2,ran:true}},details:[],
         messages:{'hello-output-1':'Output: [7, 14, 21, 28]'},scroll:[0,0]
@@ -240,10 +223,7 @@ def check_old_hello_snapshot(browser,url):
           sessionStorage.setItem('gpu-lab:restart:'+location.pathname+location.search,JSON.stringify({schema:1,controls,experiments:{'hello-launch':{revealed,selected:6}},details:[],messages:{},scroll:[0,0]}));
         }""",revealed)
         page.reload()
-    page.locator('#hello-sm-details summary').click()
-    page.locator('#hello-sm-write').check()
     save_launch(True)
-    expect(page.locator('#hello-sm-write')).to_be_checked()
     expect(page.locator('#hello-launch-answer')).to_be_visible()
     expect(page.locator('#hello-launch-map [data-thread="6"]')).to_have_attribute('aria-pressed','true')
     expect(page.locator('#hello-launch-index')).to_contain_text('skips the calculation')
@@ -270,17 +250,13 @@ def check_hello(browser,url,root,errors):
     context=browser.new_context(java_script_enabled=False)
     page=context.new_page();page.goto(url+'lessons/hello.html')
     expect(page.locator('.hello-section')).to_have_count(5)
-    expect(page.locator('.hello-thread')).to_have_count(38)
+    expect(page.locator('.hello-thread')).to_have_count(34)
     expect(page.locator('#hello-output-4')).to_have_text('Run to compare the kernel’s result with the PyTorch example.')
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
     page.locator('#hello-bridge-complete-2 summary').click()
     expect(page.locator('#hello-bridge-full-2')).to_be_visible()
     expect(page.locator('#hello-bounds-code-3')).to_contain_text('if (i < n)')
-    page.locator('#hello-sm-details summary').click()
-    expect(page.locator('.hello-sm-machine')).to_be_visible()
-    page.locator('#hello-sm-write').check()
-    expect(page.locator('#hello-sm-write')).to_be_checked()
-    expect(page.locator('.hello-sm-machine .hello-thread strong:last-child')).to_have_text(['2.0','4.0','6.0','8.0'])
+    expect(page.locator('.hello-sm a[data-reading-link]')).to_have_attribute('href','inside-sm.html?from=hello')
     expect(page.locator('#hello-map-2 [data-thread="5"]')).to_contain_text('No calculation')
     expect(page.locator('.hello-section-end noscript p')).to_contain_text('Indices 6 and 7 skip')
     page.locator('#idea-5 noscript summary').click()

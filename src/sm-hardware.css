@@ -1,0 +1,53 @@
+/* Copyright © 2026 Christopher Snow. */
+body.sm-appendix .sidebar { display:none; }
+body.sm-appendix .layout { display:block; max-width:1500px; }
+body.sm-appendix main { max-width:none; width:100%; padding-inline:clamp(16px,4vw,64px); }
+body.sm-appendix .book-section>p,body.sm-appendix .intro>p { max-width:78ch; }
+.sm-return { display:flex; flex-wrap:wrap; gap:12px; }
+.sm-explorer-controls { position:sticky; top:var(--sm-top,90px); z-index:3; padding-block:10px; background:var(--bg); display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-block:20px; }
+.sm-event { padding:16px; border-left:3px solid var(--accent); background:var(--soft); min-height:128px; margin-bottom:20px; }
+.sm-event h3 { font-size:20px; margin-bottom:8px; }
+.sm-event p { margin:0; }
+.sm-hardware { margin:20px 0; }
+.sm-warp-states,.sm-memory-values { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.sm-warp-state { display:grid; gap:8px; padding:14px; border:1px dashed var(--accent); border-radius:6px; margin-bottom:16px; }
+.sm-device-memory,.sm-unit { border:1px solid var(--line); border-radius:6px; padding:16px; background:var(--panel); min-width:0; }
+.sm-device-memory { background:var(--accent-soft); }
+.sm-hardware h4 { margin:0 0 6px; font-size:18px; }
+.sm-hardware p { margin:0; }
+.sm-hardware strong { overflow-wrap:anywhere; }
+.sm-chip { border:2px solid var(--accent); border-radius:8px; padding:20px; }
+.sm-chip>h3 { font-size:24px; margin:0 0 16px; }
+.sm-unit[data-active="true"] { border:2px solid var(--accent); padding:15px; background:var(--accent-soft); }
+.sm-active { color:var(--accent); font-weight:650; margin-top:8px!important; }
+.sm-control-note { padding:14px 0; color:var(--muted); border-left:2px dashed var(--line); padding-left:14px; margin:12px 0!important; }
+.sm-connection { display:flex; gap:12px; align-items:center; justify-content:center; padding:12px; color:var(--muted); text-align:center; min-height:56px; }
+.sm-connection>span:first-child { font-size:28px; line-height:1; }
+.sm-connection[data-active="true"] { color:var(--accent); font-weight:650; }
+.sm-register-values { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 0; }
+.sm-register-values dt { font-weight:650; }
+.sm-register-values dd { margin:6px 0 0; }
+.sm-arithmetic-values { margin-top:12px!important; min-height:72px; }
+.sm-hardware figcaption { margin-top:14px; color:var(--muted); }
+.sm-hardware-overview .sm-chip { padding:16px; }
+.sm-hardware-overview .sm-unit { padding:12px; }
+@media(min-width:1000px) {
+ .sm-appendix .chapter-definition dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 28px; }
+ .sm-appendix .chapter-definition dl>div { margin:0; }
+}
+@media(max-width:600px) {
+ .sm-warp-states,.sm-memory-values,.sm-register-values { grid-template-columns:minmax(0,1fr); }
+ .sm-chip { padding:12px; }
+ .sm-event { min-height:190px; }
+}
+
+@media(min-width:900px) {
+ .sm-chip { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:0 20px; }
+ .sm-chip>h3 { grid-column:1/-1; }
+ .sm-chip>.sm-unit,.sm-chip>.sm-connection { grid-column:1; }
+ .sm-control-block { grid-column:2; grid-row:2/7; align-self:start; border-left:2px dashed var(--line); padding-left:16px; }
+ .sm-control-block .sm-warp-states { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:899px) {
+ .sm-control-block { margin-top:18px; border-top:2px dashed var(--line); padding-top:18px; }
+}

@@ -1,5 +1,5 @@
 // Copyright © 2026 Christopher Snow.
-import {registerExperiment} from './experiment-state.mjs';
+import {registerExperiment,saveReadingState} from './experiment-state.mjs';
 const link=document.querySelector('.gpu-map-link');
 const standalone=document.body.classList.contains('gpu-map-page');
 if(link&&!standalone){
@@ -53,7 +53,14 @@ if(link&&!standalone){
    const url=new URL(a.href);
    if(a.target==='_blank'||a.hasAttribute('download')||url.origin!==location.origin||!url.pathname.endsWith('.html')||url.pathname===mapURL.pathname)return;
    event.preventDefault();
-   if(url.pathname===location.pathname)close();else location.assign(url.href);
+   if(url.pathname===location.pathname)close();else {
+    if(url.pathname.endsWith('/inside-sm.html')){
+      try{saveReadingState();}catch(error){status.hidden=false;status.textContent='Your reading state could not be saved. '+error.message;return;}
+      url.searchParams.set('from',location.pathname.split('/').at(-1)?.replace('.html','')||'index');
+      url.searchParams.set('return',location.pathname+location.search+location.hash);
+    }
+    location.assign(url.href);
+   }
   });
   if(opened)frame.contentWindow.focus();
  });

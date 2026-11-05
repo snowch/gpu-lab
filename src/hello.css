@@ -66,24 +66,6 @@
  .hello-code-bridge { padding-top:16px; border-top:0; }
 }
 
-/* Connect the familiar thread cards to the hardware, without implying a schedule. */
+/* Keep the hardware introduction short; the optional explorer has its own page. */
 .hello-sm { margin-top:30px; padding-top:24px; border-top:1px solid var(--line); }
 .hello-sm>h3 { font-size:22px; margin-bottom:18px; }
-.hello-sm details,.hello-sm summary { font-size:16px; }
-.hello-sm summary { min-height:44px; padding-block:8px; cursor:pointer; }
-.hello-sm details>p:first-of-type { margin-top:16px; }
-.hello-sm-machine { margin:20px 0; padding:18px; border:2px solid var(--accent); border-radius:8px; background:var(--soft); }
-.hello-sm-label { margin-bottom:14px; }
-.hello-sm-label strong { color:var(--accent); font-size:22px; }
-.hello-sm-phase { border:0; padding:0; margin:0 0 18px; display:flex; flex-wrap:wrap; gap:8px; min-width:0; }
-.hello-sm-phase legend { padding:0; margin-bottom:8px; }
-.hello-sm-phase label { display:flex; align-items:center; gap:7px; min-height:44px; padding:6px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); cursor:pointer; }
-.hello-sm-phase input { min-height:0; width:18px; height:18px; margin:0; padding:0; accent-color:var(--accent); }
-.hello-sm-phase label:has(input:checked) { border-color:var(--accent); background:var(--accent-soft); }
-.hello-sm .hello-group { margin:0; border-style:dashed; }
-.hello-sm h4 { margin:0 0 12px; font-size:16px; }
-.hello-sm .hello-thread strong { width:calc(100% - 8px); padding:4px; border:2px solid transparent; border-radius:4px; text-align:center; }
-.hello-sm-machine:has(#hello-sm-read:checked) .hello-thread strong:nth-of-type(1),
-.hello-sm-machine:has(#hello-sm-multiply:checked) .hello-thread strong:nth-of-type(2),
-.hello-sm-machine:has(#hello-sm-write:checked) .hello-thread strong:nth-of-type(3) { border-color:var(--accent); background:var(--accent-soft); }
-@media(max-width:500px) { .hello-sm-machine { padding:12px; } }

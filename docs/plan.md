@@ -43,9 +43,8 @@ experiment and visual beside its own explanation in a continuous downward flow.
    versus eight threads per block. Put launch and bounds-check bridges beside their
    diagrams, with a complete function available locally from the first launch.
    Assemble the complete function in the final idea. Introduce an SM beside blocks
-   as the hardware executing their threads. An expandable, fixed worked example
-   reuses the block’s four thread cards to highlight read, multiply and write;
-   it shows a possible placement, not a schedule. Defer warps, detailed scheduling
+   as shared hardware executing their threads. Link the optional Inside an SM
+   appendix instead of repeating the thread cards. Defer warps, detailed scheduling
    and shared memory to later mechanism lessons. Finish with an input-count
    prediction exercise and the optional repair workshop.
 2. **Where are tensor values stored?** (`devices.html`): follow the same five inputs
@@ -199,3 +198,13 @@ Before the CUDA path becomes a graded track, compile and run every example on a 
 and toolkit version; record outputs and compare simulator claims with appropriate profiler
 metrics. Performance labs need warm-up, synchronisation, repeated measurements and explicit
 measurement scope. No measured performance claim is made by this initial lab.
+
+## Optional hardware depth
+
+`inside-sm.html` is a full-width appendix linked locally from chapters 1 and 6.
+Chapter 1 retains the thread/block/SM distinction; chapter 6 keeps a visible hardware
+relationship diagram beside its scheduling exercise. The appendix walks values
+through registers, load/store and arithmetic execution units, with a scheduler
+selecting ready warp instructions. It teaches resource sharing rather than recolouring
+an existing input/output diagram. Readers can return to their saved experiment and
+scroll position. It is optional early detail, not a prerequisite detour from chapter 1.

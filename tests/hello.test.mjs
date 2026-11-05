@@ -35,7 +35,7 @@ test('static introduction includes all worked diagrams with unique control IDs',
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length);
  assert.equal((html.match(/class="hello-section"/g)||[]).length,5);
- assert.equal((html.match(/class="hello-thread"/g)||[]).length,38);
+ assert.equal((html.match(/class="hello-thread"/g)||[]).length,34);
  for(let i=0;i<5;i++){
   assert.ok(html.includes('id="hello-factor-'+i+'"'));
   assert.ok(html.includes('id="hello-output-'+i+'"'));
@@ -43,22 +43,12 @@ test('static introduction includes all worked diagrams with unique control IDs',
  assert.doesNotMatch(html,/hello-next|hello-back/);
 });
 
-test('the SM worked example connects a whole block to model-derived instruction values',()=>{
- const html=renderSmExplanation(),state=simulateIntro(2,2);
- assert.equal((html.match(/class="hello-thread"/g)||[]).length,state.size);
- assert.doesNotMatch(html,/data-thread=|<button|warp/i);
- assert.match(html,/Worked example: doubling the inputs in Block 0/);
- assert.match(html,/Block 1 is omitted/);
- assert.match(html,/not execution timing/);
- assert.match(html,/id="hello-sm-details"/);
- assert.equal((html.match(/type="radio"/g)||[]).length,3);
- for(const t of state.threads.filter(t=>t.block===0)) {
-  assert.ok(html.includes(`Thread ${t.i}`));
-  assert.ok(html.includes(`>${t.input.toFixed(1)}</strong>`));
-  assert.ok(html.includes(`>${t.output.toFixed(1)}</strong>`));
- }
+test('chapter 1 keeps the SM distinction and links the optional hardware appendix',()=>{
+ const html=renderSmExplanation();
+ assert.doesNotMatch(html,/hello-thread|hello-sm-details|type="radio"/);
+ assert.match(html,/does not own a separate arithmetic unit/);
+ assert.match(html,/data-reading-link href="inside-sm.html\?from=hello"/);
  const chapter=renderIntroSections();
- assert.ok(chapter.indexOf('One multiplication per thread')<chapter.indexOf('Threads are organised into blocks'));
  assert.ok(chapter.indexOf('id="hello-map-2"')<chapter.indexOf('id="hello-sm-title"'));
  assert.ok(chapter.indexOf('id="hello-sm-title"')<chapter.indexOf('id="idea-4"'));
 });
