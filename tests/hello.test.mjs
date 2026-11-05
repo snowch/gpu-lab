@@ -24,7 +24,7 @@ test('intro diagram and outputs derive from thread indices and selected multipli
  assert.match(kernelSource(3),/input\[i\] \* 3.0f/);
 });
 
-import {renderIntroSections} from '../src/hello-view.mjs';
+import {renderIntroSections,renderSmExplanation} from '../src/hello-view.mjs';
 test('static introduction includes all worked diagrams with unique control IDs',()=>{
  const html=renderIntroSections();
  assert.equal(pythonSource(),'import torch\nx = torch.tensor(\n    [1.0, 2.0, 3.0, 4.0, 5.0],\n    device="cuda",\n)\ny = x * 2');
@@ -35,12 +35,32 @@ test('static introduction includes all worked diagrams with unique control IDs',
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length);
  assert.equal((html.match(/class="hello-section"/g)||[]).length,5);
- assert.equal((html.match(/class="hello-thread"/g)||[]).length,34);
+ assert.equal((html.match(/class="hello-thread"/g)||[]).length,38);
  for(let i=0;i<5;i++){
   assert.ok(html.includes('id="hello-factor-'+i+'"'));
   assert.ok(html.includes('id="hello-output-'+i+'"'));
  }
  assert.doesNotMatch(html,/hello-next|hello-back/);
+});
+
+test('the SM worked example connects a whole block to model-derived instruction values',()=>{
+ const html=renderSmExplanation(),state=simulateIntro(2,2);
+ assert.equal((html.match(/class="hello-thread"/g)||[]).length,state.size);
+ assert.doesNotMatch(html,/data-thread=|<button|warp/i);
+ assert.match(html,/Worked example: doubling the inputs in Block 0/);
+ assert.match(html,/Block 1 is omitted/);
+ assert.match(html,/not execution timing/);
+ assert.match(html,/id="hello-sm-details"/);
+ assert.equal((html.match(/type="radio"/g)||[]).length,3);
+ for(const t of state.threads.filter(t=>t.block===0)) {
+  assert.ok(html.includes(`Thread ${t.i}`));
+  assert.ok(html.includes(`>${t.input.toFixed(1)}</strong>`));
+  assert.ok(html.includes(`>${t.output.toFixed(1)}</strong>`));
+ }
+ const chapter=renderIntroSections();
+ assert.ok(chapter.indexOf('One multiplication per thread')<chapter.indexOf('Threads are organised into blocks'));
+ assert.ok(chapter.indexOf('id="hello-map-2"')<chapter.indexOf('id="hello-sm-title"'));
+ assert.ok(chapter.indexOf('id="hello-sm-title"')<chapter.indexOf('id="idea-4"'));
 });
 
 test('new-case launch plans cover each input and identify only surplus threads',()=>{

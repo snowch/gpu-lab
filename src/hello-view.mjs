@@ -5,13 +5,14 @@ import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,bo
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   const groups=stage>=2?Array.from({length:state.blocks},(_,i)=>i):[null];
-  return groups.map(group=>`<div class="hello-group">${group===null?'':`<h3>Block ${group}</h3>`}<div class="hello-threads">${state.threads.filter(t=>group===null||t.block===group).map(t=>{
-    const tag=stage===0?'div':'button';
+  return groups.map(group=>`<div class="hello-group">${group===null?'':`<h3>Block ${group}</h3>`}<div class="hello-threads">${state.threads.filter(t=>group===null||t.block===group).map(t=>renderIntroThread(stage,state,t,selected,showOutput)).join('')}</div></div>`).join('');
+}
+function renderIntroThread(stage,state,t,selected,showOutput,worked=false) {
+    const interactive=stage!==0&&!worked,tag=interactive?'button':'div';
     const calculation=t.skipped?'No calculation':t.invalid?(showOutput?'Invalid read':'Run to check'):'× '+state.factor;
     const cardState=t.skipped?'skip':t.invalid?(showOutput?'invalid':'pending'):null;
-    const values=[['Input',t.input===null?'No element':tensorValue(t.input)],[stage===0?'Calculation':'Thread '+t.i,calculation],['Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':tensorValue(t.output)]];
-    return `<${tag} class="hello-thread" ${stage===0?'':`type="button" data-thread="${t.i}" aria-pressed="${t.i===selected}"`} ${cardState?`data-state="${cardState}"`:''}>${values.map(([label,value])=>`<small>${escape(label)}</small><strong>${escape(value)}</strong>`).join('')}</${tag}>`;
-  }).join('')}</div></div>`).join('');
+    const values=[[worked?'Read input':'Input',t.input===null?'No element':tensorValue(t.input)],[stage===0?'Calculation':'Thread '+t.i,calculation],[worked?'Write output':'Output',!showOutput?'?':t.skipped?'Skipped':t.invalid?'Invalid access':tensorValue(t.output)]];
+    return `<${tag} class="hello-thread" ${interactive?`type="button" data-thread="${t.i}" aria-pressed="${t.i===selected}"`:''} ${cardState?`data-state="${cardState}"`:''}>${values.map(([label,value])=>`<small>${escape(label)}</small><strong>${escape(value)}</strong>`).join('')}</${tag}>`;
 }
 export function renderIntroSections() {
   const start=simulateIntro(0,2);
@@ -60,6 +61,7 @@ export function renderIntroSections() {
       <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.map(tensorValue).join(', ')}].</p></details></noscript>
       ${stage>0?`<p id="hello-index-${stage}" role="status"${stage===4?' hidden':''}>Select a thread to follow its input and output.</p>`:''}
       ${stage===2||stage===3?`</div>${renderCodeBridge(stage,state.factor)}</div>`:''}
+      ${stage===2?renderSmExplanation():''}
       ${stage===4?renderCudaTrace(state.threads[4],state,false):''}
       ${stage===4?renderLaunchPractice():''}
       ${stage===4?`<div class="hello-complete">
@@ -77,6 +79,29 @@ export function renderIntroSections() {
       </div>`:''}
     </section>`;
   }).join('\n');
+}
+
+export function renderSmExplanation() {
+  const state=simulateIntro(2,2),threads=state.threads.filter(t=>t.block===0);
+  return `<section class="hello-sm" aria-labelledby="hello-sm-title">
+    <h3 id="hello-sm-title">Where do these threads run?</h3>
+    ${definitions([['Streaming multiprocessor (SM)','A part of the GPU containing hardware that executes instructions for threads.']])}
+    <p>The GPU assigns each block to one SM, where it stays for its lifetime. Several blocks can share an SM when resources allow. The SM can carry out work for multiple threads in parallel; a block’s threads do not necessarily all execute at once.</p>
+    <p>A block groups threads together. The SM supplies the hardware that reads their input values, performs their multiplications and writes their results.</p>
+    <details id="hello-sm-details"><summary>Inside one SM: read → multiply → write</summary>
+      <p><strong>Worked example: doubling the inputs in Block 0.</strong> This fixed example uses the opening multiplier, ${state.factor}, independently of the experiment controls.</p>
+      <ul>${threads.slice(0,2).map(t=>`<li>Thread ${t.i} reads <strong>${tensorValue(t.input)}</strong>. The SM’s arithmetic hardware multiplies it by <strong>${state.factor}</strong>, producing <strong>${tensorValue(t.output)}</strong>, which the thread writes to its output position.</li>`).join('')}</ul>
+      <div class="hello-sm-machine" aria-label="An example SM containing all four threads of Block 0">
+        <p class="hello-sm-label"><strong>One SM</strong> · hardware shared by the block’s threads</p>
+        <fieldset class="hello-sm-phase"><legend>Highlight an instruction</legend>
+          ${[['read','Read input'],['multiply','Multiply'],['write','Write output']].map(([phase,label],i)=>`<label><input type="radio" name="hello-sm-phase" id="hello-sm-${phase}" value="${phase}"${i===0?' checked':''}> ${label}</label>`).join('')}
+        </fieldset>
+        <div class="hello-group"><h4>Block 0 · four threads</h4><div class="hello-threads">${threads.map(t=>renderIntroThread(2,state,t,0,true,true)).join('')}</div></div>
+      </div>
+      <p class="hello-note">One possible block placement on an NVIDIA GPU. Block 1 is omitted; it could share this SM or run on another. Highlighting follows the calculation, not execution timing. The cards represent threads sharing SM hardware.</p>
+      <p><a href="scheduling.html">Chapter 6: how an SM keeps threads making progress →</a></p>
+    </details>
+  </section>`;
 }
 export function renderIntroTransfer() {
   const plan=launchPlan(6);

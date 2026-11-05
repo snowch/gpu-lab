@@ -42,9 +42,12 @@ experiment and visual beside its own explanation in a continuous downward flow.
    the block view beside a selected-thread CUDA trace, then predict and compare four
    versus eight threads per block. Put launch and bounds-check bridges beside their
    diagrams, with a complete function available locally from the first launch.
-   Assemble the complete function in the final idea. SMs, warps
-   and shared memory belong in later mechanism lessons; the ownership diagram lives
-   in the scheduling lab. Finish with an input-count prediction exercise and the optional repair workshop.
+   Assemble the complete function in the final idea. Introduce an SM beside blocks
+   as the hardware executing their threads. An expandable, fixed worked example
+   reuses the block’s four thread cards to highlight read, multiply and write;
+   it shows a possible placement, not a schedule. Defer warps, detailed scheduling
+   and shared memory to later mechanism lessons. Finish with an input-count
+   prediction exercise and the optional repair workshop.
 2. **Where are tensor values stored?** (`devices.html`): follow the same five inputs
    through a CPU-to-GPU copy, multiplication in GPU memory, and a result copy back.
    Each action has its own setup, prediction prompt, control, diagram and result.
