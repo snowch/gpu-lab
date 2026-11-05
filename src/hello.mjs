@@ -2,7 +2,7 @@ import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
-import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,launchSource,introPrompt} from './hello-model.mjs';
+import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,launchSource,boundsSource,introPrompt} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
 import {renderIntroMap,renderCudaTrace} from './hello-view.mjs';
 for (const section of document.querySelectorAll('.hello-section')) {
@@ -17,6 +17,12 @@ function model(){return simulateIntro(stage,factor(),stage===3?$('hello-guard').
 function code(){
   let value;try{value=factor();}catch{return;}
   $('hello-operation').textContent='y = x * '+value;
+  if(stage===2) document.getElementById('hello-bridge-full-2').textContent=kernelSource(value);
+  if(stage===3) {
+    const guard=$('hello-guard').checked;
+    document.getElementById('hello-bounds-code-3').textContent=boundsSource(value,guard);
+    document.getElementById('hello-bounds-code-3-label').textContent='CUDA C++ · body excerpt from runKernel · check '+(guard?'enabled':'disabled (diagnostic)');
+  }
   if(stage===4) $('hello-full').textContent=kernelSource(value);
 }
 function inspect(t){
@@ -58,6 +64,7 @@ $('hello-run').addEventListener('click',()=>{
     $('hello-output').textContent=resultText();
   }catch(error){result=null;$('hello-output').textContent=error.message;}
 });
+if(stage===2) document.getElementById('hello-bridge-download-2').addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello-blocks.cu');}catch(error){$('hello-output').textContent=error.message;}});
 $('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
 code();draw();$('hello-run').disabled=false;
 registerExperiment('hello-'+stage,()=>({selected,ran:result!==null,length:steps[stage].length,message:$('hello-output').textContent}),state=>{

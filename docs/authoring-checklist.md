@@ -25,8 +25,12 @@ second set of authoring requirements.
   learner’s choices from PyTorch’s kernel, allocation and launch responsibilities.
 - [ ] Build from behaviour to concepts to implementation. Introduce only what the
   next example needs. Do not begin with a broken kernel or unexplained CUDA fragment.
-  When CUDA first appears, show a complete kernel and its launch together, then
-  explain their parts. Label later excerpts as excerpts of an already-seen function.
+  Keep short CUDA bridges beside the concept and diagram they explain. A first
+  launch excerpt must name the function’s purpose and offer its complete function
+  and launch locally; explain its arguments before relying on them. Label body
+  excerpts with their function and role. Keep core bridges visible alongside the
+  PyTorch operation; reserve disclosures for complete references and deeper detail,
+  rather than hiding required languages behind tabs.
 - [ ] Before a new mechanism, explain the problem it solves in the current example.
   A definition tells the reader what a term means; a short bridge tells them why
   they need it. Connect the last observable result to the next question. Ground

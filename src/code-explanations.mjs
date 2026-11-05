@@ -3,7 +3,7 @@ import {codeExplanations} from './code-explanation-data.mjs';
 import {annotatedSource,explanationList} from './code-explanations-view.mjs';
 const seen=new WeakMap();
 function refresh(pre){
- if(pre.matches('.reference-code,[data-code-question]'))return;
+ if(pre.matches('.reference-code,[data-code-question],[data-code-explained-locally]'))return;
  const source=pre.textContent;
  if(seen.get(pre)===source)return;
  seen.set(pre,source);

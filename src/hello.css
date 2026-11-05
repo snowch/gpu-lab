@@ -52,3 +52,16 @@
  .hello-cuda-variables { gap:8px; }
  .hello-cuda-variables dt code { font-size:12px; }
 }
+
+/* A local code bridge follows its diagram on phones and sits beside it when room allows. */
+.hello-section[data-stage="2"],.hello-section[data-stage="3"] { container-type:inline-size; }
+.hello-bridge-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:22px; align-items:start; }
+.hello-bridge-visual,.hello-code-bridge { min-width:0; }
+.hello-code-bridge { padding-top:16px; border-top:1px solid var(--line); }
+.hello-code-bridge>h3 { font-size:22px; margin:0 0 16px; }
+.hello-code-bridge details { margin-top:20px; }
+.hello-code-bridge summary { min-height:44px; cursor:pointer; padding-block:8px; }
+@container(min-width:900px) {
+ .hello-bridge-layout { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:24px; }
+ .hello-code-bridge { padding-top:16px; border-top:0; }
+}

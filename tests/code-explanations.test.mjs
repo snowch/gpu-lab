@@ -31,6 +31,8 @@ test('walkthroughs preserve code attributes, source and static explanations with
  assert.equal(explainHTML('<pre>y = x * 2</pre>'),'<pre>y = x * 2</pre>');
  const question='<pre data-code-question><code>transposed = x.T\ny = transposed[0, :] * 2</code></pre>';
  assert.equal(explainHTML(question),question);
+ const local='<pre data-code-explained-locally><code>if (i &lt; n) { output[i] = input[i] * 2.0f; }</code></pre>';
+ assert.equal(explainHTML(local),local);
 });
 test('repair explanations follow the actual guard and arithmetic instead of asserting a correct kernel',()=>{
  for(const guard of [true,false])for(const operation of ['multiply','add','vector-add']){

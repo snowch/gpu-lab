@@ -17,13 +17,18 @@ colours, type sizes or spacing into another stylesheet.
   refreshes dynamic snippets. Keep each fragment tied to actual source. Preserve
   essential explanations without JavaScript and exclude reference-question snippets.
   Mark other prediction-only code with `data-code-question` to avoid giving its answer.
+  For a short bridge with its own diagram-linked explanation, use
+  `codePanel({explainedLocally: true, ...})` to avoid a second generic walkthrough.
   Use 1.5 line spacing in code, 1.45 in explanation lists and 6px list-item padding.
 - Code language: label PyTorch and CUDA C++ explicitly. Green identifies PyTorch;
   blue identifies CUDA, with suitable accents in both themes. Colour supplements
   the language label. Use `codePanel()` for labelled explanatory code.
-- CUDA progression follows the [authoring checklist](authoring-checklist.md): show
-  a complete kernel and launch before excerpts. Later selected-thread substitutions
-  may share one labelled panel with the general expression; avoid duplicate panels.
+- CUDA progression follows the [authoring checklist](authoring-checklist.md): put
+  short, labelled code bridges beside the concepts and diagrams they explain.
+  At the first launch, name the function’s purpose and offer the complete function
+  locally. Keep required PyTorch and CUDA bridges visible; use disclosures for
+  complete references and deeper detail. Later selected-thread substitutions may
+  share one labelled panel with the general expression; avoid duplicate panels.
 - Supporting code: neutral panels with 16px code explain setup and later examples.
 - Focal operation: the existing larger operation panel highlights the calculation
   currently being explored. It has a different role from a complete opening program.

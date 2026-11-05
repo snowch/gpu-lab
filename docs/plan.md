@@ -40,7 +40,9 @@ experiment and visual beside its own explanation in a continuous downward flow.
    example and five values. Introduce threads, indices, blocks and bounds checks
    as needed; assemble the CUDA kernel at the end. Preserve the thread and block visuals, repeat
    the block view beside a selected-thread CUDA trace, then predict and compare four
-   versus eight threads per block. Show no CUDA fragments before the complete function and its launch. SMs, warps
+   versus eight threads per block. Put launch and bounds-check bridges beside their
+   diagrams, with a complete function available locally from the first launch.
+   Assemble the complete function in the final idea. SMs, warps
    and shared memory belong in later mechanism lessons; the ownership diagram lives
    in the scheduling lab. Finish with an input-count prediction exercise and the optional repair workshop.
 2. **Where are tensor values stored?** (`devices.html`): follow the same five inputs
