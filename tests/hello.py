@@ -12,8 +12,30 @@ def hello_flow(page, url):
     for i in range(1,6):
         expect(page.locator(f'#idea-{i}')).to_be_visible()
     expect(page.locator('.hello-relationships')).to_have_count(0)
-    for i in range(1,5):
+    for i in range(1,3):
         expect(page.locator(f'#idea-{i} [data-language="cuda"]')).to_have_count(0)
+    expect(page.locator('#hello-bridge-launch-2')).to_be_visible()
+    expect(page.locator('#hello-bridge-complete-2')).not_to_have_attribute('open','')
+    expect(page.locator('#hello-bridge-launch-2 + .code-explanations')).to_have_count(0)
+    page.locator('#hello-bridge-complete-2 summary').click()
+    expect(page.locator('#hello-bridge-full-2')).to_contain_text('__global__ void runKernel')
+    page.locator('#hello-factor-2').fill('3')
+    expect(page.locator('#hello-bridge-full-2')).to_contain_text('input[i] * 3.0f')
+    with page.expect_download() as bridge_download:
+        page.locator('#hello-bridge-download-2').click()
+    assert 'input[i] * 3.0f' in Path(bridge_download.value.path()).read_text()
+    page.locator('#hello-factor-2').fill('2')
+    page.locator('#hello-bridge-complete-2 summary').click()
+    expect(page.locator('#hello-bounds-code-3')).to_contain_text('if (i < n)')
+    expect(page.locator('[role=tablist]')).to_have_count(0)
+    for stage in [2,3]:
+        visual=page.locator(f'#idea-{stage+1} .hello-bridge-visual').bounding_box()
+        code=page.locator(f'#idea-{stage+1} .hello-code-bridge').bounding_box()
+        if page.viewport_size['width']>=1440:
+            assert code['x']>visual['x']+visual['width']-1
+            assert abs(code['y']-visual['y'])<2
+        else:
+            assert code['y']>=visual['y']+visual['height']-1
     expect(page.locator('#hello-launch-4')).to_have_text('int threadsPerBlock = 4;\nint blocks = 2;\n\nrunKernel<<<blocks, threadsPerBlock>>>(\n    d_input, d_output, 5\n);')
     assert page.locator('#hello-full-4').evaluate('el=>el.getBoundingClientRect().top') < page.locator('#hello-launch-4').evaluate('el=>el.getBoundingClientRect().top')
     assert page.locator('#hello-next, #hello-back').count() == 0
@@ -67,6 +89,8 @@ def hello_flow(page, url):
     assert skipped.evaluate('el=>getComputedStyle(el).backgroundColor') != page.locator('#hello-map-2 [data-thread="4"]').evaluate('el=>getComputedStyle(el).backgroundColor')
     expect(page.locator('#hello-map-3 [data-state="skip"]')).to_have_count(3)
     page.locator('#hello-guard-3').uncheck()
+    expect(page.locator('#hello-bounds-code-3')).not_to_contain_text('if (i < n)')
+    expect(page.locator('#hello-bounds-code-3-label')).to_contain_text('disabled (diagnostic)')
     expect(page.locator('#hello-map-3 [data-state="skip"]')).to_have_count(0)
     expect(page.locator('#hello-map-3 [data-thread="5"]')).to_contain_text('Run to check')
     page.locator('#hello-run-3').scroll_into_view_if_needed()
@@ -77,6 +101,7 @@ def hello_flow(page, url):
     expect(page.locator('#hello-map-3 [data-thread="5"]')).to_contain_text('Invalid read')
     expect(page.locator('#hello-map-3 [data-thread="5"]')).not_to_contain_text('No calculation')
     page.locator('#hello-guard-3').check()
+    expect(page.locator('#hello-bounds-code-3')).to_contain_text('if (i < n)')
     page.locator('#hello-run-3').click()
     expect(page.locator('#hello-map-3 [data-state="skip"]')).to_have_count(3)
     expect(page.locator('#hello-map-3 [data-thread="5"]')).to_contain_text('Skipped')
@@ -220,6 +245,9 @@ def check_hello(browser,url,root,errors):
     expect(page.locator('.hello-thread')).to_have_count(34)
     expect(page.locator('#hello-output-4')).to_have_text('Run to compare the kernel’s result with the PyTorch example.')
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
+    page.locator('#hello-bridge-complete-2 summary').click()
+    expect(page.locator('#hello-bridge-full-2')).to_be_visible()
+    expect(page.locator('#hello-bounds-code-3')).to_contain_text('if (i < n)')
     expect(page.locator('#hello-map-2 [data-thread="5"]')).to_contain_text('No calculation')
     expect(page.locator('.hello-section-end noscript p')).to_contain_text('Indices 6 and 7 skip')
     page.locator('#idea-5 noscript summary').click()

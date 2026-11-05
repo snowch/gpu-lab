@@ -14,7 +14,7 @@ export function explanationList(entries){
 export function explainHTML(html){
  return html.replace(/<pre\b([^>]*)>([\s\S]*?)<\/pre>/g,(original,attrs,inner)=>{
   // Documentation questions already supply a task; a walkthrough could give its answer away.
-  if(attrs.includes('reference-code')||attrs.includes('data-code-question'))return original;
+  if(attrs.includes('reference-code')||attrs.includes('data-code-question')||attrs.includes('data-code-explained-locally'))return original;
   const code=inner.match(/^<code\b([^>]*)>([\s\S]*)<\/code>$/);
   const encoded=code?code[2]:inner;
   if(encoded.includes('<'))return original;

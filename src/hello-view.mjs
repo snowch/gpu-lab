@@ -1,7 +1,7 @@
 import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {openingCode,browserNotice,codePanel,definitions,readerTask} from './chapter-view.mjs';
-import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,introPrompt} from './hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,boundsSource,introPrompt} from './hello-model.mjs';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderIntroMap(stage,state,selected=0,showOutput=true) {
   const groups=stage>=2?Array.from({length:state.blocks},(_,i)=>i):[null];
@@ -38,7 +38,7 @@ export function renderIntroSections() {
       ${worked?`<p>Here, each thread handles one input value:</p><ul class="hello-thread-examples">${worked.threads.slice(0,2).map(thread=>`<li>Thread ${thread.i} reads <strong>${tensorValue(thread.input)}</strong>, multiplies it by <strong>${worked.factor}</strong>, and writes <strong>${tensorValue(thread.output)}</strong>.</li>`).join('')}<li>Threads ${worked.threads[2].i}–${worked.threads.at(-1).i} do the same for the remaining inputs.</li></ul><p>Each thread follows the same instructions using a different input value. The GPU is built to run many threads at the same time. It schedules threads in groups, so launching many threads does not mean they all run at once.</p>`:''}
       <p class="hello-concept">${step.concept}</p>
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * ${state.factor}</code></pre></div>
-      ${stage===2?'<p>For our example we choose four threads per block. Two blocks provide eight threads for five inputs. The final CUDA section shows the launch code that requests those groups. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The grey cards have no input and say “No calculation”. Select one to inspect its index; the next experiment explores the check that makes it skip the arrays.</p>':''}
+      ${stage===2?'<p>In the diagram, four threads per block give eight threads in total for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The grey cards have no input and say “No calculation”. Select one to inspect its index; the next experiment explores the check that makes it skip the arrays.</p>':''}
       ${stage===3?'<p>The check asks whether a thread’s index is smaller than the input count, 5. Indices 0–4 pass; indices 5–7 skip the read, multiplication and write.</p>':''}
       ${stage===4?`<p>PyTorch chooses its own kernel and launch settings for <code>y = x * 2</code>. Our <code>runKernel</code> is a separate CUDA teaching example that lets us choose the settings ourselves; PyTorch does not call it for this expression.</p>
       <details class="more-settings" id="hello-pytorch-control"><summary>More about PyTorch, optimisation and profiling</summary>
@@ -54,10 +54,12 @@ export function renderIntroSections() {
       <button id="hello-run-${stage}" type="button" class="primary" disabled>Run</button>
       <p class="hello-note">Browser simulation</p>
       ${stage===1?readerTask(step.instruction):''}
+      ${stage===2||stage===3?'<div class="hello-bridge-layout"><div class="hello-bridge-visual">':''}
       <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,stage===4?4:0,false)}</div>
       <p id="hello-output-${stage}" class="hello-output" role="status">${introPrompt(stage)}</p>
       <noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.map(tensorValue).join(', ')}].</p></details></noscript>
       ${stage>0?`<p id="hello-index-${stage}" role="status"${stage===4?' hidden':''}>Select a thread to follow its input and output.</p>`:''}
+      ${stage===2||stage===3?`</div>${renderCodeBridge(stage,state.factor)}</div>`:''}
       ${stage===4?renderCudaTrace(state.threads[4],state,false):''}
       ${stage===4?renderLaunchPractice():''}
       ${stage===4?`<div class="hello-complete">
@@ -122,4 +124,28 @@ export function renderLaunchPractice() {
       <p>Two blocks of four and one block of eight both supply eight threads. The output values stay the same: indices 0–4 calculate results and indices 5–7 skip the arrays.</p>
     </div>
   </div>`;
+}
+
+export function renderCodeBridge(stage,factor) {
+  if(stage===2)return `<div class="hello-code-bridge" aria-labelledby="hello-bridge-title-2">
+    <h3 id="hello-bridge-title-2">How CUDA requests these blocks</h3>
+    ${definitions([['Launch','Starting a GPU function with a chosen number of blocks and threads per block.']])}
+    <p>PyTorch chooses its launch for <code>y = x * 2</code>. In this separate CUDA C++ example, we choose the block count and size. <code>runKernel</code> is our name for the GPU function that multiplies each input.</p>
+    ${codePanel({id:'hello-bridge-launch-2',source:launchSource(),label:'CUDA C++ · launch for this diagram',explainedLocally:true})}
+    <p><code>blocks = 2</code> matches the two block boundaries; <code>threadsPerBlock = 4</code> matches the four cards in each. The <code>&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> syntax requests that grouping. The last argument, <code>5</code>, is the input count. <code>d_input</code> and <code>d_output</code> refer to arrays already in GPU memory.</p>
+    <p class="hello-note">The browser simulates the calculation; it does not compile or execute this CUDA code.</p>
+    <details id="hello-bridge-complete-2"><summary>See the complete CUDA function for this diagram</summary>
+      <p>Each thread calculates its array index, skips indices with no input, then multiplies one value. The next section explores that check.</p>
+      ${codePanel({id:'hello-bridge-full-2',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
+      <p>The launch above starts this function. The download also includes memory allocation and copies.</p>
+      <button type="button" id="hello-bridge-download-2">Download this CUDA example</button> <a href="desktop.html#first-cuda">Desktop setup</a>
+    </details>
+  </div>`;
+  if(stage===3)return `<div class="hello-code-bridge" aria-labelledby="hello-bridge-title-3">
+    <h3 id="hello-bridge-title-3">The check in CUDA</h3>
+    <p>Here <code>i</code> is the thread’s array index and <code>n</code> is the input count, 5. The condition protects both the read and the write.</p>
+    ${codePanel({id:'hello-bounds-code-3',source:boundsSource(factor),label:'CUDA C++ · body excerpt from runKernel · check enabled',explainedLocally:true})}
+    <p>The braces enclose the statements controlled by <code>if</code>; the <code>f</code> suffix writes the multiplier as a 32-bit floating-point value. Toggle the check above to compare this excerpt with and without its condition.</p>
+  </div>`;
+  return '';
 }

@@ -7,8 +7,8 @@ export function browserNotice() {
   return '<p class="chapter-browser-note">Run the examples below in your browser with no installation or GPU required. The browser simulates the calculation; it does not execute PyTorch or GPU code. To run the PyTorch snippet itself, use a Python environment with PyTorch and an NVIDIA GPU.</p>';
 }
 
-export function codePanel({id,source,language='cuda',label,labelId=id+'-label',selected=false}) {
-  return `<div class="chapter-code-panel${selected?' is-selected-thread':''}" data-language="${language}"><p class="chapter-code-label" id="${labelId}">${escape(label)}</p><pre id="${id}" aria-labelledby="${labelId}"><code>${escape(source)}</code></pre></div>`;
+export function codePanel({id,source,language='cuda',label,labelId=id+'-label',selected=false,explainedLocally=false}) {
+  return `<div class="chapter-code-panel${selected?' is-selected-thread':''}" data-language="${language}"><p class="chapter-code-label" id="${labelId}">${escape(label)}</p><pre id="${id}" aria-labelledby="${labelId}"${explainedLocally?' data-code-explained-locally':''}><code>${escape(source)}</code></pre></div>`;
 }
 
 // Keep first-use definitions readable without JavaScript or colour cues.

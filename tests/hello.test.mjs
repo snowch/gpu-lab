@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,introPrompt} from '../src/hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,boundsSource,introPrompt} from '../src/hello-model.mjs';
 test('intro diagram and outputs derive from thread indices and selected multiplier',()=>{
  for(let stage=0;stage<steps.length;stage++)for(const factor of [-10,-0.5,0,2,3,10]){
   const r=simulateIntro(stage,factor);
@@ -53,12 +53,27 @@ test('new-case launch plans cover each input and identify only surplus threads',
   }
   for(const count of [0,33,1.5,NaN])assert.throws(()=>launchPlan(count));
 });
-test('concepts precede CUDA and the first CUDA panel contains a complete kernel',()=>{
+test('CUDA bridges stay with their diagrams and provide a local complete function',()=>{
   const html=renderIntroSections();
-  const cuda=html.indexOf('data-language="cuda"');
-  assert.ok(cuda>html.indexOf('id="idea-5"'));
-  assert.ok(html.indexOf('__global__')<html.indexOf('id="hello-launch-4"'));
-  assert.doesNotMatch(html,/hello-relationships|hello-selected-code|hello-line-/);
+  const blocks=html.split('id="idea-3"')[1].split('id="idea-4"')[0];
+  const bounds=html.split('id="idea-4"')[1].split('id="idea-5"')[0];
+  assert.ok(html.indexOf('data-language="cuda"')>html.indexOf('id="idea-3"'));
+  assert.ok(blocks.indexOf('id="hello-map-2"')<blocks.indexOf('id="hello-bridge-launch-2"'));
+  assert.match(blocks,/See the complete CUDA function for this diagram/);
+  assert.match(blocks,/__global__ void runKernel/);
+  assert.match(bounds,/body excerpt from runKernel/);
+  assert.match(bounds,/if \(i &lt; n\)/);
+  assert.doesNotMatch(html,/role="tablist"|The final CUDA section shows/);
+});
+
+test('bounds excerpts match the guarded function and expose only the diagnostic body without a check',()=>{
+  for(const factor of [-0.5,2,3.25]) {
+    const guarded=boundsSource(factor);
+    assert.ok(kernelSource(factor).includes('    '+guarded.replaceAll('\n','\n    ')));
+    assert.match(guarded,/if \(i < n\)/);
+    assert.doesNotMatch(boundsSource(factor,false),/if/);
+    assert.ok(guarded.includes(boundsSource(factor,false)));
+  }
 });
 
 
