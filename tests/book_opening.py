@@ -121,7 +121,10 @@ def check_chapter_styles(browser,url,root):
         page=context.new_page();baseline=None
         for slug in ['hello','devices','reading','layout','requests']:
             page.goto(url+'lessons/'+slug+'.html')
-            expect(page.locator('.chapter-definition').first).to_be_visible()
+            if slug in ['devices','reading']:
+                expect(page.locator('.chapter-definition')).to_have_count(0)
+            else:
+                expect(page.locator('.chapter-definition').first).to_be_visible()
             expect(page.locator('.chapter-task').first).to_be_visible()
             expect(page.locator('.brand-note')).to_have_text('/ interactive book')
             expect(page.locator('.intro .book-note')).to_have_count(0)

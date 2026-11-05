@@ -48,8 +48,8 @@ experiment and visual beside its own explanation in a continuous downward flow.
    Each action has its own setup, prediction prompt, control, diagram and result.
    Compare five/eight-input copy sizes and change the multiplier. Explain allocation
    separately from transfers; retain the original tensors in the diagram.
-3. **How do we select values from a tensor?** (`reading.html`): introduce shape and
-   slicing with a 5×5 tensor. Select rows and columns and multiply five values.
+3. **How do we select values from a tensor?** (`reading.html`): apply familiar shape and
+   slicing notation to a 5×5 tensor. Select rows and columns and multiply five values.
    Keep memory offsets and warp terminology for the following chapters.
 4. **How are tensor values arranged in memory?** (`layout.html`): follow the same
    values into a memory strip, introduce views and strides, then compare a column
