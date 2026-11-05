@@ -349,9 +349,15 @@ no timing or speedup claim.
 ## Chapter 1 reading progression
 
 The five independent experiments now cover the operation, thread indices, launch
-groups, bounds checks, then a complete CUDA function and launch. CUDA panels occur
-only in the final experiment. Earlier selections explain indices in plain language.
-The SM/block/warp diagram belongs to the scheduling lesson. Reference lookups follow
+groups, bounds checks, then a complete CUDA function and launch. Short CUDA launch
+and bounds-check bridges sit beside their diagrams, with the complete function
+available locally from the first launch. Earlier selections explain indices in plain language.
+Beside blocks, a fixed, labelled SM example reuses simulateIntro(2,2) and displays
+all four threads of Block 0. Native radio controls highlight read, multiply or write
+without changing the example’s values or the prediction experiments. This is one
+possible block placement and an instruction illustration, not a scheduler, cache
+simulation, instruction-count model or timeline. Detailed SM/block/warp scheduling
+belongs to chapter 6. Reference lookups follow
 the complete kernel. The final input-count exercise uses launchPlan: four threads
 per block, ceiling division for block count, and explicit surplus thread indices.
 Existing multiplier, guard and selection IDs are retained for restart snapshots;
