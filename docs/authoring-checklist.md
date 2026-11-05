@@ -32,6 +32,10 @@ second set of authoring requirements.
   they need it. Connect the last observable result to the next question. Ground
   execution terms in a specific input, calculation and output before generalising
   about many executions or parallel progress.
+- [ ] Match explanations to the ML audience: assume basic Python, array indexing and
+  floating-point familiarity. Explain unfamiliar PyTorch arguments and GPU mechanisms;
+  use a short contextual note where prerequisite knowledge needs clarification.
+  Keep deeper compiler, optimisation and profiling discussion optional until needed.
 - [ ] Define new terms before using them in prose, diagrams or controls. Use the
   shared `definitions()` callout: bold term, brief meaning, visible Definition label.
   Group related terms, remove duplicate explanations, and leave later mentions plain.
