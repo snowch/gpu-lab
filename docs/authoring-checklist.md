@@ -36,6 +36,10 @@ second set of authoring requirements.
   floating-point familiarity. Explain unfamiliar PyTorch arguments and GPU mechanisms;
   use a short contextual note where prerequisite knowledge needs clarification.
   Keep deeper compiler, optimisation and profiling discussion optional until needed.
+  Put detailed scheduler policy, arithmetic rules and secondary accounting behind
+  labelled native disclosures when the main activity does not require them.
+  Keep experiment inputs, units, scope and prediction rules visible beside controls;
+  use compact local tables for shared assumptions instead of repeating long paragraphs.
 - [ ] Define new terms before using them in prose, diagrams or controls. Use the
   shared `definitions()` callout: bold term, brief meaning, visible Definition label.
   Group related terms, remove duplicate explanations, and leave later mentions plain.

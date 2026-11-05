@@ -72,12 +72,11 @@ export const chapters = [
         terms: [
           ['Resident warp', 'A warp already assigned resources on an SM. Every warp in this experiment is resident from the start.'],
           ['Instruction issue', 'Selecting a ready warp and starting its next instruction. An issue slot is one opportunity to do that; this teaching machine has one per cycle.'],
-          ['Scheduler', 'The mechanism that chooses which ready resident warp issues next. This teaching scheduler searches in round-robin order after the last warp selected.'],
-          ['Issue-slot use', 'Issued instructions divided by elapsed model cycles. This describes how many teaching issue slots were used.'],
+          ['Scheduler', 'The mechanism that chooses which ready resident warp starts its next instruction.'],
         ],
-        body: `<p>All resident warps begin ready at cycle zero. After each issue, the scheduler searches from the next warp, skipping waiting and completed warps. When one waits for its load, another may have an instruction ready. After Run, the warp cards show each warp immediately before the selected cycle’s instruction starts.</p>
-          <p>Keep latency fixed and change only the number of resident warps. Each extra warp adds another six instructions, so the total work changes too. Compare idle slots and issue-slot use; elapsed cycles for these different workloads do not give a speedup.</p>
-          <p>This teaching SM starts with its warps already resident and does not calculate resource limits or competition for memory bandwidth. Its single issue slot and fixed load latency describe this experiment, rather than a particular GPU.</p>`,
+        body: `<p>All resident warps begin ready at cycle zero. When one waits for a load, the scheduler can choose another ready warp. After Run, inspect the cards immediately before the selected cycle’s instruction starts.</p>
+          <p>Keep latency fixed and change only the number of resident warps. Each extra warp adds another six instructions, so the total work changes too. Compare idle cycles and when the SM can start an instruction; elapsed cycles for these different workloads do not give a speedup.</p>
+          <p>The experiment uses one instruction-issue opportunity per cycle and fixed load latency. It starts with resident warps and excludes resource limits and bandwidth competition.</p>`,
         task: 'Predict whether two ready warps can fill every wait at latency 6. Run, inspect an idle cycle if one remains, then change only the warp count to 4. Explain the difference using which warps are ready and how many instructions each adds.',
         experiment: {
           model: 'scheduling', defaults: { warps: 2, latency: 6 }, focus: 'ready',
@@ -101,10 +100,9 @@ export const chapters = [
       {
         id: 'divergence-uniform', title: 'Give every lane inputs with the same sign',
         terms: [
-          ['Path', 'The sequence of operations chosen by one outcome of a condition. Here the positive path doubles an input; the negative path negates it.'],
           ['Lane mask', 'The set of lanes participating in one issued operation. A lane outside that mask does no work for that operation.'],
         ],
-        body: `<p>All 32 lanes begin with the same sign. A non-empty path issues its operations; an empty path is skipped. In this first experiment each path has one operation, so changing from all positive to all negative changes the selected arithmetic without creating mixed participation.</p>
+        body: `<p>All 32 lanes begin with the same sign. The positive path doubles an input; the negative path negates it. A path runs only if a lane needs it. In this first experiment each path has one operation, so changing from all positive to all negative changes the selected arithmetic without creating mixed participation.</p>
           <p>Open “Inspect the PyTorch example for these settings” to see the chosen inputs and expressions. After Run, the lane cards highlight the selected operation’s mask and show each input’s final output.</p>`,
         task: 'Predict how many paths are needed when all inputs are positive. Run and inspect the mask. Change only the signs to all negative, run again, and explain whether two paths are now needed.',
         experiment: {
@@ -117,10 +115,9 @@ export const chapters = [
         id: 'divergence-mixed', title: 'Let a warp contain both signs',
         terms: [
           ['Divergence', 'Different participating lanes of one warp taking different paths through a condition.'],
-          ['Lane slot', 'One lane’s opportunity to take part in an issued operation. This model counts 32 slots for every path operation.'],
         ],
         body: `<p>With both signs present, the model runs each non-empty path using its own mask. It issues positive-path operations first, then negative-path operations. Lanes on the other path wait without contributing to the current operation. The displayed order is a teaching choice, not a CUDA guarantee.</p>
-          <p>Begin with one operation per path. Then change the negative expression from <code>-x</code> to <code>-x * 2 + 1</code>: negate, multiply, add. Even one negative lane causes that non-empty path to appear. Useful lane slots count participating lanes across all issued operations; lane-slot use divides that count by all 32-slot operations.</p>
+          <p>Begin with one operation per path. Then change the negative expression from <code>-x</code> to <code>-x * 2 + 1</code>: negate, multiply, add. Even one negative lane causes that non-empty path to appear.</p>
           <p>These counts cover only the listed arithmetic. A compiler can combine operations or execute them conditionally, so this trace does not establish compiled instruction counts or timings.</p>`,
         task: 'Predict which masks appear for alternating signs, then run. Change only the pattern to one negative lane. Next change only the negative path from one to three operations. Explain why the rare path still appears in the trace.',
         experiment: {
@@ -132,7 +129,7 @@ export const chapters = [
       {
         id: 'divergence-tail', title: 'Separate unused lanes from different paths',
         body: `<p>Return to the five-value scale of earlier chapters. Here only the first five lanes have inputs. The remaining positions are unused throughout the calculation. That differs from a participating lane masked off for one path that later takes part in its own path.</p>
-          <p>Keep all inputs positive and vary the input count first. Lane-slot use can fall even when there is only one path. Then keep five inputs and switch to alternating signs to see both effects together. Empty positions in this warp are not filled with another block’s threads; other resident warps may still make progress, as chapter 6 showed.</p>`,
+          <p>Keep all inputs positive and vary the input count first. Five inputs leave 27 unused lane positions even when there is only one path. Then keep five inputs and switch to alternating signs to see both effects together. Empty positions in this warp are not filled with another block’s threads; other resident warps may still make progress, as chapter 6 showed.</p>`,
         task: 'With five positive inputs, predict whether the low participation means divergence. Run, then change only the signs to alternating. Explain which lane positions are unused throughout and which participate on a different path.',
         experiment: {
           model: 'divergence', defaults: { pattern: 'positive', activeLanes: 5, negativeOps: 1 }, focus: 'tail',
@@ -144,27 +141,25 @@ export const chapters = [
       },
     ],
     transfer: {
-      prompt: 'Compare five all-positive inputs with 32 inputs containing one negative value. Which case has different paths within the warp? Can a low lane-slot use alone tell you the cause?',
-      answer: '<p>The 32-input case has both paths, because lane 0 is negative and the others are positive. Five all-positive inputs use only one path but leave 27 positions unused. A low lane-slot use alone cannot distinguish incomplete input participation from mixed paths; inspect the actual masks.</p>',
+      prompt: 'Compare five all-positive inputs with 32 inputs containing one negative value. Which case has different paths within the warp? Can low participation alone tell you the cause?',
+      answer: '<p>The 32-input case has both paths, because lane 0 is negative and the others are positive. Five all-positive inputs use only one path but leave 27 positions unused. Low participation alone cannot distinguish incomplete inputs from mixed paths; inspect the masks. Optional lane-slot accounting quantifies both effects.</p>',
     },
   },
   {
     slug: 'reduction', number: 8, title: 'How do threads add values together?',
     lead: 'Add four input values, then check which writes must finish before another thread reads them.',
     source: sumSource(),
-    openingHTML: `<p>A sum combines many inputs into one result. PyTorch chooses the implementation for the sum and arranges the necessary storage and launches.</p>
+    openingHTML: `<p>This reduction combines many inputs into one sum. PyTorch selects its implementation and launches.</p>
       <p>We use four values, then eight: add pairs, then add those results until one sum remains. Earlier five-value examples made an incomplete group visible; a power of two keeps this first cooperation example free of extra boundary rules. The browser’s one-block tree is a chosen algorithm, not a trace of <code>torch.sum</code>.</p>`,
     sections: [
       {
         id: 'reduction-tree', title: 'Combine four inputs into one sum',
         leadIn: 'Multiplication gave each thread an independent output. A sum is different: values handled by different threads must meet. We need somewhere to exchange partial results and a way to wait until those results are ready.',
         terms: [
-          ['Reduction', 'Combining many values into fewer values using an operation such as addition; here all inputs become one sum.'],
           ['Shared memory', 'Storage that threads in the same block can read and write. Each FP32 storage position is called a word. In this model thread i first writes input i into shared word i.'],
-          ['Partial sum', 'A sum containing only some of the original inputs. The diagram lists those input indices beside each partial sum.'],
           ['Block barrier', 'A point that all threads in the block must reach before any continues. It also makes preceding shared-memory writes visible to participating threads after the barrier.'],
         ],
-        body: `<p>Each thread first writes one input into shared memory. The initial barrier ensures all those writes precede the first partner reads. At partner distance 2, threads 0 and 1 add values from words 2 and 3. After another barrier, thread 0 adds the two partial sums at distance 1.</p>
+        body: `<p>Each thread first writes one input into shared memory. The initial barrier orders those writes before partner reads. A partial sum contains some of the inputs; the diagram lists their indices. At partner distance 2, threads 0 and 1 add values from words 2 and 3. After another barrier, thread 0 adds the two partial sums at distance 1.</p>
           <p>Step through the writes before the arithmetic. “Unwritten” means a thread has not yet stored its input there. Each model arithmetic stage reads a snapshot of the preceding stage, representing the ordering between stages. Only some threads add, but every thread reaches each block barrier.</p>`,
         task: 'Predict which two input indices contribute to thread 0’s first partial sum. Run and step through the writes, initial barrier and first addition. Explain why the first two array neighbours are not the first pair combined.',
         experiment: { model: 'reduction', defaults: { size: 4, synchronised: true }, controls: [], focus: 'tree', code: sumSource },
@@ -216,11 +211,11 @@ function renderScheduling(result, cursor, focus) {
     return card(`Warp ${id} · ${action}`, next, event.selected === id);
   }).join('');
   const counts = [['Model cycles', result.cycles], [introductory ? 'Instructions started' : 'Issued instructions', result.issued], ['Idle cycles', result.idle]];
-  if (!introductory) counts.push(['Issue-slot use', percent(result.issueUtilisation)]);
   return `<div class="continuation-visual" aria-label="Computed warp readiness and instruction trace">
     ${metrics(counts)}
     <p><strong>${escape(current)}</strong></p><p class="muted">Warp states immediately before this cycle’s instruction starts. LD = load; MUL = multiply; ST = store.</p>
     <div class="continuation-cards">${cards}</div>
+    ${introductory?'':`<p>Each model cycle provides one issue slot. Issue-slot use is issued instructions divided by model cycles.</p>${metrics([['Issue-slot use',percent(result.issueUtilisation)]])}<details><summary>Inspect the teaching scheduler’s rules</summary><p>After each issue, search round-robin from the next warp, skipping waiting and completed warps. The trace stops when the last store starts; store-completion latency is outside this model.</p></details>`}
     <details><summary>Inspect the complete model trace</summary>${table(['Cycle', 'Selected warp', 'Instruction', 'Waiting warps'], result.trace.map(t => [t.cycle, t.selected === null ? 'None' : t.selected, t.instruction, t.before.flatMap((w, i) => w.status === 'waiting' ? [i] : []).join(', ') || 'None']), 'Complete model run; cycle numbers start at zero.')}</details>
     <p>${escape(introductory ? `${result.issued} instructions start in ${result.cycles} model cycles; ${result.idle} cycles are idle. Step through a load and its following multiply to locate the wait.` : `${result.issued} instructions issued in ${result.cycles} model cycles; ${result.idle} slots were idle. Every resident warp adds six instructions. This is issue-slot use for the selected work, not occupancy or a measured GPU speedup.`)}</p>
   </div>`;
@@ -234,12 +229,13 @@ function renderDivergence(result, cursor, focus) {
     return `<div class="continuation-card${!lane.active ? ' unused' : event.mask.includes(lane.id) ? ' selected' : ''}"><strong>Lane ${lane.id}</strong><p>${lane.active ? `${tensorValue(lane.input)} → ${tensorValue(lane.output)}` : '—'}<br>${state}</p></div>`;
   }).join('');
   return `<div class="continuation-visual" aria-label="Computed branch masks and lane outputs">
-    ${metrics(introductory ? [['Paths used', result.paths], ['Path operations', result.instructions]] : [['Paths used', result.paths], ['Path operations', result.instructions], ['Useful lane slots', result.usefulSlots], ['Lane-slot use', percent(result.utilisation)]])}
+    ${metrics([['Paths used', result.paths], ['Path operations', result.instructions]])}
     <p><strong>${escape(event.label)}: ${event.mask.length} lanes participate.</strong></p>
     <details><summary>Inspect the lane indices for each path</summary>${table(['Operation', 'Participating lane indices'], result.trace.map(t => [t.label, t.mask.join(', ')]), 'Actual masks in the chosen positive-first teaching order.')}</details>
     <p class="muted">Each card shows input → final output. “Now” participates in the selected operation; “Other path” is masked off now; “Unused” has no input throughout.</p>
     <div class="lane-grid">${lanes}</div>
-    <p>${escape(introductory ? 'All participating lanes follow the same path. The other path has no participating lanes, so the model skips it.' : `${result.usefulSlots} useful lane slots out of ${result.instructions * 32} possible slots. Empty paths are skipped. Both different paths and unused tail positions can reduce this ratio; these are explicit path operations, not compiled instructions or timings.`)}</p>
+    <p>${introductory?'All participating lanes follow the same path; the model skips the other path.':'Inspect which lanes participate now, which take the other path, and which have no input. The listed path operations are teaching steps, rather than compiled instructions or timings.'}</p>
+    ${introductory?'':`<details><summary>Optional: count lane participation</summary><p>A lane slot is one lane’s opportunity to participate in an operation. This model counts 32 slots per path operation. Useful slots count the participating lanes; lane-slot use is useful slots divided by all slots.</p>${metrics([['Useful lane slots',result.usefulSlots],['Lane-slot use',percent(result.utilisation)]])}<p>${result.usefulSlots} useful slots out of ${result.instructions*32}. Both mixed paths and unused positions can reduce this ratio. The masks show which cause applies.</p></details>`}
   </div>`;
 }
 

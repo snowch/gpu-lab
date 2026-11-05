@@ -24,35 +24,26 @@ export function codeExplanations(source) {
     add('torch.testing.assert_close(y, x + x)', 'Checks the captured multiplication against addition of the same inputs, outside the recorded interval.');
   } else if(python){
     if(source.includes('x_cpu =')) {
-      add('x_cpu = torch.tensor(', 'Creates the input tensor in CPU memory. The list supplies its values; x_cpu is the name we use to refer to it.');
+      add('x_cpu = torch.tensor(', 'Creates the input tensor in CPU memory.');
       add('dtype=torch.float32', 'Stores each number as FP32, a 32-bit floating-point value taking four bytes.');
       add('x_gpu = x_cpu.to("cuda")', 'Copies the CPU tensor to NVIDIA GPU memory. x_cpu still refers to the original CPU tensor.');
       match(/y_gpu = x_gpu \* [^\n]+/, 'Multiplies each GPU input by this amount. The new result tensor y_gpu stays in GPU memory.');
       add('y_cpu = y_gpu.cpu()', 'Requests a CPU copy of the result, waiting for the work needed to produce it. The GPU result remains available too.');
     } else if(source.includes('scaled_dot_product_attention')) {
-      add('import torch.nn.functional as F', 'Makes PyTorch’s functional operations available under the shorter name F.');
-      add('k_cache = torch.arange(', 'Creates the cached key values. reshape(3, 4) arranges them as three token rows with four components each; division by 10 scales the keys.');
-      add('v_cache = torch.arange(', 'Creates the cached values for the same three tokens, also with four components per row.');
-      add('q_new = torch.tensor(', 'Supplies the new token’s query: four components used to compare it with the cached keys.');
-      add('k_new = torch.tensor(', 'Supplies the new token’s key, to be added to the key cache.');
-      add('v_new = torch.tensor(', 'Supplies the new token’s value, to be added to the value cache.');
-      add('k_cache = torch.cat((k_cache, k_new), dim=-2)', 'Appends the new key as another token row. dim=-2 selects the row dimension in this two-dimensional example.');
-      add('v_cache = torch.cat((v_cache, v_new), dim=-2)', 'Appends the corresponding value row, keeping the key and value caches aligned.');
+      add('k_cache = torch.arange(', 'Creates three cached key rows with four components each. v_cache supplies the corresponding value rows.');
+      add('q_new = torch.tensor(', 'Supplies the new query. k_new and v_new supply its key and value; each row has four components.');
+      add('k_cache = torch.cat((k_cache, k_new), dim=-2)', 'Appends the new key along the token-row dimension. The matching v_cache call appends its value; torch.cat makes new tensors and copies the entries.');
       add('out = F.scaled_dot_product_attention(', 'Combines the cached values according to their keys’ matches with q_new. PyTorch selects the attention implementation.');
       add('dropout_p=0.0, is_causal=False', 'Disables dropout and an additional causal mask. This single query may attend to every supplied cache row, including its new row.');
     } else if(source.includes('weights = torch.softmax')) {
-      match(/n, d = [^\n]+/, 'Sets the number of token rows n and the number of components d in each row.');
       const scale=source.match(/\) \* (1000|1)\n/);
-      add('q = torch.tensor(', `Creates the query rows: what each token looks for. The nested lists build one row at a time${scale?`, then multiplication by ${scale[1]} scales all query components`:''}.`);
+      add('q = torch.tensor(', `Creates deterministic query inputs. k and v supply matching key and value rows${scale?`, then multiplication by ${scale[1]} scales all query components`:''}.`);
       if(scale)entries.at(-1).lines.push(source.slice(0,source.indexOf(scale[0])).split('\n').length-1);
-      add('k = torch.tensor(', 'Creates the key rows used for comparison with each query.');
-      add('v = torch.tensor(', 'Creates the value rows that attention will combine.');
       add('scores = q @ k.T / d**0.5', 'Transposes the keys with .T, multiplies queries by keys with @, then divides by the square root of their width. Each score compares one query with one key.');
       add('weights = torch.softmax(scores, dim=-1)', 'Turns each score row into non-negative weights summing to one. dim=-1 selects the last dimension: the keys within that row.');
       add('out = weights @ v', 'Forms a weighted sum of the value rows for each query.');
       add('print(out[0])', 'Prints the four-component result for query row 0.');
     } else if(source.includes('row = torch.tensor(')) {
-      match(/\[[^\n]*for k in range\(16\)\]/, m=>m[0].includes(' if ')?'Builds sixteen input values in one row. The condition chooses a value for each position k.':'Repeats this value sixteen times to build the input row.');
       add('dtype=torch.float32', 'Initially stores the row in FP32, before any conversion to a smaller input format.');
       match(/a = row\.repeat\(16, 1\)\.to\(torch\.\w+\)/, 'Repeats the row sixteen times to form matrix a, then converts its inputs to the selected number format. Conversion can round or discard small values.');
       add('b = torch.ones(', 'Creates a matrix filled with ones, so each output dot product adds the entries of one input row.');
@@ -61,21 +52,18 @@ export function codeExplanations(source) {
       match(/converted = row\.to\(torch\.\w+\)\.float\(\)/, 'Converts inputs to the selected format, then back to FP32 for the explicit arithmetic below. Any information lost in the first conversion stays lost.');
       add('total = torch.zeros((), dtype=torch.float32)', 'Creates an FP32 scalar running sum, initially zero. The empty shape () means a single scalar.');
       add('reference = torch.zeros((), dtype=torch.float32)', 'Creates a separate FP32 sum for comparison using the original inputs.');
-      add('for k in range(16):', 'Visits positions 0 through 15 in a declared order, unlike a matrix library’s implementation-dependent addition order.');
+      add('for k in range(16):', 'Fixes the accumulation order, unlike a matrix library’s implementation-dependent order.');
       add('total = total + converted[k] * 1.0', 'Accumulates products from the converted inputs. This explicit example runs on the CPU.');
       add('reference = reference + row[k] * 1.0', 'Accumulates the original FP32 inputs in the same order, isolating the effect of input conversion.');
     } else if(source.includes('c = a @ b')) {
       match(/n = \d+/, 'Sets the number of rows and columns in each square matrix.');
-      add('a = torch.tensor(', 'Creates matrix a from the following nested Python lists: one inner list for each row.');
-      add('(r + k) % 5 - 2', 'Generates a small integer value for row r, column k. % is the remainder after division, giving a repeating pattern.');
-      add('b = torch.tensor(', 'Creates matrix b. Here k selects its row and c its column.');
-      add('(k + c) % 3 - 1', 'Generates b’s repeating input pattern using remainder modulo 3.');
+      add('a = torch.tensor(', 'Creates the FP32 input matrix a. Its repeating values make the products easy to check.');
+      add('b = torch.tensor(', 'Creates input matrix b using the other repeating pattern.');
       add('dtype=torch.float32, device="cuda"', 'Stores the matrices as FP32 tensors on an NVIDIA GPU.');
       add('c = a @ b', 'Multiplies the matrices: each output combines one row of a with one column of b. PyTorch chooses the kernel and launch settings.');
-      add('print(c.cpu())', 'Copies the result to CPU memory and prints it. Lowercase c here names the result tensor; the c inside the list above was a column index.');
+      add('print(c.cpu())', 'Copies the result to CPU memory for printing.');
     } else if(source.includes('torch.where')) {
-      match(/values = [^\n]+/, 'Builds the chosen sign pattern. Multiplying a Python list repeats it; adding lists joins them.');
-      match(/values\[:\d+\]/, 'Keeps the first chosen number of inputs. The slice endpoint is excluded.');
+      match(/values = [^\n]+/, 'Sets the input sign pattern for the lane comparison.');
       add('device="cuda"', 'Places the input tensor in NVIDIA GPU memory.');
       match(/y = torch\.where\([^\n]+/, 'Selects the positive expression where x > 0 and the other expression elsewhere. Python evaluates both supplied expressions; this does not establish that a GPU branch is used.');
       add('print(y.cpu())', 'Copies the selected results to CPU memory and prints them.');
@@ -101,7 +89,7 @@ export function codeExplanations(source) {
     } else if(source.includes('torch.tensor(')) {
       add('x = torch.tensor(', 'Creates a tensor containing the input values in the list.');
       add('device="cuda"', 'Asks PyTorch to store that tensor on an NVIDIA GPU.');
-      match(/y = x \* [^\n]+/, 'Multiplies every value in x by this amount and stores the results in a new tensor, y. The numbers in x stay the same.');
+      match(/y = x \* [^\n]+/, 'Multiplies every value in x by this amount and stores the results in a new tensor, y. The values in x stay the same.');
       match(/z = y \* [^\n]+/, 'Applies a second multiplication to y, producing a new GPU tensor z.');
       add('print(z.cpu())', 'Waits for the needed GPU work, copies z to CPU memory and prints it.');
     }
