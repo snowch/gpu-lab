@@ -160,6 +160,8 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 layout.locator('#reading-index-packed').select_option('2');layout.locator('#reading-run-packed').click()
                 requests=context.new_page();requests.goto(url+'lessons/requests.html')
                 requests.locator('#reading-pattern-sectors').select_option('column');requests.locator('#reading-run-sectors').click()
+                sm=context.new_page();sm.goto(url+'lessons/inside-sm.html')
+                for _ in range(4):sm.locator('#sm-next').click()
                 concept_map=context.new_page();concept_map.goto(url+'lessons/meet-gpu.html?chapter=matmul')
                 for disclosure in ['gpu','sm-0','block-a','a-warp-1','a-w1-lane-7']:
                     concept_map.locator('#'+disclosure+' > summary').click()
@@ -235,6 +237,8 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(second).to_have_url(url+'lessons/memory.html?keep=1#simulator')
                 expect(second.locator('#stride')).to_have_value('8');expect(second.locator('#sector-count')).to_have_text('32')
                 expect(second.locator('#lanes button').nth(5)).to_have_attribute('aria-pressed','true')
+                expect(sm.locator('#sm-position')).to_have_text('Event 4 of 8')
+                expect(sm.locator('[data-sm-unit=arithmetic]')).to_contain_text('1.0 × 2 → 2.0')
                 expect(kernel.locator('#kernel-event')).to_have_text(trace)
                 expect(lesson.locator('#scheduling-wait [data-visual-output]')).to_have_text(lesson_trace,use_inner_text=True)
                 expect(lesson.locator('#scheduling-ready [data-visual-output]')).to_have_text(ready_trace,use_inner_text=True)

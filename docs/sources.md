@@ -188,3 +188,12 @@ output. Commands were checked against these guides, not executed on GPU hardware
 it requires a physical NVIDIA GPU. Its syntax and the standard-library trace
 reader's synthetic schema fixtures are checked in CI. These checks do not validate
 CUPTI capture, Nsight execution, a PyTorch launch configuration or GPU performance.
+
+## Inside an SM appendix
+
+The hardware overview uses the CUDA Programming Guide’s hardware multithreading
+section linked above: per-thread working registers, shared execution units and
+ready warp instruction selection. FP32 arithmetic units and load/store units are
+separate roles in the diagram. No unit counts, ISA lowering or latency values are
+claimed. The functional worked sequence is generated locally from 64 FP32 inputs;
+its chosen event order is not a captured PyTorch or CUDA compiler trace.

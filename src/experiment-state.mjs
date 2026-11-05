@@ -11,7 +11,7 @@ function formState() { return controls().map(el => ({ id: el.id, name: el.name, 
 function restoreForm(values) {
   for (const [index, value] of values.entries()) {
     // Completion is shared durable state, not a per-tab experiment snapshot.
-    if (value.id === 'lesson-complete') continue;
+    if (value.id === 'lesson-complete' || /^hello-sm-(read|multiply|write)$/.test(value.id)) continue;
     const el = value.id ? document.getElementById(value.id) : controls()[index];
     if (!el) throw new Error('An experiment control changed');
     el.value = value.value;
@@ -24,7 +24,7 @@ function releaseLock() {
 }
 function snapshot() {
   const key = snapshotKey();
-  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4','hello-launch'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
+  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4','hello-launch'] : document.getElementById('sm-explorer') ? ['sm-hardware'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
   if (required.some(name => !hooks.has(name))) throw new Error('An experiment has not finished loading. Wait or reload that window before restarting.');
   if (composing || document.readyState !== 'complete' || document.querySelector('main [aria-busy="true"],main [contenteditable="true"]')) throw new Error('Finish the current input or operation in each GPU Lab window, then try again.');
   const guard = { reason: '' }; dispatchEvent(new CustomEvent('gpu-lab:before-restart', { detail: guard }));
@@ -32,11 +32,14 @@ function snapshot() {
   const data = { schema: 1, controls: formState(), experiments: Object.fromEntries([...hooks].map(([name, hook]) => [name, hook.save()])),
     details: [...document.querySelectorAll('main details')].map(el => el.open),
     messages: Object.fromEntries([...document.querySelectorAll('main [id]')].filter(el => /(?:feedback|kernel-status|prediction-feedback|challenge-feedback)$/.test(el.id)).map(el => [el.id, el.textContent])),
-    scroll: [scrollX, scrollY] };
+    focus: document.activeElement?.closest('main') ? document.activeElement.id : null, scroll: [scrollX, scrollY] };
   const encoded = JSON.stringify(data);
   sessionStorage.setItem(key, encoded);
   if (sessionStorage.getItem(key) !== encoded) throw new Error('This window could not save its experiment. Allow browser storage and retry.');
 }
+export const saveReadingState=snapshot;
+// Back/forward cache already preserves the live document and its scroll position.
+addEventListener('pageshow',event=>{if(event.persisted){try{sessionStorage.removeItem(snapshotKey());}catch{/* The live document already retains its state. */}}});
 addEventListener('compositionstart', () => { composing = true; });
 addEventListener('compositionend', () => { composing = false; });
 navigator.serviceWorker?.addEventListener('message', ({ data, ports }) => {
@@ -60,6 +63,9 @@ function restore() {
     const data = JSON.parse(stored);
     if (data.schema !== 1) throw new Error('Unknown snapshot');
     restoreForm(data.controls);
+    // The retired Chapter 1 SM disclosure followed its complete-function reference.
+    // Preserve the other disclosure positions when opening a snapshot from that version.
+    if (data.controls.some(control=>control.id==='hello-sm-read') && location.pathname.endsWith('/hello.html')) data.details.splice(1,1);
     for (const [name, state] of Object.entries(data.experiments)) {
       if (!hooks.has(name)) throw new Error('An experiment changed');
       hooks.get(name).restore(state);
@@ -77,7 +83,10 @@ function restore() {
       if (/^hello-output-\d+$/.test(id)) continue;
       const el = document.getElementById(id); if (el) el.textContent = text;
     }
-    requestAnimationFrame(() => scrollTo({ left: data.scroll[0], top: data.scroll[1], behavior: 'instant' }));
+    requestAnimationFrame(() => {
+      if(data.focus)document.getElementById(data.focus)?.focus({preventScroll:true});
+      scrollTo({ left: data.scroll[0], top: data.scroll[1], behavior: 'instant' });
+    });
     sessionStorage.removeItem(key);
   } catch {
     if (stored) {

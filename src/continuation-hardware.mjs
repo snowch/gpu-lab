@@ -1,6 +1,7 @@
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import { escape, fmt, metrics, table } from './continuation-ui.mjs';
+import {renderSmHardware} from './sm-hardware-view.mjs';
 import { renderSchedulingRelationships } from './scheduling-relationships.mjs';
 
 const scaleSource = `import torch
@@ -55,10 +56,13 @@ export const chapters = [
         id: 'scheduling-wait', title: 'Wait for an input value to load',
         terms: [
           ['Streaming multiprocessor (SM)', 'A GPU unit on which a block’s threads run, grouped into warps. This model begins with warps assigned to one SM.'],
+          ['Scheduler', 'The hardware that chooses a ready warp instruction to start on the appropriate execution units.'],
+          ['Registers', 'Working values held separately for individual threads on the SM.'],
+          ['Execution units', 'Shared hardware that performs instructions: arithmetic units do calculations; load/store units issue memory reads and writes.'],
           ['Cycle', 'One discrete step of this teaching machine, not a measured duration on a GPU.'],
           ['Load latency', 'The number of model cycles from starting a load until its value is ready for the dependent multiply.'],
         ],
-        body: `<p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
+        body: `<div id="sm-hardware-basics"><p>A multiply needs its input values in registers before it can start. The diagram separates those per-thread working values from the execution hardware shared by the warps.</p>${renderSmHardware()}<p><a id="scheduling-sm-explore" data-reading-link href="inside-sm.html?from=scheduling">Optional: follow values through the hardware inside an SM</a>.</p></div><p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
           <p>The chosen sequence is <code>LD, MUL, ST, LD, MUL, ST</code>. The teaching machine starts at most one instruction each cycle; an idle cycle starts none. A latency of 6 means a load started at cycle 0 becomes usable at cycle 6. Watch what can happen between those two events. The model ends when the last store starts; it does not model a later wait for the store to complete.</p>`,
         task: 'With one warp, predict where idle cycles appear. Run and step past the first load. Change only load latency to 1, run again, and explain what happened to the waits.',
         experiment: {
@@ -72,7 +76,6 @@ export const chapters = [
         terms: [
           ['Resident warp', 'A warp already assigned resources on an SM. Every warp in this experiment is resident from the start.'],
           ['Instruction issue', 'Selecting a ready warp and starting its next instruction. An issue slot is one opportunity to do that; this teaching machine has one per cycle.'],
-          ['Scheduler', 'The mechanism that chooses which ready resident warp starts its next instruction.'],
         ],
         body: `<p>All resident warps begin ready at cycle zero. When one waits for a load, the scheduler can choose another ready warp. After Run, inspect the cards immediately before the selected cycle’s instruction starts.</p>
           <p>Keep latency fixed and change only the number of resident warps. Each extra warp adds another six instructions, so the total work changes too. Compare idle cycles and when the SM can start an instruction; elapsed cycles for these different workloads do not give a speedup.</p>

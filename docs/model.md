@@ -352,12 +352,14 @@ The five independent experiments now cover the operation, thread indices, launch
 groups, bounds checks, then a complete CUDA function and launch. Short CUDA launch
 and bounds-check bridges sit beside their diagrams, with the complete function
 available locally from the first launch. Earlier selections explain indices in plain language.
-Beside blocks, a fixed, labelled SM example reuses simulateIntro(2,2) and displays
-all four threads of Block 0. Native radio controls highlight read, multiply or write
-without changing the example’s values or the prediction experiments. This is one
-possible block placement and an instruction illustration, not a scheduler, cache
-simulation, instruction-count model or timeline. Detailed SM/block/warp scheduling
-belongs to chapter 6. Reference lookups follow
+Beside blocks, a short explanation distinguishes thread executions from shared
+SM hardware. The optional inside-sm appendix uses sm-hardware-model.mjs: one block,
+two complete 32-thread warps, input values 1.0–64.0 and FP32 multiplication by 2.
+An explicit functional event order requests loads, makes values available, multiplies
+and writes results. Separate per-thread registers survive reuse of shared arithmetic
+hardware. Events have no durations, cache model, compiled-instruction counts,
+throughput or capacity assumptions. Chapter 6 keeps a static hardware overview before
+its separate existing scheduler model. Reference lookups follow
 the complete kernel. The final input-count exercise uses launchPlan: four threads
 per block, ceiling division for block count, and explicit surplus thread indices.
 Existing multiplier, guard and selection IDs are retained for restart snapshots;
