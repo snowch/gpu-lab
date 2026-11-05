@@ -29,8 +29,10 @@ def hello_flow(page, url):
     expect(page.locator('#hello-bounds-code-3')).to_contain_text('if (i < n)')
     expect(page.locator('[role=tablist]')).to_have_count(0)
     for stage in [2,3]:
-        visual=page.locator(f'#idea-{stage+1} .hello-bridge-visual').bounding_box()
-        code=page.locator(f'#idea-{stage+1} .hello-code-bridge').bounding_box()
+        # Sample both rectangles together: a click can leave scrolling in flight,
+        # which changes viewport coordinates between separate browser calls.
+        visual,code=page.locator(f'#idea-{stage+1} .hello-bridge-layout').evaluate(
+            'el=>[el.querySelector(".hello-bridge-visual"),el.querySelector(".hello-code-bridge")].map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}})')
         if page.viewport_size['width']>=1440:
             assert code['x']>visual['x']+visual['width']-1
             assert abs(code['y']-visual['y'])<2
