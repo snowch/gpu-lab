@@ -138,7 +138,7 @@ def check_sm_hardware(browser,url,root,errors):
     expect(page.locator('#sm-next')).to_be_disabled()
     expect(page.locator('#sm-diagram')).to_contain_text('Registers')
     expect(page.locator('#vsm-next')).to_be_disabled()
-    expect(page.locator('#sm-values noscript')).to_contain_text('Thread 0 loads 1.0')
+    expect(page.locator('#sm-values noscript p')).to_contain_text('Thread 0 loads 1.0')
     page.locator('#sm-explorer noscript details summary').click()
     expect(page.locator('#sm-explorer noscript details')).to_contain_text('Reuse the arithmetic units for Warp B')
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
