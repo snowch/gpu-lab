@@ -1,13 +1,19 @@
 // Copyright © 2026 Christopher Snow.
+import {renderSmValues} from '../src/sm-values-view.mjs';
 import {definitions,readerTask} from '../src/chapter-view.mjs';
 import {smFrame,smEvents} from '../src/sm-hardware-model.mjs';
 import {renderSmHardware,renderSmEvent} from '../src/sm-hardware-view.mjs';
 export function renderInsideSm(){
-  return `<p class="sm-return"><a id="sm-return" data-reading-return data-reading-link href="hello.html#hello-sm-title">Return to Chapter 1</a> · <a href="scheduling.html#scheduling-wait">Chapter 6: scheduling</a></p>
-  <section class="book-section"><h2>Threads share execution hardware</h2>
-  <p>A thread is an execution of a program, with its own working values. A streaming multiprocessor (SM) supplies the hardware that executes those instructions. A thread does not have a permanently assigned arithmetic unit.</p>
-  <p>This optional appendix follows a doubling operation through the hardware. No installation or GPU is required. Chapter 1’s small launch remains a teaching example; this view does not reveal PyTorch’s chosen kernel or launch.</p>
-  ${definitions([['Warp','A group of 32 threads within a block on NVIDIA GPUs. An SM selects ready instructions from warps.'],['Registers','Fast working storage on the SM, allocated separately for individual threads.'],['Arithmetic execution units','Hardware that performs arithmetic on register values. An SM has multiple execution units; different instructions use different hardware.'],['Load/store units','SM hardware that issues memory reads and writes for the threads.'],['Scheduler','The hardware that selects a ready warp instruction to start. An instruction is ready when the values it needs are available.']])}
+  return `<p class="sm-return"><a id="sm-return" data-reading-return data-reading-link href="hello.html#hello-sm-title">Return to Chapter 1</a> · <a href="#sm-warps">Later: warps and readiness</a></p>
+  <section class="book-section" id="sm-values"><h2>Follow a value inside an SM</h2>
+  <p>A <strong>streaming multiprocessor (SM)</strong> supplies the hardware that runs GPU instructions. Follow <strong>1.0 → 2.0</strong>, then inspect <strong>2.0 → 4.0</strong> using the same arithmetic hardware. A thread does not have a permanently assigned arithmetic unit.</p>
+  <p>You’re inspecting one thread’s values. The GPU can apply an instruction to several threads together; how it groups and schedules them comes later. This is a worked illustration, not a trace of PyTorch’s chosen kernel. No installation or GPU is required.</p>
+  ${renderSmValues()}
+  </section>
+  <section class="book-section" id="sm-warps"><h2>Later: how warps share the hardware</h2>
+  <p>The value path above is enough for Chapter 1. <a id="sm-value-return" data-reading-return data-reading-link href="hello.html#hello-sm-title">Return to Chapter 1</a>, or continue here after <a href="requests.html">Chapter 5 introduces warps</a>.</p>
+  <p>The next walkthrough adds instruction readiness: one group can use arithmetic hardware while another waits for input.</p>
+  ${definitions([['Warp','A group of 32 threads within a block on NVIDIA GPUs. An SM selects ready instructions from warps.'],['Scheduler','The hardware that selects a ready warp instruction to start. An instruction is ready when the values it needs are available.']])}
   </section>
   <section class="book-section" id="sm-explorer"><h2>Follow two warps through the same hardware</h2>
   <p><strong>Worked example:</strong> one block of 64 threads doubles 64 FP32 input values, 1.0–64.0. Warp A contains threads 0–31; Warp B contains threads 32–63. Each thread handles one input. The diagram shows the first two values from each warp; both warps contain 32 threads.</p>

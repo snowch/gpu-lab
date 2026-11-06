@@ -66,6 +66,9 @@ function restore() {
     // The retired Chapter 1 SM disclosure followed its complete-function reference.
     // Preserve the other disclosure positions when opening a snapshot from that version.
     if (data.controls.some(control=>control.id==='hello-sm-read') && location.pathname.endsWith('/hello.html')) data.details.splice(1,1);
+    // The original SM appendix began with the warp walkthrough. Its existing
+    // answer disclosures move down one position after the new beginner answer.
+    if(data.experiments['sm-hardware']&&!Object.hasOwn(data.experiments['sm-hardware'],'values'))data.details.unshift(false);
     for (const [name, state] of Object.entries(data.experiments)) {
       if (!hooks.has(name)) throw new Error('An experiment changed');
       hooks.get(name).restore(state);

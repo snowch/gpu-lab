@@ -86,7 +86,7 @@ export function renderSmExplanation() {
     <h3 id="hello-sm-title">Where do these threads run?</h3>
     ${definitions([['Streaming multiprocessor (SM)','A part of the GPU containing hardware that executes instructions for threads.']])}
     <p>The GPU assigns each block to one SM, where it stays for its lifetime. Several blocks can share an SM when resources allow. Threads share the SM’s arithmetic hardware; each thread does not own a separate arithmetic unit. A block’s threads do not necessarily all execute at once.</p>
-    <p><a id="hello-sm-explore" data-reading-link href="inside-sm.html?from=hello">Optional: explore the hardware inside an SM</a>. Follow register values through loads, multiplication and stores. Chapter 6 introduces the hardware relationships needed for scheduling.</p>
+    <p><a id="hello-sm-explore" data-reading-link href="inside-sm.html?from=hello">Optional: follow one value inside an SM</a>. Inspect how registers, memory instructions and shared arithmetic hardware turn 1.0 into 2.0.</p>
   </section>`;
 }
 export function renderIntroTransfer() {

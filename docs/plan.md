@@ -208,3 +208,13 @@ through registers, load/store and arithmetic execution units, with a scheduler
 selecting ready warp instructions. It teaches resource sharing rather than recolouring
 an existing input/output diagram. Readers can return to their saved experiment and
 scroll position. It is optional early detail, not a prerequisite detour from chapter 1.
+
+## Beginner SM value inspection
+
+The Inside an SM appendix now starts with two inspectable thread values from
+chapter 1. Load, multiply and store reveal registers and output memory separately.
+Both threads use the same depicted arithmetic hardware. Selection is an inspection
+choice, not a simulated execution order. No unit counts, latency, throughput or
+compiled instruction trace are implied. The existing two-warp readiness walkthrough
+follows a clearly labelled later-reading boundary after chapter 5. Both views retain
+their state when returning from the appendix or activating an offline update.

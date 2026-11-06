@@ -393,3 +393,13 @@ input loads and 16 output stores. Their resident-block capacities are 8, 4 and 1
 The output is identical. These are per-SM resource bounds, not simulated schedules.
 The transfer exercise uses N=8/T=2: 512 loads, 64 stores and capacity 4.
 Complete Python downloads reuse matrixCode and CI checks C against the engine.
+
+## Beginner SM value inspection
+
+The Inside an SM appendix now starts with two inspectable thread values from
+chapter 1. Load, multiply and store reveal registers and output memory separately.
+Both threads use the same depicted arithmetic hardware. Selection is an inspection
+choice, not a simulated execution order. No unit counts, latency, throughput or
+compiled instruction trace are implied. The existing two-warp readiness walkthrough
+follows a clearly labelled later-reading boundary after chapter 5. Both views retain
+their state when returning from the appendix or activating an offline update.
