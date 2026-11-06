@@ -118,7 +118,8 @@ def check_sm_hardware(browser,url,root,errors):
     page.goto(url+'lessons/inside-sm.html')
     page.locator('#sm-next').click()
     page.evaluate("""async()=>{
-      const {saveReadingState}=await import('../src/experiment-state.mjs');
+      const script=document.querySelector('script[src$="/src/sm-hardware.mjs"]');
+      const {saveReadingState}=await import(new URL('./experiment-state.mjs',script.src).href);
       saveReadingState();
       const key='gpu-lab:restart:'+location.pathname+location.search;
       const saved=JSON.parse(sessionStorage.getItem(key));
