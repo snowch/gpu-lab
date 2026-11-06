@@ -9,6 +9,7 @@ from reference_practice import check_reference_practice
 from desktop import check_desktop
 from code_explanations import check_code_explanations
 from sm_hardware import check_sm_hardware
+from map_loading import assert_map_fits, check_map_loading
 from profiling import check_profiling
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
@@ -68,7 +69,7 @@ try:
                 expect(page).to_have_url(URL+'lessons/meet-gpu.html')
                 expect(page.locator('#gpu-map')).to_be_visible()
                 expect(page.locator('#hardware-panel h2')).to_have_text('Computer / system')
-                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Concept map overflows"
+                assert_map_fits(page)
                 page.screenshot(path=str(ROOT / f"test-results/intro-{width}-{theme}.png"), full_page=True)
                 page.goto(URL + "lessons/memory.html")
                 expect(page).to_have_url(URL + "lessons/memory.html")
@@ -228,6 +229,7 @@ try:
         expect(page.locator("#tensor-slice-diagram .tensor-cell")).to_have_count(32)
         expect(page.locator("#tensor-step-summary")).to_contain_text("8 elements × 4 bytes = 32 bytes")
         context.close()
+        check_map_loading(browser, URL)
         check_lessons(browser, URL, ROOT, errors)
         check_remaining(browser, URL, ROOT, errors)
         check_version(browser, URL)
