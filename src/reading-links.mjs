@@ -1,8 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import {saveReadingState} from './experiment-state.mjs';
 import {readingReturn} from './reading-return.mjs';
-const back=document.querySelector('[data-reading-return]');
-if(back){
+for(const back of document.querySelectorAll('[data-reading-return]')){
   const target=readingReturn(location.href);
   if(target){back.href=target.href;back.textContent=target.label;}
 }
@@ -10,6 +9,8 @@ document.addEventListener('click',event=>{
   const link=event.target.closest('a');
   if(!link||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
   const url=new URL(link.href,location);
+  // In-page navigation keeps the existing return destination and live state.
+  if(url.pathname===location.pathname&&url.search===location.search&&url.hash)return;
   const appendix=url.pathname.endsWith('/inside-sm.html');
   if(url.origin!==location.origin||(!appendix&&!link.matches('[data-reading-link]'))||window.frameElement)return;
   event.preventDefault();

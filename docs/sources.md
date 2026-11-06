@@ -197,3 +197,12 @@ ready warp instruction selection. FP32 arithmetic units and load/store units are
 separate roles in the diagram. No unit counts, ISA lowering or latency values are
 claimed. The functional worked sequence is generated locally from 64 FP32 inputs;
 its chosen event order is not a captured PyTorch or CUDA compiler trace.
+
+## Related CPU and logic exercises
+
+The beginner SM view links optionally to Assembly Lab's One addition and Memory
+and addresses lessons, and Bit Lab's ALU lesson. Their source and routes were
+checked on 2026-11-06. Assembly Lab uses Arm CPU instructions; Bit Lab uses a
+four-bit integer ALU, not GPU FP32 multiplication. These links reinforce working
+values, memory transfers and shared arithmetic roles; they are not GPU hardware
+validation or prerequisites. Each opens in a labelled new tab.
