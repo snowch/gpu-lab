@@ -69,3 +69,10 @@
 /* Keep the hardware introduction short; the optional explorer has its own page. */
 .hello-sm { margin-top:30px; padding-top:24px; border-top:1px solid var(--line); }
 .hello-sm>h3 { font-size:22px; margin-bottom:18px; }
+
+.hello-launch-controls label { max-width:100%; min-width:0; }
+.hello-launch-controls select { max-width:100%; }
+.hello-transfer-cells { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; }
+.hello-transfer-cell { display:grid; gap:6px; padding:12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; }
+.hello-transfer-cell small { color:var(--muted); }
+#hello-bounds-feedback,#hello-transfer-result { padding:14px; border-left:3px solid var(--accent); background:var(--soft); }

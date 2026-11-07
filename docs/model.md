@@ -348,22 +348,24 @@ no timing or speedup claim.
 
 ## Chapter 1 reading progression
 
-The five independent experiments now cover the operation, thread indices, launch
-groups, bounds checks, then a complete CUDA function and launch. Short CUDA launch
-and bounds-check bridges sit beside their diagrams, with the complete function
-available locally from the first launch. Earlier selections explain indices in plain language.
-Beside blocks, a short explanation distinguishes thread executions from shared
-SM hardware. The optional inside-sm appendix uses sm-hardware-model.mjs: one block,
-two complete 32-thread warps, input values 1.0–64.0 and FP32 multiplication by 2.
-An explicit functional event order requests loads, makes values available, multiplies
-and writes results. Separate per-thread registers survive reuse of shared arithmetic
-hardware. Events have no durations, cache model, compiled-instruction counts,
-throughput or capacity assumptions. Chapter 6 keeps a static hardware overview before
-its separate existing scheduler model. Reference lookups follow
-the complete kernel. The final input-count exercise uses launchPlan: four threads
-per block, ceiling division for block count, and explicit surplus thread indices.
-Existing multiplier, guard and selection IDs are retained for restart snapshots;
-the new transfer exercise saves whether its explanation has been revealed.
+Chapter 1 uses two guided demonstrations (calculation and thread mapping), a
+worked four-thread block diagram followed by a regrouping prediction, a bounds
+condition diagnosis, and complete-kernel trace consolidation. The final challenge
+asks about nine inputs and four threads per block. Regrouping collects block count,
+block/local position for input[4], and output invariance. `inspectLaunch` models
+explicit block counts and `<` versus `<=`: with five inputs and eight threads,
+`<=` makes only thread 5 access outside the arrays; 6–7 still skip. With nine inputs,
+two four-thread blocks leave output[8] unwritten (null, not zero). Three blocks write
+all outputs and skip 9–11. These are functional relationships, not timings.
+
+Only the first guided demonstration has a multiplier control. Fixed worked examples
+are labelled and retain their selectable diagrams; challenge answers stay hidden
+until a prediction is checked or the reader opens a worked comparison. Hints and
+comparisons are available without JavaScript. New challenge controls use new IDs;
+old multiplier/guard/count controls are retired on snapshot restoration, old results
+are not reused as answers, and new answer disclosures start closed. Current snapshots
+preserve choices, reveals, repaired bounds and thread selections independently.
+Generated five-input CUDA downloads and the optional SM appendix remain unchanged.
 
 
 The tensor-reading sequence spans three pages with the same unchanged `readTensor`

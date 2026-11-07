@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,boundsSource,introPrompt} from '../src/hello-model.mjs';
+import {steps,simulateIntro,kernelSource,pythonSource,launchPlan,launchSource,boundsSource,introPrompt,inspectLaunch} from '../src/hello-model.mjs';
 test('intro diagram and outputs derive from thread indices and selected multiplier',()=>{
  for(let stage=0;stage<steps.length;stage++)for(const factor of [-10,-0.5,0,2,3,10]){
   const r=simulateIntro(stage,factor);
@@ -35,11 +35,9 @@ test('static introduction includes all worked diagrams with unique control IDs',
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length);
  assert.equal((html.match(/class="hello-section"/g)||[]).length,5);
- assert.equal((html.match(/class="hello-thread"/g)||[]).length,34);
- for(let i=0;i<5;i++){
-  assert.ok(html.includes('id="hello-factor-'+i+'"'));
-  assert.ok(html.includes('id="hello-output-'+i+'"'));
- }
+ assert.equal((html.match(/class="hello-thread"/g)||[]).length,26);
+ assert.ok(html.includes('id="hello-factor-0"'));
+ for(let i=1;i<5;i++)assert.ok(!html.includes('id="hello-factor-'+i+'"'));
  assert.doesNotMatch(html,/hello-next|hello-back/);
 });
 
@@ -89,20 +87,20 @@ test('bounds excerpts match the guarded function and expose only the diagnostic 
 
 test('initial experiment HTML withholds output before scripts run',()=>{
  const html=renderIntroSections().split('<section class="hello-section"').slice(1).join('');
- assert.equal((html.match(/<small>Output<\/small><strong>\?<\/strong>/g)||[]).length,34);
- assert.equal((html.match(/Predict the outputs for this multiplier, then press Run\./g)||[]).length,1);
+ assert.equal((html.match(/<small>Output<\/small><strong>\?<\/strong>/g)||[]).length,10);
+ assert.match(html,/Run to inspect the calculation/);
  assert.match(html,/id="hello-output-1"[^>]*>Run to follow/);
  assert.doesNotMatch(html,/Example output:/);
 });
 
-test('first prediction uses a different multiplier from the opening worked example',()=>{
+test('guided calculation allows a different multiplier without pretending to assess GPU reasoning',()=>{
  const html=renderIntroSections(),first=html.split('id="idea-1"')[1].split('id="idea-2"')[0];
  assert.equal(steps[0].factor,3);
  assert.notDeepEqual(simulateIntro(0,steps[0].factor).output,simulateIntro(0,2).output);
  assert.match(first,/id="hello-factor-0"[^>]*value="3"/);
  assert.match(first,/id="hello-operation-0">y = x \* 3/);
  assert.doesNotMatch(first.replace(/<noscript>[\s\S]*?<\/noscript>/g,''),/\[3\.0, 6\.0, 9\.0, 12\.0, 15\.0\]/);
- assert.ok(introPrompt(0).startsWith('Predict'));
+ assert.ok(introPrompt(0).startsWith('Run'));
  for(let stage=1;stage<5;stage++)assert.ok(introPrompt(stage).startsWith('Run'));
 });
 
@@ -126,4 +124,22 @@ test('regrouping preserves outputs and array indices while changing block member
  assert.match(launchSource(1,8),/int threadsPerBlock = 8;/);
  assert.match(launchSource(1,8),/int blocks = 1;/);
  assert.match(launchSource(1,8),/runKernel<<<blocks, threadsPerBlock>>>/);
+});
+
+test('diagnostics distinguish off-by-one access, missing work and safe surplus work',()=>{
+ const changed=inspectLaunch(5,4,2,'<=');
+ assert.deepEqual(changed.threads.filter(t=>t.invalid).map(t=>t.i),[5]);
+ assert.deepEqual(changed.threads.filter(t=>t.skipped).map(t=>t.i),[6,7]);
+ assert.equal(changed.threads[5].output,null);
+ const fixed=inspectLaunch(5,4,2);
+ assert.deepEqual(fixed.threads.filter(t=>t.skipped).map(t=>t.i),[5,6,7]);
+ const short=inspectLaunch(9,4,2);
+ assert.equal(short.safe,true);assert.deepEqual(short.missing,[8]);assert.equal(short.output[8],null);
+ for(const blocks of [3,4]){
+   const complete=inspectLaunch(9,4,blocks);
+   assert.equal(complete.safe,true);assert.deepEqual(complete.missing,[]);
+   assert.deepEqual(complete.output,[2,4,6,8,10,12,14,16,18]);
+   assert.equal(complete.threads.filter(t=>t.skipped).length,blocks*4-9);
+ }
+ for(const args of [[0,4,2],[5,0,2],[5,4,0],[5,4,9],[5,4,2,'>']])assert.throws(()=>inspectLaunch(...args));
 });

@@ -31,15 +31,13 @@ def check_code_explanations(browser,url,root):
             assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(slug,width,theme)
             if slug in ['hello','matmul','inference']:
                 listing.screenshot(path=str(root/f'test-results/explanations-{slug}-{width}-{theme}.png'))
-        # Changing the multiplier refreshes CUDA text and annotations, without changing prediction state.
+        # The complete fixed kernel keeps its source annotations and keyboard highlighting.
         page.goto(url+'lessons/hello.html')
-        page.locator('#hello-factor-4').fill('3')
         pre=page.locator('#hello-full-4')
-        expect(pre).to_contain_text('3.0f')
+        expect(pre).to_contain_text('2.0f')
         listing=pre.locator('xpath=following-sibling::*[1]')
-        expect(listing).to_contain_text('3.0f')
-        expect(listing).not_to_contain_text('2.0f')
-        expect(page.locator('#hello-map-4 .hello-thread>strong:last-child')).to_have_text(['?']*8)
+        expect(listing).to_contain_text('2.0f')
+        expect(page.locator('#hello-map-4 .hello-thread>strong:last-child')).to_have_text(['2.0','4.0','6.0','8.0','10.0','Skipped','Skipped','Skipped'])
         button=listing.locator('button').first
         button.focus();page.keyboard.press('Enter')
         expect(button).to_have_attribute('aria-pressed','true')
