@@ -11,6 +11,7 @@ function formState() { return controls().map(el => ({ id: el.id, name: el.name, 
 function restoreForm(values) {
   for (const [index, value] of values.entries()) {
     // Completion is shared durable state, not a per-tab experiment snapshot.
+    if(location.pathname.endsWith('/hello.html')&&/^(hello-factor-[1-4]|hello-guard-3|hello-transfer-count)$/.test(value.id))continue;
     if (value.id === 'lesson-complete' || /^hello-sm-(read|multiply|write)$/.test(value.id)) continue;
     const el = value.id ? document.getElementById(value.id) : controls()[index];
     if (!el) throw new Error('An experiment control changed');
@@ -24,7 +25,7 @@ function releaseLock() {
 }
 function snapshot() {
   const key = snapshotKey();
-  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4','hello-launch'] : document.getElementById('sm-explorer') ? ['sm-hardware'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
+  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4','hello-launch','hello-bounds','hello-transfer'] : document.getElementById('sm-explorer') ? ['sm-hardware'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
   if (required.some(name => !hooks.has(name))) throw new Error('An experiment has not finished loading. Wait or reload that window before restarting.');
   if (composing || document.readyState !== 'complete' || document.querySelector('main [aria-busy="true"],main [contenteditable="true"]')) throw new Error('Finish the current input or operation in each GPU Lab window, then try again.');
   const guard = { reason: '' }; dispatchEvent(new CustomEvent('gpu-lab:before-restart', { detail: guard }));
@@ -62,6 +63,9 @@ function restore() {
     stored = sessionStorage.getItem(key); if (!stored) return;
     const data = JSON.parse(stored);
     if (data.schema !== 1) throw new Error('Unknown snapshot');
+    // Retired arithmetic controls do not apply to the fixed worked examples.
+    // Old positional disclosures must not reveal newly introduced challenge answers.
+    if(location.pathname.endsWith('/hello.html')&&data.experiments['hello-1']?.version!==2)data.details=[];
     restoreForm(data.controls);
     // The retired Chapter 1 SM disclosure followed its complete-function reference.
     // Preserve the other disclosure positions when opening a snapshot from that version.
@@ -83,7 +87,7 @@ function restore() {
     for (const [id, text] of Object.entries(data.messages)) {
       // Hello owns its derived output text. Older snapshots may describe four
       // inputs; its restore hook recomputes that text for the current model.
-      if (/^hello-output-\d+$/.test(id)) continue;
+      if (location.pathname.endsWith('/hello.html')&&id.startsWith('hello-')) continue;
       const el = document.getElementById(id); if (el) el.textContent = text;
     }
     requestAnimationFrame(() => {

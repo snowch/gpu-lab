@@ -1,15 +1,15 @@
 // Copyright © 2026 Christopher Snow.
 import {cudaProgram} from './cuda-program.mjs';
 export const steps = [
-  {title:'Try a different multiplier', factor:3, concept:'The worked example doubled these five inputs. Now use the multiplier below to try a different calculation.', instruction:'Use 3, or choose a multiplier other than 2. Predict the five outputs, then run. Change the multiplier and predict again.', length:5,size:5},
+  {title:'Inspect the calculation', factor:3, concept:'Follow the same multiplication from each input to its output. You can change the multiplier to inspect another calculation.', instruction:'Run the calculation, then follow an input card down to its output.', length:5,size:5},
   {title:'One multiplication per thread', leadIn:'Our example assigns one input value to each execution of a small GPU program: read the value, multiply it by 2, and write the result.', definitions:[['Thread','One execution of a GPU program.']], concept:'Each thread uses its array index to choose matching input and output positions. This is our teaching mapping; PyTorch chooses the actual implementation for the tensor operation.', instruction:'Run, then select a thread card below to follow its input, calculation and output.', length:5,size:5},
-  {title:'Threads are organised into blocks', leadIn:'The diagram below arranges the threads into two groups. Each group is called a block. The GPU distributes work a block at a time.', definitions:[['Block','A group of threads. Threads in the same block can share a workspace and wait for one another when their calculation needs it.']], concept:'Here each thread multiplies its own input independently. Threads in a block do not necessarily all execute at once.', instruction:'Run, then select thread 4 in Block 1. Follow how its block number and position give index 4, the fifth input.', length:5,size:4},
-  {title:'More threads than input values', definitions:[['Bounds check','A check that an index refers to an element that exists before accessing it.']], concept:'Keep the same five inputs and two blocks of four threads. Now inspect the check that protects the arrays from the extra threads.', instruction:'Run with the check enabled. Then turn it off and see which threads would access beyond the arrays.', length:5,size:4},
-  {title:'Read the complete GPU function', leadIn:'The launch requests our thread groups, and the bounds check protects the arrays. Now read the complete CUDA function that joins the index calculation, check and multiplication.', definitions:[['Kernel','A GPU function executed by the threads in a launch.']], concept:'Each thread executes this kernel with its own index. Compare its complete body with the short examples beside the earlier diagrams.', instruction:'Run, then select thread 4 in Block 1. Follow its CUDA variables into the index calculation below the cards. Select a grey thread to inspect the bounds check.', length:5,size:4},
+  {title:'Threads are organised into blocks', leadIn:'The diagram below arranges the threads into two groups. Each group is called a block. The GPU distributes work a block at a time.', definitions:[['Block','A group of threads. Threads in the same block can share a workspace and wait for one another when their calculation needs it.']], concept:'Here each thread multiplies its own input independently. Threads in a block do not necessarily all execute at once.', instruction:'Inspect the worked grouping below. Select a thread to see how its block and position give its array index.', length:5,size:4},
+  {title:'More threads than input values', definitions:[['Bounds check','A check that an index refers to an element that exists before accessing it.']], concept:'Keep the same five inputs and two blocks of four threads. Now inspect the check that protects the arrays from the extra threads.', instruction:'Investigate a changed condition after inspecting the correct check.', length:5,size:4},
+  {title:'Read the complete GPU function', leadIn:'The launch requests our thread groups, and the bounds check protects the arrays. Now read the complete CUDA function that joins the index calculation, check and multiplication.', definitions:[['Kernel','A GPU function executed by the threads in a launch.']], concept:'Each thread executes this kernel with its own index. Compare its complete body with the short examples beside the earlier diagrams.', instruction:'Select a thread in the worked diagram. Trace its index, check and array access in the complete kernel.', length:5,size:4},
 ];
 export function introPrompt(stage) {
   return [
-    'Predict the outputs for this multiplier, then press Run.',
+    'Run to inspect the calculation.',
     'Run to follow each thread’s input and output.',
     'Run to inspect the indices in each block.',
     'Run with the bounds check, then compare what happens without it.',
@@ -70,4 +70,20 @@ export function boundsSource(factor,guard=true) {
   return guard?`if (i < n) {
     ${lineFor(factor)}
 }`:lineFor(factor);
+}
+
+// Diagnostic launches preserve unwritten outputs and never invent invalid read values.
+export function inspectLaunch(count, size, blocks, condition='<') {
+  launchPlan(count,size);
+  if(!Number.isInteger(blocks)||blocks<1||blocks>8)throw new RangeError('Choose 1–8 blocks.');
+  if(!['<','<='].includes(condition))throw new RangeError('Unknown condition');
+  const input=Array.from({length:count},(_,i)=>i+1),output=Array(count).fill(null);
+  const threads=Array.from({length:blocks*size},(_,i)=>{
+    const allowed=condition==='<'?i<count:i<=count,valid=i<count;
+    if(allowed&&valid)output[i]=Math.fround(input[i]*2);
+    return {i,block:Math.floor(i/size),local:i%size,input:valid?input[i]:null,
+      output:allowed&&valid?output[i]:null,skipped:!allowed,invalid:allowed&&!valid};
+  });
+  return {input,output,threads,size,blocks,factor:2,safe:threads.every(t=>!t.invalid),
+    missing:output.flatMap((v,i)=>v===null?[i]:[])};
 }

@@ -57,6 +57,14 @@ second set of authoring requirements.
   new multiplier, row or other case for prediction; label revisiting a known result
   as inspection or confirmation. A definition such as “softmax weights sum to one”
   should be checked or applied, not presented as an unseen answer to guess.
+- [ ] Make exercises practise the chapter’s GPU reasoning, rather than familiar
+  arithmetic. Label guided demonstrations “Inspect”; ask for a prediction only for
+  a new decision or case. Collect a concrete prediction before “Check”, give feedback
+  about its consequence, and show the affected values or threads. A reveal-only
+  button must say “Compare”, not claim to check an explanation it never received.
+  Teach the correct mechanism before a diagnostic mistake. Include hints and worked
+  comparisons without locking readers out, remove controls unrelated to the goal,
+  and end with a new case that requires applying the mechanism.
 - [ ] Follow predict → run → change one variable → explain. Use `readerTask()` for
   explicit learner actions, with a visible label and decorative icon. Put feedback
   beside Run. Show `?` for unknown output values until Run; hide derived counts, traces and
