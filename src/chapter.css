@@ -32,3 +32,29 @@
 .chapter-task-label { display:flex; gap:10px; color:var(--accent); font-weight:700; }
 .chapter-task p { margin:0; }
 .chapter-task .chapter-task-label { margin-bottom:8px; }
+
+/* The page reads as a chapter; visual emphasis belongs to examples and actions. */
+.book-chapter .intro { padding-bottom:30px; margin-bottom:30px; border-bottom:0; }
+.book-chapter .intro>p:last-child { font-size:19px; line-height:1.65; color:var(--muted); }
+.book-chapter .hello-section,.book-chapter .book-section { margin-block:48px; padding-top:32px; }
+.book-chapter .hello-section h2,.book-chapter .book-section h2 { font-size:clamp(27px,3vw,34px); line-height:1.2; margin-bottom:24px; }
+.chapter-definition { border-left:2px solid var(--line); background:transparent; border-radius:0; padding:4px 0 4px 20px; margin-block:26px; }
+.chapter-definition-label { color:var(--muted); font-size:13px; margin-bottom:8px; }
+.chapter-definition dt { font-size:18px; }
+.chapter-task { padding:16px 20px; border:0; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; }
+.chapter-task-label { font-size:15px; }
+.chapter-code-panel { margin-block:24px; }
+.chapter-code-label { margin:0; padding:12px 20px 4px; font-size:13px; letter-spacing:.01em; }
+.chapter-code-panel[data-language]>.chapter-code-label { border-radius:8px 8px 0 0; }
+.chapter-opening-code { padding:18px 20px; font-family:"IBM Plex Mono",monospace; font-weight:400; line-height:1.6; }
+.book-chapter .chapter-code-panel[data-language="cuda"]>pre { font-family:"IBM Plex Mono",monospace; line-height:1.6; padding:18px 20px; }
+.book-chapter .chapter-code-panel>pre { border-radius:0 0 8px 0; }
+.book-chapter .hello-operation { font-family:"IBM Plex Mono",monospace; font-weight:400; margin-bottom:0; }
+.book-chapter pre,.book-chapter pre code,.book-chapter code { font-family:"IBM Plex Mono",monospace; }
+.chapter-browser-note { border-top:1px solid var(--line); padding-top:18px; max-width:72ch; }
+@media(max-width:760px) {
+ .book-chapter .intro { padding-bottom:12px; margin-bottom:28px; }
+ .book-chapter .hello-section,.book-chapter .book-section { margin-block:36px; padding-top:26px; }
+ .chapter-code-label { padding-inline:16px; }
+ .chapter-opening-code,.book-chapter .chapter-code-panel[data-language="cuda"]>pre { padding-inline:16px; }
+}

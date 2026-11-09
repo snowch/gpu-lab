@@ -99,7 +99,8 @@ for (const path of ['dist/index.html', ...(await readdir('dist/lessons')).filter
     .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/map-toggle.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/map-toggle.mjs"></script></head>')
     .replace('</head>', '<script type="module" src="'+(current==='index'?'./':'../')+'src/desktop.mjs"></script><script type="module" src="'+(current==='index'?'./':'../')+'src/reading-links.mjs"></script></head>')
     .replace('</head>', '<link rel="stylesheet" href="'+(current==='index'?'./':'../')+'src/code-explanations.css"><script type="module" src="'+(current==='index'?'./':'../')+'src/code-explanations.mjs"></script></head>');
-  await writeFile(path, html.replace('</footer>', `${versionMarkup}</footer>`));
+  const fontBase=current==='index'?'./':'../';
+  await writeFile(path, html.replace('</head>', `<link rel="preload" href="${fontBase}assets/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin></head>`).replace('</footer>', `${versionMarkup}</footer>`));
 }
 await buildOffline('dist', identity);
 console.log('Built static course in dist/ with explicit, verified offline downloads (all asset paths are relative).');
