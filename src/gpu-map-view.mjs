@@ -33,7 +33,8 @@ function insideChapters(body){
 function node(id,concept,title,hint,body,kind=''){
  return `<details class="map-node ${kind}" id="${id}" data-map-concept="${concept}"><summary><span><strong>${title} ${chapterLabel(concept)}</strong><span class="map-hint">${hint}</span>${insideChapters(body)}</span></summary><div class="map-inside">${body}</div></details>`;
 }
-const concept=(id,prefix,children='',hint='Definition, book example and chapter links')=>node(`${prefix}-${id}`,id,escape(conceptById(id).title),hint,info(id)+children);
+const conceptHints={barrier:'Orders shared-memory writes and reads',banks:'Maps shared-memory addresses to banks',sectors:'Groups nearby memory requests',tensor:'Values with shape, data type and device',shape:'Selects tensor rows and columns',strides:'Locates values in existing storage',dtype:'Value formats, range and rounding',copy:'Copies values between storage allocations'};
+const concept=(id,prefix,children='',hint=conceptHints[id]??conceptById(id).meaning)=>node(`${prefix}-${id}`,id,escape(conceptById(id).title),hint,info(id)+children);
 export function renderWarp(block,w){
  return node(`${block}-warp-${w}`,'warp',`Warp ${w}`,`Threads ${w*32}–${w*32+31} · 32 lane positions`,
  `<p>A <strong>lane</strong> is a thread’s position within its warp. T labels give the thread index within block ${block.toUpperCase()}. Select a lane to inspect its thread.</p><div class="map-lanes">${Array.from({length:32},(_,i)=>node(`${block}-w${w}-lane-${i}`,'lane',`<span class="map-lane-label">Lane ${i}</span> T${w*32+i}`,'',`<p>Lane ${i} → thread ${w*32+i} within block ${block.toUpperCase()}. Its registers hold its own working values.</p>${chapterLinks(conceptById('thread'))}`,'map-lane')).join('')}</div>${chapterLinks(conceptById('warp'))}`,'map-warp');

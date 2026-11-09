@@ -12,7 +12,7 @@ export function codeExplanations(source) {
   const match=(pattern,meaning)=>{const m=source.match(pattern);if(m)add(m[0].trim(),typeof meaning==='function'?meaning(m):meaning);};
   const python=/^import torch\b/.test(source.trimStart());
   if(source.includes('prof.export_chrome_trace("trace.json")')) {
-    add('from torch.profiler import ProfilerActivity, profile, record_function', 'Imports the activity selectors, recording context and named-range annotation used below.');
+    add('from torch.profiler import ProfilerActivity, profile, record_function', 'Imports the CPU/CUDA activity selectors, the profile recording context and record_function for naming the captured operation.');
     add('print("PyTorch:", torch.__version__)', 'Records the installed PyTorch version. The following prints record its CUDA build and the actual GPU model.');
     add('x = torch.arange(\n    1, 4097, dtype=torch.float32, device="cuda",\n)', 'Creates 4,096 FP32 inputs, from 1.0 to 4096.0, on the NVIDIA GPU. The endpoint 4097 is excluded.');
     add('for _ in range(5):', 'Runs five warm-up multiplications before capture. The underscore is a loop variable whose value is unused.');
@@ -49,7 +49,7 @@ export function codeExplanations(source) {
       add('b = torch.ones(', 'Creates a matrix filled with ones, so each output dot product adds the entries of one input row.');
       add('c = a @ b', 'Multiplies the matrices. PyTorch selects the matrix implementation and its accumulation rules.');
       add('print(c[0, 0].float().item())', 'Selects one output, converts it to FP32 and reads its scalar value for printing. This cannot recover information lost during input conversion.');
-      match(/converted = row\.to\(torch\.\w+\)\.float\(\)/, 'Converts inputs to the selected format, then back to FP32 for the explicit arithmetic below. Any information lost in the first conversion stays lost.');
+      match(/converted = row\.to\(torch\.\w+\)\.float\(\)/, 'Converts inputs to the selected format, then back to FP32 for the explicit accumulation loop. Any information lost in the first conversion stays lost.');
       add('total = torch.zeros((), dtype=torch.float32)', 'Creates an FP32 scalar running sum, initially zero. The empty shape () means a single scalar.');
       add('reference = torch.zeros((), dtype=torch.float32)', 'Creates a separate FP32 sum for comparison using the original inputs.');
       add('for k in range(16):', 'Fixes the accumulation order, unlike a matrix library’s implementation-dependent order.');
@@ -74,7 +74,7 @@ export function codeExplanations(source) {
       add('total = x.sum()', 'Combines all input values into one scalar tensor on the GPU. PyTorch chooses the algorithm for the sum and handles its launches.');
       add('print(total.cpu())', 'Copies the scalar result to CPU memory so Python can print it.');
     } else if(source.includes('torch.arange')) {
-      match(/torch\.arange\((?:1, 26|32 \* 8)/, m=>m[0].includes('1, 26')?'Creates the FP32 values 1.0 through 25.0. The endpoint 26 is excluded.':'Creates 256 consecutive FP32 values, starting at 0.0.');
+      match(/torch\.arange\(\s*(1,\s*26|32 \* 8)/, m=>m[1].startsWith('1,')?'Creates the FP32 values 1.0 through 25.0. The endpoint 26 is excluded.':'Creates 256 consecutive FP32 values, starting at 0.0.');
       add('dtype=torch.float32', 'Stores each value in four-byte FP32 format.');
       add('device="cuda"', 'Places the tensor in NVIDIA GPU memory.');
       match(/\.reshape\((?:5, 5|32, 8)\)/, 'Interprets the same values as the requested rows and columns. In this setup the reshape shares the original storage.');
@@ -97,9 +97,15 @@ export function codeExplanations(source) {
     add('__global__ void', 'Declares a GPU kernel. Each launched thread executes this function. void means the function returns no value; this example writes results into output arrays.');
     if(!source.includes('tile[32][33]')) {
       add('const float*', 'Passes the location of an array of FP32 values. const prevents this function from changing values through that input pointer.');
-      match(/int i = [^\n;]+;/, 'Declares an integer i and calculates this thread’s array index. blockIdx.x is the block number, blockDim.x is the number of threads per block, and threadIdx.x is the thread’s position within that block.');
-      add('if (i < n)', 'Allows array work only when i is smaller than the input count n. Extra threads skip that work.');
-      match(/(?:output|y)\[i\] = [^;]+;/, source.includes('void gather(')?'Reads the selected input element and copies it to y[i]. Brackets select array elements; ; ends the statement.':'Reads the indexed input value or values, performs the shown arithmetic, then writes the indexed result. A trailing f marks an FP32 literal; ; ends the statement.');
+      match(/int i = [^\n;]+;/, m=>[
+        'Declares an integer i and calculates this thread’s array index.',
+        ...[['blockIdx.x','the block number'],['blockDim.x','the number of threads per block'],['threadIdx.x','the thread’s position within its block']]
+          .filter(([term])=>m[0].includes(term)).map(([term,meaning])=>`${term} is ${meaning}.`),
+      ].join(' '));
+      add('if (i < n)', 'Runs the enclosed array accesses only when i is smaller than the input count n. Otherwise this thread skips them.');
+      match(/(?:output|y)\[i\] = [^;]+;/, m=>source.includes('void gather(')
+        ? 'Reads the selected input element and copies it to y[i]. Brackets select array elements. The semicolon ends the statement.'
+        : 'Reads the indexed input value or values, performs the shown arithmetic, then writes the indexed result. '+(/\b(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?f\b/i.test(m[0])?'A trailing f marks an FP32 literal. ':'')+'The semicolon ends the statement.');
       match(/x\[\d+ \+ i \* \d+\]/, 'Selects an input element using the starting offset plus index times stride. These are element positions, not byte offsets.');
     }
     if(source.includes('tile[32][33]')) {
