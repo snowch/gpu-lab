@@ -186,6 +186,12 @@ author’s knowledge of later chapters.
    “below” that carries an instruction. Name the actual card, figure, code panel or
    control; keep selection instructions adjacent to their targets. If a result only
    appears after Run or inside a disclosure, say how to reveal it first.
+   Remove leftover author instructions such as “check which terms this example
+   uses”. A code explanation describes constructs actually present in its fragment;
+   a reader task names an action, its target and a question or result to inspect.
+   Verify requested settings against the initial and changed UI states: do not ask
+   readers to change a value already selected, or promise a failure that depends on
+   an unstated block size. Name a disclosure when the target is inside it.
 4. **Enough information to act:** before Run, verify that inputs and rules needed for
    a prediction are available, without revealing the answer. If the relevant source
    is collapsed, name the disclosure to open. Check the initial case, a changed case
@@ -203,6 +209,8 @@ validation notes. Automated tests can protect structural requirements such as
 source-before-prediction order and hidden results; they cannot establish that the
 prose prepares a newcomer. Do not claim learner testing without learner observations.
 For the whole-book baseline, see [the learning-flow audit](learning-flow-audit.md).
+The subsequent [reader instruction audit](reader-instruction-audit.md) records fixes
+to stale prompts, settings and code explanations.
 
 ## Acceptance checks
 

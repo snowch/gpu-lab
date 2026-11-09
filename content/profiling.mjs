@@ -40,7 +40,7 @@ export function renderProfiling(source) {
   <details><summary>Compare your answer</summary><p>There are 6 blocks, 32 threads per block and 192 launched threads. These counts do not establish how many useful array elements are processed or how much parallel execution occurs.</p></details></section>
 
   <section class="book-section" id="nsight"><h2>Optional: inspect with NVIDIA Nsight</h2>
-  <p><strong>Nsight Systems</strong> shows CPU calls, transfers and GPU kernels on a timeline. <strong>Nsight Compute</strong> inspects individual kernels and their hardware metrics. Both need a supported NVIDIA setup and separate installation; Compute may also need permission to access GPU performance counters. Follow their official guides below for your platform.</p>
+  <p><strong>Nsight Systems</strong> shows CPU calls, transfers and GPU kernels on a timeline. <strong>Nsight Compute</strong> inspects individual kernels and their hardware metrics. Both need a supported NVIDIA setup and separate installation; Compute may also need permission to access GPU performance counters. Use the Nsight Systems and Nsight Compute links in References for installation and command options on your platform.</p>
   <p>The download’s <code>--external</code> mode runs the same setup and multiplication without starting the PyTorch profiler. It marks the target multiplication with an <strong>NVTX range</strong>: a named annotation that NVIDIA’s tools can recognise.</p>
   <h3>Nsight Systems: follow the timeline</h3>
   ${shell('profiling-nsys','nsys profile -t cuda,nvtx -o multiply \\\n  python profile-pytorch.py --external\nnsys stats --report cuda_gpu_trace multiply.nsys-rep')}

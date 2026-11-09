@@ -35,7 +35,7 @@ export function renderIntroSections() {
  <p class="eyebrow">02 · Thread groups</p><h2 id="hello-title-2">Group threads into blocks</h2>
  <p>We specify groups of threads when starting a GPU program. Each group is called a <strong>block</strong>. The GPU distributes the calculation a block at a time.</p>
  ${definitions([['Block','A group of threads. Threads in the same block can share data and wait for one another when their calculation needs it. Our multiplication does not need that cooperation.']])}
- <p>This worked example uses <strong>two blocks of four threads</strong>. That provides eight threads for five inputs. The grey tiles have no input, so those threads must skip the calculation.</p>
+ <p>Return to doubling the five inputs. This worked example uses <strong>two blocks of four threads</strong>. That provides eight threads for five inputs. The grey tiles have no input, so those threads must skip the calculation.</p>
  <div class="hello-visual"><p class="hello-figure-title">Worked grouping · 5 inputs, 8 threads</p><p class="hello-note">Select a thread tile. Its block number and position determine its array index.</p>
  <div id="hello-map-2">${renderIntroMap(2,grouped,4)}</div>
  ${renderIndexRule()}<div id="hello-index-2" class="hello-index-panel" role="status">${renderIndexSubstitution(grouped.threads[4],grouped)}</div></div>
@@ -64,7 +64,7 @@ export function renderLaunchPractice() {
   return `<div class="hello-launch-practice" aria-labelledby="hello-launch-title">
     <h3 id="hello-launch-title">Predict a different grouping</h3>
     <p>Keep the same five inputs and multiply each by 2. This exercise starts with eight threads per block.</p><p class="hello-note">These small block sizes illustrate grouping, not recommended settings or GPU speed. Extra threads with no input skip the calculation.</p>
-    ${readerTask('Change from four to eight threads per block. Predict the smallest block count, the location of the thread handling input[4], and whether the output values change.','Predict the regrouping')}
+    ${readerTask('For eight threads per block, predict the smallest block count, the location of the thread handling input[4], and whether the output values change. Then compare with four threads per block.','Predict the regrouping')}
     <div class="hello-launch-controls">
       <label for="hello-launch-size">Threads per block<select id="hello-launch-size"><option value="8">8</option><option value="4">4</option></select></label>
       <label for="hello-launch-guess">Your block count<select id="hello-launch-guess"><option value="">Choose…</option><option>1</option><option>2</option><option>3</option></select></label>

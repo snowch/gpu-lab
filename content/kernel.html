@@ -33,7 +33,7 @@
     <main id="main">
       <section class="intro">
         <p>Before this workshop, complete <a href="hello.html">chapter 1: How does a GPU double five values?</a></p>
-        <p class="eyebrow">HANDS-ON PROTOTYPE · CUDA C++ · BROWSER SIMULATION</p>
+        <p class="eyebrow">EXTRA PRACTICE · CUDA C++ · BROWSER SIMULATION</p>
         <h1>Repair a kernel</h1>
         <p class="lead">Repair a kernel, explain its failures, then build vector addition.</p>
         <p>Begin with <code>y = 2 * x</code>, then transfer what you learn to <code>y = x + b</code>: the elementwise addition used in residual connections in neural networks.</p>
@@ -75,11 +75,11 @@
         <div class="kernel-actions"><button id="run-model" class="primary" type="button">Run model checks</button><button id="reset-kernel" type="button">Reset starter</button></div>
         <p id="simulation-note" class="kernel-note">Browser simulation · no CUDA compilation or GPU execution.</p><p>In PyTorch: <code id="kernel-pytorch">y = 2 * x</code>. This is the operation we are implementing, not PyTorch’s internal kernel source.</p>
         <p id="kernel-status" role="status">Start a guided challenge, or change the editable statements above and run the model checks.</p>
-        <details class="more-settings"><summary>Run this kernel on an NVIDIA GPU</summary>
+        <details class="more-settings"><summary>Run a complete CUDA program locally</summary>
         <p>Download a complete CUDA C++ program for 35 elements, including your kernel, allocation, launch and output read-back. Invalid accesses and duplicate writes must be repaired before download.</p>
         <pre><code id="cuda-source"></code></pre><button id="download-cuda" type="button">Download CUDA program</button>
         <p><a href="desktop.html#first-cuda">Run safe downloaded kernels with GPGPU-Sim</a> without a GPU. For native execution, use an NVIDIA GPU, compatible driver, CUDA Toolkit and host C++ compiler:</p><pre>nvcc -std=c++17 kernel.cu -o kernel
-./kernel</pre><p>These new generated programs have not yet been compiled or tested on an NVIDIA GPU.</p></details>
+./kernel</pre><p>Physical execution of these generated programs on an NVIDIA GPU remains unvalidated.</p></details>
         <details class="more-settings"><summary>Hint: where should the first thread write?</summary><p>The first output is <code>y[0]</code>. Work out <code>i</code> when <code>blockIdx.x * blockDim.x + threadIdx.x</code> is zero. Then check whether that expression still reaches the right elements in a second block.</p></details>
       </section>
       <section id="kernel-results" class="section-space" aria-labelledby="run-title" hidden>
@@ -100,7 +100,7 @@
         <h3>Input x · highlighted at a read</h3><p class="kernel-note">Each tile shows its element index and value. FP32 elements occupy four bytes; offsets are relative to this buffer.</p><div id="kernel-input" class="kernel-memory"></div>
         <div id="second-input-panel" hidden><h3>Second input b</h3><div id="kernel-second-input" class="kernel-memory"></div></div><h3>Model output y after this step</h3><p class="kernel-note">A dash means no thread has written that element yet. Finished-run checks above are independent of the replay position.</p><div id="kernel-output" class="kernel-memory"></div>
       </section>
-      <section class="challenge section-space"><h2>Keep investigating</h2><ol><li>Pass all three lengths. Which element did the starting kernel miss?</li><li>Inspect length 35. Jump to the last thread: why does its guard skip the memory access?</li><li>Remove the bounds check and run the model. Find the first invalid access, then repair it.</li><li>Try the local index. Why can a single-block test pass while length 35 fails?</li></ol><p>Unsafe configurations are diagnosed by the model and cannot be downloaded until repaired.</p></section>
+      <section class="challenge section-space"><h2>Keep investigating</h2><ol><li>Pass the checks for lengths 8, 32 and 35. Which element did the starting kernel miss?</li><li>With the global index repaired and the bounds check enabled, inspect length 35. Select the last launched thread: why does it skip the array accesses?</li><li>Remove the bounds check and run the model. Find the first invalid access, then repair it.</li><li>Set Threads per block to 8, enable the bounds check and choose the local index, threadIdx.x. Why can length 8 pass while length 35 fails?</li></ol><p>Unsafe configurations are diagnosed by the model and cannot be downloaded until repaired.</p></section>
 
       <details class="more-settings section-space"><summary>What the simulation establishes</summary><p>The browser computes indexing, guards, FP32 arithmetic, reads, writes, duplicate writes and unfilled outputs for the supported expressions. It does not compile CUDA, simulate SM scheduling, caches or warps, or predict time. Replay order is chosen for inspection, not GPU execution order.</p><p>Browser checks do not establish hardware correctness or performance.</p><p><a href="https://docs.nvidia.com/cuda/cuda-programming-guide/index.html">CUDA Programming Guide ↗</a></p></details>
       <!-- REFERENCE_KERNEL -->

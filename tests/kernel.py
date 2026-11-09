@@ -33,7 +33,7 @@ def check_kernel(browser, base_url, root, errors):
             page.locator('#trace-next').click()
             expect(page.locator('#kernel-event')).to_contain_text('Read x[0] = 0.5 at byte offset 0')
             expect(page.locator('#kernel-input .active')).to_have_count(1)
-            page.get_by_text('Run this kernel on an NVIDIA GPU',exact=True).click()
+            page.get_by_text('Run a complete CUDA program locally',exact=True).click()
             with page.expect_download() as downloaded:
                 page.locator('#download-cuda').click()
             from pathlib import Path

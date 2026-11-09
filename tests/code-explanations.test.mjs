@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {testedPythonExamples} from '../src/desktop-catalog.mjs';
 import {kernelSource} from '../src/hello-model.mjs';
+import {readingOpening} from '../src/book-code.mjs';
 import {kernelBody} from '../src/kernel-model.mjs';
 import {codeExplanations} from '../src/code-explanation-data.mjs';
 import {annotatedSource,explainHTML} from '../src/code-explanations-view.mjs';
@@ -35,11 +36,38 @@ test('walkthroughs preserve code attributes, source and static explanations with
  assert.equal(explainHTML(local),local);
 });
 test('repair explanations follow the actual guard and arithmetic instead of asserting a correct kernel',()=>{
- for(const guard of [true,false])for(const operation of ['multiply','add','vector-add']){
-  const source=kernelBody({index:'next',guard,operation});
+ for(const index of ['global','local','next'])for(const guard of [true,false])for(const operation of ['multiply','add','vector-add']){
+  const source=kernelBody({index,guard,operation});
   const entries=codeExplanations(source);
   assert.equal(entries.some(e=>e.fragment==='if (i < n)'),guard);
-  assert.ok(entries.some(e=>e.fragment.includes('+ 1;')));
+  const indexEntry=entries.find(e=>e.fragment.startsWith('int i ='));
+  assert.ok(indexEntry);
+  for(const term of ['blockIdx.x','blockDim.x','threadIdx.x']){
+   assert.equal(indexEntry.meaning.includes(term),indexEntry.fragment.includes(term),`${index}: ${term}`);
+  }
+  assert.equal(indexEntry.fragment.includes('+ 1;'),index==='next');
   assert.doesNotMatch(entries.map(e=>e.meaning).join(' '),/correct index|unique index/);
+ }
+});
+
+test('CUDA arithmetic explanations only explain a float suffix when its statement contains one',()=>{
+ const literal=codeExplanations(kernelSource(2)).find(e=>e.fragment.startsWith('output[i] ='));
+ assert.match(literal.fragment,/2\.0f/);
+ assert.match(literal.meaning,/trailing f/);
+ for(const operation of ['multiply','add','vector-add']){
+  const expression=codeExplanations(kernelBody({index:'global',guard:true,operation})).find(e=>e.fragment.startsWith('y[i] ='));
+  assert.ok(expression);
+  assert.doesNotMatch(expression.meaning,/trailing f/);
+ }
+});
+test('formatted tensor openings explain the arange input range without changing copyable source',()=>{
+ for(const mode of ['selection','layout','requests']){
+  const source=readingOpening(mode);
+  const range=codeExplanations(source).find(e=>e.fragment.startsWith('torch.arange('));
+  assert.ok(range,mode);
+  assert.ok(source.includes(range.fragment));
+  assert.match(range.meaning,/1\.0 through 25\.0/);
+  assert.match(range.meaning,/endpoint 26 is excluded/);
+  assert.equal(decode(annotatedSource(source).replace(/<[^>]+>/g,'')),source);
  }
 });
