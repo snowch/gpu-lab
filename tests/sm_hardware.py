@@ -68,7 +68,7 @@ def check_sm_hardware(browser,url,root,errors):
             page.locator('#sm-explorer').screenshot(path=str(root/f'test-results/sm-appendix-{width}-{theme}.png'),style='.topbar{position:static!important}.sm-explorer-controls{position:static!important}')
             page.locator('#sm-value-return').click()
             expect(page).to_have_url(url+'lessons/hello.html?keep=sm')
-            expect(page.locator('#hello-output-2')).to_contain_text('[2.0, 4.0, 6.0, 8.0, 10.0]')
+            expect(page.locator('#hello-index-2')).to_contain_text('output[4] = 10.0')
             expect(page.locator('#hello-map-2 [data-thread="4"]')).to_have_attribute('aria-pressed','true')
             page.wait_for_function('(position)=>Math.abs(scrollY-position)<8',arg=position)
             expect(page.locator('#hello-sm-explore')).to_be_focused()
