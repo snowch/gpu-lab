@@ -105,3 +105,26 @@ and app updates. Experiment snapshots exclude the checkbox so an older tab snaps
 cannot undo a durable mark. An actual save failure keeps the choice on the current page and
 reports it beside the checkbox; an unsaved change blocks an app restart until saved
 or undone.
+
+## Visual direction: technical field guide
+
+The shared shell uses IBM Plex Sans for reading/headings and IBM Plex Mono for
+source, formulae and technical values. Font files and SIL OFL licences live in
+`assets/fonts`; no runtime font service is used. Keep opening code at 18px and
+supporting source at 16px. Never shrink code to fit a line.
+
+The palette is paper #f7faf9, ink #193237, muted #536e71, evergreen #146653,
+pale green #e5f3ec and CUDA blue #245b91, with corresponding dark surfaces.
+Green/blue identify the existing language roles; formula term colours carry a
+separate, explicitly labelled relationship. Keep structure legible without colour.
+
+The reading layout is left aligned: quiet contents rail, chapter title/lead,
+then a continuous sequence of explanations, actions, code and diagrams. Prose
+uses a 68-character measure; diagrams may use the whole reading area. On phones,
+the header takes two rows in DOM keyboard order, and contents remain collapsible.
+
+Design review: avoid turning each paragraph into another identical card. Reserve
+strong surfaces for source and diagrams; definitions use a quiet left rule,
+actions a green cue, and active contents a white surface/edge marker. Chapter
+headings carry the hierarchy, without extra decorative labels or automatic motion.
+Preserve the learning sequence, selections, Run behaviour and completion controls.

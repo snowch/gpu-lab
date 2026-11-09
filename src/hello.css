@@ -93,3 +93,25 @@
 .hello-index-terms dt { font-size:14px; line-height:1.4; }
 .hello-index-terms dd { margin:6px 0 0; font:600 22px/1.4 ui-monospace,monospace; }
 .hello-index-panel>p:last-child { margin-bottom:0; }
+
+/* Thread cards are the visual centre: clear paths, quiet grouping boundaries. */
+.hello-group { padding:16px; border-radius:12px; background:var(--soft); border-color:transparent; }
+.hello-group h3 { font-size:16px; font-weight:600; margin-bottom:16px; }
+.hello-thread { padding:16px 6px; border-radius:8px; border-color:transparent; }
+.hello-thread small { font-size:13px; }
+.hello-thread strong { font-size:23px; font-variant-numeric:tabular-nums; }
+.hello-thread strong:not(:last-child)::after { padding:7px 0; }
+.hello-thread[aria-pressed="true"] { outline-width:2px; outline-offset:0; }
+.hello-thread[data-state="skip"] { border-color:var(--line); }
+.hello-index-panel { border:1px solid var(--line); border-radius:10px; padding:22px; box-shadow:0 3px 0 var(--soft); }
+.hello-index-panel h3 { font-size:18px; }
+.hello-index-equation { font-family:"IBM Plex Mono",monospace; font-weight:600; }
+.hello-index-terms>div { padding:12px; border-radius:6px; }
+.hello-start-values>div { border-radius:10px; border:0; padding:20px; background:var(--soft); }
+.hello-launch-controls { gap:16px; }
+.hello-launch-controls select { margin-top:0; }
+@media(max-width:500px) {
+ .hello-group { padding:12px; }
+ .hello-index-panel { padding:16px; }
+ .hello-index-terms>div { padding:9px; }
+}

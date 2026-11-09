@@ -49,7 +49,7 @@ class CourseHandler(BaseHTTPRequestHandler):
             legacy=(ROOT/'tests/fixtures/legacy-worker.js').read_text()
             files=json.loads((root/'release.json').read_text())['files']
             body=legacy.replace('__VERSION__',json.dumps('legacy-complete')).replace('__FILES__',json.dumps([f['path'] for f in files])).encode()
-        types = {'.html':'text/html', '.js':'text/javascript', '.mjs':'text/javascript', '.css':'text/css', '.json':'application/json', '.webmanifest':'application/manifest+json', '.svg':'image/svg+xml', '.png':'image/png', '.cu':'text/plain', '.py':'text/plain'}
+        types = {'.woff2':'font/woff2', '.html':'text/html', '.js':'text/javascript', '.mjs':'text/javascript', '.css':'text/css', '.json':'application/json', '.webmanifest':'application/manifest+json', '.svg':'image/svg+xml', '.png':'image/png', '.cu':'text/plain', '.py':'text/plain'}
         self.send_response(200); self.send_header('Content-Type', types.get(file.suffix,'application/octet-stream'))
         self.send_header('Cache-Control','no-store'); self.send_header('Content-Length',str(len(body))); self.end_headers()
         try: self.wfile.write(body)
@@ -123,6 +123,10 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                     if file['path'].endswith('.html'):
                         tab=context.new_page(); response=tab.goto(url+file['path']); assert response.ok and response.from_service_worker
                         assert tab.locator('meta[name="gpu-release"]').get_attribute('content')==releases['one']['id']
+                        if file['path']=='lessons/hello.html':
+                            tab.evaluate('document.fonts.ready')
+                            assert tab.evaluate("[...document.fonts].some(f=>f.family==='IBM Plex Sans'&&f.status==='loaded')")
+                            assert tab.evaluate("[...document.fonts].some(f=>f.family==='IBM Plex Mono'&&f.status==='loaded')")
                         tab.close()
                 assets=page.evaluate('''async files => {for (const f of files) { const r=await fetch(new URL(f.path, new URL(document.querySelector('meta[name="gpu-base"]').content,location.href))); if(!r.ok || (await r.arrayBuffer()).byteLength!==f.bytes) return f.path;} return null;}''',releases['one']['files'])
                 assert assets is None, assets
