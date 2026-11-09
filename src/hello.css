@@ -115,3 +115,7 @@
  .hello-index-panel { padding:16px; }
  .hello-index-terms>div { padding:9px; }
 }
+
+/* Local launch explanations use the shared compact walkthrough rhythm. */
+.hello-launch-explanations li { padding:6px 8px; }
+.hello-launch-explanations code,.hello-launch-explanations li::marker { color:var(--cuda-ink); }
