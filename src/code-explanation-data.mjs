@@ -97,7 +97,7 @@ export function codeExplanations(source) {
     add('__global__ void', 'Declares a GPU kernel. Each launched thread executes this function. void means the function returns no value; this example writes results into output arrays.');
     if(!source.includes('tile[32][33]')) {
       add('const float*', 'Passes the location of an array of FP32 values. const prevents this function from changing values through that input pointer.');
-      match(/int i = [^\n;]+;/, 'Declares an integer i and calculates the array index used below. blockIdx.x is the block number, blockDim.x its size, and threadIdx.x the position in the block. Check which terms this example uses.');
+      match(/int i = [^\n;]+;/, 'Declares an integer i and calculates this thread’s array index. blockIdx.x is the block number, blockDim.x is the number of threads per block, and threadIdx.x is the thread’s position within that block.');
       add('if (i < n)', 'Allows array work only when i is smaller than the input count n. Extra threads skip that work.');
       match(/(?:output|y)\[i\] = [^;]+;/, source.includes('void gather(')?'Reads the selected input element and copies it to y[i]. Brackets select array elements; ; ends the statement.':'Reads the indexed input value or values, performs the shown arithmetic, then writes the indexed result. A trailing f marks an FP32 literal; ; ends the statement.');
       match(/x\[\d+ \+ i \* \d+\]/, 'Selects an input element using the starting offset plus index times stride. These are element positions, not byte offsets.');
