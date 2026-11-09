@@ -37,18 +37,19 @@ one thing, explain, inspect the code, and apply the idea to a new case. Keep eac
 experiment and visual beside its own explanation in a continuous downward flow.
 
 1. **How does a GPU double five values?** (`hello.html`): open with the short PyTorch
-   example and five values. Introduce threads, indices, blocks and bounds checks
-   as needed; trace a selected thread through the complete CUDA kernel at the end. Preserve the thread and block visuals, repeat
-   the block view beside a selected-thread CUDA trace. Predict and compare four
-   versus eight threads per block immediately after the worked grouping. Put launch and bounds-check bridges beside their
-   diagrams, with a complete function available locally from the first launch.
-   Define kernel beside the first launch; consolidate with a complete-function trace in the final idea. Introduce an SM beside blocks
-   as shared hardware executing their threads. Link the optional Inside an SM
-   appendix instead of repeating the thread cards. Defer warps, detailed scheduling
-   and shared memory to later mechanism lessons. After teaching the correct guard,
-   diagnose an off-by-one condition. Finish by choosing a sufficient launch for
-   nine inputs, distinguishing missing work from unsafe access. Keep hints and
-   worked comparisons available, followed by the optional repair workshop.
+   example and five values. Combine the calculation/thread demonstrations in one
+   compact input-to-output table. Add block boundaries with small thread tiles and
+   one shared, selectable index substitution. Keep five short sections in a continuous
+   reading flow: threads, blocks, launch settings, bounds checks and a nine-input case.
+   Put launch syntax and an optional complete kernel immediately after grouping;
+   define launch and kernel before using them. Avoid a second full worked trace at
+   the end. Retain all three reasoning challenges: regroup four/eight threads per
+   block, diagnose an off-by-one condition after teaching the correct guard, then
+   choose enough blocks for nine inputs. Mark unknown outputs until Run and
+   distinguish missing work from unsafe access. Introduce an SM beside blocks as
+   shared hardware; defer warps, scheduling and shared memory to later lessons.
+   Desktop/profiling extensions and documentation practice remain explicitly optional.
+   Preserve earlier thread selections, predictions and manual completion on restart.
 2. **Where are tensor values stored?** (`devices.html`): follow the same five inputs
    through a CPU-to-GPU copy, multiplication in GPU memory, and a result copy back.
    Each action has its own setup, prediction prompt, control, diagram and result.

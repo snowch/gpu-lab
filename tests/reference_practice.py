@@ -10,6 +10,7 @@ def check_reference_practice(browser,url,root):
         context.route('https://docs.pytorch.org/**',lambda route:route.fulfill(content_type='text/html',body='<h1>Official documentation</h1>'))
         page=context.new_page();page.goto(url+'lessons/hello.html')
         expect(page.locator('.reference-task')).to_have_count(3)
+        page.locator('.hello-doc-practice > summary').click()
         task=page.locator('aside[aria-labelledby="reference-hello-pytorch"]')
         expect(task.locator('.reference-code')).to_contain_text('device="cuda"')
         expect(task).to_contain_text('does not specify dtype')
@@ -54,6 +55,7 @@ def check_reference_practice(browser,url,root):
     for slug in ['hello','devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','putting-it-together','desktop','profiling']:
         page.goto(url+'lessons/'+slug+'.html')
         expect(page.locator('.chapter-references')).to_be_visible()
+        if slug=='hello':page.locator('.hello-doc-practice > summary').click()
         for task in page.locator('.reference-task').all():
             task.locator('summary').click()
             expect(task.locator('details p').first).to_be_visible()

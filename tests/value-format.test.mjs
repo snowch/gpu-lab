@@ -11,12 +11,12 @@ test('floating-point data remains recognisable for whole and fractional values',
   assert.equal(tensorValue(1000),'1000.0');
 });
 
-test('thread cards distinguish floating-point values from thread indices and unknown results',()=>{
+test('thread rows distinguish floating-point values from thread indices and unknown results',()=>{
   const state=simulateIntro(1,1.5);
-  const before=renderIntroMap(1,state,0,false),after=renderIntroMap(1,state,0,true);
-  assert.match(before,/<small>Input<\/small><strong>1\.0<\/strong>/);
-  assert.match(before,/<small>Thread 0<\/small>/);
-  assert.match(before,/<small>Output<\/small><strong>\?<\/strong>/);
-  assert.match(after,/<small>Output<\/small><strong>1\.5<\/strong>/);
-  assert.match(after,/<small>Output<\/small><strong>3\.0<\/strong>/);
+  const before=renderIntroMap(0,state,0,false),after=renderIntroMap(0,state,0,true);
+  assert.match(before,/<td>1\.0<\/td>/);
+  assert.match(before,/>Thread 0<\/button>/);
+  assert.match(before,/class="hello-result">\?<\/td>/);
+  assert.match(after,/class="hello-result">1\.5<\/td>/);
+  assert.match(after,/class="hello-result">3\.0<\/td>/);
 });

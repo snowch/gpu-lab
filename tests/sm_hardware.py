@@ -68,7 +68,7 @@ def check_sm_hardware(browser,url,root,errors):
             page.locator('#sm-explorer').screenshot(path=str(root/f'test-results/sm-appendix-{width}-{theme}.png'),style='.topbar{position:static!important}.sm-explorer-controls{position:static!important}')
             page.locator('#sm-value-return').click()
             expect(page).to_have_url(url+'lessons/hello.html?keep=sm')
-            expect(page.locator('#hello-output-2')).to_contain_text('[2.0, 4.0, 6.0, 8.0, 10.0]')
+            expect(page.locator('#hello-index-2')).to_contain_text('output[4] = 10.0')
             expect(page.locator('#hello-map-2 [data-thread="4"]')).to_have_attribute('aria-pressed','true')
             page.wait_for_function('(position)=>Math.abs(scrollY-position)<8',arg=position)
             expect(page.locator('#hello-sm-explore')).to_be_focused()
@@ -103,7 +103,7 @@ def check_sm_hardware(browser,url,root,errors):
     expect(page.locator('#reading-index-row')).to_have_value('2')
     expect(page.locator('#reading-feedback-row')).to_have_text(result)
     page.goto(url+'lessons/hello.html')
-    page.locator('#hello-run-1').click()
+    page.locator('#hello-run-0').click()
     page.locator('.gpu-map-link').click()
     map_=page.frame_locator('#gpu-map-frame')
     map_.locator('#gpu > summary').click();map_.locator('#sm-0 > summary').click()
@@ -112,7 +112,7 @@ def check_sm_hardware(browser,url,root,errors):
     page.locator('#sm-return').click()
     expect(page.locator('.gpu-map-link')).to_have_text('Close map')
     page.locator('.gpu-map-link').click()
-    expect(page.locator('#hello-output-1')).to_contain_text('[2.0, 4.0, 6.0, 8.0, 10.0]')
+    expect(page.locator('#hello-output-0')).to_contain_text('[2.0, 4.0, 6.0, 8.0, 10.0]')
     # A snapshot from the previous, warp-only appendix restores its cursor and
     # disclosures while the new value inspector starts fresh.
     page.goto(url+'lessons/inside-sm.html')

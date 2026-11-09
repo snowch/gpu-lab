@@ -40,7 +40,7 @@ await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
   .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())
   .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer())
-  .replace('<!-- REFERENCE_HELLO -->',desktopLinks('hello')+renderChapterReferences('hello')));
+  .replace('<!-- REFERENCE_HELLO -->','<details class="hello-local"><summary>Optional: run locally or inspect a real PyTorch launch</summary>'+desktopLinks('hello')+'<p><a href="profiling.html">Inspect PyTorch’s real kernel launches</a> on an NVIDIA GPU, or read a saved trace.</p></details>'+renderChapterReferences('hello',{compact:true})));
 await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where are tensor values stored?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: How does a GPU double five values?'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
 for(const [i,part] of ['selection','layout','requests'].entries()) {
   const chapter=chapters[i+2],previous=chapters[i+1],next=chapters[i+3];

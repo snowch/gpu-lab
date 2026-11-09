@@ -25,20 +25,18 @@ test('intro diagram and outputs derive from thread indices and selected multipli
 });
 
 import {renderIntroSections,renderSmExplanation} from '../src/hello-view.mjs';
-test('static introduction includes all worked diagrams with unique control IDs',()=>{
+test('compact introduction keeps source, static diagrams and unique control IDs',()=>{
  const html=renderIntroSections();
  assert.equal(pythonSource(),'import torch\nx = torch.tensor(\n    [1.0, 2.0, 3.0, 4.0, 5.0],\n    device="cuda",\n)\ny = x * 2');
- assert.ok(html.indexOf('import torch') < html.indexOf('Idea 1 of 5'));
- assert.match(html,/Result <code>y<\/code><\/dt><dd><code>\[2\.0, 4\.0, 6\.0, 8\.0, 10\.0\]/);
  assert.equal((html.match(/import torch\nx = /g)||[]).length,1);
- assert.match(html,/How does the GPU calculate these results/);
+ assert.ok(html.indexOf('import torch')<html.indexOf('id="hello-map-0"'));
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length);
- assert.equal((html.match(/class="hello-section"/g)||[]).length,5);
- assert.equal((html.match(/class="hello-thread"/g)||[]).length,26);
- assert.ok(html.includes('id="hello-factor-0"'));
- for(let i=1;i<5;i++)assert.ok(!html.includes('id="hello-factor-'+i+'"'));
- assert.doesNotMatch(html,/hello-next|hello-back/);
+ assert.match(html,/One input and one output per thread/);
+ assert.match(html,/Array index rule/);
+ assert.equal((html.match(/id="hello-run-/g)||[]).length,1);
+ assert.equal((html.match(/__global__ void runKernel/g)||[]).length,1);
+ assert.doesNotMatch(html,/hello-next|hello-back|id="hello-map-4"|id="hello-map-1"/);
 });
 
 test('chapter 1 keeps the SM distinction and links the optional hardware appendix',()=>{
@@ -67,7 +65,7 @@ test('CUDA bridges stay with their diagrams and provide a local complete functio
   const bounds=html.split('id="idea-4"')[1].split('id="idea-5"')[0];
   assert.ok(html.indexOf('data-language="cuda"')>html.indexOf('id="idea-3"'));
   assert.ok(blocks.indexOf('id="hello-map-2"')<blocks.indexOf('id="hello-bridge-launch-2"'));
-  assert.match(blocks,/See the complete CUDA function for this diagram/);
+  assert.match(blocks,/Complete CUDA kernel for this example/);
   assert.match(blocks,/__global__ void runKernel/);
   assert.match(bounds,/body excerpt from runKernel/);
   assert.match(bounds,/if \(i &lt; n\)/);
@@ -85,25 +83,22 @@ test('bounds excerpts match the guarded function and expose only the diagnostic 
 });
 
 
-test('initial experiment HTML withholds output before scripts run',()=>{
- const html=renderIntroSections().split('<section class="hello-section"').slice(1).join('');
- assert.equal((html.match(/<small>Output<\/small><strong>\?<\/strong>/g)||[]).length,10);
+test('initial compact table withholds output before scripts run',()=>{
+ const html=renderIntroSections();
+ assert.equal((html.match(/class="hello-result">\?/g)||[]).length,5);
  assert.match(html,/Run to inspect the calculation/);
- assert.match(html,/id="hello-output-1"[^>]*>Run to follow/);
  assert.doesNotMatch(html,/Example output:/);
+ const first=html.split('id="hello-map-0"')[1].split('</table>')[0];
+ assert.doesNotMatch(first,/class="hello-result">[0-9]/);
 });
 
-test('guided calculation allows a different multiplier without pretending to assess GPU reasoning',()=>{
- const html=renderIntroSections(),first=html.split('id="idea-1"')[1].split('id="idea-2"')[0];
- assert.equal(steps[0].factor,3);
- assert.notDeepEqual(simulateIntro(0,steps[0].factor).output,simulateIntro(0,2).output);
- assert.match(first,/id="hello-factor-0"[^>]*value="3"/);
- assert.match(first,/id="hello-operation-0">y = x \* 3/);
- assert.doesNotMatch(first.replace(/<noscript>[\s\S]*?<\/noscript>/g,''),/\[3\.0, 6\.0, 9\.0, 12\.0, 15\.0\]/);
+test('the single guided demo can change multiplier without pretending to assess arithmetic',()=>{
+ const html=renderIntroSections();
+ assert.match(html,/id="hello-factor-0"[^>]*value="2"/);
+ assert.match(html,/Change the multiplier to inspect another calculation/);
+ assert.notDeepEqual(simulateIntro(0,3).output,simulateIntro(0,2).output);
  assert.ok(introPrompt(0).startsWith('Run'));
- for(let stage=1;stage<5;stage++)assert.ok(introPrompt(stage).startsWith('Run'));
 });
-
 
 test('regrouping preserves outputs and array indices while changing block membership',()=>{
  const four=simulateIntro(4,2,true,4),eight=simulateIntro(4,2,true,8);

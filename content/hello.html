@@ -35,8 +35,9 @@
       <header class="intro">
         <p class="eyebrow">CHAPTER 1</p>
         <h1>How does a GPU double five values?</h1>
-        <p>Start with a PyTorch program that doubles five input values, then follow how the GPU computes the results. By the end, you will be able to trace one input to its output, choose enough threads for every input, and explain why extra threads need a bounds check.</p>
+        <p>Follow five input values from a PyTorch operation to GPU threads. Then choose enough threads for every input and keep extra threads from accessing the arrays.</p>
       </header>
+      <nav class="hello-outline" aria-label="In this chapter"><span>In this chapter</span><a href="#idea-1">1. Threads</a><a href="#idea-3">2. Blocks</a><a href="#idea-5">3. Launch</a><a href="#idea-4">4. Bounds check</a><a href="#hello-transfer">5. Apply it</a></nav>
       <noscript><p class="notice">Enable JavaScript to change the examples. The worked diagrams and code below remain readable without it.</p></noscript>
       <!-- INTRO_SECTIONS -->
       <!-- HELLO_TRANSFER -->

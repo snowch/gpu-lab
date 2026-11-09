@@ -127,6 +127,12 @@ second set of authoring requirements.
   then add block boundaries, then connect a local copy of the block view to CUDA.
   A code walkthrough must not replace a diagram that explains a different relationship.
   Ask for launch-count predictions before revealing calculated launch settings.
+- [ ] Recover diagram space through a compact representation, rather than smaller
+  text or touch targets. Use rows for repeated input/calculation/output relationships,
+  small tiles for grouping, and one shared detail panel for the selected item. Keep
+  group boundaries, explicit states and the values needed to reason visible. Combine
+  repeated demonstrations that teach the same outcome; retain distinct diagnosis and
+  transfer tasks. Check the whole page before adding another diagram or splitting it.
 - [ ] Make visuals show a relationship or consequence. Generate values from the model.
   When connecting threads to hardware, follow a known input through its read,
   calculation and write. Explain what the hardware does; distinguish logical
