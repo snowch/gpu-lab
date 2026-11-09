@@ -19,6 +19,8 @@ def check_sm_hardware(browser,url,root,errors):
             expect(page.locator('#sm-values')).not_to_contain_text('warp')
             expect(page.locator('#vsm-output-0')).to_have_text('?')
             expect(page.locator('#vsm-output-1')).to_have_text('?')
+            # Keyboard focus does not wait for the script to enable the button.
+            expect(page.locator('#vsm-next')).to_be_enabled()
             page.locator('#vsm-next').focus();page.keyboard.press('Enter')
             expect(page.locator('#vsm-loaded-0')).to_have_text('1.0')
             expect(page.locator('#vsm-result-0')).to_have_text('—')
