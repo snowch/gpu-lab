@@ -4,13 +4,13 @@ import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
 import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,launchSource,introPrompt,inspectLaunch} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
-import {renderIntroMap,renderCudaTrace} from './hello-view.mjs';
+import {renderIntroMap,renderCudaTrace,renderIndexSubstitution} from './hello-view.mjs';
 for (const section of document.querySelectorAll('.hello-section')) {
 const stage=Number(section.dataset.stage);
 if(stage===3){registerExperiment('hello-3',()=>({}),()=>{});continue;}
 const worked=stage===2||stage===4;
 const $=id=>document.getElementById(id+'-'+stage);
-let selected=stage===4?4:0,result=worked?simulateIntro(stage,2):null;
+let selected=stage>=2?4:0,result=worked?simulateIntro(stage,2):null;
 function factor(){
   if(!$('hello-factor'))return 2;
   if($('hello-factor').value.trim()==='') throw new Error('Enter a multiplier first.');
@@ -25,6 +25,7 @@ function code(){
 }
 function inspect(t){
   if(stage===0)return;
+  if(stage===2){$('hello-index').innerHTML=renderIndexSubstitution(t,model());return;}
   $('hello-index').textContent=stage===1
     ? 'Thread '+t.i+': i = '+t.i+'. Read the input at index '+t.i+', multiply it, then write the output at index '+t.i+'.'
     : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips the read, multiplication and write.':t.invalid?' No element '+t.i+' exists: without the check, the read is invalid and there is no valid result.':'');
@@ -82,7 +83,7 @@ let launchRevealed=false,launchSelected=4;
 function inspectGrouping(){
   const state=simulateIntro(4,2,true,Number(launchSize.value));
   const t=state.threads[launchSelected];
-  document.getElementById('hello-launch-index').textContent=`Thread ${t.i}: block ${t.block} × ${state.size} + position ${t.local} = index ${t.i}. `+(t.skipped?'No element exists here; the check skips the calculation.':`Input ${tensorValue(t.input)} → output ${tensorValue(t.output)}.`);
+  document.getElementById('hello-launch-index').innerHTML=renderIndexSubstitution(t,state);
 }
 function showLaunch(){
   launchAnswer.hidden=!launchRevealed;
