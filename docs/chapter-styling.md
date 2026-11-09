@@ -128,3 +128,14 @@ strong surfaces for source and diagrams; definitions use a quiet left rule,
 actions a green cue, and active contents a white surface/edge marker. Chapter
 headings carry the hierarchy, without extra decorative labels or automatic motion.
 Preserve the learning sequence, selections, Run behaviour and completion controls.
+
+## Compact Chapter 1 diagrams
+
+Chapter 1 uses a single thread table, then four-column thread tiles within labelled
+block boundaries. Valid inputs, safe skips and invalid accesses have explicit text;
+selection and keyboard focus remain distinct. A single local detail panel follows
+each selectable map. Do not restore the old tall repeated input/arrow/output cards,
+shrink the shared code/body text, or stack four-thread blocks into two-column grids.
+Keep the three reasoning challenges and their independent reveal/saved states.
+The complete kernel, desktop extension and documentation practice use labelled
+native disclosures. The opening example and required CUDA bridges stay visible.

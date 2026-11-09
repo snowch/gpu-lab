@@ -65,7 +65,7 @@ function restore() {
     if (data.schema !== 1) throw new Error('Unknown snapshot');
     // Retired arithmetic controls do not apply to the fixed worked examples.
     // Old positional disclosures must not reveal newly introduced challenge answers.
-    if(location.pathname.endsWith('/hello.html')&&data.experiments['hello-1']?.version!==2)data.details=[];
+    if(location.pathname.endsWith('/hello.html')&&data.experiments['hello-0']?.version!==3)data.details=[];
     restoreForm(data.controls);
     // The retired Chapter 1 SM disclosure followed its complete-function reference.
     // Preserve the other disclosure positions when opening a snapshot from that version.

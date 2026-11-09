@@ -1,75 +1,65 @@
-import {tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
+import {tensorValue} from './value-format.mjs';
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
-import {steps,simulateIntro,kernelSource,runnableSource,launchPlan,launchSource,introPrompt,inspectLaunch} from './hello-model.mjs';
+import {simulateIntro,runnableSource,launchPlan,launchSource,introPrompt,inspectLaunch} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
-import {renderIntroMap,renderCudaTrace,renderIndexSubstitution} from './hello-view.mjs';
-for (const section of document.querySelectorAll('.hello-section')) {
-const stage=Number(section.dataset.stage);
-if(stage===3){registerExperiment('hello-3',()=>({}),()=>{});continue;}
-const worked=stage===2||stage===4;
-const $=id=>document.getElementById(id+'-'+stage);
-let selected=stage>=2?4:0,result=worked?simulateIntro(stage,2):null;
-function factor(){
-  if(!$('hello-factor'))return 2;
-  if($('hello-factor').value.trim()==='') throw new Error('Enter a multiplier first.');
-  const value=Number($('hello-factor').value);simulateIntro(stage,value);return value;
+import {renderIntroMap,renderIndexSubstitution} from './hello-view.mjs';
+const byId=id=>document.getElementById(id);
+const factorInput=byId('hello-factor-0'),introMap=byId('hello-map-0');
+let introSelected=0,introResult=null,incomingIntroVersion=3;
+function introModel(){
+ if(factorInput.value.trim()==='')throw new Error('Enter a multiplier first.');
+ return simulateIntro(0,Number(factorInput.value));
 }
-function model(){return simulateIntro(stage,factor());}
-function code(){
-  let value;try{value=factor();}catch{return;}
-  $('hello-operation').textContent='y = x * '+value;
-  if(stage===2) document.getElementById('hello-bridge-full-2').textContent=kernelSource(value);
-  if(stage===4) $('hello-full').textContent=kernelSource(value);
+function inspectIntro(){
+ const thread=introModel().threads[introSelected];
+ byId('hello-index-0').textContent=`Thread ${thread.i} reads x[${thread.i}] = ${tensorValue(thread.input)}. `+(introResult?`Writes y[${thread.i}] = ${tensorValue(thread.output)}.`:'Run to reveal its output.');
 }
-function inspect(t){
-  if(stage===0)return;
-  if(stage===2){$('hello-index').innerHTML=renderIndexSubstitution(t,model());return;}
-  $('hello-index').textContent=stage===1
-    ? 'Thread '+t.i+': i = '+t.i+'. Read the input at index '+t.i+', multiply it, then write the output at index '+t.i+'.'
-    : 'Thread '+t.i+': block '+t.block+' × '+steps[stage].size+' threads per block + position '+t.local+' = index '+t.i+'.'+(t.skipped?' No element '+t.i+' exists, so the check skips the read, multiplication and write.':t.invalid?' No element '+t.i+' exists: without the check, the read is invalid and there is no valid result.':'');
-  if(stage===4) {
-    const state=model();
-    document.getElementById('hello-cuda-trace')?.remove();
-    $('hello-index').insertAdjacentHTML('afterend',renderCudaTrace(t,state,result!==null));
-  }
+function drawIntro(){
+ try{const state=introModel();introMap.innerHTML=renderIntroMap(0,state,introSelected,introResult!==null);inspectIntro();}
+ catch(error){introMap.replaceChildren();byId('hello-index-0').textContent=error.message;}
 }
-function draw(){
-  const container=$('hello-map');container.replaceChildren();
-  let state;try{state=model();}catch{if(stage===4)document.getElementById('hello-cuda-trace').textContent='Enter a valid multiplier to inspect the CUDA trace.';return;}
-  container.innerHTML=renderIntroMap(stage,state,selected,result!==null);
-  inspect(state.threads[selected]??state.threads[0]);
-}
-function invalidate(){
-  result=null;$('hello-output').textContent='Settings changed. Run to inspect the new results.';code();draw();
-}
-function resultText(){return (worked?'Worked output: [':'Output: [')+result.output.map(tensorValue).join(', ')+']';}
-$('hello-map').addEventListener('click',event=>{
-  const button=event.target.closest('button[data-thread]');
-  if(!button)return;
-  selected=Number(button.dataset.thread);
-  // Preserve the cards and focused element so browser scroll anchoring stays stable.
-  for(const card of $('hello-map').querySelectorAll('button[data-thread]')) {
-    card.setAttribute('aria-pressed',String(Number(card.dataset.thread)===selected));
-  }
-  try{inspect(model().threads[selected]);}catch{/* Keep the validation message until the input is corrected. */}
+introMap.addEventListener('click',event=>{
+ const button=event.target.closest('[data-thread]');if(!button)return;
+ introSelected=Number(button.dataset.thread);
+ for(const row of introMap.querySelectorAll('tbody tr')){
+  const control=row.querySelector('[data-thread]'),chosen=Number(control.dataset.thread)===introSelected;
+  control.setAttribute('aria-pressed',String(chosen));row.classList.toggle('is-selected',chosen);
+ }
+ inspectIntro();
 });
-$('hello-factor')?.addEventListener('input',invalidate);
-$('hello-run')?.addEventListener('click',()=>{
-  try{
-    result=model();draw();
-    $('hello-output').textContent=resultText();
-  }catch(error){result=null;$('hello-output').textContent=error.message;}
+factorInput.addEventListener('input',()=>{introResult=null;drawIntro();byId('hello-output-0').textContent='Settings changed. Run to inspect the new results.';});
+byId('hello-run-0').addEventListener('click',()=>{
+ try{introResult=introModel();drawIntro();byId('hello-output-0').textContent='Output: ['+introResult.output.map(tensorValue).join(', ')+']';}
+ catch(error){introResult=null;byId('hello-output-0').textContent=error.message;}
 });
-if(stage===2) document.getElementById('hello-bridge-download-2').addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello-blocks.cu');}catch(error){$('hello-output').textContent=error.message;}});
-$('hello-download')?.addEventListener('click',()=>{try{downloadCuda(runnableSource(factor()),'hello.cu');}catch(error){$('hello-output').textContent=error.message;}});
-code();draw();if($('hello-run'))$('hello-run').disabled=false;
-registerExperiment('hello-'+stage,()=>({version:2,selected,ran:result!==null,length:steps[stage].length,message:$('hello-output').textContent}),state=>{
-  selected=Number.isInteger(state.selected)&&state.selected>=0&&state.selected<model().threads.length?state.selected:0;result=worked?model():(stage===0||state.version===2)&&state.ran===true&&!state.message?.startsWith('Example output:')?model():null;code();draw();
-  $('hello-output').textContent=result?resultText():introPrompt(stage);
+drawIntro();byId('hello-run-0').disabled=false;
+registerExperiment('hello-0',()=>({version:3,selected:introSelected,ran:introResult!==null}),state=>{
+ incomingIntroVersion=state.version;
+ introSelected=Number.isInteger(state.selected)&&state.selected>=0&&state.selected<5?state.selected:0;
+ try{introResult=state.ran===true&&!state.message?.startsWith('Example output:')?introModel():null;}catch{introResult=null;}
+ drawIntro();byId('hello-output-0').textContent=introResult?'Output: ['+introResult.output.map(tensorValue).join(', ')+']':introPrompt(0);
 });
-}
+// The former standalone thread demo is now the opening table. Migrate its
+// selection without revealing an answer for a different multiplier.
+registerExperiment('hello-1',()=>({version:3}),state=>{
+ if(incomingIntroVersion!==3&&Number.isInteger(state.selected)&&state.selected>=0&&state.selected<5){introSelected=state.selected;drawIntro();}
+});
+const grouped=simulateIntro(2,2);let groupedSelected=4;
+function inspectBlock(){byId('hello-index-2').innerHTML=renderIndexSubstitution(grouped.threads[groupedSelected],grouped);}
+byId('hello-map-2').addEventListener('click',event=>{
+ const button=event.target.closest('[data-thread]');if(!button)return;groupedSelected=Number(button.dataset.thread);
+ for(const card of byId('hello-map-2').querySelectorAll('[data-thread]'))card.setAttribute('aria-pressed',String(card===button));inspectBlock();
+});
+registerExperiment('hello-2',()=>({version:3,selected:groupedSelected}),state=>{
+ groupedSelected=Number.isInteger(state.selected)&&state.selected>=0&&state.selected<8?state.selected:4;
+ byId('hello-map-2').innerHTML=renderIntroMap(2,grouped,groupedSelected);inspectBlock();
+});
+// Retain these hook names so earlier restart snapshots still restore. Bounds
+// diagnosis has its own hook; the repeated final worked trace has been removed.
+for(const stage of [3,4])registerExperiment('hello-'+stage,()=>({version:3}),()=>{});
+byId('hello-bridge-download-2').addEventListener('click',()=>downloadCuda(runnableSource(2),'hello-blocks.cu'));
 
 // The regrouping activity has its own controls and reveal state.
 const launchSize=document.getElementById('hello-launch-size');
@@ -176,9 +166,9 @@ function showTransfer(){
     'Two blocks launch eight threads, leaving input index 8 without a thread. The bounds check prevents invalid accesses but cannot supply missing threads. '+
     (state.missing.length?`Your ${state.blocks} blocks still leave index ${state.missing.join(', ')} unwritten.`:`Your ${state.blocks} blocks write all nine results. `+(state.blocks===minimum?'This is the smallest sufficient launch.':'This is safe, but three blocks are sufficient.'))+
     ' With the smallest launch, indices 9–11 skip; index 8 must write the ninth result.';
-  transferDiagram.innerHTML=`<h3>Your launch: ${state.blocks} blocks × 4 threads</h3><div class="hello-transfer-cells">`+
-    state.input.map((value,i)=>`<div class="hello-transfer-cell"><small>Input[${i}] · ${tensorValue(value)}</small><small>Output</small><strong>${state.output[i]===null?'Unwritten':tensorValue(state.output[i])}</strong><small>${state.output[i]===null?'No thread launched':`Thread ${i}`}</small></div>`).join('')+
-    `</div><p>${state.threads.filter(t=>t.skipped).length?'Skipped thread indices: '+state.threads.filter(t=>t.skipped).map(t=>t.i).join(', '):'No launched thread skips.'}</p>`;
+  transferDiagram.innerHTML=`<h3>Your launch: ${state.blocks} blocks × 4 threads</h3><div class="hello-table-wrap"><table class="hello-transfer-table"><caption>Results for your checked launch</caption><thead><tr><th scope="col">Index</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Thread</th></tr></thead><tbody>`+
+    state.input.map((value,i)=>`<tr class="hello-transfer-cell"><th scope="row">${i}</th><td>${tensorValue(value)}</td><td><strong>${state.output[i]===null?'Unwritten':tensorValue(state.output[i])}</strong></td><td>${state.output[i]===null?'Not launched':i}</td></tr>`).join('')+
+    `</tbody></table></div><p>${state.threads.filter(t=>t.skipped).length?'Skipped thread indices: '+state.threads.filter(t=>t.skipped).map(t=>t.i).join(', '):'No launched thread skips.'}</p>`;
 }
 for(const control of [coverageGuess,repairBlocks,skipGuess])control.addEventListener('change',()=>{transferRevealed=false;showTransfer();});
 document.getElementById('hello-transfer-run').disabled=false;
