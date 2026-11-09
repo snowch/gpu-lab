@@ -76,3 +76,20 @@
 .hello-transfer-cell { display:grid; gap:6px; padding:12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; }
 .hello-transfer-cell small { color:var(--muted); }
 #hello-bounds-feedback,#hello-transfer-result { padding:14px; border-left:3px solid var(--accent); background:var(--soft); }
+
+/* Repeat the same labelled terms in the rule and its selected-thread substitution. */
+.hello-index-panel { margin:20px 0; padding:18px; border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:6px; background:var(--panel); }
+.hello-index-panel h3 { margin:0 0 14px; font-size:20px; }
+.hello-index-equation { margin:12px 0; font:600 20px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+.hello-index-equation span { padding:2px 4px; border-radius:3px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+.hello-term-block { background:#e8f0fa; color:#245d92; }
+.hello-term-size { background:#fcf3df; color:#795519; }
+.hello-term-position { background:#f1eafa; color:#684185; }
+[data-theme="dark"] .hello-term-block { background:#213b56; color:#b3d9ff; }
+[data-theme="dark"] .hello-term-size { background:#44371e; color:#f3d38d; }
+[data-theme="dark"] .hello-term-position { background:#3a2c4e; color:#dfc1fc; }
+.hello-index-terms { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:16px 0; }
+.hello-index-terms>div { padding:10px; border-radius:4px; min-width:0; }
+.hello-index-terms dt { font-size:14px; line-height:1.4; }
+.hello-index-terms dd { margin:6px 0 0; font:600 22px/1.4 ui-monospace,monospace; }
+.hello-index-panel>p:last-child { margin-bottom:0; }

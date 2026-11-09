@@ -40,7 +40,9 @@ export function renderIntroSections() {
       ${worked?`<p>Here, each thread handles one input value:</p><ul class="hello-thread-examples">${worked.threads.slice(0,2).map(thread=>`<li>Thread ${thread.i} reads <strong>${tensorValue(thread.input)}</strong>, multiplies it by <strong>${worked.factor}</strong>, and writes <strong>${tensorValue(thread.output)}</strong>.</li>`).join('')}<li>Threads ${worked.threads[2].i}–${worked.threads.at(-1).i} do the same for the remaining inputs.</li></ul><p>Each thread follows the same instructions using a different input value. The GPU is built to run many threads at the same time. It schedules threads in groups, so launching many threads does not mean they all run at once.</p>`:''}
       <p class="hello-concept">${step.concept}</p>
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * ${state.factor}</code></pre></div>
-      ${stage===2?'<p>In the diagram, four threads per block give eight threads in total for five inputs. Each thread has a position within its block. Its index across the array is: block number × threads per block + position within the block.</p><p>Block 1, position 0 gives 1 × 4 + 0 = 4: the fifth input. The grey cards have no input and say “No calculation”. Select one to inspect its index; the next experiment explores the check that makes it skip the arrays.</p>':''}
+      ${stage===2?`<p>In the diagram, four threads per block give eight threads in total for five inputs. Each thread has a position within its block. Combine that position with its block number to find its array index.</p>
+      ${renderIndexRule()}
+      <p>The grey cards have no input and say “No calculation”. Select one to inspect its index; the next section explores the check that makes it skip the arrays.</p>`:''}
       ${stage===3?'<p>The correct check is <code>i &lt; n</code>. With five inputs, the valid indices are 0–4. An index of 5 has no element, so it must fail the check.</p>':''}
       ${stage===4?`<p>PyTorch chooses its own kernel and launch settings for <code>y = x * 2</code>. Our <code>runKernel</code> is a separate CUDA teaching example that lets us choose the settings ourselves; PyTorch does not call it for this expression.</p>
       <details class="more-settings" id="hello-pytorch-control"><summary>More about PyTorch, optimisation and profiling</summary>
@@ -58,10 +60,11 @@ export function renderIntroSections() {
       ${stage===1?readerTask(step.instruction,'Inspect'):''}
       ${stage===3?renderBoundsChallenge():`
       ${stage===2?'<div class="hello-bridge-layout"><div class="hello-bridge-visual">':''}
-      <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,stage===4?4:0,workedView)}</div>
+      <div id="hello-map-${stage}" aria-label="Each input connects to its output">${renderIntroMap(stage,state,stage>=2?4:0,workedView)}</div>
+      ${stage===2?`<div id="hello-index-2" class="hello-index-panel" role="status">${renderIndexSubstitution(state.threads[4],state)}</div>`:''}
       <p id="hello-output-${stage}" class="hello-output" role="status">${workedView?'Worked output: ['+state.output.map(tensorValue).join(', ')+']':introPrompt(stage)}</p>
       ${workedView?'':`<noscript><details><summary>Compare the worked result</summary><p>Output: [${state.output.map(tensorValue).join(', ')}].</p></details></noscript>`}
-      ${stage>0&&stage!==3?`<p id="hello-index-${stage}" role="status"${stage===4?' hidden':''}>Select a thread to follow its input and output.</p>`:''}
+      ${stage===1||stage===4?`<p id="hello-index-${stage}" role="status"${stage===4?' hidden':''}>Select a thread to follow its input and output.</p>`:''}
       ${stage===2?`</div>${renderCodeBridge(stage,state.factor)}</div>`:''}
       `}
       ${stage===2?renderLaunchPractice()+renderSmExplanation():''}
@@ -159,7 +162,7 @@ export function renderLaunchPractice() {
       <button type="button" id="hello-launch-download">Download this launch as a CUDA program</button>
       <div id="hello-launch-map" aria-label="Thread grouping for the checked launch"></div>
       <p id="hello-launch-output"></p>
-      <p id="hello-launch-index" role="status"></p>
+      <div id="hello-launch-index" class="hello-index-panel" role="status"></div>
       <p>Two blocks of four and one block of eight both supply eight threads. The output values stay the same: indices 0–4 calculate results and indices 5–7 skip the arrays.</p>
     </div>
   </div>`;
@@ -187,4 +190,19 @@ export function renderCodeBridge(stage,factor) {
     <p>The braces enclose the statements controlled by <code>if</code>; the <code>f</code> suffix writes the multiplier as a 32-bit floating-point value. The worked check excludes any thread with no input element.</p>
   </div>`;
   return '';
+}
+
+export function renderIndexRule() {
+  return `<aside class="hello-index-panel" aria-labelledby="hello-index-rule-title">
+    <h3 id="hello-index-rule-title">Find a thread’s array index</h3>
+    <p class="hello-index-equation">index = <span class="hello-term-block">block number</span> × <span class="hello-term-size">threads per block</span> + <span class="hello-term-position">position within the block</span></p>
+    <p class="hello-note">Positions and array indices start at zero. This finds an element’s position, rather than its value.</p>
+  </aside>`;
+}
+export function renderIndexSubstitution(thread,state) {
+  const equation=`index = ${thread.block} × ${state.size} + ${thread.local} = ${thread.i}`;
+  return `<h3>Selected thread ${thread.i} · Block ${thread.block}, position ${thread.local}</h3>
+    <p class="hello-index-equation" aria-label="${equation}">index = <span class="hello-term-block">${thread.block}</span> × <span class="hello-term-size">${state.size}</span> + <span class="hello-term-position">${thread.local}</span> = <strong>${thread.i}</strong></p>
+    <dl class="hello-index-terms"><div class="hello-term-block"><dt>Block number</dt><dd>${thread.block}</dd></div><div class="hello-term-size"><dt>Threads per block</dt><dd>${state.size}</dd></div><div class="hello-term-position"><dt>Position within the block</dt><dd>${thread.local}</dd></div></dl>
+    <p>${thread.skipped?`No <code>input[${thread.i}]</code> exists. The check skips the calculation.`:`Reads <code>input[${thread.i}]</code>, whose value is <strong>${tensorValue(thread.input)}</strong>. Writes the result to <code>output[${thread.i}]</code>.`}</p>`;
 }

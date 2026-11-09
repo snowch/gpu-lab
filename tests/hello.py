@@ -57,6 +57,16 @@ def hello_flow(page,url):
     assert 'input[i] * 2.0f' in Path(download.value.path()).read_text()
     page.locator('#hello-bridge-complete-2 summary').click()
 
+    # The selected thread substitutes model values into the visible index rule.
+    expect(page.locator('#hello-index-rule-title')).to_have_text('Find a thread’s array index')
+    for i in [0,2,4,5,7]:
+        page.locator(f'#hello-map-2 [data-thread="{i}"]').click()
+        panel=page.locator('#hello-index-2')
+        expect(panel.locator('.hello-index-equation')).to_have_text(f'index = {i//4} × 4 + {i%4} = {i}')
+        expect(panel.locator('.hello-index-terms dd')).to_have_text([str(i//4),'4',str(i%4)])
+        if i<5:expect(panel).to_contain_text(f'whose value is {i+1}.0')
+        else:expect(panel).to_contain_text('skips the calculation')
+
     # Regrouping: require all predictions; wrong answers still get useful feedback.
     expect(page.locator('#hello-launch-answer')).to_be_hidden()
     page.locator('#hello-launch-run').click()
@@ -64,7 +74,7 @@ def hello_flow(page,url):
     grouping(page,'2','1:0','different')
     expect(page.locator('#hello-launch-feedback')).to_contain_text('Compare your predictions')
     expect(page.locator('#hello-launch-map .hello-group')).to_have_count(1)
-    expect(page.locator('#hello-launch-index')).to_contain_text('block 0 × 8 + position 4 = index 4')
+    expect(page.locator('#hello-launch-index')).to_contain_text('index = 0 × 8 + 4 = 4')
     expect(page.locator('#hello-launch-output')).to_contain_text('[2.0, 4.0, 6.0, 8.0, 10.0]')
     grouping(page)
     expect(page.locator('#hello-launch-feedback')).to_contain_text('All three predictions match')

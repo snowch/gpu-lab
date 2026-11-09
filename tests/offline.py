@@ -241,7 +241,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(page.locator('#hello-launch-answer')).to_be_visible()
                 expect(page.locator('#hello-launch-size')).to_have_value('8')
                 expect(page.locator('#hello-launch-feedback')).to_contain_text('All three predictions match')
-                expect(page.locator('#hello-launch-index')).to_contain_text('block 0 × 8 + position 4 = index 4')
+                expect(page.locator('#hello-launch-index')).to_contain_text('index = 0 × 8 + 4 = 4')
                 expect(second).to_have_url(url+'lessons/memory.html?keep=1#simulator')
                 expect(second.locator('#stride')).to_have_value('8');expect(second.locator('#sector-count')).to_have_text('32')
                 expect(second.locator('#lanes button').nth(5)).to_have_attribute('aria-pressed','true')
