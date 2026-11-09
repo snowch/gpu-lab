@@ -38,7 +38,7 @@ export function renderIntroSections() {
       ${step.leadIn?`<p>${step.leadIn}</p>`:''}
       ${definitions(step.definitions)}
       ${worked?`<p>Here, each thread handles one input value:</p><ul class="hello-thread-examples">${worked.threads.slice(0,2).map(thread=>`<li>Thread ${thread.i} reads <strong>${tensorValue(thread.input)}</strong>, multiplies it by <strong>${worked.factor}</strong>, and writes <strong>${tensorValue(thread.output)}</strong>.</li>`).join('')}<li>Threads ${worked.threads[2].i}–${worked.threads.at(-1).i} do the same for the remaining inputs.</li></ul><p>Each thread follows the same instructions using a different input value. The GPU is built to run many threads at the same time. It schedules threads in groups, so launching many threads does not mean they all run at once.</p>`:''}
-      <p class="hello-concept">${step.concept}</p>
+      ${step.concept?`<p class="hello-concept">${step.concept}</p>`:''}
       <div class="chapter-code-panel" data-language="pytorch"><p class="chapter-code-label">PyTorch operation</p><pre class="hello-operation"><code id="hello-operation-${stage}">y = x * ${state.factor}</code></pre></div>
       ${stage===2?`<p>In the diagram, four threads per block give eight threads in total for five inputs. Each thread has a position within its block. Combine that position with its block number to find its array index.</p>
       ${renderIndexRule()}
@@ -171,10 +171,19 @@ export function renderLaunchPractice() {
 export function renderCodeBridge(stage,factor) {
   if(stage===2)return `<div class="hello-code-bridge" aria-labelledby="hello-bridge-title-2">
     <h3 id="hello-bridge-title-2">How CUDA requests these blocks</h3>
-    ${definitions([['Launch','Starting a GPU function with a chosen number of blocks and threads per block.']])}
-    <p>PyTorch chooses its launch for <code>y = x * 2</code>. In this separate CUDA C++ example, we choose the block count and size. <code>runKernel</code> is our name for the GPU function that multiplies each input.</p>
+    ${definitions([['Launch','Starting a GPU function with a chosen number of blocks and threads per block.'],['Kernel','A GPU function executed by the threads in a launch.']])}
+    <p>PyTorch chooses its launch for <code>y = x * 2</code>. In this separate CUDA C++ example, we choose the block count and size. <code>runKernel</code> is the name we chose for this example’s kernel, which multiplies each input.</p>
     ${codePanel({id:'hello-bridge-launch-2',source:launchSource(),label:'CUDA C++ · launch for this diagram',explainedLocally:true})}
-    <p><code>blocks = 2</code> matches the two block boundaries; <code>threadsPerBlock = 4</code> matches the four cards in each. The <code>&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> syntax requests that grouping. The last argument, <code>5</code>, is the input count. <code>d_input</code> and <code>d_output</code> refer to arrays already in GPU memory.</p>
+    <div class="code-explanations hello-launch-explanations">
+      <p class="code-explanation-heading">What each part does</p>
+      <ul>
+        <li><code>int threadsPerBlock = 4;</code> — Sets four threads in each block, matching its four cards. <code>int</code> declares an integer variable.</li>
+        <li><code>int blocks = 2;</code> — Sets two blocks, giving eight threads in total.</li>
+        <li><code>runKernel&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> — Starts our kernel with that block count and size.</li>
+        <li><code>d_input, d_output</code> — The input and output arrays already in GPU memory.</li>
+        <li><code>5</code> — The input count passed to the kernel.</li>
+      </ul>
+    </div>
     <p class="hello-note">The browser simulates the calculation; it does not compile or execute this CUDA code.</p>
     <details id="hello-bridge-complete-2"><summary>See the complete CUDA function for this diagram</summary>
       <p>Each thread calculates its array index, skips indices with no input, then multiplies one value. The next section explores that check.</p>

@@ -38,11 +38,11 @@ experiment and visual beside its own explanation in a continuous downward flow.
 
 1. **How does a GPU double five values?** (`hello.html`): open with the short PyTorch
    example and five values. Introduce threads, indices, blocks and bounds checks
-   as needed; assemble the CUDA kernel at the end. Preserve the thread and block visuals, repeat
+   as needed; trace a selected thread through the complete CUDA kernel at the end. Preserve the thread and block visuals, repeat
    the block view beside a selected-thread CUDA trace. Predict and compare four
    versus eight threads per block immediately after the worked grouping. Put launch and bounds-check bridges beside their
    diagrams, with a complete function available locally from the first launch.
-   Assemble the complete function in the final idea. Introduce an SM beside blocks
+   Define kernel beside the first launch; consolidate with a complete-function trace in the final idea. Introduce an SM beside blocks
    as shared hardware executing their threads. Link the optional Inside an SM
    appendix instead of repeating the thread cards. Defer warps, detailed scheduling
    and shared memory to later mechanism lessons. After teaching the correct guard,
