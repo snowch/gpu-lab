@@ -33,7 +33,7 @@ export function renderIntroSections() {
  </section>
  <section class="hello-section" data-stage="2" id="idea-3" aria-labelledby="hello-title-2">
  <p class="eyebrow">02 · Thread groups</p><h2 id="hello-title-2">Group threads into blocks</h2>
- <p>We specify groups of threads when starting a GPU program. Each group is called a <strong>block</strong>. The GPU distributes the calculation a block at a time.</p>
+ <p>In CUDA, threads are organised into groups called <strong>blocks</strong>. The GPU distributes the calculation a block at a time.</p>
  ${definitions([['Block','A group of threads. Threads in the same block can share data and wait for one another when their calculation needs it. Our multiplication does not need that cooperation.']])}
  <p>Return to doubling the five inputs. This worked example uses <strong>two blocks of four threads</strong>. That provides eight threads for five inputs. The grey tiles have no input, so those threads must skip the calculation.</p>
  <div class="hello-visual"><p class="hello-figure-title">Worked grouping · 5 inputs, 8 threads</p><p class="hello-note">Select a thread tile. Its block number and position determine its array index.</p>
@@ -43,7 +43,7 @@ export function renderIntroSections() {
  ${renderSmExplanation()}
  </section>
  <section class="hello-section hello-launch-section" data-stage="4" id="idea-5" aria-labelledby="hello-title-4">
- <p class="eyebrow">03 · CUDA launch</p><h2 id="hello-title-4">Choose the number of blocks and threads</h2>
+ <p class="eyebrow">03 · CUDA launch</p><h2 id="hello-title-4">Choose blocks and threads in CUDA C++</h2>
  ${renderCodeBridge(2,2)}${renderLaunchPractice()}
  </section>
  <section class="hello-section" data-stage="3" id="idea-4" aria-labelledby="hello-title-3">
@@ -123,9 +123,11 @@ export function renderIntroTransfer() {
 export function renderCodeBridge(stage,factor) {
  if(stage!==2)return '';
  return `<div class="hello-code-bridge" aria-labelledby="hello-title-4">
- <p>Where did “two blocks of four” come from? In CUDA C++, we choose those settings when starting a GPU function.</p>
- ${definitions([['Launch','A request to start a GPU function with a chosen number of blocks and threads per block.'],['Kernel','A GPU function executed by the threads in a launch.']])}
- <p><code>runKernel</code> is our chosen name for the kernel that doubles the inputs. This launch creates the grouping in the worked diagram:</p>
+ <p>Where did “two blocks of four” come from? To choose those counts ourselves, we’ll use CUDA C++.</p>
+ ${definitions([['Kernel','A function executed by GPU threads.'],['Launch','A request to execute a kernel. In CUDA, the launch specifies the number of blocks and threads per block.']])}
+ <p>Ordinary PyTorch GPU operations usually handle kernel selection and launches for you. One operation may launch several kernels. Tensor layout and data type can still affect performance.</p>
+ <p>When you launch a CUDA C++ kernel directly, you specify the block and thread counts. Our <code>runKernel</code> example doubles the inputs using a separate implementation; it is not PyTorch’s internal kernel.</p>
+ <p>The launch below requests the two blocks of four threads shown in the diagram:</p>
  ${codePanel({id:'hello-bridge-launch-2',source:launchSource(),label:'CUDA C++ · launch from the CPU program',explainedLocally:true})}
  <div class="code-explanations hello-launch-explanations"><p class="code-explanation-heading">What each part does</p><ul>
  <li><code>int threadsPerBlock = 4;</code> — Sets four threads per block; <code>int</code> declares an integer variable.</li>
@@ -136,7 +138,7 @@ export function renderCodeBridge(stage,factor) {
  <p>Each thread calculates its index, checks whether an input exists, then doubles it. The next section explains that check.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
  <button type="button" id="hello-bridge-download-2">Download complete CUDA program</button> <a href="desktop.html#first-cuda">Desktop setup</a></details>
- <p class="hello-note"><strong>What PyTorch handles:</strong> <code>y = x * 2</code> describes the calculation. PyTorch chooses its kernel and launch settings; this expression does not let you set their block or thread counts directly. Layout, data type and other choices can still affect performance. Our CUDA program is a separate implementation, not PyTorch’s generated source.</p></div>`;
+ </div>`;
 }
 export function renderIndexRule() {
  return `<div class="hello-index-rule" aria-labelledby="hello-index-rule-title"><h3 id="hello-index-rule-title">Array index rule</h3><p class="hello-index-equation">index = <span class="hello-term-block">block number</span> × <span class="hello-term-size">threads per block</span> + <span class="hello-term-position">position in block</span></p></div>`;

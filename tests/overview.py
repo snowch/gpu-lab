@@ -115,6 +115,8 @@ def check_overview(browser,base_url,root,errors):
     frame.locator('#gpu > summary').click()
     frame.locator('#gpu .map-chapter-links a[href="devices.html"]').last.click()
     expect(page).to_have_url(base_url+'lessons/devices.html')
+    # The URL changes before the destination's module turns the map link into a button.
+    page.wait_for_load_state('load')
     expect(page.locator('#gpu-map-panel')).to_be_hidden()
     page.locator('.gpu-map-link').click()
     expect(page.frame_locator('#gpu-map-frame').locator('#hardware-panel')).to_be_visible()
