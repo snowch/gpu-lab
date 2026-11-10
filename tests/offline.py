@@ -56,6 +56,8 @@ class CourseHandler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError): pass
 
 def panel(page):
+    # Release markup can appear before the restarted page has attached its controls.
+    page.wait_for_load_state('load')
     if not page.locator('#app-status-dialog').is_visible(): page.locator('#app-status-open').click()
 
 def check(page):
