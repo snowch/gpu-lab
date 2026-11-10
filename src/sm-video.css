@@ -1,0 +1,15 @@
+/* Copyright © 2026 Christopher Snow. */
+body.sm-appendix .sidebar { display:none; }
+body.sm-appendix .layout { display:block; max-width:1440px; }
+body.sm-appendix main { max-width:none; width:100%; padding-inline:clamp(16px,4vw,56px); }
+body.sm-appendix .intro { padding-bottom:20px; margin-bottom:24px; }
+body.sm-appendix .intro p { max-width:70ch; }
+.sm-recording video { display:block; width:100%; height:auto; aspect-ratio:16/9; background:#142c2b; border:1px solid var(--line); border-radius:12px; }
+.sm-video-note { color:var(--muted); font-size:16px; margin-block:14px; }
+.sm-video-downloads { display:flex; flex-wrap:wrap; gap:12px 28px; margin-block:20px 28px; }
+.sm-video-downloads a,.sm-return a { display:inline-block; padding-block:8px; }
+.sm-transcript { border-block:1px solid var(--line); padding-block:18px; }
+.sm-transcript summary { min-height:44px; align-content:center; font-weight:600; cursor:pointer; }
+.sm-transcript section { max-width:72ch; margin-block:28px; }
+.sm-transcript h2 { font-size:22px; margin-bottom:10px; }
+.sm-return { margin-top:24px; }

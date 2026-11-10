@@ -36,12 +36,13 @@ export async function buildOffline(directory, identity = { commit: null, date: n
       .replace('</body>', `${panel}</body>`)
       .replace('</head>', `<meta name="gpu-base" content="${base}"><meta name="gpu-release" content="__BUILD_ID__"><script type="module" src="${base}src/offline.mjs"></script></head>`);
     // Pin executable assets to this release even before a worker controls the page.
-    html = html.replace(/((?:src|href)=")(\.\/|\.\.\/)?(src\/|assets\/)/g, `$1${base}releases/__BUILD_ID__/$3`);
+    html = html.replace(/((?:src|href|poster)=")(\.\/|\.\.\/)?(src\/|assets\/)/g, `$1${base}releases/__BUILD_ID__/$3`);
     await writeFile(`${directory}/${path}`, html);
   }
   const worker = await readFile(new URL('./service-worker.js', import.meta.url), 'utf8');
   const contract = (await readFile(new URL('../src/release-contract.mjs', import.meta.url), 'utf8')).replace(/export /g, '');
-  const workerSource = contract + '\n' + worker;
+  const ranges=(await readFile(new URL('../src/media-range.mjs',import.meta.url),'utf8')).replace(/export /g,'');
+  const workerSource = contract + '\n' + ranges + '\n' + worker;
   const fingerprint = createHash('sha256').update(workerSource);
   for (const path of files) fingerprint.update(path).update('\0').update(await readFile(`${directory}/${path}`)).update('\0');
   const id = fingerprint.digest('hex');

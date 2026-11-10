@@ -396,12 +396,15 @@ The output is identical. These are per-SM resource bounds, not simulated schedul
 The transfer exercise uses N=8/T=2: 512 loads, 64 stores and capacity 4.
 Complete Python downloads reuse matrixCode and CI checks C against the engine.
 
-## Beginner SM value inspection
+## SM recording and value walkthrough
 
-The Inside an SM appendix now starts with two inspectable thread values from
-chapter 1. Load, multiply and store reveal registers and output memory separately.
-Both threads use the same depicted arithmetic hardware. Selection is an inspection
-choice, not a simulated execution order. No unit counts, latency, throughput or
-compiled instruction trace are implied. The existing two-warp readiness walkthrough
-follows a clearly labelled later-reading boundary after chapter 5. Both views retain
-their state when returning from the appendix or activating an offline update.
+The beginner appendix uses an approved recording of the Chapter 1 value path:
+1.0 → 2.0 and 2.0 → 4.0, with a third-thread transfer case 3.0 → 6.0. Registers
+hold per-thread working values; shared arithmetic units return results to registers;
+stores write the output array. Values and hardware roles are conceptual, not a
+schedule or compiler trace. Caches, unit counts, latency and throughput are omitted.
+
+The existing generated 64-input/two-warp readiness sequence remains unchanged in
+Chapter 6’s optional hardware walkthrough. Its cursor is saved independently of
+the chapter’s teaching scheduler. The video saves time and playback preferences,
+restores paused, and retires old inspector snapshots without replaying them.

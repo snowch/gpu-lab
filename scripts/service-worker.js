@@ -229,7 +229,7 @@ self.addEventListener('fetch', event => {
     if (id) {
       const cache = await caches.open(cacheName(id));
       const cached = await cache.match(new URL(path, BASE));
-      if (cached) return cached;
+      if (cached) return mediaRangeResponse(event.request.headers.get('Range'),cached);
       // Missing assets from a selected release must never fall through to a
       // different root deployment. The immutable release URL may repair them.
       const response = await fetch(new URL(`releases/${id}/${path}`, BASE), { cache: 'no-store' });
@@ -238,7 +238,7 @@ self.addEventListener('fetch', event => {
         if (!await verified(response.clone(), file)) return new Response('This release file could not be verified. Return to App status to repair or update.', { status: 503, headers: { 'Content-Type': 'text/plain' } });
         await cache.put(new URL(path, BASE), response.clone());
       }
-      return response;
+      return mediaRangeResponse(event.request.headers.get('Range'),response);
     }
     try { return await fetch(event.request); }
     catch (error) {

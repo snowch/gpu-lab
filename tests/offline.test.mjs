@@ -14,7 +14,7 @@ test('release fingerprints every file, measures bytes, pins assets and leaves wo
     async function build(content = 'first') {
       await rm(directory, { recursive: true, force: true });
       await mkdir(`${directory}/lessons`, { recursive: true }); await mkdir(`${directory}/examples`);
-      const html = '<html><head><link rel="stylesheet" href="../src/style.css"></head><body><div class="top-actions"></div><footer></footer></body></html>';
+      const html = '<html><head><link rel="stylesheet" href="../src/style.css"></head><body><div class="top-actions"></div><video poster="../assets/poster.jpg"><source src="../assets/clip.mp4"><track src="../assets/captions.vtt"></video><footer></footer></body></html>';
       await writeFile(`${directory}/index.html`, html); await writeFile(`${directory}/lessons/test.html`, html);
       await writeFile(`${directory}/examples/test.cu`, content);
       return buildOffline(directory);
@@ -28,6 +28,8 @@ test('release fingerprints every file, measures bytes, pins assets and leaves wo
     }
     assert.equal(second.bytes, second.files.reduce((n, f) => n + f.bytes, 0));
     assert.match(await readFile(`${directory}/lessons/test.html`, 'utf8'), new RegExp(`href="../releases/${second.id}/src/style.css"`));
+    const media=await readFile(`${directory}/lessons/test.html`,'utf8');
+    for(const [attribute,path] of [['poster','poster.jpg'],['src','clip.mp4'],['src','captions.vtt']])assert.ok(media.includes(`${attribute}="../releases/${second.id}/assets/${path}"`));
     assert.match(await readFile(`${directory}/index.html`, 'utf8'), /id="app-status-open"/);
     assert.doesNotMatch(await readFile(`${directory}/sw.js`, 'utf8'), /cache\.addAll|skipWaiting/);
     for (const bad of [{ ...second, bytes: 0 }, { ...second, id: 'main' }, { ...second, files: [...second.files, second.files[0]] }, { ...second, files: [{...second.files[0], path:'../bad'}] }]) assert.throws(() => validateRelease(bad));

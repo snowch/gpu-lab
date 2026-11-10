@@ -1,6 +1,7 @@
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import { escape, fmt, metrics, table } from './continuation-ui.mjs';
+import {renderSmWalkthrough} from './sm-walkthrough-view.mjs';
 import {renderSmHardware} from './sm-hardware-view.mjs';
 import { renderSchedulingRelationships } from './scheduling-relationships.mjs';
 
@@ -62,7 +63,7 @@ export const chapters = [
           ['Cycle', 'One discrete step of this teaching machine, not a measured duration on a GPU.'],
           ['Load latency', 'The number of model cycles from starting a load until its value is ready for the dependent multiply.'],
         ],
-        body: `<div id="sm-hardware-basics"><p>A multiply needs its input values in registers before it can start. The diagram separates those per-thread working values from the execution hardware shared by the warps.</p>${renderSmHardware()}<p><a id="scheduling-sm-explore" data-reading-link href="inside-sm.html?from=scheduling#sm-warps">Optional: follow values through the hardware inside an SM</a>.</p></div><p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
+        body: `<div id="sm-hardware-basics"><p>A multiply needs its input values in registers before it can start. The diagram separates those per-thread working values from the execution hardware shared by the warps.</p>${renderSmHardware()}<p><a id="scheduling-sm-explore" href="#sm-warps">Optional: follow two warps through shared hardware</a>.</p></div><p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
           <p>The chosen sequence is <code>LD, MUL, ST, LD, MUL, ST</code>. The teaching machine starts at most one instruction each cycle; an idle cycle starts none. A latency of 6 means a load started at cycle 0 becomes usable at cycle 6. Watch what can happen between those two events. The model ends when the last store starts; it does not model a later wait for the store to complete.</p>`,
         task: 'With one warp, predict where idle cycles appear. Run and step past the first load. Change only load latency to 1, run again, and explain what happened to the waits.',
         experiment: {
@@ -91,7 +92,7 @@ export const chapters = [
       prompt: 'A resident warp is waiting on a load, and another resident warp is ready. Must the next issue slot be idle? Explain what this model can tell you, and whether doubling the resident warp count proves a speedup.',
       answer: '<p>The ready warp can issue: the scheduler skips the waiting warp. Adding resident warps also adds six instructions per warp in this experiment. Compare issue-slot use and idle slots, but do not turn the elapsed cycles of different workloads into a speedup. Actual residency and performance need resource and hardware evidence beyond this model.</p>',
     },
-    optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Compare blocks A and C on SM 0 with block B on SM 1. Each block has two warps; available resources constrain which blocks can share an SM.</p>${renderSchedulingRelationships()}</section>`,
+    optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Compare blocks A and C on SM 0 with block B on SM 1. Each block has two warps; available resources constrain which blocks can share an SM.</p>${renderSchedulingRelationships()}</section>${renderSmWalkthrough()}`,
   },
   {
     slug: 'divergence', number: 7, title: 'What if lanes need different calculations?',
