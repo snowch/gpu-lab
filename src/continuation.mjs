@@ -1,5 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
+import './sm-hardware.mjs';
 import {registerExperiment} from './experiment-state.mjs';
 import {continuationChapters,computeExperiment,experimentResult,traceLength} from './continuation-view.mjs';
 import {openingCode} from './chapter-view.mjs';

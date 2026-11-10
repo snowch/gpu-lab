@@ -204,20 +204,16 @@ measurement scope. No measured performance claim is made by this initial lab.
 
 ## Optional hardware depth
 
-`inside-sm.html` is a full-width appendix linked locally from chapters 1 and 6.
-Chapter 1 retains the thread/block/SM distinction; chapter 6 keeps a visible hardware
-relationship diagram beside its scheduling exercise. The appendix walks values
-through registers, load/store and arithmetic execution units, with a scheduler
-selecting ready warp instructions. It teaches resource sharing rather than recolouring
-an existing input/output diagram. Readers can return to their saved experiment and
-scroll position. It is optional early detail, not a prerequisite detour from chapter 1.
+`inside-sm.html` is a short, full-width video appendix linked from Chapter 1 as
+“Watch: inside an SM · 3 minutes”. The approved narrated deck follows a load,
+register multiplication and store, then contrasts separate thread values with
+shared execution hardware. Native playback controls, English captions, a generated
+transcript and video/PDF downloads work without a custom player or installation.
+The return link preserves the originating chapter’s inputs, result and position;
+return visits and release updates restore the video position without autoplay.
 
-## Beginner SM value inspection
-
-The Inside an SM appendix now starts with two inspectable thread values from
-chapter 1. Load, multiply and store reveal registers and output memory separately.
-Both threads use the same depicted arithmetic hardware. Selection is an inspection
-choice, not a simulated execution order. No unit counts, latency, throughput or
-compiled instruction trace are implied. The existing two-warp readiness walkthrough
-follows a clearly labelled later-reading boundary after chapter 5. Both views retain
-their state when returning from the appendix or activating an offline update.
+The interactive two-warp readiness walkthrough is local to Chapter 6, behind an
+optional disclosure reached from its hardware overview. Chapter 6 retains its
+visible core diagram and teaching-scheduler experiments. The optional trace keeps
+its own saved cursor; moving it has not changed its values or event semantics.
+No instruction timing, execution-unit count or captured PyTorch trace is implied.

@@ -189,18 +189,18 @@ it requires a physical NVIDIA GPU. Its syntax and the standard-library trace
 reader's synthetic schema fixtures are checked in CI. These checks do not validate
 CUPTI capture, Nsight execution, a PyTorch launch configuration or GPU performance.
 
-## Inside an SM appendix
+## Inside an SM recording and Chapter 6 walkthrough
 
-The hardware overview uses the CUDA Programming Guide’s hardware multithreading
+The recording and hardware overview use the CUDA Programming Guide’s hardware multithreading
 section linked above: per-thread working registers, shared execution units and
 ready warp instruction selection. FP32 arithmetic units and load/store units are
 separate roles in the diagram. No unit counts, ISA lowering or latency values are
-claimed. The functional worked sequence is generated locally from 64 FP32 inputs;
+claimed. Chapter 6’s optional functional worked sequence is generated locally from 64 FP32 inputs;
 its chosen event order is not a captured PyTorch or CUDA compiler trace.
 
 ## Related CPU and logic exercises
 
-The beginner SM view links optionally to Assembly Lab's One addition and Memory
+The Chapter 6 hardware walkthrough links optionally to Assembly Lab's One addition and Memory
 and addresses lessons, and Bit Lab's ALU lesson. Their source and routes were
 checked on 2026-11-06. Assembly Lab uses Arm CPU instructions; Bit Lab uses a
 four-bit integer ALU, not GPU FP32 multiplication. These links reinforce working

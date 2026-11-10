@@ -18,7 +18,7 @@ export function renderBookNav(current='index') {
 export function renderRoadmap() {
   return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"${completionAttribute(c.slug)}><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div>${completionIndicator(c.slug)}</a>`).join('\n');
 }
-export function renderBookPage({slug,number,title,lead,content,previous,next,continuation=false,appendix=false,map=false}) {
+export function renderBookPage({slug,number,title,lead,content,previous,next,continuation=false,appendix=false,map=false,references=true,pagination=true}) {
   return `<!doctype html>
 <!-- Copyright © 2026 Christopher Snow. -->
 <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="${lead}"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,"><title>${title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css"><link rel="stylesheet" href="../src/hello.css"><link rel="stylesheet" href="../src/foundations.css"><link rel="stylesheet" href="../src/chapter.css">${continuation||appendix?'<link rel="stylesheet" href="../src/continuation.css"><link rel="stylesheet" href="../src/scheduling-relationships.css">':''}<script type="module" src="../src/${appendix||map?'theme':continuation?'continuation':'foundations'}.mjs"></script></head>
@@ -26,6 +26,6 @@ export function renderBookPage({slug,number,title,lead,content,previous,next,con
 <div class="layout"><aside class="sidebar" aria-label="Course navigation"><p class="eyebrow">HOW GPUS RUN AI</p><p class="sidebar-title">Under the hood.</p>${renderBookNav(slug)}<div class="sidebar-bottom"><span class="status-label">INTERACTIVE BOOK · DRAFT</span><p>Runs in your browser.<br>No GPU required.</p></div></aside><main id="main"><header class="${map?'map-heading':'intro'}">${map?'':`<p class="eyebrow">${appendix?'APPENDIX':'CHAPTER '+number}</p>`}<h1>${title}</h1><p>${lead}</p></header>${appendix||map?'':'<noscript><p class="notice">Enable JavaScript to run the experiments. The code, explanations and input diagrams remain readable without it.</p></noscript>'}
 ${content}
 ${appendix||map?'':desktopLinks(slug)}
-${map?'':renderChapterReferences(slug)}
-${map?'':`<nav class="book-pager" aria-label="Chapter sequence"><a href="${previous.href}">← ${previous.title}</a>${renderLessonForward(slug,`<a href="${next.href}">${next.title} →</a>`)}</nav>`}<footer${map?' hidden':''}><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
+${map||!references?'':renderChapterReferences(slug)}
+${map||!pagination?'':`<nav class="book-pager" aria-label="Chapter sequence"><a href="${previous.href}">← ${previous.title}</a>${renderLessonForward(slug,`<a href="${next.href}">${next.title} →</a>`)}</nav>`}<footer${map?' hidden':''}><span>Copyright © 2026 Christopher Snow.</span><a href="https://github.com/snowch/gpu-lab">Contribute or report a problem ↗</a></footer></main></div></body></html>`;
 }

@@ -152,6 +152,12 @@ second set of authoring requirements.
   beside the picture, and defer scheduling details until they are needed.
 - [ ] Label dynamic code as dynamic and update it with the controls. Explain fixed
   reference code as fixed. Never tell readers to follow a change that does not occur.
+- [ ] Keep a supporting recording page short: native manual playback, captions,
+  a readable transcript, downloads and a return link. State its scope in the parent
+  chapter. Place deeper interactions beside the chapter that introduces their
+  prerequisites. Such a recording page need not duplicate the parent’s references
+  and documentation exercises. Include media in offline verification and check
+  playback, seeking and paused restoration after a return or update.
 - [ ] End each published chapter/lab with `renderChapterReferences(slug)`: a References
   section with two or three annotated official links, followed by Use the documentation
   with at least two applied questions and local answer disclosures. The GPU map is a

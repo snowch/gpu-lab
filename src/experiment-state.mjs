@@ -12,6 +12,7 @@ function restoreForm(values) {
   for (const [index, value] of values.entries()) {
     // Completion is shared durable state, not a per-tab experiment snapshot.
     if(location.pathname.endsWith('/hello.html')&&/^(hello-factor-[1-4]|hello-guard-3|hello-transfer-count)$/.test(value.id))continue;
+    if(location.pathname.endsWith('/inside-sm.html')&&value.id?.startsWith('vsm-'))continue;
     if (value.id === 'lesson-complete' || /^hello-sm-(read|multiply|write)$/.test(value.id)) continue;
     const el = value.id ? document.getElementById(value.id) : controls()[index];
     if (!el) throw new Error('An experiment control changed');
@@ -25,7 +26,8 @@ function releaseLock() {
 }
 function snapshot() {
   const key = snapshotKey();
-  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4','hello-launch','hello-bounds','hello-transfer'] : document.getElementById('sm-explorer') ? ['sm-hardware'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
+  const required = document.querySelector('[data-book-experiment]') ? [...document.querySelectorAll('[data-book-experiment]')].map(el=>el.dataset.bookExperiment) : document.querySelector('.hello-section') ? ['hello-0','hello-1','hello-2','hello-3','hello-4','hello-launch','hello-bounds','hello-transfer'] : document.getElementById('sm-recording') ? ['sm-recording'] : document.getElementById('sm-explorer') ? ['sm-hardware'] : document.getElementById('kernel-editor') ? ['kernel'] : document.getElementById('tensor-diagram') ? ['memory','tensor-layout'] : document.body.dataset.lesson ? ['lesson'] : document.getElementById('gpu-map') ? ['gpu-map'] : document.getElementById('work-map') ? ['overview'] : [];
+  if(document.getElementById('sm-explorer'))required.push('sm-hardware');
   if (required.some(name => !hooks.has(name))) throw new Error('An experiment has not finished loading. Wait or reload that window before restarting.');
   if (composing || document.readyState !== 'complete' || document.querySelector('main [aria-busy="true"],main [contenteditable="true"]')) throw new Error('Finish the current input or operation in each GPU Lab window, then try again.');
   const guard = { reason: '' }; dispatchEvent(new CustomEvent('gpu-lab:before-restart', { detail: guard }));
@@ -70,9 +72,11 @@ function restore() {
     // The retired Chapter 1 SM disclosure followed its complete-function reference.
     // Preserve the other disclosure positions when opening a snapshot from that version.
     if (data.controls.some(control=>control.id==='hello-sm-read') && location.pathname.endsWith('/hello.html')) data.details.splice(1,1);
-    // The original SM appendix began with the warp walkthrough. Its existing
-    // answer disclosures move down one position after the new beginner answer.
-    if(data.experiments['sm-hardware']&&!Object.hasOwn(data.experiments['sm-hardware'],'values'))data.details.unshift(false);
+    // The recording replaces the former value inspector and warp appendix.
+    // Their positional disclosures must not open the new transcript.
+    if(location.pathname.endsWith('/inside-sm.html')&&data.experiments['sm-hardware']){
+      delete data.experiments['sm-hardware'];data.details=[];
+    }
     for (const [name, state] of Object.entries(data.experiments)) {
       if (!hooks.has(name)) throw new Error('An experiment changed');
       hooks.get(name).restore(state);

@@ -57,7 +57,7 @@ export function renderSmExplanation() {
  return `<div class="hello-sm" aria-labelledby="hello-sm-title"><h3 id="hello-sm-title">Where do these threads run?</h3>
  ${definitions([['Streaming multiprocessor (SM)','A part of the GPU containing hardware that executes instructions for threads.']])}
  <p>Each block stays on one SM. Several blocks can share an SM when resources allow. Threads share the SM’s arithmetic hardware; each thread does not own a separate arithmetic unit. They do not necessarily all execute at once.</p>
- <p class="hello-note">This diagram shows grouping, not hardware placement or execution order. <a id="hello-sm-explore" data-reading-link href="inside-sm.html?from=hello">Optional: follow one value inside an SM</a>.</p></div>`;
+ <p class="hello-note">This diagram shows grouping, not hardware placement or execution order. <a id="hello-sm-explore" data-reading-link href="inside-sm.html?from=hello">Watch: inside an SM · 3 minutes</a>.</p></div>`;
 }
 const choice=(id,label,options)=>`<label for="${id}">${label}<select id="${id}"><option value="">Choose…</option>${options.map(([value,text])=>`<option value="${value}">${text}</option>`).join('')}</select></label>`;
 export function renderLaunchPractice() {
