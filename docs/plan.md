@@ -212,6 +212,13 @@ parent-state return and offline update restoration. The separate-memory example
 counts tensor payloads and makes no timing claim. Rebuild instructions are in
 `assets/media/devices/README.md`.
 
+Chapter 3 follows with `reading-video.html`, after its explanation exercise.
+Eight slides connect row/column coordinates and colon syntax to selected inputs
+and elementwise results. A new column-3 question checks interpretation. The
+recording preserves Chapter 3's distinction between logical coordinates and the
+storage positions introduced next. Playback, downloads, saved-state return and
+offline coverage match Chapter 2. See `assets/media/reading/README.md`.
+
 `inside-sm.html` is a short, full-width video appendix linked from Chapter 1 as
 “Watch: inside an SM · 3½ minutes”. The approved narrated deck follows a load,
 register multiplication and store, then contrasts separate thread values with

@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {devicesRecordingData as data,devicesFigure} from '../scripts/render-devices-recording.mjs';
+import {readingRecordingData as selection,readingFigure} from '../scripts/render-reading-recording.mjs';
 test('device recording preserves source buffers, distinguishes copies from calculation and withholds the transfer answer',()=>{
  assert.deepEqual(data.steps.map(s=>s.transferBytes),[20,0,20]);
  const back=data.steps[2];assert.deepEqual(back.after.cpu[0],back.before.cpu[0]);assert.deepEqual(back.after.gpu,back.before.gpu);
@@ -12,7 +13,15 @@ test('device recording preserves source buffers, distinguishes copies from calcu
  assert.match(devicesFigure('answer'),/32 bytes copied/);
  assert.match(devicesFigure('calculate'),/0 bytes copied/);
 });
-for(const slug of ['devices'])test(`${slug} recording media, captions and transcript retain exact audio-cue timing`,async()=>{
+test('selection recap follows logical coordinates and leaves a new column unanswered until its explanation',()=>{
+ assert.deepEqual(selection.rowOne.values,[6,7,8,9,10]);assert.deepEqual(selection.columnOne.values,[2,7,12,17,22]);
+ assert.deepEqual(selection.challenge.sourceOffsets,[3,8,13,18,23]);
+ assert.deepEqual(selection.challenge.output,[8,18,28,38,48]);
+ assert.equal((readingFigure('question').match(/class="active"/g)||[]).length,0);
+ assert.equal((readingFigure('answer').match(/class="active"/g)||[]).length,5);
+ assert.deepEqual(selection.row.matrix,selection.challenge.matrix);
+});
+for(const slug of ['devices','reading'])test(`${slug} recording media, captions and transcript retain exact audio-cue timing`,async()=>{
  const base=new URL('../',import.meta.url),json=async file=>JSON.parse(await readFile(new URL(file,base),'utf8'));
  const scenes=await json(`content/${slug}-scenes.json`),media=await json(`content/${slug}-media.json`);
  assert.equal((await stat(new URL(`assets/media/${slug}/${slug}.mp4`,base))).size,media.bytes);
