@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:11.288
+Chapter Two starts with five floating-point values in a CPU tensor. Their storage is in system RAM. Each value uses four bytes in the chosen format.
+
+00:00:11.508 --> 00:00:22.601
+We are following a discrete GPU with separate device memory. The names x CPU and x GPU help us track location; the names themselves do not move any values.
+
+00:00:24.621 --> 00:00:35.651
+Calling the tensor's to method with cuda as the destination requests a GPU copy. PyTorch arranges storage and copies five values: twenty bytes of tensor data.
+
+00:00:35.871 --> 00:00:44.020
+The original CPU tensor still exists. The copy contains the same numbers in different storage; copying has not doubled them.
+
+00:00:46.040 --> 00:00:56.173
+Multiply the GPU tensor by two. The result, y GPU, has its own GPU storage. The input x GPU keeps its original values.
+
+00:00:56.393 --> 00:01:08.617
+This operation copies zero bytes between CPU and GPU. That does not mean zero memory activity: the calculation still reads inputs and writes outputs in GPU memory.
+
+00:01:10.637 --> 00:01:20.600
+Calling CPU on the result requests a CPU copy. The values two, four, six, eight and ten now also have storage in system RAM.
+
+00:01:20.820 --> 00:01:31.551
+Twenty bytes cross back in this example. The GPU result remains on the GPU; PyTorch does not automatically move every calculation's result to the CPU.
+
+00:01:33.571 --> 00:01:43.640
+Across this sequence, twenty bytes of tensor data go in, zero cross during multiplication, and twenty come back. That is forty bytes copied between devices.
+
+00:01:43.860 --> 00:01:52.116
+These are payload counts for the chosen example. They exclude other traffic and overhead, and they do not tell us how long the operations take.
+
+00:01:54.136 --> 00:02:03.565
+If another calculation needs the GPU result, it can read it there. A CPU copy is needed when a CPU-side consumer needs the values.
+
+00:02:03.785 --> 00:02:13.577
+Choosing where to keep values can avoid unnecessary round trips. Whether that improves an application's speed depends on its actual operations and measurements.
+
+00:02:15.597 --> 00:02:25.368
+Try eight values instead, each still using four bytes. The GPU has multiplied them by three. Now request a CPU copy of y GPU.
+
+00:02:25.588 --> 00:02:37.001
+Which values appear in the CPU result, and how many bytes of tensor data cross back? Does this copy change the original CPU input? Pause and explain the storage locations.
+
+00:02:42.821 --> 00:02:54.021
+The CPU result contains three, six, nine, twelve, fifteen, eighteen, twenty-one and twenty-four. Eight values at four bytes each means thirty-two bytes copied back.
+
+00:02:54.241 --> 00:03:06.295
+The original CPU input is unchanged. Return to Chapter Two and trace which operation creates each destination tensor, separating copies from calculation and from timing claims.

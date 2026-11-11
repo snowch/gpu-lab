@@ -204,6 +204,14 @@ measurement scope. No measured performance claim is made by this initial lab.
 
 ## Optional hardware depth
 
+Chapter 2 offers an optional narrated recap after its new-case exercise, at
+`devices-video.html`. Eight model-derived slides follow CPU and GPU buffers,
+separate copies from calculation, and apply the byte count to eight results.
+The recap reuses native playback, captions, transcript, PDF/video downloads,
+parent-state return and offline update restoration. The separate-memory example
+counts tensor payloads and makes no timing claim. Rebuild instructions are in
+`assets/media/devices/README.md`.
+
 `inside-sm.html` is a short, full-width video appendix linked from Chapter 1 as
 “Watch: inside an SM · 3½ minutes”. The approved narrated deck follows a load,
 register multiplication and store, then contrasts separate thread values with
