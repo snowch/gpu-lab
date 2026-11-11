@@ -3,6 +3,7 @@ import {renderLessonCompletion} from '../src/lesson-completion-view.mjs';
 import {exportDesktop} from './export-desktop.mjs';
 import {renderDesktop} from '../content/desktop.mjs';
 import {renderInsideSm} from '../content/inside-sm.mjs';
+import {renderReductionVideo} from '../content/reduction-video.mjs';
 import {renderProfiling} from '../content/profiling.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 import {memorySetup,memoryExample} from '../src/book-code.mjs';
@@ -35,6 +36,8 @@ await writeFile('dist/lessons/desktop.html',renderBookPage({slug:'desktop',appen
 await writeFile('dist/lessons/profiling.html',renderBookPage({slug:'profiling',appendix:true,title:'Inspect PyTorch GPU launches',lead:'Capture a multiplication on an NVIDIA GPU, view its timeline and inspect the grid and block dimensions.',content:renderProfiling(await readFile('examples/profile-pytorch.py','utf8')),previous:{href:'desktop.html',title:'Desktop setup'},next:{href:'../index.html',title:'Book contents'}}));
 
 await writeFile('dist/lessons/inside-sm.html',renderBookPage({slug:'inside-sm',appendix:true,title:'Inside an SM',lead:'Follow a value through GPU memory, registers and shared arithmetic hardware.',content:renderInsideSm(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/sm-video.mjs"></script></head>'));
+
+await writeFile('dist/lessons/reduction-video.html',renderBookPage({slug:'reduction-video',appendix:true,title:'Shared memory and barriers',lead:'Follow four inputs through shared-memory writes, barriers and partial sums. Then inspect a read before its write.',content:renderReductionVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))

@@ -217,3 +217,11 @@ optional disclosure reached from its hardware overview. Chapter 6 retains its
 visible core diagram and teaching-scheduler experiments. The optional trace keeps
 its own saved cursor; moving it has not changed its values or event semantics.
 No instruction timing, execution-unit count or captured PyTorch trace is implied.
+
+Chapter 8 offers an optional narrated recap after its transfer exercise, at
+`reduction-video.html`. Eleven model-derived slides follow the four-input tree,
+block barriers and one unsafe read-before-write interleaving, then ask about eight
+threads. The page reuses native playback, English captions, a source-generated
+transcript, PDF/video downloads and a return link preserving chapter state.
+Offline coverage includes playback, range seeking and paused restoration across
+updates. See `assets/media/reduction/README.md` for the reproducible media workflow.

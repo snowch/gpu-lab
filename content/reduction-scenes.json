@@ -1,0 +1,124 @@
+[
+  {
+    "id": "s01",
+    "title": "Four inputs. One sum.",
+    "lead": "How do values from different threads meet?",
+    "stage": "inputs",
+    "captions": [
+      "A sum combines values handled by different threads. Follow the four inputs from Chapter Eight: one, two, three and four.",
+      "There are four threads in one block. A block is a group whose threads can cooperate. Each thread has one input.",
+      "This is our teaching algorithm for the sum, not a trace of the implementation PyTorch selects."
+    ]
+  },
+  {
+    "id": "s02",
+    "title": "Write into a shared workspace.",
+    "lead": "Shared memory lets threads in one block exchange values.",
+    "stage": "first-write",
+    "captions": [
+      "Each thread starts with its own input. To exchange values, the block uses shared memory: storage its threads can read and write.",
+      "Each four-byte storage position is a word. Thread zero writes its input, one point zero, into shared word zero.",
+      "The other words are still unwritten in this snapshot. The thread numbers and word indices start at zero."
+    ]
+  },
+  {
+    "id": "s03",
+    "title": "Each thread writes its input.",
+    "lead": "The picture shows writes; the program still needs ordering.",
+    "stage": "writes",
+    "captions": [
+      "Now inspect the state after all four input writes. Shared words zero through three hold one, two, three and four.",
+      "We display those writes in an inspection order. A real program cannot rely on threads reaching their instructions in this order.",
+      "Before a thread reads its partner's value, the program must establish that the write comes first."
+    ]
+  },
+  {
+    "id": "s04",
+    "title": "Wait before reading a partner.",
+    "lead": "Every thread in the block reaches the barrier.",
+    "stage": "initial-barrier",
+    "captions": [
+      "A block barrier provides that ordering. All four threads must reach it before any continues beyond it.",
+      "The barrier also orders shared-memory accesses. Preceding writes become visible to the block's threads after the barrier.",
+      "This does not wait for other blocks. It orders cooperation within this block, including the writes needed by our first additions."
+    ]
+  },
+  {
+    "id": "s05",
+    "title": "Combine partners two words apart.",
+    "lead": "Each partial sum contains a different pair of inputs.",
+    "stage": "pairs",
+    "captions": [
+      "For four inputs, the first partner distance is two. Thread zero adds shared word two to its own word: one plus three makes four.",
+      "Thread one adds shared word three: two plus four makes six.",
+      "The partial sums are written into words zero and one. Their input-index labels show that the two pairs have no input in common."
+    ]
+  },
+  {
+    "id": "s06",
+    "title": "Wait again before the next stage.",
+    "lead": "Only two threads added. All four still reach the barrier.",
+    "stage": "stage-barrier",
+    "captions": [
+      "The next addition needs the new partial sum from thread one. We therefore need another block barrier after the partial-sum writes.",
+      "Threads two and three perform no addition in this stage. They still reach the barrier with the other threads.",
+      "The barrier belongs after the conditional addition, where every thread can reach it. It must not be restricted to just the adding threads."
+    ]
+  },
+  {
+    "id": "s07",
+    "title": "Combine the two partial sums.",
+    "lead": "Every original input contributes exactly once.",
+    "stage": "sum",
+    "captions": [
+      "The partner distance is now one. Thread zero combines four and six, producing ten in shared word zero.",
+      "Follow the input-index labels: the final sum contains indices zero, two, one and three, each exactly once.",
+      "The arrows express dependencies between values. They do not show GPU clock cycles or promise that the drawn operations execute simultaneously."
+    ]
+  },
+  {
+    "id": "s08",
+    "title": "What if the ordering is missing?",
+    "lead": "One diagnostic interleaving: a read arrives before its write.",
+    "stage": "hazard",
+    "captions": [
+      "Now remove the synchronisation. In this diagnostic, thread zero writes its own input, then reads shared word two before thread two writes there.",
+      "The partner word is unwritten. There is no valid partial sum to display.",
+      "This is one possible interleaving exposing a data race: conflicting accesses without the required ordering, including a write. We assign no numeric result to the racy program."
+    ]
+  },
+  {
+    "id": "s09",
+    "title": "A later write cannot repair the read.",
+    "lead": "The required write must precede the read that uses it.",
+    "stage": "late-write",
+    "captions": [
+      "Thread two eventually writes three point zero. That does not repair the read that already happened.",
+      "Putting a barrier only after the early read cannot fix it either. The input writes must be ordered before partner reads, and partial-sum writes before the next stage's reads.",
+      "Even a plausible answer from another execution would not establish that the program is safe."
+    ]
+  },
+  {
+    "id": "s10",
+    "title": "Pause: extend the block to eight inputs.",
+    "lead": "Only four threads add in the first stage.",
+    "stage": "question",
+    "hold": 5,
+    "captions": [
+      "Try a new case with eight inputs and eight threads in one block. The first partner distance is four, so only threads zero through three add.",
+      "How many threads must reach the block barrier after those additions?",
+      "Which thread supplies the value that thread one reads first? Pause here and explain your answers."
+    ]
+  },
+  {
+    "id": "s11",
+    "title": "All eight threads reach the barrier.",
+    "lead": "Thread 5 writes before thread 1 reads word 5.",
+    "stage": "answer",
+    "captions": [
+      "All eight threads must reach the block barrier. That includes the four threads that did no addition.",
+      "Thread one first reads shared word five. Thread five's input write must precede that read; the initial barrier establishes the ordering.",
+      "Return to Chapter Eight. Set the input count to eight and inspect the tree. Follow the writes, barriers and partner distances. Explain each read using the write that supplies its value."
+    ]
+  }
+]
