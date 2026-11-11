@@ -124,10 +124,10 @@ export function renderCodeBridge(stage,factor) {
  if(stage!==2)return '';
  return `<div class="hello-code-bridge" aria-labelledby="hello-title-4">
  <p>Where did “two blocks of four” come from? To choose those counts ourselves, we’ll use CUDA C++.</p>
- ${definitions([['Kernel','A function executed by GPU threads.'],['Launch','A request to execute a kernel. In CUDA, the launch specifies the number of blocks and threads per block.']])}
+ ${definitions([['Kernel','A GPU function whose body contains the instructions each thread executes.'],['Launch','A request to execute a kernel. In CUDA, the launch specifies the number of blocks and threads per block.']])}
  <p>Ordinary PyTorch GPU operations usually handle kernel selection and launches for you. One operation may launch several kernels. Tensor layout and data type can still affect performance.</p>
  <p>When you launch a CUDA C++ kernel directly, you specify the block and thread counts. Our <code>runKernel</code> example doubles the inputs using a separate implementation; it is not PyTorch’s internal kernel.</p>
- <p>The launch below requests the two blocks of four threads shown in the diagram:</p>
+ <p>The launch below is a call in the CPU program, outside the kernel definition. It requests the two blocks of four threads shown in the diagram:</p>
  ${codePanel({id:'hello-bridge-launch-2',source:launchSource(),label:'CUDA C++ · launch from the CPU program',explainedLocally:true})}
  <div class="code-explanations hello-launch-explanations"><p class="code-explanation-heading">What each part does</p><ul>
  <li><code>int threadsPerBlock = 4;</code> — Sets four threads per block; <code>int</code> declares an integer variable.</li>

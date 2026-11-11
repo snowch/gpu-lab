@@ -13,7 +13,8 @@ export const guides = {
   dispatcher: 'https://docs.pytorch.org/docs/2.14/notes/extending.html#extending-torch-native-api',
   compiler: 'https://docs.pytorch.org/docs/2.14/user_guide/torch_compiler/torch.compiler_get_started.html',
   cudaSemantics: 'https://docs.pytorch.org/docs/2.14/notes/cuda.html',
-  launch: 'https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html',
+  launch: 'https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#triple-chevron-notation',
+  occupancy: 'https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#kernel-launch-and-occupancy',
   cpu: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.cpu.html',
   shape: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.shape.html',
   contiguous: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.contiguous.html',
@@ -33,7 +34,7 @@ export const guides = {
   tensor: 'https://docs.pytorch.org/docs/stable/generated/torch.tensor.html',
   stride: 'https://docs.pytorch.org/docs/stable/generated/torch.Tensor.stride.html',
   cuda: 'https://docs.nvidia.com/cuda/cuda-programming-guide/index.html',
-  indices: 'https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#built-in-variables',
+  indices: 'https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#thread-and-grid-index-intrinsics',
   barriers: 'https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#thread-block-synchronization-functions',
   shared: 'https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#thread-block-synchronization',
   scheduling: 'https://docs.nvidia.com/cuda/cuda-programming-guide/03-advanced/advanced-kernel-programming.html#hardware-multithreading',
@@ -61,10 +62,11 @@ export const referenceTasks = {
     answer:'device selects the storage device: "cuda" places this tensor on an NVIDIA GPU. dtype selects the numerical representation. With PyTorch’s usual default settings, these floating-point inputs produce torch.float32. Changing the default floating-point dtype can change that inference. Choosing a dtype alone does not move a tensor between CPU and GPU.',
   },
   'hello-indices': {
-    title:'CUDA thread indices', page:'indices', label:'CUDA: built-in variables',
+    title:'CUDA thread indices', page:'indices', label:'CUDA: Thread and Grid Index Intrinsics (§2.1.2.3)',
     code:'runKernel<<<2, 4>>>(d_input, d_output, 5);',
-    prompt:'Find threadIdx, blockIdx and blockDim. Which gives a thread’s position inside its block? Which gives the block’s size?',
-    followUp:'Use the kernel-launch reference above to interpret <<<2, 4>>>. Is runKernel a CUDA keyword?',
+    prompt:'In “Thread and Grid Index Intrinsics”, find threadIdx, blockIdx and blockDim. Which gives a thread’s position inside its block? Which gives the block’s size?',
+    followUp:'Open “Triple Chevron Notation” to interpret <<<2, 4>>>. Which value is the block count, and which is the number of threads per block? Is runKernel a CUDA keyword?',
+    followUpPage:'launch',followUpLabel:'CUDA: Triple Chevron Notation (§2.1.2.2.1)',
     answer:'threadIdx gives the position within the block; blockDim gives its dimensions. blockIdx identifies the block in the grid. The launch requests two blocks with four threads each. runKernel is the name we chose for our function; it is not a CUDA keyword or an official API entry.',
   },
   'hello-dispatch': {
@@ -173,7 +175,7 @@ export const referenceTasks = {
     answer:'A column view shares the original storage and keeps the stride needed to reach its values. .contiguous() creates a packed copy when the view is not already contiguous. Making that copy has a cost; fewer sectors in a later read alone do not prove an overall speedup.',
   },
   'kernel-launch': {
-    title:'Apply the launch rules to a repair', page:'launch', label:'CUDA: writing and launching kernels',
+    title:'Apply the launch rules to a repair', page:'launch', label:'CUDA: Triple Chevron Notation',
     prompt:'Find the launch configuration and thread-index examples. For 35 inputs and 8 threads per block, how many blocks cover the input? Which thread indices need the bounds check?',
     answer:'Five blocks launch 40 threads. Indices 0–34 access the input; indices 35–39 must skip it. The global index combines the block number, block size and local thread position. Changing only the block count does not repair an incorrect local-only index.',
   },
@@ -230,8 +232,8 @@ export function renderReferenceTask(key) {
     <h3 id="reference-${key}"><svg class="reference-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Z"/><path d="M12 5v15"/></svg><span>${task.independent?'Find it in the guide':'Look it up'}: ${escape(task.title)}</span></h3>
     ${task.code?`<p class="reference-note">Fixed excerpt for this question. <a href="desktop.html#examples">Complete programs and execution limits</a>.</p><pre class="reference-code"><code>${escape(task.code)}</code></pre>`:''}
     <p>${escape(task.prompt)}</p>
-    ${task.followUp?`<p>${escape(task.followUp)}</p>`:''}
     <p>${link(task.page,task.label)}</p>
+    ${task.followUp?`<p>${escape(task.followUp)}</p>${task.followUpPage?`<p>${link(task.followUpPage,task.followUpLabel)}</p>`:''}`:''}
     <details><summary>Compare your answer</summary><p>${escape(task.answer)}</p>${task.solution?`<p>${link(task.solution,'Open the relevant section')}</p>`:''}</details>
     <p class="reference-note">Reference opens online; the comparison works offline.</p>
   </aside>`;
@@ -244,18 +246,18 @@ export const chapterReferences = {
   'putting-it-together':{sources:[['contiguous','PyTorch: Tensor.contiguous','Check whether a layout change makes a copy.'],['matmul','CUDA Best Practices: shared tile reuse','Check the mechanism behind the model’s reduced input loads.'],['timing','PyTorch: asynchronous CUDA execution','Define the boundary of an optional GPU timing comparison.']],tasks:['capstone-copy','capstone-measure']},
   desktop:{sources:[['docker','Docker installation','Install Docker with Linux-container support for the CUDA simulator path.'],['gpgpu','GPGPU-Sim README','Read supported toolchains and the distinction between functional and performance simulation.'],['pytorchInstall','PyTorch installation selector','Choose an installation for your operating system and CPU or CUDA execution.']],tasks:['desktop-simulator','desktop-pytorch']},
   hello: {
-    sources:[['tensor','PyTorch: torch.tensor','Check device and the inferred number type when dtype is omitted.'],['dispatcher','PyTorch: selecting an implementation','Read the dispatcher paragraph under “Extending torch native API”; the rest is advanced.'],['launch','CUDA: writing and launching kernels','Recognise the complete GPU function and the <<<blocks, threads>>> launch syntax.']],
+    sources:[['tensor','PyTorch: torch.tensor','Check device and the inferred number type when dtype is omitted.'],['dispatcher','PyTorch: selecting an implementation','Read the dispatcher paragraph under “Extending torch native API”; the rest is advanced.'],['launch','CUDA: Triple Chevron Notation (§2.1.2.2.1)','In the first C++ example, compare the vecAdd definition with vecAdd<<<1, 256>>> in main. The first two launch arguments choose blocks and threads per block.']],
     tasks:['hello-pytorch','hello-dispatch','hello-indices'],
     note:'runKernel is our example function name, not a CUDA API or a function generated by PyTorch. Follow the CUDA references for the language features it uses.',
-    optional:[['scheduling','CUDA: SMs and blocks','Check why a block stays on one SM and why several blocks can share it. Detailed warp scheduling follows in chapter 6.'],['compiler','PyTorch: torch.compile getting started','Later reading: compilation can generate kernels and combine operations. The opening example uses ordinary PyTorch execution.']],
+    optional:[['occupancy','CUDA: Kernel Launch and Occupancy (§2.3.7)','Later reading: the opening paragraphs explain how blocks are assigned to SMs. Leave the occupancy calculations until chapter 6.'],['compiler','PyTorch: torch.compile getting started','Later reading: compilation can generate kernels and combine operations. The opening example uses ordinary PyTorch execution.']],
   },
   devices:{sources:[['to','PyTorch: Tensor.to','Check when a device conversion returns the original tensor or makes a copy.'],['cpu','PyTorch: Tensor.cpu','Check how a CPU copy is requested.'],['cudaSemantics','PyTorch: CUDA semantics','Read the opening rules for the device on which results are created.']],tasks:['devices','devices-result']},
   reading:{sources:[['indexing','PyTorch: tensor views and indexing','Find basic indexing and slicing examples. The next chapter explains shared storage.'],['shape','PyTorch: Tensor.shape','Check how a tensor reports the sizes of its dimensions.']],tasks:['selection','selection-shape']},
   layout:{sources:[['indexing','PyTorch: tensor views','Distinguish changing how values are accessed from copying them.'],['stride','PyTorch: Tensor.stride','Check the unit of a stride.'],['contiguous','PyTorch: Tensor.contiguous','Check when requesting a contiguous layout makes a copy.']],tasks:['reading','layout-copy']},
   requests:{sources:[['coalescing','CUDA Best Practices: coalesced access','Compare aligned and misaligned accesses to 32-byte regions.'],['scheduling','CUDA: hardware multithreading','Check how a block’s threads are divided into warps.']],tasks:['requests','requests-warp']},
   memory:{sources:[['stride','PyTorch: Tensor.stride','Relate a view’s strides to the byte addresses in the diagram.'],['indexing','PyTorch: tensor views','Check which operations share storage.'],['coalescing','CUDA Best Practices: coalesced access','Compare the model’s sectors with the documented access rules.']],tasks:['memory','memory-copy']},
-  kernel:{sources:[['indices','CUDA: built-in variables','Check the meanings of threadIdx, blockIdx and blockDim.'],['launch','CUDA: writing and launching kernels','Relate block counts, thread counts and bounds checks to the repair.']],tasks:['kernel','kernel-launch'],note:'Function names in the repair examples are chosen for this course. The CUDA guide documents their qualifiers, indexing variables and launch syntax.'},
-  scheduling:{sources:[['scheduling','CUDA: hardware multithreading','Distinguish resident work, ready work and hardware resource limits.'],['launch','CUDA: writing and launching kernels','Review how launched threads are grouped into blocks.']],tasks:['scheduling','scheduling-limits']},
+  kernel:{sources:[['indices','CUDA: built-in variables','Check the meanings of threadIdx, blockIdx and blockDim.'],['launch','CUDA: Triple Chevron Notation','Relate block counts, thread counts and bounds checks to the repair.']],tasks:['kernel','kernel-launch'],note:'Function names in the repair examples are chosen for this course. The CUDA guide documents their qualifiers, indexing variables and launch syntax.'},
+  scheduling:{sources:[['scheduling','CUDA: hardware multithreading','Distinguish resident work, ready work and hardware resource limits.'],['launch','CUDA: Triple Chevron Notation','Review how launched threads are grouped into blocks.']],tasks:['scheduling','scheduling-limits']},
   divergence:{sources:[['where','PyTorch: torch.where','Check how the opening operation selects a result for each condition.'],['divergence','CUDA Best Practices: branching and divergence','Check the warp-level scope of divergent paths and predication.']],tasks:['divergence','divergence-scope']},
   'shared-memory':{sources:[['banks','CUDA Best Practices: shared-memory banks','Compare bank conflicts with the same-word broadcast exception.'],['barriers','CUDA: synchronisation functions','Check the scope and participation rules for __syncthreads().']],tasks:['shared-memory','shared-banks']},
   reduction:{sources:[['sum','PyTorch: Tensor.sum','Follow the torch.sum link to check the complete sum requested by x.sum().'],['barriers','CUDA: synchronisation functions','Check which threads must reach the barrier and which writes it makes visible.'],['shared','CUDA: thread block synchronisation','Connect shared storage to cooperation within one block.']],tasks:['reduction','reduction-order']},

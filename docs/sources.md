@@ -206,3 +206,18 @@ checked on 2026-11-06. Assembly Lab uses Arm CPU instructions; Bit Lab uses a
 four-bit integer ALU, not GPU FP32 multiplication. These links reinforce working
 values, memory transfers and shared arithmetic roles; they are not GPU hardware
 validation or prerequisites. Each opens in a labelled new tab.
+
+## CUDA reference targets (checked 11 November 2026)
+
+Chapter 1 now links to CUDA’s introductory [Triple Chevron Notation (§2.1.2.2.1)](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#triple-chevron-notation)
+for the launch arguments. Its first example places the `vecAdd` definition above
+`vecAdd<<<1, 256>>>` in `main`. [Thread and Grid Index Intrinsics (§2.1.2.3)](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#thread-and-grid-index-intrinsics)
+defines `threadIdx`, `blockIdx` and `blockDim`, and shows a complete vector-add body
+with a separate launch. These are adjacent links in the indexing/launch question;
+the shared launch and index references also serve the repair workshop.
+
+[Kernel Launch and Occupancy (§2.3.7)](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#kernel-launch-and-occupancy)
+is retained as later reading: the opening explains block assignment to SMs, while
+the remainder develops resource and occupancy calculations. It is not the first
+lookup for Chapter 1’s launch syntax. Section numbers are reading aids; the links
+use verified heading anchors.

@@ -172,6 +172,10 @@ second set of authoring requirements.
 - [ ] Say that browser exercises have no installed PyTorch/CUDA documentation version;
   matching installed versions applies to optional local execution. External links
   open in a labelled new tab so readers retain their experiment.
+- [ ] Verify documentation deep links against the named section and its examples.
+  The target must contain the syntax or rule needed by the question. Put each
+  lookup link beside its question, including follow-ups, rather than sending
+  readers back to a distant reference list or the top of a long guide.
 
 ## Required reading-order review
 
