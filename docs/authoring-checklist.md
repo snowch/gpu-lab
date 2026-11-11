@@ -8,6 +8,34 @@ curriculum; `docs/model.md` defines numerical assumptions; the styling and termi
 documents describe implementation details. Historical redesign notes are not a
 second set of authoring requirements.
 
+## Design and learning review
+
+Every new or revised learner-facing page, exercise, diagram and recording requires
+both reviews. Discover and read an appropriate design/UX skill and a
+learning/instructional-design skill before deciding the approach, when available.
+Use the book’s existing audience, curriculum and shared components as constraints.
+
+- [ ] **Design:** check visual hierarchy, typography, spacing, contrast, code and
+  diagram readability, action clarity and consistent use of shared styling.
+  Inspect the built result on phone, tablet and desktop in both themes, including
+  affected interaction states. Improve presentation without adding controls or
+  decoration that distract from the example.
+- [ ] **Learning:** check the chapter’s question, audience and prerequisites;
+  explain each new concept before relying on it. Keep the calculation, code,
+  diagram and task connected. Check that exercises practise the intended GPU
+  reasoning and apply it to a new case, rather than repeat an answer already shown.
+  Remove repetition and optional detail that weakens the main progression.
+- [ ] **Proportionate scope:** a layout, new lesson or new interaction needs a full
+  review; a small wording or link edit needs a focused review of the preceding,
+  changed and following sections and affected states. Neither review may be skipped
+  solely because an edit is small. Existing detailed checks below remain authoritative.
+- [ ] **Evidence:** record the skills used and their actual findings or decisions
+  in the PR, together with the reviewed sequence, viewports and states. If a suitable
+  skill is unavailable, record that limitation and complete these checks directly.
+  Passing tests, invoking a skill or subjective claims of beauty do not replace
+  inspecting the result or checking its teaching purpose. Do not claim learner
+  testing without observations from learners.
+
 ## Learning journey
 
 - [ ] Name the calculation, inputs, destination or comparison in titles and instructions:
