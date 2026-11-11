@@ -7,7 +7,8 @@ RECORDINGS=[dict(slug='devices',chapter=2,title='Follow tensor values between CP
     untouched='#device-map-1 code',untouched_text=['x_cpu','x_gpu']),
     dict(slug='reading',chapter=3,title='Select tensor rows and columns',control='#reading-index-row',value='1',run='#reading-run-row',result='#reading-feedback-row',untouched='#reading-map-column .book-reads li>span:last-child strong',untouched_text=['?']*5),
     dict(slug='layout',chapter=4,title='Follow tensor views into memory',control='#reading-index-column',value='1',run='#reading-run-column',result='#reading-feedback-column',untouched='#reading-map-packed .book-reads li>span:last-child strong',untouched_text=['?']*5),
-    dict(slug='requests',chapter=5,title='Group five reads into memory sectors',control='#reading-index-sectors',value='3',run='#reading-run-sectors',result='#reading-feedback-sectors')]
+    dict(slug='requests',chapter=5,title='Group five reads into memory sectors',control='#reading-index-sectors',value='3',run='#reading-run-sectors',result='#reading-feedback-sectors'),
+    dict(slug='scheduling',chapter=6,title='Choose a ready warp while another waits',control='#scheduling-ready-warps',value='4',run='[data-book-experiment="scheduling-ready"] [data-run]',result='#scheduling-ready-feedback',untouched='#scheduling-wait-feedback',untouched_text=['Predict the result, then press Run.'],advance=3,position='[data-book-experiment="scheduling-ready"] [data-position]')]
 
 def check_foundations_recordings(browser,url,root,errors):
     for spec in RECORDINGS:
@@ -19,6 +20,9 @@ def check_foundations_recordings(browser,url,root,errors):
                 page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
                 page.goto(url+f'lessons/{slug}.html?keep=video')
                 page.locator(spec['control']).select_option(spec['value']);page.locator(spec['run']).click()
+                if spec.get('advance'):
+                    for _ in range(spec['advance']):page.locator(spec['run']).locator('xpath=..').locator('[data-next]').click()
+                trace_position=page.locator(spec['position']).inner_text() if spec.get('position') else None
                 result=page.locator(spec['result']).inner_text()
                 if spec.get('untouched'):expect(page.locator(spec['untouched'])).to_have_text(spec['untouched_text'])
                 recap=page.locator(f'#{slug}-recording-link')
@@ -48,6 +52,7 @@ def check_foundations_recordings(browser,url,root,errors):
                 page.locator(f'#{slug}-return').click();expect(page).to_have_url(url+f'lessons/{slug}.html?keep=video')
                 expect(page.locator(spec['control'])).to_have_value(spec['value'])
                 expect(page.locator(spec['result'])).to_have_text(result,use_inner_text=True)
+                if trace_position:expect(page.locator(spec['position'])).to_have_text(trace_position)
                 if spec.get('untouched'):expect(page.locator(spec['untouched'])).to_have_text(spec['untouched_text'])
                 page.wait_for_function('position=>Math.abs(scrollY-position)<8',arg=position)
                 expect(page.locator(f'#{slug}-watch')).to_be_focused();page.locator(f'#{slug}-watch').click()
