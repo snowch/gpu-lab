@@ -221,3 +221,14 @@ is retained as later reading: the opening explains block assignment to SMs, whil
 the remainder develops resource and occupancy calculations. It is not the first
 lookup for Chapter 1’s launch syntax. Section numbers are reading aids; the links
 use verified heading anchors.
+
+## Attention example with visible rescaling
+
+The deterministic key inputs in Chapter 11 and its generated PyTorch source use
+the same shifted index formula, `((2*i+j+4)%7-3)/2`. For query zero, the two-key
+trace reaches later larger scores, rescaling non-empty denominator and weighted
+totals. The recurrence and scope remain those documented above. Model tests compare
+every query against stable materialised attention across supported sizes, tiles
+and scales; the generated CPU PyTorch example independently checks the shown
+calculation. These checks do not establish production FlashAttention execution or
+GPU numerical/performance agreement.

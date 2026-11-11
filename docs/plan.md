@@ -282,6 +282,13 @@ values come from the existing precision model; common playback, captions,
 transcript, downloads and offline return checks apply. See
 `assets/media/tensor-cores/README.md`.
 
+Chapter 11's optional recap follows one weighted component, full intermediate
+reads/writes, online totals and later-maximum rescaling. A four-key tile question
+applies the same recurrence while changing the single-query scratch count. The
+chapter and recording share the revised key fixture; both retain the distinction
+between JavaScript double arithmetic and assumed four-byte storage. Common
+playback and offline features apply. See `assets/media/attention/README.md`.
+
 ## Course recording review
 
 Short recaps can support recall after a chapter's independent exercise. Each
@@ -300,15 +307,15 @@ uses the current thirteen-chapter book; recommendations below are future work.
 | 8 | Trace shared-memory writes, barriers and the reduction tree. | Recap included. |
 | 9 | Follow shared input reuse and partial sums across K phases. | Recap included. |
 | 10 | Trace input conversion before accumulation, including cancellation and a range-sensitive case. | Recap included. |
-| 11 | Explain weighted outputs, then tile updates and rescaling of both running totals. | Recommended after revising the illustrative scores as described below. |
+| 11 | Explain weighted outputs, then tile updates and rescaling of both running totals. | Recap included; later larger scores now rescale retained totals. |
 | 12 | Connect KV payload, prefill/decode and batch reuse; distinguish capacity, work and ideal time bounds. | Recommended. |
 | 13 | Model how to form a hypothesis, check outputs and choose a fair measurement. | Optional investigation guide; preserve the learner's independent recommendation. |
 
-The current Chapter 11 default reaches its largest query-0 score in the first
-key tile. Subsequent rescaling factors are all 1.0, so a narrated example should
-include a later larger score to show both retained totals changing scale. Compare
-all final query outputs with the materialised reference for the same inputs, and
-retain the parent's implementation and timing qualifiers.
+Chapter 11 now uses a shifted deterministic key fixture in both the browser
+model and PyTorch source. With two-key tiles, query zero encounters later larger
+scores and both non-empty retained totals visibly rescale. Every query output
+is checked against the materialised reference for the same inputs. The recurrence,
+byte-accounting scope and implementation/timing qualifiers remain unchanged.
 
 Chapter 5's recap should include the row crossing a sector boundary as well as a
 packed column. Chapter 6 must retain its explicit scheduler assumptions; Chapter

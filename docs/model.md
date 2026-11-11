@@ -205,7 +205,9 @@ One WMMA API call expresses 4,096 scalar FMAs; it is not necessarily one hardwar
 
 ## Attention (Lab 07)
 
-Deterministic Q/K/V have length 8, 16 or 32, width four. Full dense unmasked attention uses
+Deterministic Q/K/V have length 8, 16 or 32, width four. The key fixture uses
+`((2*i+j+4)%7-3)/2`, also used by the generated PyTorch example, so query zero
+encounters larger scores in later tiles and visibly rescales non-empty totals. Full dense unmasked attention uses
 scores QKᵀ/√d. A stable reference subtracts row maxima before exponentiation. The online
 implementation computes all queries in key tiles, recording query zero. For each tile:
 

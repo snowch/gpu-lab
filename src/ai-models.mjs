@@ -74,7 +74,7 @@ export function attention({ n=8, tile=2, mode='online', scale=1 }={}) {
   choice('n',n,[8,16,32]);choice('tile',tile,[2,4,8]);choice('mode',mode,['online','materialised']);choice('scale',scale,[1,1000]);
   const d=4;
   const q=Array.from({length:n},(_,i)=>Array.from({length:d},(_,j)=>((i+j)%5-2)*scale));
-  const k=Array.from({length:n},(_,i)=>Array.from({length:d},(_,j)=>((2*i+j)%7-3)/2));
+  const k=Array.from({length:n},(_,i)=>Array.from({length:d},(_,j)=>((2*i+j+4)%7-3)/2));
   const v=Array.from({length:n},(_,i)=>Array.from({length:d},(_,j)=>(i+j)%9-4));
   const scores=q.map(row=>k.map(key=>row.reduce((s,x,j)=>s+x*key[j],0)/Math.sqrt(d)));
   const probabilities=scores.map(row=>{const m=Math.max(...row),e=row.map(x=>Math.exp(x-m)),l=e.reduce((a,b)=>a+b,0);return e.map(x=>x/l);});

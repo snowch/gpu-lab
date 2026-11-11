@@ -1,5 +1,6 @@
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
+import {recordingLink} from './recording-view.mjs';
 import {attention, inferenceBudget} from './ai-models.mjs';
 import {escape, fmt, metrics, table} from './continuation-ui.mjs';
 
@@ -12,7 +13,7 @@ q = torch.tensor(
     dtype=torch.float32, device="cuda",
 ) * ${scale}
 k = torch.tensor(
-    [[((2 * i + j) % 7 - 3) / 2 for j in range(d)]
+    [[((2 * i + j + 4) % 7 - 3) / 2 for j in range(d)]
      for i in range(n)],
     dtype=torch.float32, device="cuda",
 )
@@ -73,6 +74,7 @@ const transferCacheB = inferenceBudget({batch:1,sequence:512});
 
 export const chapters = [
   {
+    closingHTML:recordingLink('attention','update attention totals without full score matrices','Follow weighted results and rescaling of both retained totals, then compare a different tile width. The recording distinguishes selected intermediate transfers, single-query scratch and complete traffic; it does not execute a production FlashAttention kernel or predict GPU time.'),
     slug:'attention', number:11, title:'How can attention use less memory?',
     lead:'Compute attention’s weighted sums, then compare storing full score and weight matrices with processing keys in tiles.',
     source:attentionCode(),
@@ -95,7 +97,7 @@ export const chapters = [
       },
       {
         id:'attention-online', title:'Combine one key tile at a time',
-        body:`<p>We can visit a few keys at a time, combine their contribution, then move to the next group. Keep a running weighted total and a normalisation total (the sum of unnormalised weights), instead of writing full score and weight matrices. When a larger score arrives, earlier weights need a new common scale. Multiply both previous totals by the same factor before adding the new tile’s contributions. Their ratio is preserved. The result below shows these additions for output component zero.</p><p>The current output estimate uses only the keys visited so far. It need not equal the final answer until every key has been included. The final result below compares all queries against the full-matrix reference.</p><p>This experiment fixes N = 8 and width = 4. Its single-query scratch budget is <strong>tile width + 4 + 2 floats</strong>: one tile of scores, four accumulated output components and two normalisation scalars. It excludes inputs, output, tile rereads and the browser's own arrays and trace. It is not a production kernel's allocation or a total memory-traffic estimate.</p>`,
+        body:`<p>We can visit a few keys at a time, combine their contribution, then move to the next group. Keep a running weighted total and a normalisation total (the sum of unnormalised weights), instead of writing full score and weight matrices. When a larger score arrives, earlier weights need a new common scale. Multiply both previous totals by the same factor before adding the new tile’s contributions. Their ratio is preserved. The result below shows these additions for output component zero. After Run, choose Next step once and compare both entries in “Previous × scale”. The later larger score in this example changes that scale.</p><p>The current output estimate uses only the keys visited so far. It need not equal the final answer until every key has been included. The final result below compares all queries against the full-matrix reference.</p><p>This experiment fixes N = 8 and width = 4. Its single-query scratch budget is <strong>tile width + 4 + 2 floats</strong>: one tile of scores, four accumulated output components and two normalisation scalars. It excludes inputs, output, tile rereads and the browser's own arrays and trace. It is not a production kernel's allocation or a total memory-traffic estimate.</p>`,
         terms:[['Online softmax','A running normalisation that updates when another group of scores arrives, without keeping the complete score row.'],['Scratch storage','Temporary space used while calculating a result. This experiment counts the state needed for one query.']],
         task:'Predict whether changing the key tile from 2 to 4 changes the final result or only the intermediate steps and scratch budget. Run, step to the last tile, then change only tile width and compare.',
         experiment:{model:'attention',defaults:{...attentionDefaults,mode:'online'},focus:'attention-online',controls:[{key:'tile',label:'Keys per tile',options:[[2,'2 keys'],[4,'4 keys'],[8,'8 keys']]}]},

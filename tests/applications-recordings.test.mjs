@@ -16,3 +16,17 @@ test('precision recap distinguishes input loss, accumulation, range and exact-in
  assert.doesNotMatch(precisionFigure('question'),/Changed inputs: 0|Converted sum: 4.0/);
  assert.match(precisionFigure('answer'),/Converted sum: 4.0 · reference: 4.0/);
 });
+
+import {attentionRecordingData as attn,attentionRecordingFrame,attentionFigure} from '../scripts/render-attention-recording.mjs';
+import {roundedTensorValue} from '../src/value-format.mjs';
+test('attention recap rescales non-empty totals and distinguishes tile scratch from matrix traffic',()=>{
+ const {source,event}=attentionRecordingFrame('rescale');
+ assert.ok(event.rescale>0&&event.rescale<1);assert.ok(event.previous.l>0);assert.notEqual(event.previous.acc[0],0);
+ assert.match(attentionFigure('rescale'),new RegExp(roundedTensorValue(event.previous.l*event.rescale).replaceAll('.','\\.')));
+ assert.ok(attentionFigure('rescale').includes(roundedTensorValue(event.previous.acc[0]*event.rescale)));
+ assert.equal(source.scratchFloats,8);assert.equal(attn.four.scratchFloats,10);
+ assert.equal(source.intermediateComparison.materialisedBytes,1024);assert.equal(source.intermediateBytes,0);
+ for(const r of [source,attn.four]){assert.ok(r.maxError<1e-12);for(let i=0;i<r.n;i++)for(let j=0;j<r.d;j++)assert.ok(Math.abs(r.output[i][j]-attn.materialised.output[i][j])<1e-12);}
+ assert.doesNotMatch(attentionFigure('question'),/After rescaling|New totals|10 scratch floats|40 bytes/);
+ assert.match(attentionFigure('answer'),/10 scratch floats × 4 bytes = 40 bytes/);
+});
