@@ -352,7 +352,21 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
             tab=ctx.pages[0];tab.goto(url)
             expect(tab.locator('html')).to_have_attribute('data-test-release','one')
             panel(tab);ready(tab);expect(tab.locator('#version-status')).to_have_text('Update ready')
-            tab.locator('#restart-update').click();expect(tab.locator('html')).to_have_attribute('data-test-release','two')
+            started=time.monotonic();tab.locator('#restart-update').click()
+            try:
+                # A cold restart verifies both retained and pending releases.
+                # The application allows 15 s for this RPC; a 5 s assertion
+                # can expire while the media hashes are still being checked.
+                expect(tab.locator('html')).to_have_attribute('data-test-release','two',timeout=20000)
+            except AssertionError:
+                print('Cold restart diagnostics:', {
+                    'elapsed':time.monotonic()-started,
+                    'error':tab.locator('#app-status-error').inner_text(),
+                    'status':tab.locator('#version-status').inner_text(),
+                    'storage':tab.evaluate('navigator.storage.estimate()'),
+                },flush=True)
+                raise
+            print(f'Cold offline restart completed in {time.monotonic()-started:.2f}s',flush=True)
             ctx.close()
             print('PASS persistent profile: no activation on closing all windows; cold offline reopen, deferred badge and explicit offline restart')
             # Exercise the actual former worker and its automatically saved cache.
