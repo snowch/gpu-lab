@@ -202,7 +202,15 @@ and toolkit version; record outputs and compare simulator claims with appropriat
 metrics. Performance labs need warm-up, synchronisation, repeated measurements and explicit
 measurement scope. No measured performance claim is made by this initial lab.
 
-## Optional hardware depth
+## Optional recordings and hardware depth
+
+`inside-sm.html` is a short, full-width video appendix linked from Chapter 1 as
+“Watch: inside an SM · 3½ minutes”. The approved narrated deck follows a load,
+register multiplication and store, then contrasts separate thread values with
+shared execution hardware. Native playback controls, English captions, a generated
+transcript and video/PDF downloads work without a custom player or installation.
+The return link preserves the originating chapter’s inputs, result and position;
+return visits and release updates restore the video position without autoplay.
 
 Chapter 2 offers an optional narrated recap after its new-case exercise, at
 `devices-video.html`. Eight model-derived slides follow CPU and GPU buffers,
@@ -219,13 +227,12 @@ recording preserves Chapter 3's distinction between logical coordinates and the
 storage positions introduced next. Playback, downloads, saved-state return and
 offline coverage match Chapter 2. See `assets/media/reading/README.md`.
 
-`inside-sm.html` is a short, full-width video appendix linked from Chapter 1 as
-“Watch: inside an SM · 3½ minutes”. The approved narrated deck follows a load,
-register multiplication and store, then contrasts separate thread values with
-shared execution hardware. Native playback controls, English captions, a generated
-transcript and video/PDF downloads work without a custom player or installation.
-The return link preserves the originating chapter’s inputs, result and position;
-return visits and release updates restore the video position without autoplay.
+Chapter 4 adds `layout-video.html`, following its explanation exercise. Eight
+slides distinguish values, element offsets and byte offsets; follow strides in
+shared storage; then compare a packed copy and an already-contiguous row. The
+new column-3 copy question checks new offsets and payload while preserving the
+original values. The same playback, transcript, downloads, return and offline
+features apply. See `assets/media/layout/README.md`.
 
 The interactive two-warp readiness walkthrough is local to Chapter 6, behind an
 optional disclosure reached from its hardware overview. Chapter 6 retains its
@@ -248,3 +255,36 @@ across K phases. A new 8 × 8 case checks phase loads and the scope of sharing.
 Counts describe the teaching algorithm, excluding caches and GPU timing. The
 recording has the same accessible playback, downloads, return-state preservation
 and offline update coverage. See `assets/media/matmul/README.md` for its sources.
+
+## Course recording review
+
+Short recaps can support recall after a chapter's independent exercise. Each
+should trace one example and end with a fresh explanation question. This review
+uses the current thirteen-chapter book; recommendations below are future work.
+
+| Chapter | Recording goal | State |
+| --- | --- | --- |
+| 1 | Trace five inputs through blocks, global indices and bounds checks. | Core recap recommended; the existing SM video supplies separate hardware depth. |
+| 2 | Follow CPU/GPU copies and distinguish transfer payload from calculation. | Recap included. |
+| 3 | Interpret row/column coordinates and colon syntax, then follow selected outputs. | Recap included. |
+| 4 | Connect views, strides, offsets and packed storage while preserving values. | Recap included. |
+| 5 | Group the same five reads into sectors; distinguish useful bytes, alignment and covered regions. | Recommended next. |
+| 6 | Narrate a waiting warp and another ready warp on the declared teaching timeline. | Recommended next. |
+| 7 | Follow changing active masks and distinguish other-path lanes from unused tail positions. | Recommended next. |
+| 8 | Trace shared-memory writes, barriers and the reduction tree. | Recap included. |
+| 9 | Follow shared input reuse and partial sums across K phases. | Recap included. |
+| 10 | Trace input conversion before accumulation, including cancellation and a range-sensitive case. | Recommended. |
+| 11 | Explain weighted outputs, then tile updates and rescaling of both running totals. | Recommended after revising the illustrative scores as described below. |
+| 12 | Connect KV payload, prefill/decode and batch reuse; distinguish capacity, work and ideal time bounds. | Recommended. |
+| 13 | Model how to form a hypothesis, check outputs and choose a fair measurement. | Optional investigation guide; preserve the learner's independent recommendation. |
+
+The current Chapter 11 default reaches its largest query-0 score in the first
+key tile. Subsequent rescaling factors are all 1.0, so a narrated example should
+include a later larger score to show both retained totals changing scale. Compare
+all final query outputs with the materialised reference for the same inputs, and
+retain the parent's implementation and timing qualifiers.
+
+Chapter 5's recap should include the row crossing a sector boundary as well as a
+packed column. Chapter 6 must retain its explicit scheduler assumptions; Chapter
+7 must label its chosen path order. Chapters 10–12 need the same separation of
+arithmetic/storage models from measured GPU execution as their parent lessons.

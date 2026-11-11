@@ -11,7 +11,7 @@ document.addEventListener('click',event=>{
   const url=new URL(link.href,location);
   // In-page navigation keeps the existing return destination and live state.
   if(url.pathname===location.pathname&&url.search===location.search&&url.hash)return;
-  const appendix=['inside-sm','reduction-video','matmul-video','devices-video','reading-video'].some(slug=>url.pathname.endsWith('/'+slug+'.html'));
+  const appendix=['inside-sm','reduction-video','matmul-video','devices-video','reading-video','layout-video'].some(slug=>url.pathname.endsWith('/'+slug+'.html'));
   if(url.origin!==location.origin||(!appendix&&!link.matches('[data-reading-link]'))||window.frameElement)return;
   event.preventDefault();
   try{
