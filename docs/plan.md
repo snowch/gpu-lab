@@ -275,6 +275,13 @@ revealing its groups. Useful bytes, covered bytes and physical traffic remain
 separate. Packing and output stores are outside the input-load count. Captions,
 transcript, slides, downloads and offline state restoration use the common player.
 
+Chapter 10's optional recap compares converted and original-input FP32 running
+sums through cancellation, then tests very small and exactly representable inputs.
+It separates number format, accumulation and hardware execution. All displayed
+values come from the existing precision model; common playback, captions,
+transcript, downloads and offline return checks apply. See
+`assets/media/tensor-cores/README.md`.
+
 ## Course recording review
 
 Short recaps can support recall after a chapter's independent exercise. Each
@@ -292,7 +299,7 @@ uses the current thirteen-chapter book; recommendations below are future work.
 | 7 | Follow changing active masks and distinguish other-path lanes from unused tail positions. | Recap included. |
 | 8 | Trace shared-memory writes, barriers and the reduction tree. | Recap included. |
 | 9 | Follow shared input reuse and partial sums across K phases. | Recap included. |
-| 10 | Trace input conversion before accumulation, including cancellation and a range-sensitive case. | Recommended. |
+| 10 | Trace input conversion before accumulation, including cancellation and a range-sensitive case. | Recap included. |
 | 11 | Explain weighted outputs, then tile updates and rescaling of both running totals. | Recommended after revising the illustrative scores as described below. |
 | 12 | Connect KV payload, prefill/decode and batch reuse; distinguish capacity, work and ideal time bounds. | Recommended. |
 | 13 | Model how to form a hypothesis, check outputs and choose a fair measurement. | Optional investigation guide; preserve the learner's independent recommendation. |

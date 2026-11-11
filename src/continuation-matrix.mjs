@@ -1,5 +1,6 @@
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
+import {recordingLink} from './recording-view.mjs';
 import {tiledMatmul, precisionMatmul} from './ai-models.mjs';
 import {escape, fmt, metrics, table} from './continuation-ui.mjs';
 
@@ -90,6 +91,7 @@ export const chapters = [
     closingHTML:'<section class="book-section" id="matmul-recording-link"><h2>Watch input tiles feed several outputs</h2><p>Optional recap: <a id="matmul-watch" data-reading-link href="matmul-video.html?from=matmul">watch how matrix tiles reuse inputs</a>. Follow one input into several outputs, retain the partial sums across K phases, then explain the input-load counts. The recording illustrates this teaching algorithm; it does not show the implementation PyTorch selected or measure GPU speed.</p></section>',
   },
   {
+    closingHTML:recordingLink('tensor-cores','follow input rounding into FP32 sums','Compare conversion, cancellation and small-value range before applying an exact-input case. The recording uses sequential arithmetic to explain accuracy; it does not identify tensor-core instructions or GPU timings.'),
     slug:'tensor-cores',number:10,title:'What changes when matrix inputs use fewer bits?',
     lead:'Convert FP32 inputs to FP16 or BF16, compare the resulting sums, then connect matrix operations to tensor cores.',
     source:precisionCode(precisionDefaults),

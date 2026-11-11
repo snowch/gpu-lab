@@ -36,7 +36,7 @@ test('layout recording distinguishes values, source offsets, new copy offsets an
  assert.match(layoutFigure('answer'),/New stride: 1/);assert.match(layoutFigure('contiguous-row'),/0 bytes of values copied/);
  assert.match(layoutFigure('storage'),/Value 1.0 is at element offset 0/);
 });
-for(const slug of ['devices','reading','layout','requests','scheduling','divergence'])test(`${slug} recording media, captions and transcript retain exact audio-cue timing`,async()=>{
+for(const slug of ['devices','reading','layout','requests','scheduling','divergence','tensor-cores'])test(`${slug} recording media, captions and transcript retain exact audio-cue timing`,async()=>{
  const base=new URL('../',import.meta.url),json=async file=>JSON.parse(await readFile(new URL(file,base),'utf8'));
  const scenes=await json(`content/${slug}-scenes.json`),media=await json(`content/${slug}-media.json`);
  assert.equal((await stat(new URL(`assets/media/${slug}/${slug}.mp4`,base))).size,media.bytes);
