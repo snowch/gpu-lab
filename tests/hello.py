@@ -24,6 +24,11 @@ def grouping(page,blocks='1',position='0:4',values='same'):
 def hello_flow(page,url):
     page.goto(url+'lessons/hello.html')
     expect(page.locator('.hello-section')).to_have_count(5)
+    outline=page.get_by_role('navigation',name='In this chapter')
+    expect(outline.locator('a')).to_have_count(5)
+    for link in outline.locator('a').all():
+        expect(link).to_be_visible()
+        expect(page.locator(link.get_attribute('href'))).to_have_count(1)
     expect(page.locator('.hello-start-code')).to_contain_text('device="cuda"')
     expect(page.locator('[id^=hello-factor-]')).to_have_count(1)
     expect(page.locator('[id^=hello-run-]')).to_have_count(1)
