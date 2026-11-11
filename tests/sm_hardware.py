@@ -110,7 +110,9 @@ def check_sm_hardware(browser,url,root,errors):
     page.goto(url+'lessons/scheduling.html#sm-warps')
     page.locator('#sm-walkthrough > summary').focus();page.keyboard.press('Enter')
     expect(page.locator('#sm-next')).to_be_disabled()
-    page.locator('#sm-explorer noscript details summary').click()
+    # Smooth scrolling at this nested disclosure can keep mouse actionability
+    # unstable. Exercise native keyboard activation, including without scripts.
+    page.locator('#sm-explorer noscript details summary').focus();page.keyboard.press('Enter')
     expect(page.locator('#sm-explorer noscript details')).to_contain_text('Reuse the arithmetic units for Warp B')
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     context.close()
