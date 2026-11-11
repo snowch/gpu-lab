@@ -4,7 +4,8 @@ from playwright.sync_api import expect
 
 RECORDINGS=[dict(slug='devices',chapter=2,title='Follow tensor values between CPU and GPU',
     control='#device-count-0',value='8',run='#device-run-0',result='#device-feedback-0',
-    untouched='#device-map-1 code',untouched_text=['x_cpu','x_gpu'])]
+    untouched='#device-map-1 code',untouched_text=['x_cpu','x_gpu']),
+    dict(slug='reading',chapter=3,title='Select tensor rows and columns',control='#reading-index-row',value='1',run='#reading-run-row',result='#reading-feedback-row',untouched='#reading-map-column .book-reads li>span:last-child strong',untouched_text=['?']*5)]
 
 def check_foundations_recordings(browser,url,root,errors):
     for spec in RECORDINGS:

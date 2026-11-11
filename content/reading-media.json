@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 174,
+  "bytes": 8098369,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 22.592,
+      "title": "Choose values by coordinates."
+    },
+    {
+      "id": "s02",
+      "start": 22.592,
+      "end": 42.197,
+      "title": "A row fixes the first coordinate."
+    },
+    {
+      "id": "s03",
+      "start": 42.197,
+      "end": 64.235,
+      "title": "Multiply the selected row."
+    },
+    {
+      "id": "s04",
+      "start": 64.235,
+      "end": 81.984,
+      "title": "A column fixes the second coordinate."
+    },
+    {
+      "id": "s05",
+      "start": 81.984,
+      "end": 104.64,
+      "title": "Multiply the selected column."
+    },
+    {
+      "id": "s06",
+      "start": 104.64,
+      "end": 127.616,
+      "title": "Change only the index."
+    },
+    {
+      "id": "s07",
+      "start": 127.616,
+      "end": 151.171,
+      "title": "Pause: interpret this expression."
+    },
+    {
+      "id": "s08",
+      "start": 151.171,
+      "end": 173.869,
+      "title": "The second coordinate fixes the column."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 9.837,
+      "text": "Chapter Three keeps the floating-point values on the GPU and arranges them in a five by five tensor. Row and column numbers start at zero."
+    },
+    {
+      "id": "s01-c2",
+      "start": 10.057,
+      "end": 21.172,
+      "text": "The first coordinate selects a row; the second selects a column. These logical coordinates identify inputs. PyTorch chooses execution details for the CUDA operation."
+    },
+    {
+      "id": "s02-c1",
+      "start": 23.192,
+      "end": 32.088,
+      "text": "Read x, zero, colon. Row zero is fixed, while the colon includes all columns. Trace the five highlighted inputs from left to right."
+    },
+    {
+      "id": "s02-c2",
+      "start": 32.308,
+      "end": 40.777,
+      "text": "Selecting the row chooses the inputs. Multiplying each selected value by two is a separate calculation, which we will inspect next."
+    },
+    {
+      "id": "s03-c1",
+      "start": 42.797,
+      "end": 51.523,
+      "text": "Each output is twice its selected input. The source coordinates beside the values show where every input came from in the original tensor."
+    },
+    {
+      "id": "s03-c2",
+      "start": 51.743,
+      "end": 62.815,
+      "text": "This multiplication creates a new result tensor. It leaves the original x unchanged. Selecting a row and calculating its outputs are different parts of the expression."
+    },
+    {
+      "id": "s04-c1",
+      "start": 64.835,
+      "end": 72.557,
+      "text": "Now read x, colon, zero. The column is fixed, while the colon includes all rows. We take one input from each row."
+    },
+    {
+      "id": "s04-c2",
+      "start": 72.777,
+      "end": 80.564,
+      "text": "The first row and first column share their first value, but the other inputs differ. Both selections still contain five values."
+    },
+    {
+      "id": "s05-c1",
+      "start": 82.584,
+      "end": 91.331,
+      "text": "Multiply each column input by two. Each result uses one highlighted input; we are not adding the five values into a single total."
+    },
+    {
+      "id": "s05-c2",
+      "start": 91.551,
+      "end": 103.22,
+      "text": "This is elementwise multiplication: apply the operation separately to each selected value. Changing from a row to a column changes the inputs, while the multiplier stays fixed."
+    },
+    {
+      "id": "s06-c1",
+      "start": 105.24,
+      "end": 114.819,
+      "text": "With index one, a row selection chooses the second row. A column selection chooses the second column. Compare their five inputs in the diagram."
+    },
+    {
+      "id": "s06-c2",
+      "start": 115.039,
+      "end": 126.196,
+      "text": "Keep the multiplier fixed and explain which coordinates changed. A different selection can change the values without changing the number of inputs or the calculation applied to each."
+    },
+    {
+      "id": "s07-c1",
+      "start": 128.216,
+      "end": 137.048,
+      "text": "Try x, colon, three, then multiply by two. Before checking, identify which dimension is fixed and which dimension the colon includes."
+    },
+    {
+      "id": "s07-c2",
+      "start": 137.268,
+      "end": 145.951,
+      "text": "Trace the five input cells, then predict their five outputs. Does index three mean the fourth row or the fourth column here? Pause and explain."
+    },
+    {
+      "id": "s08-c1",
+      "start": 151.771,
+      "end": 162.501,
+      "text": "Index three fixes the fourth column because counting starts at zero. The colon includes every row. The diagram follows those five inputs into their doubled results."
+    },
+    {
+      "id": "s08-c2",
+      "start": 162.721,
+      "end": 172.449,
+      "text": "The original tensor is unchanged. Return to Chapter Three, change only a row or column index, and explain the selected inputs before pressing Run."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 9.237,
+      "s01-c2": 11.115,
+      "s02-c1": 8.896,
+      "s02-c2": 8.469,
+      "s03-c1": 8.725,
+      "s03-c2": 11.072,
+      "s04-c1": 7.723,
+      "s04-c2": 7.787,
+      "s05-c1": 8.747,
+      "s05-c2": 11.669,
+      "s06-c1": 9.579,
+      "s06-c2": 11.157,
+      "s07-c1": 8.832,
+      "s07-c2": 8.683,
+      "s08-c1": 10.731,
+      "s08-c2": 9.728
+    }
+  }
+}
