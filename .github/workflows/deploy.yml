@@ -32,8 +32,8 @@ jobs:
       # course bundles its fonts; avoid apt's unrelated font/mirror downloads.
       - run: python -m playwright install --only-shell chromium
         timeout-minutes: 10
-      - run: python tests/browser.py
       - run: python tests/offline.py
+      - run: python tests/browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

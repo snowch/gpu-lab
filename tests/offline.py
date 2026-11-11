@@ -207,7 +207,16 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(page.locator('#app-status-error')).not_to_be_empty(timeout=30000)
                 ready(page);expect(page.locator('#restart-update')).to_be_hidden()
                 CourseHandler.fail=None;page.locator('#download-update').click()
-                expect(page.locator('#version-status')).to_have_text('Update ready',timeout=30000)
+                try:
+                    expect(page.locator('#version-status')).to_have_text('Update ready',timeout=30000)
+                except AssertionError:
+                    print('Update diagnostics:', {
+                        'error':page.locator('#app-status-error').inner_text(),
+                        'progress':page.locator('#progress-text').inner_text(),
+                        'storage':page.evaluate('navigator.storage.estimate()'),
+                        'recentRequests':CourseHandler.requests[-8:],
+                    },flush=True)
+                    raise
                 page.locator('#later-update').click();expect(page.locator('#app-status-summary')).to_contain_text('Update ready')
                 assert second.locator('meta[name="gpu-release"]').get_attribute('content')==releases['one']['id']
                 # Input composition in ANY window blocks everyone without resetting state.
