@@ -1,0 +1,321 @@
+{
+  "durationSeconds": 266,
+  "bytes": 12249435,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 22.599,
+      "title": "Four inputs. One sum."
+    },
+    {
+      "id": "s02",
+      "start": 22.599,
+      "end": 46.605,
+      "title": "Write into a shared workspace."
+    },
+    {
+      "id": "s03",
+      "start": 46.605,
+      "end": 69.204,
+      "title": "Each thread writes its input."
+    },
+    {
+      "id": "s04",
+      "start": 69.204,
+      "end": 92.037,
+      "title": "Wait before reading a partner."
+    },
+    {
+      "id": "s05",
+      "start": 92.037,
+      "end": 113.996,
+      "title": "Combine partners two words apart."
+    },
+    {
+      "id": "s06",
+      "start": 113.996,
+      "end": 137.341,
+      "title": "Wait again before the next stage."
+    },
+    {
+      "id": "s07",
+      "start": 137.341,
+      "end": 163.46,
+      "title": "Combine the two partial sums."
+    },
+    {
+      "id": "s08",
+      "start": 163.46,
+      "end": 190.987,
+      "title": "What if the ordering is missing?"
+    },
+    {
+      "id": "s09",
+      "start": 190.987,
+      "end": 214.652,
+      "title": "A later write cannot repair the read."
+    },
+    {
+      "id": "s10",
+      "start": 214.652,
+      "end": 238.171,
+      "title": "Pause: extend the block to eight inputs."
+    },
+    {
+      "id": "s11",
+      "start": 238.171,
+      "end": 266.337,
+      "title": "All eight threads reach the barrier."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 8.259,
+      "text": "A sum combines values handled by different threads. Follow the four inputs from Chapter Eight: one, two, three and four."
+    },
+    {
+      "id": "s01-c2",
+      "start": 8.479,
+      "end": 15.135,
+      "text": "There are four threads in one block. A block is a group whose threads can cooperate. Each thread has one input."
+    },
+    {
+      "id": "s01-c3",
+      "start": 15.355,
+      "end": 21.179,
+      "text": "This is our teaching algorithm for the sum, not a trace of the implementation PyTorch selects."
+    },
+    {
+      "id": "s02-c1",
+      "start": 23.199,
+      "end": 31.305,
+      "text": "Each thread starts with its own input. To exchange values, the block uses shared memory: storage its threads can read and write."
+    },
+    {
+      "id": "s02-c2",
+      "start": 31.525,
+      "end": 39.035,
+      "text": "Each four-byte storage position is a word. Thread zero writes its input, one point zero, into shared word zero."
+    },
+    {
+      "id": "s02-c3",
+      "start": 39.255,
+      "end": 45.185,
+      "text": "The other words are still unwritten in this snapshot. The thread numbers and word indices start at zero."
+    },
+    {
+      "id": "s03-c1",
+      "start": 47.205,
+      "end": 54.331,
+      "text": "Now inspect the state after all four input writes. Shared words zero through three hold one, two, three and four."
+    },
+    {
+      "id": "s03-c2",
+      "start": 54.551,
+      "end": 62.188,
+      "text": "We display those writes in an inspection order. A real program cannot rely on threads reaching their instructions in this order."
+    },
+    {
+      "id": "s03-c3",
+      "start": 62.408,
+      "end": 67.784,
+      "text": "Before a thread reads its partner's value, the program must establish that the write comes first."
+    },
+    {
+      "id": "s04-c1",
+      "start": 69.804,
+      "end": 75.799,
+      "text": "A block barrier provides that ordering. All four threads must reach it before any continues beyond it."
+    },
+    {
+      "id": "s04-c2",
+      "start": 76.019,
+      "end": 83.016,
+      "text": "The barrier also orders shared-memory accesses. Preceding writes become visible to the block's threads after the barrier."
+    },
+    {
+      "id": "s04-c3",
+      "start": 83.236,
+      "end": 90.617,
+      "text": "This does not wait for other blocks. It orders cooperation within this block, including the writes needed by our first additions."
+    },
+    {
+      "id": "s05-c1",
+      "start": 92.637,
+      "end": 100.723,
+      "text": "For four inputs, the first partner distance is two. Thread zero adds shared word two to its own word: one plus three makes four."
+    },
+    {
+      "id": "s05-c2",
+      "start": 100.943,
+      "end": 104.548,
+      "text": "Thread one adds shared word three: two plus four makes six."
+    },
+    {
+      "id": "s05-c3",
+      "start": 104.768,
+      "end": 112.576,
+      "text": "The partial sums are written into words zero and one. Their input-index labels show that the two pairs have no input in common."
+    },
+    {
+      "id": "s06-c1",
+      "start": 114.596,
+      "end": 122.02,
+      "text": "The next addition needs the new partial sum from thread one. We therefore need another block barrier after the partial-sum writes."
+    },
+    {
+      "id": "s06-c2",
+      "start": 122.24,
+      "end": 127.957,
+      "text": "Threads two and three perform no addition in this stage. They still reach the barrier with the other threads."
+    },
+    {
+      "id": "s06-c3",
+      "start": 128.177,
+      "end": 135.921,
+      "text": "The barrier belongs after the conditional addition, where every thread can reach it. It must not be restricted to just the adding threads."
+    },
+    {
+      "id": "s07-c1",
+      "start": 137.941,
+      "end": 144.704,
+      "text": "The partner distance is now one. Thread zero combines four and six, producing ten in shared word zero."
+    },
+    {
+      "id": "s07-c2",
+      "start": 144.924,
+      "end": 152.22,
+      "text": "Follow the input-index labels: the final sum contains indices zero, two, one and three, each exactly once."
+    },
+    {
+      "id": "s07-c3",
+      "start": 152.44,
+      "end": 162.04,
+      "text": "The arrows express dependencies between values. They do not show GPU clock cycles or promise that the drawn operations execute simultaneously."
+    },
+    {
+      "id": "s08-c1",
+      "start": 164.06,
+      "end": 173.34,
+      "text": "Now remove the synchronisation. In this diagnostic, thread zero writes its own input, then reads shared word two before thread two writes there."
+    },
+    {
+      "id": "s08-c2",
+      "start": 173.56,
+      "end": 177.891,
+      "text": "The partner word is unwritten. There is no valid partial sum to display."
+    },
+    {
+      "id": "s08-c3",
+      "start": 178.111,
+      "end": 189.567,
+      "text": "This is one possible interleaving exposing a data race: conflicting accesses without the required ordering, including a write. We assign no numeric result to the racy program."
+    },
+    {
+      "id": "s09-c1",
+      "start": 191.587,
+      "end": 197.304,
+      "text": "Thread two eventually writes three point zero. That does not repair the read that already happened."
+    },
+    {
+      "id": "s09-c2",
+      "start": 197.524,
+      "end": 207.465,
+      "text": "Putting a barrier only after the early read cannot fix it either. The input writes must be ordered before partner reads, and partial-sum writes before the next stage's reads."
+    },
+    {
+      "id": "s09-c3",
+      "start": 207.685,
+      "end": 213.232,
+      "text": "Even a plausible answer from another execution would not establish that the program is safe."
+    },
+    {
+      "id": "s10-c1",
+      "start": 215.252,
+      "end": 223.487,
+      "text": "Try a new case with eight inputs and eight threads in one block. The first partner distance is four, so only threads zero through three add."
+    },
+    {
+      "id": "s10-c2",
+      "start": 223.707,
+      "end": 227.333,
+      "text": "How many threads must reach the block barrier after those additions?"
+    },
+    {
+      "id": "s10-c3",
+      "start": 227.553,
+      "end": 232.951,
+      "text": "Which thread supplies the value that thread one reads first? Pause here and explain your answers."
+    },
+    {
+      "id": "s11-c1",
+      "start": 238.771,
+      "end": 244.296,
+      "text": "All eight threads must reach the block barrier. That includes the four threads that did no addition."
+    },
+    {
+      "id": "s11-c2",
+      "start": 244.516,
+      "end": 253.199,
+      "text": "Thread one first reads shared word five. Thread five's input write must precede that read; the initial barrier establishes the ordering."
+    },
+    {
+      "id": "s11-c3",
+      "start": 253.419,
+      "end": 264.917,
+      "text": "Return to Chapter Eight. Set the input count to eight and inspect the tree. Follow the writes, barriers and partner distances. Explain each read using the write that supplies its value."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 7.659,
+      "s01-c2": 6.656,
+      "s01-c3": 5.824,
+      "s02-c1": 8.107,
+      "s02-c2": 7.509,
+      "s02-c3": 5.931,
+      "s03-c1": 7.125,
+      "s03-c2": 7.637,
+      "s03-c3": 5.376,
+      "s04-c1": 5.995,
+      "s04-c2": 6.997,
+      "s04-c3": 7.381,
+      "s05-c1": 8.085,
+      "s05-c2": 3.605,
+      "s05-c3": 7.808,
+      "s06-c1": 7.424,
+      "s06-c2": 5.717,
+      "s06-c3": 7.744,
+      "s07-c1": 6.763,
+      "s07-c2": 7.296,
+      "s07-c3": 9.6,
+      "s08-c1": 9.28,
+      "s08-c2": 4.331,
+      "s08-c3": 11.456,
+      "s09-c1": 5.717,
+      "s09-c2": 9.941,
+      "s09-c3": 5.547,
+      "s10-c1": 8.235,
+      "s10-c2": 3.627,
+      "s10-c3": 5.397,
+      "s11-c1": 5.525,
+      "s11-c2": 8.683,
+      "s11-c3": 11.499
+    }
+  }
+}

@@ -10,6 +10,7 @@ let operation = null, pruning = null;
 let restarting = false;
 let navigationGate, releaseNavigation;
 const seen = new Map();
+const verifying = new Map();
 async function readState() {
   const cache = await caches.open(META);
   return (await cache.match(STATE))?.json() ?? {};
@@ -29,9 +30,18 @@ async function verified(response, file) {
 }
 async function complete(release) {
   if (!release) return false;
-  const cache = await caches.open(cacheName(release.id));
-  for (const file of release.files) if (!await verified(await cache.match(new URL(file.path, BASE)), file)) return false;
-  return true;
+  // Many open tabs request status together after a download. Share that scan,
+  // including its byte/hash checks, rather than rereading every video per tab.
+  // Retain no result after it finishes: the next check must detect eviction.
+  if (verifying.has(release.id)) return verifying.get(release.id);
+  const scan = (async () => {
+    const cache = await caches.open(cacheName(release.id));
+    for (const file of release.files) if (!await verified(await cache.match(new URL(file.path, BASE)), file)) return false;
+    return true;
+  })();
+  verifying.set(release.id, scan);
+  try { return await scan; }
+  finally { if (verifying.get(release.id) === scan) verifying.delete(release.id); }
 }
 async function broadcast(message) {
   for (const client of await self.clients.matchAll({ type: 'window', includeUncontrolled: true })) {

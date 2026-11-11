@@ -28,10 +28,12 @@ jobs:
           python-version: '3.12'
       - run: python tests/profiling_trace.py
       - run: pip install -r tests/requirements.txt
-      - run: python -m playwright install --with-deps chromium
+      # The Ubuntu runner already has the headless Chromium libraries. The
+      # course bundles its fonts; avoid apt's unrelated font/mirror downloads.
+      - run: python -m playwright install --only-shell chromium
         timeout-minutes: 10
-      - run: python tests/browser.py
       - run: python tests/offline.py
+      - run: python tests/browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -6,6 +6,31 @@ import {createHash,webcrypto} from 'node:crypto';
 import vm from 'node:vm';
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 
+test('concurrent readiness checks share byte verification but later checks detect eviction and recover from errors',async()=>{
+  const base='https://example.test/gpu-lab/',body='recording bytes';
+  const release={id:'1'.repeat(64),files:[{path:'video.mp4',bytes:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex')}]};
+  const started=deferred(),resume=deferred();
+  let reads=0,present=true,denied=false;
+  const cache={async match(){
+    reads++;
+    if(reads===1){started.resolve();await resume.promise;}
+    if(denied){denied=false;throw new Error('Storage temporarily unavailable');}
+    return present?new Response(body):undefined;
+  }};
+  const context=vm.createContext({release,URL,Request,Response,AbortController,AbortSignal,crypto:webcrypto,console,setTimeout,clearTimeout,
+    caches:{async open(){return cache;}},self:{registration:{scope:base},addEventListener(){}}});
+  const contract=(await readFile(new URL('../src/release-contract.mjs',import.meta.url),'utf8')).replaceAll('export ','');
+  vm.runInContext(contract+'\n'+await readFile(new URL('../scripts/service-worker.js',import.meta.url),'utf8'),context);
+  const check=()=>vm.runInContext('complete(release)',context);
+  const first=check();await started.promise;
+  const others=Array.from({length:15},check);
+  resume.resolve();assert.ok((await Promise.all([first,...others])).every(Boolean));
+  assert.equal(reads,1,'Sixteen tabs should not reread the same recording sixteen times');
+  present=false;assert.equal(await check(),false,'A completed check cannot conceal later eviction');
+  present=true;denied=true;await assert.rejects(check(),/Storage temporarily unavailable/);
+  assert.equal(await check(),true,'A rejected scan must not poison the next retry');
+});
+
 test('background cache pruning finishes before an update can create its staging cache',async()=>{
   const base='https://example.test/gpu-lab/',prefix=`gpu-lab:${base}:`,stores=new Map(),handlers=new Map();
   const file=body=>({path:'index.html',bytes:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex')});

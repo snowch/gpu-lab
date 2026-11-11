@@ -1,0 +1,66 @@
+# Copyright © 2026 Christopher Snow.
+import json
+from playwright.sync_api import expect
+
+def check_reduction_video(browser, url, root, errors):
+    media = json.loads((root/'content/reduction-media.json').read_text())
+    for width in [390,820,1440]:
+        for theme in ['light','dark']:
+            context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
+            page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)))
+            page.goto(url+'lessons/reduction.html?keep=video')
+            page.locator('#reduction-size-size').select_option('8')
+            page.locator('#reduction-size [data-run]').click()
+            page.locator('#reduction-size [data-next]').click()
+            result=page.locator('#reduction-size [data-visual-output]').inner_text()
+            # Read the preceding transfer, recording recap and following local-run section.
+            expect(page.locator('.continuation-transfer h2')).to_have_text('Try a new case')
+            expect(page.locator('#reduction-recording-link')).to_contain_text('Optional recap')
+            link=page.locator('#reduction-watch')
+            link.evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-250,behavior:'instant'})")
+            position=page.evaluate('scrollY')
+            link.focus();page.keyboard.press('Enter')
+            expect(page.locator('h1')).to_have_text('Shared memory and barriers')
+            expect(page.locator('.sidebar')).to_be_hidden()
+            expect(page.locator('#lesson-complete,.chapter-references')).to_have_count(0)
+            video=page.locator('#reduction-video')
+            expect(video).to_have_attribute('controls','')
+            expect(video).to_have_attribute('playsinline','')
+            expect(video).to_have_attribute('preload','none')
+            assert video.get_attribute('autoplay') is None
+            expect(video.locator('track')).to_have_attribute('srclang','en')
+            expect(video.locator('track')).to_have_attribute('default','')
+            page.locator('#reduction-transcript summary').focus();page.keyboard.press('Enter')
+            expect(page.locator('#reduction-transcript section')).to_have_count(11)
+            expect(page.locator('#reduction-transcript')).to_contain_text('We assign no numeric result to the racy program')
+            video.evaluate('v=>v.load()')
+            page.wait_for_function('document.querySelector("#reduction-video").readyState>=1')
+            assert abs(video.evaluate('v=>v.duration')-media['durationSeconds'])<1
+            assert video.evaluate('v=>v.videoWidth')==3840
+            video.evaluate('v=>{v.currentTime=45;v.playbackRate=1.25;v.muted=true;v.play()}')
+            page.wait_for_function('document.querySelector("#reduction-video").currentTime>45.1')
+            video.evaluate('v=>v.pause()')
+            page.wait_for_function('document.querySelector("#reduction-video").textTracks[0].cues?.length>0')
+            assert video.evaluate('v=>v.textTracks[0].mode')=='showing'
+            assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+            page.locator('#reduction-recording').screenshot(path=str(root/f'test-results/reduction-video-{width}-{theme}.png'),style='.topbar{position:static!important}')
+            page.locator('#reduction-return').click()
+            expect(page).to_have_url(url+'lessons/reduction.html?keep=video')
+            expect(page.locator('#reduction-size-size')).to_have_value('8')
+            expect(page.locator('#reduction-size [data-visual-output]')).to_have_text(result,use_inner_text=True)
+            page.wait_for_function('(position)=>Math.abs(scrollY-position)<8',arg=position)
+            expect(page.locator('#reduction-watch')).to_be_focused()
+            page.locator('#reduction-watch').click()
+            page.wait_for_function('document.querySelector("#reduction-video").currentTime>=45')
+            assert page.locator('#reduction-video').evaluate('v=>v.paused&&v.playbackRate===1.25')
+            expect(page.locator('#reduction-transcript')).to_have_attribute('open','')
+            context.close()
+    context=browser.new_context(java_script_enabled=False,viewport={'width':390,'height':1000})
+    page=context.new_page();page.goto(url+'lessons/reduction-video.html')
+    expect(page.locator('#reduction-video')).to_be_visible()
+    page.locator('#reduction-transcript summary').click()
+    expect(page.locator('#reduction-transcript')).to_contain_text('All eight threads must reach the block barrier')
+    expect(page.locator('#reduction-return')).to_have_attribute('href','reduction.html#reduction-recording-link')
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    context.close()
+    print('PASS: Chapter 8 recording playback, captions, keyboard return, saved experiment/video state, six layouts/themes and no-JavaScript transcript')

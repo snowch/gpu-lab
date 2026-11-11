@@ -66,6 +66,10 @@ queued download. A deterministic worker test pauses cleanup and starts an update
 it reproduces the former race without relying on timing.
 
 The worker stores a small selection record separately from per-release caches.
+Concurrent completeness checks share one in-progress byte/hash verification per
+release, so a status broadcast to many tabs does not reread every recording once
+per tab. Results are discarded when the scan finishes, including on errors;
+subsequent checks still verify current cache contents and detect eviction.
 Preparing an update sets `pending`; only Restart to update changes `active`.
 Closing all tabs, reopening the browser, visibility changes and ordinary refresh
 never select a pending release. Later dismisses the dialog, not its badge.
