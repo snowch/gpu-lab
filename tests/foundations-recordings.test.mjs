@@ -1,4 +1,5 @@
 // Copyright © 2026 Christopher Snow.
+import {requestsRecordingData as requests,requestsFigure} from '../scripts/render-requests-recording.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
@@ -35,7 +36,7 @@ test('layout recording distinguishes values, source offsets, new copy offsets an
  assert.match(layoutFigure('answer'),/New stride: 1/);assert.match(layoutFigure('contiguous-row'),/0 bytes of values copied/);
  assert.match(layoutFigure('storage'),/Value 1.0 is at element offset 0/);
 });
-for(const slug of ['devices','reading','layout'])test(`${slug} recording media, captions and transcript retain exact audio-cue timing`,async()=>{
+for(const slug of ['devices','reading','layout','requests'])test(`${slug} recording media, captions and transcript retain exact audio-cue timing`,async()=>{
  const base=new URL('../',import.meta.url),json=async file=>JSON.parse(await readFile(new URL(file,base),'utf8'));
  const scenes=await json(`content/${slug}-scenes.json`),media=await json(`content/${slug}-media.json`);
  assert.equal((await stat(new URL(`assets/media/${slug}/${slug}.mp4`,base))).size,media.bytes);
@@ -43,4 +44,16 @@ for(const slug of ['devices','reading','layout'])test(`${slug} recording media, 
  assert.equal(media.scenes.length,scenes.length);assert.ok(Math.abs(media.scenes.at(-1).end-media.durationSeconds)<1);
  const vtt=await readFile(new URL(`assets/media/${slug}/captions.vtt`,base),'utf8');let end=0;
  for(const cue of media.cues){assert.ok(cue.start>=end&&cue.end>cue.start);assert.ok(vtt.includes(cue.text));end=cue.end;}
+});
+
+test('sector recap preserves useful bytes, accounts for alignment and excludes the answer before reveal',()=>{
+ for(const s of Object.values(requests))assert.equal(s.load.usefulBytes,20);
+ assert.deepEqual(requests.column.values,requests.packed.values);
+ assert.deepEqual(requests.column.load.sectors.map(s=>s.id),[0,1,2]);
+ assert.equal(requests.packed.load.sectors.length,1);
+ assert.deepEqual(requests.rowOne.load.sectors.map(s=>s.laneIds),[[0,1,2],[3,4]]);
+ assert.deepEqual(requests.challenge.load.sectors.map(s=>s.laneIds),[[0],[1,2,3,4]]);
+ assert.equal(requests.challenge.load.coveredBytes,64);
+ assert.doesNotMatch(requestsFigure('question'),/20 useful bytes|64 covered bytes/);
+ assert.match(requestsFigure('answer'),/20 useful bytes · 2 sectors · 64 covered bytes/);
 });

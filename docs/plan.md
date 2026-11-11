@@ -256,6 +256,13 @@ Counts describe the teaching algorithm, excluding caches and GPU timing. The
 recording has the same accessible playback, downloads, return-state preservation
 and offline update coverage. See `assets/media/matmul/README.md` for its sources.
 
+Chapter 5's optional recap follows five model-derived input reads into aligned
+32-byte sectors. It compares row and column reads with a packed copy, includes a
+neighbouring row crossing a sector boundary, and asks about a different row before
+revealing its groups. Useful bytes, covered bytes and physical traffic remain
+separate. Packing and output stores are outside the input-load count. Captions,
+transcript, slides, downloads and offline state restoration use the common player.
+
 ## Course recording review
 
 Short recaps can support recall after a chapter's independent exercise. Each
@@ -268,7 +275,7 @@ uses the current thirteen-chapter book; recommendations below are future work.
 | 2 | Follow CPU/GPU copies and distinguish transfer payload from calculation. | Recap included. |
 | 3 | Interpret row/column coordinates and colon syntax, then follow selected outputs. | Recap included. |
 | 4 | Connect views, strides, offsets and packed storage while preserving values. | Recap included. |
-| 5 | Group the same five reads into sectors; distinguish useful bytes, alignment and covered regions. | Recommended next. |
+| 5 | Group the same five reads into sectors; distinguish useful bytes, alignment and covered regions. | Recap included. |
 | 6 | Narrate a waiting warp and another ready warp on the declared teaching timeline. | Recommended next. |
 | 7 | Follow changing active masks and distinguish other-path lanes from unused tail positions. | Recommended next. |
 | 8 | Trace shared-memory writes, barriers and the reduction tree. | Recap included. |
