@@ -13,11 +13,11 @@ export function renderSmHardware(frame=null){
     <div class="sm-device-memory"><h4>GPU memory</h4><p>Input and output arrays</p>${frame?`<div class="sm-memory-values">${frame.warps.map(w=>`<p>Warp ${w.name} · inputs <strong>${preview(w.input)}</strong><br>Outputs <strong>${preview(w.output)}</strong></p>`).join('')}</div>`:''}</div>
     ${edge('memory',['request','arrive','store'].includes(kind),kind==='request'?'Read request':kind==='arrive'?'Loaded values':kind==='store'?'Output values':'Memory requests and values')}
     <div class="sm-chip"><h3>Inside one SM</h3>
-      ${unit('load-store','Load/store units',frame?'Issue memory reads and writes, connecting GPU memory with the threads’ registers.':'Issue memory reads and writes.')}
+      ${unit('load-store','Load/store units','Handle memory instructions: a load brings a value into a register; a store writes a register value to memory.')}
       ${edge('load-registers',['arrive','store'].includes(kind),frame?'Values between load/store units and registers':'Load/store ↔ registers')}
-      ${unit('registers','Registers',frame?'Hold working values separately for each thread.':'Per-thread working values.',registers)}
-      ${edge('arithmetic',kind==='multiply',frame?'Register operands to arithmetic units; results back to registers':'Operands and results')}
-      ${unit('arithmetic','Arithmetic units · FP32',frame?'Perform arithmetic using register values. Many threads share this hardware.':'Shared hardware using register operands.',arithmetic)}
+      ${unit('registers','Registers','Small, fast storage on the SM that holds working values separately for each thread.',registers)}
+      ${edge('arithmetic',kind==='multiply',frame?'Register operands to arithmetic units; results back to registers':'Working values to arithmetic; results to registers')}
+      ${unit('arithmetic','Floating-point arithmetic units','Calculate with register values and return results to registers. Threads share these units. FP32 means 32-bit floating point.',arithmetic)}
       <aside class="sm-control-block" aria-label="Instruction selection">
     ${frame?`<div class="sm-warp-states">${frame.warps.map(w=>`<div class="sm-warp-state"><strong>Warp ${w.name} · 32 threads</strong><span>State after this event: ${w.status}</span></div>`).join('')}</div>`:''}
       ${unit('scheduler','Scheduler',frame?'Chooses an instruction from a ready warp. Different instructions use different execution units.':'Selects a ready warp instruction.')}

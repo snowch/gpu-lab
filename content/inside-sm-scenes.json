@@ -1,10 +1,67 @@
 [
- {"id":"s01","step":"Follow one value inside an SM","title":"Where does the multiplication happen?","lead":"Follow 1.0 → 2.0 inside the GPU.","stage":0,"text":"In Chapter One, the GPU doubles five input values. Let’s follow one of them: one point zero becomes two point zero. The values are stored in GPU memory. A streaming multiprocessor, or S M, supplies the hardware that executes instructions. We will follow a load, a multiply, and a store."},
- {"id":"s02","step":"Load from memory into a register","title":"Load the input.","lead":"Memory holds the input. A register holds the working value.","stage":1,"text":"We start by inspecting Thread Zero. Its load instruction requests the value at input index zero. Load and store hardware connects memory operations with the thread’s working registers. The value one point zero is now available in a register. Nothing has been written to the output array yet."},
- {"id":"s03","step":"Multiply using shared arithmetic hardware","title":"Multiply the register value.","lead":"The result returns to a register. Output memory is still unwritten.","stage":2,"text":"The multiply instruction uses the loaded value and the multiplier two. Floating point arithmetic hardware produces two point zero and returns the result to a register. The arithmetic unit is hardware shared by threads. It is not a little processor permanently owned by Thread Zero. The result is still inside the S M, not in the output array."},
- {"id":"s04","step":"Store the result in GPU memory","title":"Write the result back.","lead":"The store writes 2.0 into output[0].","stage":3,"text":"The store is a separate instruction. Load and store hardware writes two point zero from the thread’s result register into output index zero in GPU memory. We have now followed the whole value path: memory to register, arithmetic, then register to memory."},
- {"id":"s05","step":"Inspect another thread’s working values","title":"Another thread. Separate values.","lead":"Thread 1 loads 2.0 while Thread 0’s values remain distinct.","stage":4,"text":"Now inspect Thread One, whose input is two point zero. Its load supplies its own working register. Thread Zero’s values remain separate. We are changing which values we inspect, not choosing the GPU’s execution order. A GPU can execute instructions for groups of threads together; this picture isolates two threads to make their values easy to follow."},
- {"id":"s06","step":"Reuse the same kinds of execution hardware","title":"The hardware is shared.","lead":"Thread 1 multiplies 2.0 → 4.0, then stores 4.0.","stage":5,"text":"Thread One’s multiply uses the same depicted floating point hardware, this time producing four point zero. Its store writes that result to output index one. Each thread has its own working values, while execution units are shared. The boxes show hardware roles, not how many units a real S M contains or exactly when instructions execute."},
- {"id":"s07","step":"Pause and explain where the result is","title":"Pause and explain.","lead":"A third thread loads 3.0 and multiplies by 2. The store has not run.","stage":6,"question":"Where is its result: a working register or the output array?","text":"Try one more case. A third thread loads three point zero and multiplies it by two. Its store instruction has not run. Where is the result at this point: in a working register, or in the output array? Pause here and explain why."},
- {"id":"s08","step":"Check the explanation and return to Chapter 1","title":"Registers first. Memory after the store.","lead":"The multiply produces 6.0 in a working register.","stage":7,"text":"The result, six point zero, is in a working register. The store is what writes it to the output array. That is the distinction to take back to Chapter One: threads describe executions with separate working values. The S M provides shared hardware for loads, arithmetic and stores. This is a conceptual explanation, not a trace of the kernel PyTorch selected."}
+  {
+    "id": "s01",
+    "step": "Follow one value inside an SM",
+    "title": "Where does the multiplication happen?",
+    "lead": "Follow 1.0 → 2.0 inside the GPU.",
+    "stage": 0,
+    "text": "In Chapter One, the GPU doubles five input values. Let’s follow one of them: one point zero becomes two point zero. The GPU program supplies instructions: individual operations such as a load, a multiply, or a store. A streaming multiprocessor, or S M, provides the hardware that performs those instructions. The input and output arrays are in GPU memory, outside the S M."
+  },
+  {
+    "id": "s02",
+    "step": "Load from memory into a register",
+    "title": "Load the input.",
+    "lead": "A register is small, fast storage inside the SM.",
+    "stage": 1,
+    "text": "Thread Zero’s load requests the value at input index zero. Load and store units handle memory instructions. A load brings a value from memory into a register: a small, fast storage location inside the S M. Registers hold the working values that arithmetic instructions use. The request can take time; this diagram jumps ahead to when one point zero arrives in a register. The input array still holds its original value. Nothing has been written to the output array yet."
+  },
+  {
+    "id": "s03",
+    "step": "Multiply using shared arithmetic hardware",
+    "title": "Multiply the register value.",
+    "lead": "The result returns to a register. Output memory is still unwritten.",
+    "stage": 2,
+    "text": "The multiply instruction uses the loaded value and the multiplier two. Floating point arithmetic units perform calculations on floating point values. Here, they produce two point zero and return the result to a register. Our values use thirty two bit floating point, often called F P thirty two. These arithmetic units are shared by threads, rather than permanently owned by Thread Zero. The multiply has not written the result to the output array. That needs a store."
+  },
+  {
+    "id": "s04",
+    "step": "Store the result in GPU memory",
+    "title": "Write the result back.",
+    "lead": "The store writes 2.0 into output[0].",
+    "stage": 3,
+    "text": "The store is a separate instruction. Load and store units write two point zero from the thread’s result register into output index zero in GPU memory. The result is now in the output array. We have followed the whole value path: memory to register, arithmetic, then register to memory."
+  },
+  {
+    "id": "s05",
+    "step": "Inspect another thread’s working values",
+    "title": "Another thread. Separate values.",
+    "lead": "Thread 1 loads 2.0 while Thread 0’s values remain distinct.",
+    "stage": 4,
+    "text": "Now inspect Thread One, whose input is two point zero. Its load supplies its own working register. Thread Zero’s values remain separate. We are changing which values we inspect, not choosing the GPU’s execution order. A GPU can execute instructions for groups of threads together; this picture isolates two threads to make their values easy to follow."
+  },
+  {
+    "id": "s06",
+    "step": "Reuse the same kinds of execution hardware",
+    "title": "The hardware is shared.",
+    "lead": "Thread 1 multiplies 2.0 → 4.0, then stores 4.0.",
+    "stage": 5,
+    "text": "Thread One’s multiply uses the same depicted floating point hardware, producing four point zero. Its store writes that result to output index one. Each thread has its own working values, while execution units are shared. The input and result columns identify values, not fixed physical registers. A register can be reused after a value is no longer needed. The boxes show hardware roles, not unit counts or exactly when instructions execute."
+  },
+  {
+    "id": "s07",
+    "step": "Pause and explain where the result is",
+    "title": "Pause and explain.",
+    "lead": "A third thread loads 3.0 and multiplies by 2. The store has not run.",
+    "stage": 6,
+    "question": "Where is its result: a working register or the output array?",
+    "text": "Try one more case. A third thread loads three point zero and multiplies it by two. Its store instruction has not run. Where is the result at this point: in a working register, or in the output array? Pause here and explain why."
+  },
+  {
+    "id": "s08",
+    "step": "Check the explanation and return to Chapter 1",
+    "title": "Registers first. Memory after the store.",
+    "lead": "The multiply produces 6.0 in a working register.",
+    "stage": 7,
+    "text": "The result, six point zero, is in a working register. The store is what writes it to the output array. That is the distinction to take back to Chapter One: threads describe executions with separate working values. The S M provides shared hardware for loads, arithmetic and stores. This is a conceptual explanation, not a trace of the kernel PyTorch selected."
+  }
 ]

@@ -56,14 +56,15 @@ export const chapters = [
       {
         id: 'scheduling-wait', title: 'Wait for an input value to load',
         terms: [
+          ['Instruction', 'One operation in the GPU program, such as a load, multiply or store.'],
           ['Streaming multiprocessor (SM)', 'A GPU unit on which a block’s threads run, grouped into warps. This model begins with warps assigned to one SM.'],
           ['Scheduler', 'The hardware that chooses a ready warp instruction to start on the appropriate execution units.'],
-          ['Registers', 'Working values held separately for individual threads on the SM.'],
+          ['Registers', 'Small, fast storage locations on the SM that hold each thread’s working values between instructions.'],
           ['Execution units', 'Shared hardware that performs instructions: arithmetic units do calculations; load/store units issue memory reads and writes.'],
           ['Cycle', 'One discrete step of this teaching machine, not a measured duration on a GPU.'],
           ['Load latency', 'The number of model cycles from starting a load until its value is ready for the dependent multiply.'],
         ],
-        body: `<div id="sm-hardware-basics"><p>A multiply needs its input values in registers before it can start. The diagram separates those per-thread working values from the execution hardware shared by the warps.</p>${renderSmHardware()}<p><a id="scheduling-sm-explore" href="#sm-warps">Optional: follow two warps through shared hardware</a>.</p></div><p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
+        body: `<div id="sm-hardware-basics"><p>A load can take time: the multiply must wait until its input value reaches a register. The arithmetic units then use that value; a separate store writes the result to the output array. The diagram separates each thread’s working values from the hardware shared by the warps.</p>${renderSmHardware()}<p><a id="scheduling-sm-explore" href="#sm-warps">Optional: follow two warps through shared hardware</a>.</p></div><p>Begin with one warp on an SM. A load starts a wait; its dependent multiply cannot start until the value is ready. After Run, the warp card labels its next instruction as ready when it can start, or waiting when its input is still unavailable.</p>
           <p>The chosen sequence is <code>LD, MUL, ST, LD, MUL, ST</code>. The teaching machine starts at most one instruction each cycle; an idle cycle starts none. A latency of 6 means a load started at cycle 0 becomes usable at cycle 6. Watch what can happen between those two events. The model ends when the last store starts; it does not model a later wait for the store to complete.</p>`,
         task: 'With one warp, predict where idle cycles appear. Run and step past the first load. Change only load latency to 1, run again, and explain what happened to the waits.',
         experiment: {

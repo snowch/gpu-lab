@@ -1,7 +1,9 @@
 # Copyright © 2026 Christopher Snow.
+import json
 from playwright.sync_api import expect
 
 def check_sm_hardware(browser,url,root,errors):
+    media=json.loads((root/'content/inside-sm-media.json').read_text())
     for width in [390,820,1440]:
         for theme in ['light','dark']:
             context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
@@ -9,7 +11,7 @@ def check_sm_hardware(browser,url,root,errors):
             page.goto(url+'lessons/hello.html?keep=sm')
             page.locator('#hello-map-2 [data-thread="4"]').click()
             link=page.locator('.hello-sm a[data-reading-link]')
-            expect(link).to_have_text('Watch: inside an SM · 3 minutes')
+            expect(link).to_have_text('Watch: inside an SM · 3½ minutes')
             link.evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-250,behavior:'instant'})")
             position=page.evaluate('scrollY')
             link.focus();page.keyboard.press('Enter')
@@ -29,7 +31,8 @@ def check_sm_hardware(browser,url,root,errors):
             expect(page.locator('#sm-transcript section')).to_have_count(8)
             video.evaluate('v=>v.load()')
             page.wait_for_function('document.querySelector("#sm-video").readyState>=1')
-            assert 175<video.evaluate('v=>v.duration')<178
+            assert abs(video.evaluate('v=>v.duration')-media['durationSeconds'])<1
+            assert (root/'assets/media/inside-sm/inside-sm.mp4').stat().st_size==media['bytes']
             assert video.evaluate('v=>v.videoWidth')==3840
             video.evaluate('v=>{v.currentTime=45;v.playbackRate=1.25;v.muted=true;v.play()}')
             page.wait_for_function('document.querySelector("#sm-video").currentTime>45.1')
