@@ -205,7 +205,7 @@ measurement scope. No measured performance claim is made by this initial lab.
 ## Optional hardware depth
 
 `inside-sm.html` is a short, full-width video appendix linked from Chapter 1 as
-“Watch: inside an SM · 3 minutes”. The approved narrated deck follows a load,
+“Watch: inside an SM · 3½ minutes”. The approved narrated deck follows a load,
 register multiplication and store, then contrasts separate thread values with
 shared execution hardware. Native playback controls, English captions, a generated
 transcript and video/PDF downloads work without a custom player or installation.
