@@ -221,19 +221,21 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 # Input composition in ANY window blocks everyone without resetting state.
                 second.evaluate("dispatchEvent(new CompositionEvent('compositionstart'))")
                 panel(page);page.locator('#restart-update').click()
-                expect(page.locator('#app-status-error')).to_contain_text('Finish the current input')
+                # Restart verifies the full release before asking every window.
+                # Allow the existing 15-second RPC budget on slower CI disks.
+                expect(page.locator('#app-status-error')).to_contain_text('Finish the current input',timeout=20000)
                 second.evaluate("dispatchEvent(new CompositionEvent('compositionend'))")
                 expect(second.locator('#sector-count')).to_have_text('32')
                 # A busy/unsaved participant or denied snapshot storage blocks all tabs.
                 second.evaluate("window.updateGuard=e=>{e.detail.reason='Finish the unsaved operation first.'};addEventListener('gpu-lab:before-restart',updateGuard)")
-                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('unsaved operation')
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('unsaved operation',timeout=20000)
                 second.evaluate("() => {removeEventListener('gpu-lab:before-restart',updateGuard);window.originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('Storage denied','SecurityError')};}")
-                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('Storage denied')
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('Storage denied',timeout=20000)
                 second.evaluate('() => {Storage.prototype.setItem=window.originalSet;}')
                 # A tab with its JS disabled never receives a forced navigation.
                 blocked=context.new_page();blocked.goto(url+'index.html');blocked.wait_for_load_state('networkidle')
                 blocked_cdp=context.new_cdp_session(blocked);blocked_cdp.send('Emulation.setScriptExecutionDisabled',{'value':True})
-                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('did not respond',timeout=10000)
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('did not respond',timeout=20000)
                 blocked_cdp.detach();blocked.close()
                 # Activation works offline and restores each tab's independent work/route.
                 context.set_offline(True);page.locator('#restart-update').click()
