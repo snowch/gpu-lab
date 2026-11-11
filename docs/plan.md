@@ -225,3 +225,11 @@ threads. The page reuses native playback, English captions, a source-generated
 transcript, PDF/video downloads and a return link preserving chapter state.
 Offline coverage includes playback, range seeking and paused restoration across
 updates. See `assets/media/reduction/README.md` for the reproducible media workflow.
+
+Chapter 9 offers a matching optional recap at `matmul-video.html`, after its
+transfer exercise. Ten model-derived slides connect one dot product to shared
+input tiles, reuse across output rows and columns, and private partial sums kept
+across K phases. A new 8 × 8 case checks phase loads and the scope of sharing.
+Counts describe the teaching algorithm, excluding caches and GPU timing. The
+recording has the same accessible playback, downloads, return-state preservation
+and offline update coverage. See `assets/media/matmul/README.md` for its sources.

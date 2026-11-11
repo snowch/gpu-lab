@@ -10,6 +10,7 @@ from desktop import check_desktop
 from code_explanations import check_code_explanations
 from sm_hardware import check_sm_hardware
 from reduction_video import check_reduction_video
+from matmul_video import check_matmul_video
 from map_loading import assert_map_fits, check_map_loading
 from profiling import check_profiling
 # Copyright © 2026 Christopher Snow.
@@ -246,6 +247,7 @@ try:
         check_profiling(browser, URL, ROOT, errors)
         check_sm_hardware(browser, URL, ROOT, errors)
         check_reduction_video(browser, URL, ROOT, errors)
+        check_matmul_video(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

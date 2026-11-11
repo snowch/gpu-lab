@@ -172,16 +172,15 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 layout.locator('#reading-index-packed').select_option('2');layout.locator('#reading-run-packed').click()
                 requests=context.new_page();requests.goto(url+'lessons/requests.html')
                 requests.locator('#reading-pattern-sectors').select_option('column');requests.locator('#reading-run-sectors').click()
-                sm=context.new_page();sm.goto(url+'lessons/inside-sm.html')
-                sm.locator('#sm-video').evaluate('v=>v.load()')
-                sm.wait_for_function('document.querySelector("#sm-video").readyState>=1')
-                sm.locator('#sm-video').evaluate('v=>{v.currentTime=45;v.playbackRate=1.25}')
-                sm.locator('#sm-transcript summary').click()
-                reduction_video=context.new_page();reduction_video.goto(url+'lessons/reduction-video.html')
-                reduction_video.locator('#reduction-video').evaluate('v=>v.load()')
-                reduction_video.wait_for_function('document.querySelector("#reduction-video").readyState>=1')
-                reduction_video.locator('#reduction-video').evaluate('v=>{v.currentTime=45;v.playbackRate=1.25}')
-                reduction_video.locator('#reduction-transcript summary').click()
+                recordings=[]
+                for route,recording_id,folder in [('inside-sm','sm','inside-sm'),('reduction-video','reduction','reduction'),('matmul-video','matmul','matmul')]:
+                    tab=context.new_page();tab.goto(url+'lessons/'+route+'.html')
+                    video=tab.locator('#'+recording_id+'-video')
+                    video.evaluate('v=>v.load()')
+                    tab.wait_for_function('id=>document.getElementById(id).readyState>=1',arg=recording_id+'-video')
+                    video.evaluate('v=>{v.currentTime=45;v.playbackRate=1.25}')
+                    tab.locator('#'+recording_id+'-transcript summary').click()
+                    recordings.append((tab,recording_id,folder))
                 lesson.locator('#scheduling-sm-explore').click()
                 for _ in range(4):lesson.locator('#sm-next').click()
                 concept_map=context.new_page();concept_map.goto(url+'lessons/meet-gpu.html?chapter=matmul')
@@ -271,24 +270,19 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(second.locator('#lanes button').nth(5)).to_have_attribute('aria-pressed','true')
                 expect(lesson.locator('#sm-position')).to_have_text('Event 4 of 8')
                 expect(lesson.locator('#sm-explorer [data-sm-unit=arithmetic]')).to_contain_text('1.0 × 2 → 2.0')
-                expect(sm.locator('#sm-transcript')).to_have_attribute('open','')
-                sm.wait_for_function('Math.abs(document.querySelector("#sm-video").currentTime-45)<.5')
-                assert sm.locator('#sm-video').evaluate('v=>v.paused&&v.playbackRate===1.25')
-                media=sm.locator('#sm-video source').get_attribute('src')
-                partial=sm.evaluate('''async media=>{const r=await fetch(media,{headers:{Range:'bytes=100-199'}});return {status:r.status,range:r.headers.get('Content-Range'),bytes:(await r.arrayBuffer()).byteLength}}''',media)
-                assert partial=={'status':206,'range':f"bytes 100-199/{(ROOT/'assets/media/inside-sm/inside-sm.mp4').stat().st_size}",'bytes':100},partial
-                sm.locator('#sm-video').evaluate('v=>{v.currentTime=120;v.muted=true;v.play()}')
-                sm.wait_for_function('document.querySelector("#sm-video").currentTime>120.1')
-                sm.locator('#sm-video').evaluate('v=>v.pause()')
-                expect(reduction_video.locator('#reduction-transcript')).to_have_attribute('open','')
-                reduction_video.wait_for_function('Math.abs(document.querySelector("#reduction-video").currentTime-45)<.5')
-                assert reduction_video.locator('#reduction-video').evaluate('v=>v.paused&&v.playbackRate===1.25')
-                reduction_media=reduction_video.locator('#reduction-video source').get_attribute('src')
-                partial=reduction_video.evaluate('''async media=>{const r=await fetch(media,{headers:{Range:'bytes=100-199'}});return {status:r.status,range:r.headers.get('Content-Range'),bytes:(await r.arrayBuffer()).byteLength}}''',reduction_media)
-                assert partial=={'status':206,'range':f"bytes 100-199/{(ROOT/'assets/media/reduction/reduction.mp4').stat().st_size}",'bytes':100},partial
-                reduction_video.locator('#reduction-video').evaluate('v=>{v.currentTime=120;v.muted=true;v.play()}')
-                reduction_video.wait_for_function('document.querySelector("#reduction-video").currentTime>120.1')
-                reduction_video.locator('#reduction-video').evaluate('v=>v.pause()')
+                for tab,recording_id,folder in recordings:
+                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
+                    expect(tab.locator('#'+recording_id+'-transcript')).to_have_attribute('open','')
+                    tab.wait_for_function('id=>Math.abs(document.getElementById(id).currentTime-45)<.5',arg=recording_id+'-video')
+                    video=tab.locator('#'+recording_id+'-video')
+                    assert video.evaluate('v=>v.paused&&v.playbackRate===1.25')
+                    media=video.locator('source').get_attribute('src')
+                    partial=tab.evaluate('''async media=>{const r=await fetch(media,{headers:{Range:'bytes=100-199'}});return {status:r.status,range:r.headers.get('Content-Range'),bytes:(await r.arrayBuffer()).byteLength}}''',media)
+                    size=(ROOT/'assets/media'/folder/(folder+'.mp4')).stat().st_size
+                    assert partial=={'status':206,'range':f'bytes 100-199/{size}','bytes':100},partial
+                    video.evaluate('v=>{v.currentTime=120;v.muted=true;v.play()}')
+                    tab.wait_for_function('id=>document.getElementById(id).currentTime>120.1',arg=recording_id+'-video')
+                    video.evaluate('v=>v.pause()')
                 expect(kernel.locator('#kernel-event')).to_have_text(trace)
                 expect(lesson.locator('#scheduling-wait [data-visual-output]')).to_have_text(lesson_trace,use_inner_text=True)
                 expect(lesson.locator('#scheduling-ready [data-visual-output]')).to_have_text(ready_trace,use_inner_text=True)
@@ -358,7 +352,21 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
             tab=ctx.pages[0];tab.goto(url)
             expect(tab.locator('html')).to_have_attribute('data-test-release','one')
             panel(tab);ready(tab);expect(tab.locator('#version-status')).to_have_text('Update ready')
-            tab.locator('#restart-update').click();expect(tab.locator('html')).to_have_attribute('data-test-release','two')
+            started=time.monotonic();tab.locator('#restart-update').click()
+            try:
+                # A cold restart verifies both retained and pending releases.
+                # The application allows 15 s for this RPC; a 5 s assertion
+                # can expire while the media hashes are still being checked.
+                expect(tab.locator('html')).to_have_attribute('data-test-release','two',timeout=20000)
+            except AssertionError:
+                print('Cold restart diagnostics:', {
+                    'elapsed':time.monotonic()-started,
+                    'error':tab.locator('#app-status-error').inner_text(),
+                    'status':tab.locator('#version-status').inner_text(),
+                    'storage':tab.evaluate('navigator.storage.estimate()'),
+                },flush=True)
+                raise
+            print(f'Cold offline restart completed in {time.monotonic()-started:.2f}s',flush=True)
             ctx.close()
             print('PASS persistent profile: no activation on closing all windows; cold offline reopen, deferred badge and explicit offline restart')
             # Exercise the actual former worker and its automatically saved cache.
