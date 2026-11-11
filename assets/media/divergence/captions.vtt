@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:12.312
+Chapter Seven follows a conditional calculation: double positive inputs and negate negative inputs. A lane mask is the set of lanes participating in one issued operation.
+
+00:00:12.532 --> 00:00:28.233
+Begin with thirty-two inputs, all positive two. Every lane takes the positive path, producing four. The negative path is empty, so this arithmetic model skips it. The trace lists arithmetic only, not loads, stores or branch overhead.
+
+00:00:30.253 --> 00:00:40.365
+Now alternate positive two and negative two across the full warp. Divergence means participating lanes of one warp take different paths through a condition.
+
+00:00:40.585 --> 00:00:53.279
+The model starts with the positive path: lanes zero, two, four, and the other even positions multiply by two. The white lanes have inputs for the other path; they do no arithmetic in this operation.
+
+00:00:55.299 --> 00:01:08.845
+Next, the negative mask selects lanes one, three, five, and the other odd positions. Negating their negative-two inputs produces positive two. The positive lanes do no arithmetic during this operation.
+
+00:01:09.065 --> 00:01:24.148
+Both paths have participating lanes, so both appear. Positive-first ordering is a teaching choice. PyTorch chooses its implementation; the conditional expression alone does not establish a compiled branch or this operation order.
+
+00:01:26.168 --> 00:01:36.195
+Change to one negative input, in lane zero. The positive path serves the other thirty-one lanes. A path needed by one lane still has a non-empty mask.
+
+00:01:36.415 --> 00:01:53.908
+Lengthen the negative expression to negate, multiply by two, then add one. Those three operations each use lane zero's mask, producing five. Alongside the positive multiply, the trace contains four arithmetic operations, not a measured GPU duration.
+
+00:01:55.928 --> 00:02:07.768
+Return to five all-positive inputs. Lanes zero through four participate in the positive multiply. The remaining twenty-seven positions have no input throughout this calculation.
+
+00:02:07.988 --> 00:02:22.900
+This low participation does not mean divergence: every participating lane takes the same path. An unused position is different from a lane waiting for its own path. Other blocks' threads do not fill the empty positions in this warp.
+
+00:02:24.920 --> 00:02:35.032
+Keep five inputs and change only their signs to alternating. Lanes zero, two and four use the positive path; lanes one and three use the negative path.
+
+00:02:35.252 --> 00:02:52.468
+Positions five through thirty-one remain unused for both operations. White cells identify participating inputs on another path; dashed cells identify positions with no input. Inspect the masks to explain low participation instead of guessing its cause.
+
+00:02:54.488 --> 00:03:04.600
+Apply the mask rule to a new case. Lanes zero through fifteen have positive two, lane sixteen has negative two, and the remaining positions have no input.
+
+00:03:04.820 --> 00:03:16.873
+The positive expression doubles its input; the negative expression negates, doubles, then adds one. Predict which operations appear and the lane mask for each. Pause before revealing the trace.
+
+00:03:22.693 --> 00:03:37.115
+The positive multiply uses lanes zero through fifteen. All three negative operations use lane sixteen. There are four issued arithmetic operations, and positions seventeen through thirty-one are unused throughout.
+
+00:03:37.335 --> 00:03:54.337
+The positive results are four and the negative result is five. Return to Chapter Seven and separate other-path lanes from unused positions. These explicit arithmetic masks do not establish compiler lowering, hardware path order or elapsed GPU time.

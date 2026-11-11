@@ -98,6 +98,7 @@ export const chapters = [
     optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Compare blocks A and C on SM 0 with block B on SM 1. Each block has two warps; available resources constrain which blocks can share an SM.</p>${renderSchedulingRelationships()}</section>${renderSmWalkthrough()}`,
   },
   {
+    closingHTML: recordingLink('divergence','follow active masks through different paths','Distinguish lanes on another path from unused positions, then explain a new mask. The recording follows the declared positive-first arithmetic model; its operation counts are not compiler output or GPU timings.'),
     slug: 'divergence', number: 7, title: 'What if lanes need different calculations?',
     lead: 'Double positive inputs and negate negative inputs, then compare lanes taking different paths with lanes that have no input.',
     source: branchSource(),

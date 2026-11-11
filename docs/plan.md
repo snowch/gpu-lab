@@ -246,6 +246,12 @@ visible core diagram and teaching-scheduler experiments. The optional trace keep
 its own saved cursor; moving it has not changed its values or event semantics.
 No instruction timing, execution-unit count or captured PyTorch trace is implied.
 
+Chapter 7's optional recap follows uniform, mixed and rare arithmetic paths, then
+distinguishes other-path lanes from positions without input. A 17-input question
+applies the mask rule before the answer. It keeps the positive-first teaching
+order and arithmetic-only scope explicit, with common playback and offline
+features. See `assets/media/divergence/README.md`.
+
 Chapter 8 offers an optional narrated recap after its transfer exercise, at
 `reduction-video.html`. Eleven model-derived slides follow the four-input tree,
 block barriers and one unsafe read-before-write interleaving, then ask about eight
@@ -283,7 +289,7 @@ uses the current thirteen-chapter book; recommendations below are future work.
 | 4 | Connect views, strides, offsets and packed storage while preserving values. | Recap included. |
 | 5 | Group the same five reads into sectors; distinguish useful bytes, alignment and covered regions. | Recap included. |
 | 6 | Narrate a waiting warp and another ready warp on the declared teaching timeline. | Recap included. |
-| 7 | Follow changing active masks and distinguish other-path lanes from unused tail positions. | Recommended next. |
+| 7 | Follow changing active masks and distinguish other-path lanes from unused tail positions. | Recap included. |
 | 8 | Trace shared-memory writes, barriers and the reduction tree. | Recap included. |
 | 9 | Follow shared input reuse and partial sums across K phases. | Recap included. |
 | 10 | Trace input conversion before accumulation, including cancellation and a range-sensitive case. | Recommended. |
