@@ -8,6 +8,13 @@ small copy changes: review the preceding, changed and following sections in the 
 page before marking the change complete. Passing automated checks does not replace
 that review.
 
+For every new or edited learner-facing page, exercise, diagram or recording,
+use both a relevant design/UX skill and a learning/instructional-design skill when
+available. Complete the checklist’s [design and learning review](docs/authoring-checklist.md#design-and-learning-review)
+before merging, with depth proportional to the change, and record the skills and
+findings in the PR. If either skill is unavailable, say so and perform the equivalent
+checklist review; never claim a skill was used when it was not.
+
 Read `docs/plan.md`, `docs/model.md` and `docs/sources.md` before extending the course.
 
 - Keep AI workloads as the motivation and introduce hardware terms at first use.
