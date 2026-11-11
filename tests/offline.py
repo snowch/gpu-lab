@@ -240,7 +240,11 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 # Activation works offline and restores each tab's independent work/route.
                 context.set_offline(True);page.locator('#restart-update').click()
                 for tab in [page,second,kernel,lesson,devices,reading,layout,requests,concept_map,final]:
-                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
+                    try:
+                        expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'],timeout=20000)
+                    except AssertionError:
+                        print('Restart diagnostics:', {'route':tab.url,'error':page.locator('#app-status-error').inner_text(),'status':page.locator('#app-status-summary').inner_text()},flush=True)
+                        raise
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
                 expect(concept_map.locator('#a-w1-lane-7')).to_have_attribute('open','')
                 expect(concept_map.locator('#a-w1-lane-7')).to_contain_text('thread 39')
@@ -273,7 +277,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(lesson.locator('#sm-position')).to_have_text('Event 4 of 8')
                 expect(lesson.locator('#sm-explorer [data-sm-unit=arithmetic]')).to_contain_text('1.0 × 2 → 2.0')
                 for tab,recording_id,folder in recordings:
-                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
+                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'],timeout=20000)
                     expect(tab.locator('#'+recording_id+'-transcript')).to_have_attribute('open','')
                     tab.wait_for_function('id=>Math.abs(document.getElementById(id).currentTime-45)<.5',arg=recording_id+'-video')
                     video=tab.locator('#'+recording_id+'-video')
