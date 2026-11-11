@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 188,
+  "bytes": 9106012,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 24.021,
+      "title": "Start with CPU memory."
+    },
+    {
+      "id": "s02",
+      "start": 24.021,
+      "end": 45.44,
+      "title": "Copy the inputs to GPU memory."
+    },
+    {
+      "id": "s03",
+      "start": 45.44,
+      "end": 70.037,
+      "title": "Calculate where the tensor lives."
+    },
+    {
+      "id": "s04",
+      "start": 70.037,
+      "end": 92.971,
+      "title": "Request the result on the CPU."
+    },
+    {
+      "id": "s05",
+      "start": 92.971,
+      "end": 113.536,
+      "title": "Count transfers separately."
+    },
+    {
+      "id": "s06",
+      "start": 113.536,
+      "end": 134.997,
+      "title": "Keep related calculations together."
+    },
+    {
+      "id": "s07",
+      "start": 134.997,
+      "end": 162.221,
+      "title": "Pause: copy eight results."
+    },
+    {
+      "id": "s08",
+      "start": 162.221,
+      "end": 187.715,
+      "title": "A copy preserves the values."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 11.288,
+      "text": "Chapter Two starts with five floating-point values in a CPU tensor. Their storage is in system RAM. Each value uses four bytes in the chosen format."
+    },
+    {
+      "id": "s01-c2",
+      "start": 11.508,
+      "end": 22.601,
+      "text": "We are following a discrete GPU with separate device memory. The names x CPU and x GPU help us track location; the names themselves do not move any values."
+    },
+    {
+      "id": "s02-c1",
+      "start": 24.621,
+      "end": 35.651,
+      "text": "Calling the tensor's to method with cuda as the destination requests a GPU copy. PyTorch arranges storage and copies five values: twenty bytes of tensor data."
+    },
+    {
+      "id": "s02-c2",
+      "start": 35.871,
+      "end": 44.02,
+      "text": "The original CPU tensor still exists. The copy contains the same numbers in different storage; copying has not doubled them."
+    },
+    {
+      "id": "s03-c1",
+      "start": 46.04,
+      "end": 56.173,
+      "text": "Multiply the GPU tensor by two. The result, y GPU, has its own GPU storage. The input x GPU keeps its original values."
+    },
+    {
+      "id": "s03-c2",
+      "start": 56.393,
+      "end": 68.617,
+      "text": "This operation copies zero bytes between CPU and GPU. That does not mean zero memory activity: the calculation still reads inputs and writes outputs in GPU memory."
+    },
+    {
+      "id": "s04-c1",
+      "start": 70.637,
+      "end": 80.6,
+      "text": "Calling CPU on the result requests a CPU copy. The values two, four, six, eight and ten now also have storage in system RAM."
+    },
+    {
+      "id": "s04-c2",
+      "start": 80.82,
+      "end": 91.551,
+      "text": "Twenty bytes cross back in this example. The GPU result remains on the GPU; PyTorch does not automatically move every calculation's result to the CPU."
+    },
+    {
+      "id": "s05-c1",
+      "start": 93.571,
+      "end": 103.64,
+      "text": "Across this sequence, twenty bytes of tensor data go in, zero cross during multiplication, and twenty come back. That is forty bytes copied between devices."
+    },
+    {
+      "id": "s05-c2",
+      "start": 103.86,
+      "end": 112.116,
+      "text": "These are payload counts for the chosen example. They exclude other traffic and overhead, and they do not tell us how long the operations take."
+    },
+    {
+      "id": "s06-c1",
+      "start": 114.136,
+      "end": 123.565,
+      "text": "If another calculation needs the GPU result, it can read it there. A CPU copy is needed when a CPU-side consumer needs the values."
+    },
+    {
+      "id": "s06-c2",
+      "start": 123.785,
+      "end": 133.577,
+      "text": "Choosing where to keep values can avoid unnecessary round trips. Whether that improves an application's speed depends on its actual operations and measurements."
+    },
+    {
+      "id": "s07-c1",
+      "start": 135.597,
+      "end": 145.368,
+      "text": "Try eight values instead, each still using four bytes. The GPU has multiplied them by three. Now request a CPU copy of y GPU."
+    },
+    {
+      "id": "s07-c2",
+      "start": 145.588,
+      "end": 157.001,
+      "text": "Which values appear in the CPU result, and how many bytes of tensor data cross back? Does this copy change the original CPU input? Pause and explain the storage locations."
+    },
+    {
+      "id": "s08-c1",
+      "start": 162.821,
+      "end": 174.021,
+      "text": "The CPU result contains three, six, nine, twelve, fifteen, eighteen, twenty-one and twenty-four. Eight values at four bytes each means thirty-two bytes copied back."
+    },
+    {
+      "id": "s08-c2",
+      "start": 174.241,
+      "end": 186.295,
+      "text": "The original CPU input is unchanged. Return to Chapter Two and trace which operation creates each destination tensor, separating copies from calculation and from timing claims."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 10.688,
+      "s01-c2": 11.093,
+      "s02-c1": 11.029,
+      "s02-c2": 8.149,
+      "s03-c1": 10.133,
+      "s03-c2": 12.224,
+      "s04-c1": 9.963,
+      "s04-c2": 10.731,
+      "s05-c1": 10.069,
+      "s05-c2": 8.256,
+      "s06-c1": 9.429,
+      "s06-c2": 9.792,
+      "s07-c1": 9.771,
+      "s07-c2": 11.413,
+      "s08-c1": 11.2,
+      "s08-c2": 12.053
+    }
+  }
+}
