@@ -234,6 +234,12 @@ new column-3 copy question checks new offsets and payload while preserving the
 original values. The same playback, transcript, downloads, return and offline
 features apply. See `assets/media/layout/README.md`.
 
+Chapter 6's optional narrated recap follows one and two resident warps through
+loads, waits and instruction issue. Its comparison keeps added work visible, and
+a new latency question tests readiness before revealing the answer. It reuses the
+common captions, transcript, downloads and offline player without changing the
+scheduler. See `assets/media/scheduling/README.md`.
+
 The interactive two-warp readiness walkthrough is local to Chapter 6, behind an
 optional disclosure reached from its hardware overview. Chapter 6 retains its
 visible core diagram and teaching-scheduler experiments. The optional trace keeps
@@ -276,7 +282,7 @@ uses the current thirteen-chapter book; recommendations below are future work.
 | 3 | Interpret row/column coordinates and colon syntax, then follow selected outputs. | Recap included. |
 | 4 | Connect views, strides, offsets and packed storage while preserving values. | Recap included. |
 | 5 | Group the same five reads into sectors; distinguish useful bytes, alignment and covered regions. | Recap included. |
-| 6 | Narrate a waiting warp and another ready warp on the declared teaching timeline. | Recommended next. |
+| 6 | Narrate a waiting warp and another ready warp on the declared teaching timeline. | Recap included. |
 | 7 | Follow changing active masks and distinguish other-path lanes from unused tail positions. | Recommended next. |
 | 8 | Trace shared-memory writes, barriers and the reduction tree. | Recap included. |
 | 9 | Follow shared input reuse and partial sums across K phases. | Recap included. |

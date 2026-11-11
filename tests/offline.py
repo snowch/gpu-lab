@@ -173,7 +173,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 requests=context.new_page();requests.goto(url+'lessons/requests.html')
                 requests.locator('#reading-pattern-sectors').select_option('column');requests.locator('#reading-run-sectors').click()
                 recordings=[]
-                for route,recording_id,folder in [('inside-sm','sm','inside-sm'),('reduction-video','reduction','reduction'),('matmul-video','matmul','matmul'),('devices-video','devices','devices'),('reading-video','reading','reading'),('layout-video','layout','layout'),('requests-video','requests','requests')]:
+                for route,recording_id,folder in [('inside-sm','sm','inside-sm'),('reduction-video','reduction','reduction'),('matmul-video','matmul','matmul'),('devices-video','devices','devices'),('reading-video','reading','reading'),('layout-video','layout','layout'),('requests-video','requests','requests'),('scheduling-video','scheduling','scheduling')]:
                     tab=context.new_page();tab.goto(url+'lessons/'+route+'.html')
                     video=tab.locator('#'+recording_id+'-video')
                     video.evaluate('v=>v.load()')

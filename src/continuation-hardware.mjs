@@ -1,6 +1,7 @@
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import { escape, fmt, metrics, table } from './continuation-ui.mjs';
+import {recordingLink} from './recording-view.mjs';
 import {renderSmWalkthrough} from './sm-walkthrough-view.mjs';
 import {renderSmHardware} from './sm-hardware-view.mjs';
 import { renderSchedulingRelationships } from './scheduling-relationships.mjs';
@@ -93,6 +94,7 @@ export const chapters = [
       prompt: 'A resident warp is waiting on a load, and another resident warp is ready. Must the next issue slot be idle? Explain what this model can tell you, and whether doubling the resident warp count proves a speedup.',
       answer: '<p>The ready warp can issue: the scheduler skips the waiting warp. Adding resident warps also adds six instructions per warp in this experiment. Compare issue-slot use and idle slots, but do not turn the elapsed cycles of different workloads into a speedup. Actual residency and performance need resource and hardware evidence beyond this model.</p>',
     },
+    closingHTML: recordingLink('scheduling','choose a ready warp while another waits','Follow the chosen single-issue teaching scheduler, distinguish waiting warps from idle slots and explain a new load latency. The model begins with resident warps and makes no GPU speed prediction.'),
     optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Compare blocks A and C on SM 0 with block B on SM 1. Each block has two warps; available resources constrain which blocks can share an SM.</p>${renderSchedulingRelationships()}</section>${renderSmWalkthrough()}`,
   },
   {
