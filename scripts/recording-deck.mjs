@@ -15,7 +15,7 @@ export function recordingDeck({chapter,title,scenes,figure,scope}){
 export async function writeRecordingDeck(output,deck,scenes){
  await mkdir(output,{recursive:true});await writeFile(`${output}/deck.html`,deck);
  await writeFile(`${output}/scenes.json`,JSON.stringify(scenes.flatMap(s=>s.captions.map((text,i)=>{
-  const say=text.replace(/\bcuda\b/gi,'[CUDA](/ˈkuːdə/)');
+  const say=text.replace(/\bcuda\b/gi,'[CUDA](/ˈkuːdə/)').replace(/\bmatrix A\b/g,'matrix [A](/ˈeɪ/)');
   return {id:`${s.id}-c${i+1}`,step:s.title,text,...(say!==text?{say}:{})};
  })),null,2));
  console.log(`Rendered ${scenes.length} slides in ${output}`);
