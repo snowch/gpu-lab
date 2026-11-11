@@ -10,6 +10,7 @@ import {renderReadingVideo} from '../content/reading-video.mjs';
 import {renderLayoutVideo} from '../content/layout-video.mjs';
 import {renderRequestsVideo} from '../content/requests-video.mjs';
 import {renderSchedulingVideo} from '../content/scheduling-video.mjs';
+import {renderDivergenceVideo} from '../content/divergence-video.mjs';
 import {renderProfiling} from '../content/profiling.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 import {memorySetup,memoryExample} from '../src/book-code.mjs';
@@ -56,6 +57,8 @@ await writeFile('dist/lessons/layout-video.html',renderBookPage({slug:'layout-vi
 await writeFile('dist/lessons/requests-video.html',renderBookPage({slug:'requests-video',appendix:true,title:'Group five reads into memory sectors',lead:'Follow five input reads through aligned sectors, then explain how a neighbouring row crosses a boundary.',content:renderRequestsVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/scheduling-video.html',renderBookPage({slug:'scheduling-video',appendix:true,title:'Choose a ready warp while another waits',lead:'Follow loads, readiness and issue slots on the declared teaching timeline, then apply a different load latency.',content:renderSchedulingVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
+
+await writeFile('dist/lessons/divergence-video.html',renderBookPage({slug:'divergence-video',appendix:true,title:'Follow active masks through different paths',lead:'Trace positive and negative masks, distinguish other-path lanes from unused positions, then explain a new input pattern.',content:renderDivergenceVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))

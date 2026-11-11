@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 236,
+  "bytes": 11909376,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 29.653,
+      "title": "A mask names participating lanes."
+    },
+    {
+      "id": "s02",
+      "start": 29.653,
+      "end": 54.699,
+      "title": "Mixed signs need different masks."
+    },
+    {
+      "id": "s03",
+      "start": 54.699,
+      "end": 85.568,
+      "title": "Other-path lanes participate later."
+    },
+    {
+      "id": "s04",
+      "start": 85.568,
+      "end": 115.328,
+      "title": "A rare path can still contain several operations."
+    },
+    {
+      "id": "s05",
+      "start": 115.328,
+      "end": 144.32,
+      "title": "Unused positions have no input."
+    },
+    {
+      "id": "s06",
+      "start": 144.32,
+      "end": 173.888,
+      "title": "A small input can show both effects."
+    },
+    {
+      "id": "s07",
+      "start": 173.888,
+      "end": 202.093,
+      "title": "Pause: one negative input after sixteen positives."
+    },
+    {
+      "id": "s08",
+      "start": 202.093,
+      "end": 235.757,
+      "title": "One negative lane keeps its whole path."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 12.312,
+      "text": "Chapter Seven follows a conditional calculation: double positive inputs and negate negative inputs. A lane mask is the set of lanes participating in one issued operation."
+    },
+    {
+      "id": "s01-c2",
+      "start": 12.532,
+      "end": 28.233,
+      "text": "Begin with thirty-two inputs, all positive two. Every lane takes the positive path, producing four. The negative path is empty, so this arithmetic model skips it. The trace lists arithmetic only, not loads, stores or branch overhead."
+    },
+    {
+      "id": "s02-c1",
+      "start": 30.253,
+      "end": 40.365,
+      "text": "Now alternate positive two and negative two across the full warp. Divergence means participating lanes of one warp take different paths through a condition."
+    },
+    {
+      "id": "s02-c2",
+      "start": 40.585,
+      "end": 53.279,
+      "text": "The model starts with the positive path: lanes zero, two, four, and the other even positions multiply by two. The white lanes have inputs for the other path; they do no arithmetic in this operation."
+    },
+    {
+      "id": "s03-c1",
+      "start": 55.299,
+      "end": 68.845,
+      "text": "Next, the negative mask selects lanes one, three, five, and the other odd positions. Negating their negative-two inputs produces positive two. The positive lanes do no arithmetic during this operation."
+    },
+    {
+      "id": "s03-c2",
+      "start": 69.065,
+      "end": 84.148,
+      "text": "Both paths have participating lanes, so both appear. Positive-first ordering is a teaching choice. PyTorch chooses its implementation; the conditional expression alone does not establish a compiled branch or this operation order."
+    },
+    {
+      "id": "s04-c1",
+      "start": 86.168,
+      "end": 96.195,
+      "text": "Change to one negative input, in lane zero. The positive path serves the other thirty-one lanes. A path needed by one lane still has a non-empty mask."
+    },
+    {
+      "id": "s04-c2",
+      "start": 96.415,
+      "end": 113.908,
+      "text": "Lengthen the negative expression to negate, multiply by two, then add one. Those three operations each use lane zero's mask, producing five. Alongside the positive multiply, the trace contains four arithmetic operations, not a measured GPU duration."
+    },
+    {
+      "id": "s05-c1",
+      "start": 115.928,
+      "end": 127.768,
+      "text": "Return to five all-positive inputs. Lanes zero through four participate in the positive multiply. The remaining twenty-seven positions have no input throughout this calculation."
+    },
+    {
+      "id": "s05-c2",
+      "start": 127.988,
+      "end": 142.9,
+      "text": "This low participation does not mean divergence: every participating lane takes the same path. An unused position is different from a lane waiting for its own path. Other blocks' threads do not fill the empty positions in this warp."
+    },
+    {
+      "id": "s06-c1",
+      "start": 144.92,
+      "end": 155.032,
+      "text": "Keep five inputs and change only their signs to alternating. Lanes zero, two and four use the positive path; lanes one and three use the negative path."
+    },
+    {
+      "id": "s06-c2",
+      "start": 155.252,
+      "end": 172.468,
+      "text": "Positions five through thirty-one remain unused for both operations. White cells identify participating inputs on another path; dashed cells identify positions with no input. Inspect the masks to explain low participation instead of guessing its cause."
+    },
+    {
+      "id": "s07-c1",
+      "start": 174.488,
+      "end": 184.6,
+      "text": "Apply the mask rule to a new case. Lanes zero through fifteen have positive two, lane sixteen has negative two, and the remaining positions have no input."
+    },
+    {
+      "id": "s07-c2",
+      "start": 184.82,
+      "end": 196.873,
+      "text": "The positive expression doubles its input; the negative expression negates, doubles, then adds one. Predict which operations appear and the lane mask for each. Pause before revealing the trace."
+    },
+    {
+      "id": "s08-c1",
+      "start": 202.693,
+      "end": 217.115,
+      "text": "The positive multiply uses lanes zero through fifteen. All three negative operations use lane sixteen. There are four issued arithmetic operations, and positions seventeen through thirty-one are unused throughout."
+    },
+    {
+      "id": "s08-c2",
+      "start": 217.335,
+      "end": 234.337,
+      "text": "The positive results are four and the negative result is five. Return to Chapter Seven and separate other-path lanes from unused positions. These explicit arithmetic masks do not establish compiler lowering, hardware path order or elapsed GPU time."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 11.712,
+      "s01-c2": 15.701,
+      "s02-c1": 10.112,
+      "s02-c2": 12.693,
+      "s03-c1": 13.547,
+      "s03-c2": 15.083,
+      "s04-c1": 10.027,
+      "s04-c2": 17.493,
+      "s05-c1": 11.84,
+      "s05-c2": 14.912,
+      "s06-c1": 10.112,
+      "s06-c2": 17.216,
+      "s07-c1": 10.112,
+      "s07-c2": 12.053,
+      "s08-c1": 14.421,
+      "s08-c2": 17.003
+    }
+  }
+}
