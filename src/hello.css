@@ -65,5 +65,8 @@
  .hello-thread span { font-size:13px; }
 }
 
-.hello-outline { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:14px; color:var(--muted); margin:0 0 24px; }
-.hello-outline span { font-weight:600; }
+.book-chapter .intro:has(+.hello-outline) { padding-bottom:0; margin-bottom:24px; }
+.hello-outline { display:flex; flex-wrap:wrap; gap:8px; font-size:14px; margin:0 0 32px; }
+.hello-outline>span { flex-basis:100%; margin-bottom:4px; color:var(--ink); font-weight:600; }
+nav.hello-outline>a { display:flex; min-height:44px; padding:8px 12px; font-size:14px; line-height:1.5; white-space:nowrap; color:var(--accent); border:1px solid var(--line); background:var(--panel); }
+.hello-outline>a:hover { border-color:var(--accent); background:var(--accent-soft); }
