@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:11.160
+Chapter Five connects tensor layout to memory requests. In this teaching example, five threads each read one FP32 input for the same multiplication.
+
+00:00:11.380 --> 00:00:24.457
+A warp has thirty-two thread positions, called lanes. Only lanes zero through four read here. The other twenty-seven positions make no read; this is a chosen mapping, not a captured PyTorch launch.
+
+00:00:26.477 --> 00:00:37.144
+A sector is an aligned thirty-two-byte region used to group the input reads. Aligned boundaries occur at byte offsets zero, thirty-two, sixty-four, and so on.
+
+00:00:37.364 --> 00:00:50.057
+Each FP32 value uses four bytes, so eight consecutive values fit inside one sector. Both the original tensor and any packed allocation start on a sector boundary in this example.
+
+00:00:52.077 --> 00:01:03.363
+Row zero occupies element offsets zero through four. Its five reads begin at byte offsets zero, four, eight, twelve and sixteen. All belong to sector zero.
+
+00:01:03.583 --> 00:01:14.484
+The threads request twenty useful bytes. One touched sector covers thirty-two bytes. Covered bytes describe the regions containing these reads; they are not additional tensor data.
+
+00:01:16.504 --> 00:01:27.533
+Column zero selects element offsets zero, five, ten, fifteen and twenty. Multiply each offset by four to find its byte position, then group by sector.
+
+00:01:27.753 --> 00:01:39.785
+Threads zero and one share sector zero. Threads two and three share sector one. Thread four reaches sector two. There are still twenty useful bytes, but the three sectors cover ninety-six bytes.
+
+00:01:41.805 --> 00:01:52.835
+The packed copy contains the same five column values in a new allocation. Its reads begin at byte offsets zero through sixteen, stepping by four, so they share one sector.
+
+00:01:53.055 --> 00:02:06.025
+This comparison counts one input read. It excludes the reads and writes that make the packed copy, and excludes output stores. Fewer touched sectors alone do not establish that packing is faster overall.
+
+00:02:08.045 --> 00:02:17.304
+Now choose row one. Its five values are neighbours, but they occupy element offsets five through nine, or byte positions twenty through thirty-nine.
+
+00:02:17.524 --> 00:02:30.644
+The first three reads belong to sector zero; the last two belong to sector one. Twenty useful bytes now touch two sectors. Consecutive values do not guarantee a single sector: the starting position matters.
+
+00:02:32.664 --> 00:02:43.395
+Apply the same rule to row three. The original storage is still sector aligned, and each value still occupies four bytes. Predict which sectors contain its five reads.
+
+00:02:43.615 --> 00:02:50.548
+How many useful bytes and covered bytes should the model report? Pause and group the byte positions before checking the answer.
+
+00:02:56.368 --> 00:03:07.419
+Row three starts at byte sixty. Its first read belongs to sector one; the remaining four belong to sector two. That is twenty useful bytes and sixty-four covered bytes.
+
+00:03:07.639 --> 00:03:20.759
+Return to Chapter Five and explain why alignment changes the count. These are addressed sectors for one modelled input read, not physical DRAM transactions, cache misses or elapsed GPU time.

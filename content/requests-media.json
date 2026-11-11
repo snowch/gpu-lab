@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 202,
+  "bytes": 9625856,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 25.877,
+      "title": "Five reads belong to one warp."
+    },
+    {
+      "id": "s02",
+      "start": 25.877,
+      "end": 51.477,
+      "title": "Group bytes into sectors."
+    },
+    {
+      "id": "s03",
+      "start": 51.477,
+      "end": 75.904,
+      "title": "A first row shares one sector."
+    },
+    {
+      "id": "s04",
+      "start": 75.904,
+      "end": 101.205,
+      "title": "A column reaches three sectors."
+    },
+    {
+      "id": "s05",
+      "start": 101.205,
+      "end": 127.445,
+      "title": "Packing changes the input layout."
+    },
+    {
+      "id": "s06",
+      "start": 127.445,
+      "end": 152.064,
+      "title": "Neighbouring values can cross a boundary."
+    },
+    {
+      "id": "s07",
+      "start": 152.064,
+      "end": 175.768,
+      "title": "Pause: where does row three land?"
+    },
+    {
+      "id": "s08",
+      "start": 175.768,
+      "end": 202.179,
+      "title": "Count regions, then state the scope."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 11.16,
+      "text": "Chapter Five connects tensor layout to memory requests. In this teaching example, five threads each read one FP32 input for the same multiplication."
+    },
+    {
+      "id": "s01-c2",
+      "start": 11.38,
+      "end": 24.457,
+      "text": "A warp has thirty-two thread positions, called lanes. Only lanes zero through four read here. The other twenty-seven positions make no read; this is a chosen mapping, not a captured PyTorch launch."
+    },
+    {
+      "id": "s02-c1",
+      "start": 26.477,
+      "end": 37.144,
+      "text": "A sector is an aligned thirty-two-byte region used to group the input reads. Aligned boundaries occur at byte offsets zero, thirty-two, sixty-four, and so on."
+    },
+    {
+      "id": "s02-c2",
+      "start": 37.364,
+      "end": 50.057,
+      "text": "Each FP32 value uses four bytes, so eight consecutive values fit inside one sector. Both the original tensor and any packed allocation start on a sector boundary in this example."
+    },
+    {
+      "id": "s03-c1",
+      "start": 52.077,
+      "end": 63.363,
+      "text": "Row zero occupies element offsets zero through four. Its five reads begin at byte offsets zero, four, eight, twelve and sixteen. All belong to sector zero."
+    },
+    {
+      "id": "s03-c2",
+      "start": 63.583,
+      "end": 74.484,
+      "text": "The threads request twenty useful bytes. One touched sector covers thirty-two bytes. Covered bytes describe the regions containing these reads; they are not additional tensor data."
+    },
+    {
+      "id": "s04-c1",
+      "start": 76.504,
+      "end": 87.533,
+      "text": "Column zero selects element offsets zero, five, ten, fifteen and twenty. Multiply each offset by four to find its byte position, then group by sector."
+    },
+    {
+      "id": "s04-c2",
+      "start": 87.753,
+      "end": 99.785,
+      "text": "Threads zero and one share sector zero. Threads two and three share sector one. Thread four reaches sector two. There are still twenty useful bytes, but the three sectors cover ninety-six bytes."
+    },
+    {
+      "id": "s05-c1",
+      "start": 101.805,
+      "end": 112.835,
+      "text": "The packed copy contains the same five column values in a new allocation. Its reads begin at byte offsets zero through sixteen, stepping by four, so they share one sector."
+    },
+    {
+      "id": "s05-c2",
+      "start": 113.055,
+      "end": 126.025,
+      "text": "This comparison counts one input read. It excludes the reads and writes that make the packed copy, and excludes output stores. Fewer touched sectors alone do not establish that packing is faster overall."
+    },
+    {
+      "id": "s06-c1",
+      "start": 128.045,
+      "end": 137.304,
+      "text": "Now choose row one. Its five values are neighbours, but they occupy element offsets five through nine, or byte positions twenty through thirty-nine."
+    },
+    {
+      "id": "s06-c2",
+      "start": 137.524,
+      "end": 150.644,
+      "text": "The first three reads belong to sector zero; the last two belong to sector one. Twenty useful bytes now touch two sectors. Consecutive values do not guarantee a single sector: the starting position matters."
+    },
+    {
+      "id": "s07-c1",
+      "start": 152.664,
+      "end": 163.395,
+      "text": "Apply the same rule to row three. The original storage is still sector aligned, and each value still occupies four bytes. Predict which sectors contain its five reads."
+    },
+    {
+      "id": "s07-c2",
+      "start": 163.615,
+      "end": 170.548,
+      "text": "How many useful bytes and covered bytes should the model report? Pause and group the byte positions before checking the answer."
+    },
+    {
+      "id": "s08-c1",
+      "start": 176.368,
+      "end": 187.419,
+      "text": "Row three starts at byte sixty. Its first read belongs to sector one; the remaining four belong to sector two. That is twenty useful bytes and sixty-four covered bytes."
+    },
+    {
+      "id": "s08-c2",
+      "start": 187.639,
+      "end": 200.759,
+      "text": "Return to Chapter Five and explain why alignment changes the count. These are addressed sectors for one modelled input read, not physical DRAM transactions, cache misses or elapsed GPU time."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 10.56,
+      "s01-c2": 13.077,
+      "s02-c1": 10.667,
+      "s02-c2": 12.693,
+      "s03-c1": 11.285,
+      "s03-c2": 10.901,
+      "s04-c1": 11.029,
+      "s04-c2": 12.032,
+      "s05-c1": 11.029,
+      "s05-c2": 12.971,
+      "s06-c1": 9.259,
+      "s06-c2": 13.12,
+      "s07-c1": 10.731,
+      "s07-c2": 6.933,
+      "s08-c1": 11.051,
+      "s08-c2": 13.12
+    }
+  }
+}

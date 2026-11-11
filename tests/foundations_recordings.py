@@ -6,7 +6,8 @@ RECORDINGS=[dict(slug='devices',chapter=2,title='Follow tensor values between CP
     control='#device-count-0',value='8',run='#device-run-0',result='#device-feedback-0',
     untouched='#device-map-1 code',untouched_text=['x_cpu','x_gpu']),
     dict(slug='reading',chapter=3,title='Select tensor rows and columns',control='#reading-index-row',value='1',run='#reading-run-row',result='#reading-feedback-row',untouched='#reading-map-column .book-reads li>span:last-child strong',untouched_text=['?']*5),
-    dict(slug='layout',chapter=4,title='Follow tensor views into memory',control='#reading-index-column',value='1',run='#reading-run-column',result='#reading-feedback-column',untouched='#reading-map-packed .book-reads li>span:last-child strong',untouched_text=['?']*5)]
+    dict(slug='layout',chapter=4,title='Follow tensor views into memory',control='#reading-index-column',value='1',run='#reading-run-column',result='#reading-feedback-column',untouched='#reading-map-packed .book-reads li>span:last-child strong',untouched_text=['?']*5),
+    dict(slug='requests',chapter=5,title='Group five reads into memory sectors',control='#reading-index-sectors',value='3',run='#reading-run-sectors',result='#reading-feedback-sectors')]
 
 def check_foundations_recordings(browser,url,root,errors):
     for spec in RECORDINGS:
@@ -19,7 +20,7 @@ def check_foundations_recordings(browser,url,root,errors):
                 page.goto(url+f'lessons/{slug}.html?keep=video')
                 page.locator(spec['control']).select_option(spec['value']);page.locator(spec['run']).click()
                 result=page.locator(spec['result']).inner_text()
-                expect(page.locator(spec['untouched'])).to_have_text(spec['untouched_text'])
+                if spec.get('untouched'):expect(page.locator(spec['untouched'])).to_have_text(spec['untouched_text'])
                 recap=page.locator(f'#{slug}-recording-link')
                 assert recap.evaluate('el=>el.previousElementSibling.matches(".book-section")&&el.nextElementSibling.matches(".desktop-links")')
                 link=page.locator(f'#{slug}-watch');link.evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-250,behavior:'instant'})")
@@ -47,7 +48,7 @@ def check_foundations_recordings(browser,url,root,errors):
                 page.locator(f'#{slug}-return').click();expect(page).to_have_url(url+f'lessons/{slug}.html?keep=video')
                 expect(page.locator(spec['control'])).to_have_value(spec['value'])
                 expect(page.locator(spec['result'])).to_have_text(result,use_inner_text=True)
-                expect(page.locator(spec['untouched'])).to_have_text(spec['untouched_text'])
+                if spec.get('untouched'):expect(page.locator(spec['untouched'])).to_have_text(spec['untouched_text'])
                 page.wait_for_function('position=>Math.abs(scrollY-position)<8',arg=position)
                 expect(page.locator(f'#{slug}-watch')).to_be_focused();page.locator(f'#{slug}-watch').click()
                 page.wait_for_function('id=>document.getElementById(id).currentTime>=45',arg=slug+'-video')

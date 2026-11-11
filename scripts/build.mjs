@@ -8,6 +8,7 @@ import {renderMatmulVideo} from '../content/matmul-video.mjs';
 import {renderDevicesVideo} from '../content/devices-video.mjs';
 import {renderReadingVideo} from '../content/reading-video.mjs';
 import {renderLayoutVideo} from '../content/layout-video.mjs';
+import {renderRequestsVideo} from '../content/requests-video.mjs';
 import {renderProfiling} from '../content/profiling.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 import {memorySetup,memoryExample} from '../src/book-code.mjs';
@@ -50,6 +51,8 @@ await writeFile('dist/lessons/devices-video.html',renderBookPage({slug:'devices-
 await writeFile('dist/lessons/reading-video.html',renderBookPage({slug:'reading-video',appendix:true,title:'Select tensor rows and columns',lead:'Follow row and column coordinates into selected inputs and their elementwise results.',content:renderReadingVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/layout-video.html',renderBookPage({slug:'layout-video',appendix:true,title:'Follow tensor views into memory',lead:'Connect selected values to element and byte offsets, then compare shared storage with a packed copy.',content:renderLayoutVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
+
+await writeFile('dist/lessons/requests-video.html',renderBookPage({slug:'requests-video',appendix:true,title:'Group five reads into memory sectors',lead:'Follow five input reads through aligned sectors, then explain how a neighbouring row crosses a boundary.',content:renderRequestsVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
