@@ -48,12 +48,12 @@ ${code('KERNEL','complete doubling kernel')}
 <section class="book-section" id="input-result"><h2>4. Copy the results into the CPU output</h2>
 <p>The launch queues GPU work. To read its result on the CPU, copy the GPU output into the already-sized CPU vector.</p>
 ${code('COPY_OUT','GPU-to-CPU result copy')}
-<p>This blocking device-to-host copy waits for the preceding kernel work in the same default stream, then returns with the CPU result available: <code>[2.0, 4.0, 6.0, 8.0, 10.0]</code>. Allocating output storage alone would not copy the result.</p>
+<p>In this program, this blocking device-to-host copy waits for the preceding kernel and returns with the CPU result available: <code>[2.0, 4.0, 6.0, 8.0, 10.0]</code>. Allocating output storage alone would not copy the result.</p>
 <details><summary>Read the complete CUDA program</summary><p>The surrounding program supplies headers, error checking, empty-input and size checks, output verification and cleanup. Its tiny four-thread blocks are for tracing, rather than a performance recommendation.</p>${codePanel({id:'launch-complete',source,label:'CUDA C++ · complete program',explainedLocally:true})}</details>
 <p><a href="../examples/launch-from-input.cu" download>Download the complete CUDA program</a>. Installation and execution commands are in the <a href="desktop.html#first-cuda">desktop setup appendix</a>.</p></section>
 
 <section class="book-section" id="new-input"><h2>5. Plan a launch for new input data</h2>
-<p>Replace only the CPU input initialiser with these values. Keep four threads per block and the same sizing and launch expressions.</p>
+<p>Replace only the CPU input values with these entries. Keep four threads per block and the same sizing and launch expressions.</p>
 <pre class="book-code" data-code-question><code>std::vector&lt;float&gt; input = {
     1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
     -1.0f, 0.0f, 0.5f, 12.0f
@@ -64,6 +64,6 @@ ${table(['Quantity','New case'],[['n and CPU output elements','9 each'],['Bytes 
 <p>The count is 9 because there are nine entries. The final data value, 12.0, is neither the count nor the last index. The unchanged <code>input.size()</code> expressions produce the new sizes automatically.</p>
 <p>Expected output: <code>[2.0, 4.0, 6.0, 8.0, 10.0, -2.0, 0.0, 1.0, 24.0]</code>. Changing 12.0 to 20.0 would change only its result to 40.0; the sizes and launch settings would stay the same.</p>
 <p>If you left <code>n</code> hard-coded to 5, extra blocks alone would not fix the result: the guard would still prevent indices 5–8 from writing. This is why the CPU derives the count from the actual data.</p></details>
-<p>The equal input and output counts belong to this elementwise calculation. A reduction can consume many inputs and produce one result; a gather can select a different number of outputs. Derive counts and storage from the operation’s contract.</p>
+<p>The equal input and output counts belong to this elementwise calculation. Summing all inputs into one total needs only one output; selecting a subset can also change the output count. Derive counts and storage from what the calculation reads and writes.</p>
 <p>Want to diagnose indexing mistakes next? Try <a href="kernel.html">Repair a kernel</a>. You can also return to <a href="devices.html#device-2">Chapter 2’s result copy</a> or continue to Chapter 3.</p></section>`;
 }

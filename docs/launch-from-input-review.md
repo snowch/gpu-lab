@@ -43,7 +43,9 @@ Decisions from the review:
   before relying on them. Explain unfamiliar source fragments directly beneath
   the corresponding excerpts, in source order.
 - State that equal input/output counts belong to this elementwise calculation;
-  reduction and gather have different contracts.
+  describe summing and selecting in familiar terms instead of introducing names
+  from later chapters. Explain result-copy ordering without relying on the
+  unintroduced term stream.
 - Generate displayed excerpts from the complete downloadable program. Exercise
   the same program with five and nine inputs against independent expected values
   in the CUDA functional-simulation workflow.

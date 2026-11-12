@@ -21,7 +21,7 @@ export function codeExplanations(source) {
     add('cudaMalloc(&d_output, bytes)', 'Allocates a separate GPU output array of the same byte size, because this kernel writes one result per input.');
     add('cudaMemcpy(\n    d_input, input.data(), bytes,\n    cudaMemcpyHostToDevice)', 'Copies bytes from the CPU input to the GPU input. The destination comes first, then the source, byte count and direction. input.data() supplies the CPU array’s address; it does not supply its length.');
     add('int threadsPerBlock = 4;', 'Chooses four threads per block. This is independent of the array length.');
-    add('cudaMemcpy(\n    output.data(), d_output, bytes,\n    cudaMemcpyDeviceToHost)', 'Copies bytes from the GPU output into the CPU output array. output.data() supplies its destination address. This blocking copy waits for the preceding work in the same default stream.');
+    add('cudaMemcpy(\n    output.data(), d_output, bytes,\n    cudaMemcpyDeviceToHost)', 'Copies bytes from the GPU output into the CPU output array. output.data() supplies its destination address. This blocking copy waits for the preceding kernel in this program.');
   } else if(source.includes('prof.export_chrome_trace("trace.json")')) {
     add('from torch.profiler import ProfilerActivity, profile, record_function', 'Imports the CPU/CUDA activity selectors, the profile recording context and record_function for naming the captured operation.');
     add('print("PyTorch:", torch.__version__)', 'Records the installed PyTorch version. The following prints record its CUDA build and the actual GPU model.');
