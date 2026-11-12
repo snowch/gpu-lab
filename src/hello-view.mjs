@@ -47,9 +47,8 @@ export function renderIntroSections() {
  ${renderCodeBridge(2,2)}${renderLaunchPractice()}
  </section>
  <section class="hello-section" data-stage="3" id="idea-4" aria-labelledby="hello-title-3">
- <p class="eyebrow">04 · Bounds check</p><h2 id="hello-title-3">Keep extra threads out of the arrays</h2>
- <p>Our two blocks of four create threads with indices 0–7, but the five inputs have indices 0–4. An extra thread must check its index before reading or writing.</p>
- ${definitions([['Bounds check','A check that an index refers to an element that exists before accessing it.']])}
+ <p class="eyebrow">04 · Test the bounds check</p><h2 id="hello-title-3">Check the boundary at index 5</h2>
+ <p>Use the bounds check from the CUDA example to inspect where array access must stop. With five inputs, index 4 exists and index 5 does not.</p>
  ${renderBoundsChallenge()}</section>`;
 }
 
@@ -81,7 +80,7 @@ export function renderLaunchPractice() {
 }
 
 export function renderBoundsChallenge() {
- return `<p>Every thread has received the same input count, <code>n = 5</code>. Each thread calculates its own array index <code>i</code> from its block number and position. Comparing <code>i &lt; n</code> permits only indices 0–4. The check trusts the supplied count; if that count is larger than the allocated arrays, an invalid access can still pass the check.</p>
+ return `<p>For <code>n = 5</code>, the correct condition <code>i &lt; n</code> permits indices 0–4 and rejects indices 5–7:</p>
  ${codePanel({id:'hello-bounds-code-3',source:boundsSource(2),label:'CUDA C++ · body excerpt from runKernel · correct check',explainedLocally:true})}
  <p>The braces enclose the statements controlled by <code>if</code>. Threads 5–7 skip both the read and the write.</p>
  <div class="hello-visual"><p class="hello-figure-title">Worked check · i &lt; 5</p>${renderIntroMap(3,inspectLaunch(5,4,2),null,true,false)}<p class="hello-note">Values are outputs. “Skipped” means no array access.</p></div>
@@ -129,8 +128,12 @@ export function renderCodeBridge(stage,factor) {
  <li><code>int blocks = 2;</code> — Requests two blocks: eight threads in total.</li>
  <li><code>runKernel&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> — Starts our kernel with those settings.</li>
  <li><code>d_input, d_output, n</code> — Supply the kernel’s inputs in order: the input array’s location, the output array’s location and the element count. The value of the CPU variable <code>n</code> is copied into the kernel’s integer input, also named <code>n</code>, for every thread. Changing blocks or threads per block does not change that value.</li></ul></div>
+ <h3>Keep extra threads out of the arrays</h3>
+ <p>The launch creates threads with indices 0–7, but the five inputs have indices 0–4. The kernel needs a check before reading or writing so the extra threads skip the arrays.</p>
+ ${definitions([['Bounds check','A check that an index refers to an element that exists before accessing it.']])}
+ <p>Each thread calculates its own array index <code>i</code> from its block number and position. The condition <code>if (i &lt; n)</code> runs the enclosed array accesses only when <code>i</code> is smaller than the supplied count. With <code>n = 5</code>, indices 0–4 proceed and indices 5–7 skip both accesses. The check trusts <code>n</code>; an incorrect count can still allow an access beyond the allocated arrays.</p>
  <details id="hello-bridge-complete-2"><summary>Complete CUDA kernel for this example</summary>
- <p>Each thread calculates its index, checks whether an input exists, then doubles it. The next section explains that check. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
+ <p>The complete function calculates each thread’s index and applies this bounds check before doubling an input. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
  <button type="button" id="hello-bridge-download-2">Download complete CUDA program</button> <a href="desktop.html#first-cuda">Desktop setup</a></details>
  </div>`;

@@ -30,7 +30,7 @@ do not introduce another walkthrough or hide essential setup in a reference link
 | Page | Finding and action |
 | --- | --- |
 | Overview | Prerequisites name Python indexing, loops and nested comprehensions; CUDA is introduced by the book. Browser/local execution and optional paths are distinguished. No added explanation needed. |
-| 1 — Double five values | The guard named `n` without explaining who supplied it. Section 03 now declares `int n = 5;`, explains the CPU's count/allocation/copy responsibilities before the launch, and passes `n` as the third ordinary argument. Its visible walkthrough explains how every thread receives that value, independently of launch dimensions. Section 04 recalls `n = 5` only to apply the guard, without a backward reference for essential setup. Pointers carry no length, and guards trust the supplied count. The nine-input transfer explicitly supplies 9. Explain queued launches versus completion/read-back in the complete-program disclosure. |
+| 1 — Double five values | The guard named `n` without explaining who supplied it. Section 03 now declares `int n = 5;`, explains the CPU's count/allocation/copy responsibilities before the launch, and passes `n` as the third ordinary argument. Its visible walkthrough explains how every thread receives that value, independently of launch dimensions. Section 03 also introduces and defines the bounds check visibly before the complete kernel and regrouping exercise. Section 04 tests that known check at the last valid and first invalid indices, rather than introducing it again. Pointers carry no length, and guards trust the supplied count. The nine-input transfer explicitly supplies 9. Explain queued launches versus completion/read-back in the complete-program disclosure. |
 | 2 — Storage | Checked original versus copied buffers, FP32 bytes, result allocation, `.to()` and `.cpu()` responsibilities. Existing text explains PyTorch's preparation and the CPU copy's wait. No change. |
 | 3 — Selection | Checked construction of `x`, zero-based row/column notation, excluded endpoint, selection count and independence of dynamic examples. Existing source and explanations supply the inputs. No change. |
 | 4 — Layout | Checked element/byte offsets, shared storage, strides, packed allocation, copy cost and already-contiguous behaviour. No change. |
@@ -53,11 +53,12 @@ do not introduce another walkthrough or hide essential setup in a reference link
 
 ## Reading-order and verification evidence
 
-Review chapter 1 as grouping → launch/parameters → regrouping → bounds check →
-nine-input transfer. Check that the CPU's count and storage responsibilities are
+Review chapter 1 as grouping → launch/parameters and bounds-check introduction →
+regrouping → boundary investigation → nine-input transfer. Check that the CPU's count and storage responsibilities are
 explained in section 03 before its launch, without opening the complete kernel or
-reading section 04. The guard section then applies the known count locally. Keep
-the correct guard before its diagnostic variant.
+reading section 04. The bounds-check definition and `if (i < n)` explanation must
+also precede the complete kernel in section 03, including when its disclosure is
+closed. Section 04 applies the known check locally before its diagnostic variant.
 Review requests as layout/warp/sector rules → equal-count comparison → boundary
 case; reduction as four-input tree → N/2 extension → unsafe ordering; matrix reuse
 as dot product → explicit mapping/zero sums → load-count derivation.
@@ -80,3 +81,22 @@ The existing CUDA introductory reference was checked directly: Triple Chevron
 Notation explains launch dimensions, ordinary arguments and asynchronous launches;
 Thread and Grid Index Intrinsics explains the built-ins. The guide does not define
 our `n`. Its meaning and the host program's responsibilities are now taught locally.
+
+
+## Follow-up: bounds-check introduction
+
+The previous review missed a dependency: Section 03's complete kernel already
+contained and explained `if (i < n)`, while Section 04 introduced Bounds check as
+new. Move the definition and short explanation outside the Section 03 disclosure,
+before that kernel. Label Section 04 as a boundary investigation and remove its
+duplicate definition. Keep its correct-check excerpt, worked diagram and changed
+condition together for local inspection. The CUDA source and numerical model are
+unchanged.
+
+Apply the same public
+[Course Builder](https://github.com/ericrisco/rsc-harness/blob/f3765d35e91690c0c7e511447da6cd0176ab38e0/skills/course-builder/SKILL.md)
+and [UX Design](https://github.com/f0d010c/stark/blob/ff94e5b4e1c98d259f3cde9f806406c4528deed4/skills/ux-design/SKILL.md)
+criteria used for the input-derived launch practice: knowledge before use,
+distinct introduction and application goals, visible essentials, and the shared
+definition treatment. The PR records the built reading-order and responsive review
+for Sections 02 → 03 → 04 → 05, including the complete kernel open and closed.
