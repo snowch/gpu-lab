@@ -8,6 +8,7 @@ export function desktopExamples(){
   const examples=[
     {slug:'hello',id:'opening',source:pythonSource(),expected:{y:[2,4,6,8,10]}},
     {slug:'devices',id:'opening',source:deviceOpening,expected:{y_cpu:[2,4,6,8,10]}},
+    {slug:'launch-from-input',id:'opening',source:deviceOpening,expected:{y_cpu:[2,4,6,8,10]}},
     ...['reading','layout','requests'].map((slug,i)=>({slug,id:'opening',source:readingOpening(i===0?'selection':'layout'),expected:{y:readTensor({pattern:i===0?'row':'column'}).output}})),
     {slug:'memory',id:'opening',source:memoryExample},
     ...continuationChapters.map(chapter=>({slug:chapter.slug,id:'opening',source:chapter.source,expected:chapter.slug==='putting-it-together'?{c:tiledMatmul({n:4}).output}:undefined})),

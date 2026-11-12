@@ -15,6 +15,7 @@ import {renderPrecisionVideo} from '../content/tensor-cores-video.mjs';
 import {renderAttentionVideo} from '../content/attention-video.mjs';
 import {renderInferenceVideo} from '../content/inference-video.mjs';
 import {renderProfiling} from '../content/profiling.mjs';
+import {renderLaunchFromInput} from '../content/launch-from-input.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 import {memorySetup,memoryExample} from '../src/book-code.mjs';
 import {escape} from '../src/continuation-ui.mjs';
@@ -75,6 +76,7 @@ await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html',
   .replace('<!-- HELLO_TRANSFER -->', renderIntroTransfer())
   .replace('<!-- REFERENCE_HELLO -->','<details class="hello-local"><summary>Optional: run locally or inspect a real PyTorch launch</summary>'+desktopLinks('hello')+'<p><a href="profiling.html">Inspect PyTorch’s real kernel launches</a> on an NVIDIA GPU, or read a saved trace.</p></details>'+renderChapterReferences('hello',{compact:true})));
 await writeFile('dist/lessons/devices.html', renderBookPage({slug:'devices',number:2,title:'Where are tensor values stored?',lead:'Follow the same five values from CPU memory to GPU memory and back.',content:renderDeviceSections(),previous:{href:'hello.html',title:'Chapter 1: How does a GPU double five values?'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
+await writeFile('dist/lessons/launch-from-input.html',renderBookPage({slug:'launch-from-input',practice:true,title:'From an input array to a CUDA launch',lead:'Derive storage sizes and launch settings from the data you already have.',content:renderLaunchFromInput(await readFile('examples/launch-from-input.cu','utf8')),previous:{href:'devices.html#device-2',title:'Chapter 2: the result copy'},next:{href:'reading.html',title:'Chapter 3: How do we select values from a tensor?'}}));
 for(const [i,part] of ['selection','layout','requests'].entries()) {
   const chapter=chapters[i+2],previous=chapters[i+1],next=chapters[i+3];
   await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({slug:chapter.slug,number:i+3,title:chapter.title,lead:chapter.summary,content:renderReadingSections(part),previous:{href:previous.slug+'.html',title:`Chapter ${i+2}: ${previous.title}`},next:{href:next.slug+'.html',title:`Chapter ${i+4}: ${next.title}`}}));

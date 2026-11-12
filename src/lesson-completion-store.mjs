@@ -1,6 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 import {chapters} from './book-chapters.mjs';
-export const lessonIds=[...chapters.filter(chapter=>chapter.opening).map(chapter=>chapter.slug),'kernel','shared-memory','memory'];
+export const lessonIds=[...chapters.filter(chapter=>chapter.opening).map(chapter=>chapter.slug),'launch-from-input','kernel','shared-memory','memory'];
 export const completionPrefix='gpu-lab:v1:manual-completion:';
 export const completionKey=id=>completionPrefix+id;
 

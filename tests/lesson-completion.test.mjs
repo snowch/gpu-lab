@@ -52,7 +52,7 @@ test('lessons expose native manual marks beside next links and both contents lis
   assert.equal(renderLessonCompletion('meet-gpu'),'');
   assert.equal(renderLessonForward('desktop',next),next);
   const nav=renderBookNav(),overview=renderRoadmap();
-  for(const id of lessonIds.filter(id=>!['memory','kernel','shared-memory'].includes(id))){
+  for(const id of lessonIds.filter(id=>!['memory','kernel','shared-memory','launch-from-input'].includes(id))){
     assert.ok(nav.includes(`data-completion-lesson="${id}"`));
     assert.ok(overview.includes(`data-completion-lesson="${id}"`));
   }

@@ -11,7 +11,18 @@ export function codeExplanations(source) {
   };
   const match=(pattern,meaning)=>{const m=source.match(pattern);if(m)add(m[0].trim(),typeof meaning==='function'?meaning(m):meaning);};
   const python=/^import torch\b/.test(source.trimStart());
-  if(source.includes('prof.export_chrome_trace("trace.json")')) {
+  if(source.includes('std::vector<float> input')||source.includes('input.size()')||source.includes('cudaMalloc(&d_input')||source.includes('output.data()')||source.trim()==='int threadsPerBlock = 4;') {
+    add('std::vector<float> input', 'Declares a CPU array named input using the C++ standard library. float stores FP32 values; the braces supply its entries. A trailing f marks a float literal.');
+    add('int n = static_cast<int>(input.size());', 'Reads the input element count with .size() and converts it to the integer type int. These small counts fit int; the complete program checks its size limit before converting. n is our chosen variable name.');
+    add('std::vector<float> output(input.size());', 'Allocates a separate CPU array with one float position per input. It will receive the copied GPU result.');
+    add('std::size_t bytes = input.size() * sizeof(float);', 'Multiplies the element count by the bytes per float. std::size_t is a C++ type for sizes; sizeof(float) is four bytes here. bytes is the size of each allocation, rather than both allocations together.');
+    add('float *d_input, *d_output;', 'Declares two pointers for GPU addresses. The * marks a pointer; declaring these variables allocates no GPU arrays. The d_ prefix is a naming choice.');
+    add('cudaMalloc(&d_input, bytes)', 'Allocates bytes of GPU storage. & lets cudaMalloc store the allocation’s address in d_input. The surrounding CUDA_CHECK checks for failure.');
+    add('cudaMalloc(&d_output, bytes)', 'Allocates a separate GPU output array of the same byte size, because this kernel writes one result per input.');
+    add('cudaMemcpy(\n    d_input, input.data(), bytes,\n    cudaMemcpyHostToDevice)', 'Copies bytes from the CPU input to the GPU input. The destination comes first, then the source, byte count and direction. input.data() supplies the CPU array’s address; it does not supply its length.');
+    add('int threadsPerBlock = 4;', 'Chooses four threads per block. This is independent of the array length.');
+    add('cudaMemcpy(\n    output.data(), d_output, bytes,\n    cudaMemcpyDeviceToHost)', 'Copies bytes from the GPU output into the CPU output array. output.data() supplies its destination address. This blocking copy waits for the preceding kernel in this program.');
+  } else if(source.includes('prof.export_chrome_trace("trace.json")')) {
     add('from torch.profiler import ProfilerActivity, profile, record_function', 'Imports the CPU/CUDA activity selectors, the profile recording context and record_function for naming the captured operation.');
     add('print("PyTorch:", torch.__version__)', 'Records the installed PyTorch version. The following prints record its CUDA build and the actual GPU model.');
     add('x = torch.arange(\n    1, 4097, dtype=torch.float32, device="cuda",\n)', 'Creates 4,096 FP32 inputs, from 1.0 to 4096.0, on the NVIDIA GPU. The endpoint 4097 is excluded.');
@@ -124,6 +135,7 @@ export function codeExplanations(source) {
     }
     match(/int threadsPerBlock = \d+;/, 'Sets the number of threads in each block. threadsPerBlock is a variable name we chose.');
     match(/int blocks = \d+;/, 'Sets the number of blocks. blocks is a variable name we chose.');
+    add('int blocks = (n + threadsPerBlock - 1)\n    / threadsPerBlock;', 'Divides the element count by the block size, rounding up so a final partial block is included. The / operator performs integer division here. blocks is a chosen variable name.');
     match(/\w+<<<[\s\S]*?;/, 'Launches the kernel from the CPU. Between <<< and >>> are the block count and threads per block; arguments in parentheses are passed to the kernel. Device arrays must already be allocated.');
   } else if(/^(?:values = |column = |packed = |transposed = )/.test(source)) {
     match(/x\[\d+, :\]/, 'Selects all columns of the chosen row. The row number starts at zero; the result shares x’s storage.');

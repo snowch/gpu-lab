@@ -51,7 +51,8 @@ test('CUDA suite covers safe workshop templates and independent references',asyn
   const dir=await mkdtemp(join(tmpdir(),'gpu-cuda-cases-'));
   try{
     execFileSync('node',['scripts/generate-cuda-cases.mjs',dir]);
-    assert.equal((await readdir(dir)).filter(f=>f.endsWith('.cu')).length,17);
+    assert.equal((await readdir(dir)).filter(f=>f.endsWith('.cu')).length,19);
+    assert.deepEqual(JSON.parse(await readFile(join(dir,'launch-input-nine.json'),'utf8')),[2,4,6,8,10,-2,0,1,24]);
     assert.match(await readFile(join(dir,'double-eight.cu'),'utf8'),/runKernel<<<\(n \+ 8 - 1\) \/ 8, 8>>>/);
     assert.deepEqual(JSON.parse(await readFile(join(dir,'double-eight.json'),'utf8')),[2,4,6,8,10]);
     for(const op of ['multiply','add','vector-add'])for(const size of [8,16,32,64]){
@@ -70,5 +71,5 @@ test('CUDA suite covers safe workshop templates and independent references',asyn
 test('appendix covers setup, expected output, provenance and explicit unsupported paths',()=>{
   const html=renderDesktop(desktopExamples(),{revision:'test-revision',image:'test-image'});
   for(const text of ['test-revision','test-image','PTX_SIM_MODE_FUNC=1','SM7_QV100','compute_70','PASS: verified 5','--network none','--device cpu','Tensor-core/WMMA','not a runnable language model'])assert.ok(html.includes(text),text);
-  assert.equal([...html.matchAll(/<th scope="row">/g)].length,14);
+  assert.equal([...html.matchAll(/<th scope="row">/g)].length,15);
 });

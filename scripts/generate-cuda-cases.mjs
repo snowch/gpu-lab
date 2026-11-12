@@ -1,9 +1,19 @@
 // Copyright © 2026 Christopher Snow.
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {runnableSource} from '../src/hello-model.mjs';
 import {cudaSource} from '../src/kernel-model.mjs';
 const destination=process.argv[2]??'test-results/generated-cuda';
 await mkdir(destination,{recursive:true});
+// Exercise the exact practice download with both the worked and transfer inputs.
+const launchSource=await readFile(new URL('../examples/launch-from-input.cu',import.meta.url),'utf8');
+for(const [name,values] of [
+  ['five',[1,2,3,4,5]],
+  ['nine',[1,2,3,4,5,-1,0,0.5,12]],
+]) {
+  const source=launchSource.replace(/(std::vector<float> input = \{)[\s\S]*?(\};)/,(_,start,end)=>`${start}\n        ${values.map(x=>x.toFixed(1)+'f').join(', ')}\n    ${end}`);
+  await writeFile(`${destination}/launch-input-${name}.cu`,source);
+  await writeFile(`${destination}/launch-input-${name}.json`,JSON.stringify(values.map(x=>x*2)));
+}
 for(const [name,factor] of [['double',2],['negative',-0.5],['zero',0],['fractional',3.25]]) {
   // Use the browser download generator, with an independent scalar reference.
   await writeFile(`${destination}/${name}.cu`,runnableSource(factor));

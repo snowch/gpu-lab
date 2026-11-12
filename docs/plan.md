@@ -111,6 +111,17 @@ map remain supplementary resources. Existing chapter URLs stay valid. Each new
 chapter ends with a transfer question, references and applied documentation tasks.
 See [migration decisions](chapter-migration.md) for the reuse/rewrite rationale.
 
+After Chapter 2, **From an input array to a CUDA launch**
+(`launch-from-input.html`) offers optional guided practice for readers writing
+CUDA. Reuse the five-input doubling calculation, derive `n` from a CPU vector,
+allocate matching output storage, distinguish element counts from byte sizes,
+derive the block count and copy the result back. A nine-input transfer task checks
+counts, coverage and safe skips. The complete CUDA download is the source for the
+displayed excerpts and is checked with both input lengths in functional simulation.
+Keep Chapter 1's explanation of who supplies `n` in the main reading path; this
+practice adds application rather than a missing prerequisite. Keep Chapter 2's
+next-page link directed to Chapter 3 and installation in the desktop appendix.
+
 Automated checks cover functions, interactions, layout and offline restoration.
 They do not establish learner comprehension. Newcomer observations remain needed:
 can readers trace a dependency, explain a changed result, and separate their

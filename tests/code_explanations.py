@@ -10,7 +10,7 @@ def check_code_explanations(browser,url,root):
         context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
         mock_version(context)
         page=context.new_page()
-        slugs=CHAPTERS+['memory','kernel','shared-memory'] if (width,theme)==(820,'light') else ['hello','matmul','inference','memory','kernel','shared-memory']
+        slugs=CHAPTERS+['launch-from-input','memory','kernel','shared-memory'] if (width,theme)==(820,'light') else ['hello','matmul','inference','launch-from-input','memory','kernel','shared-memory']
         shared_typography=None
         for slug in slugs:
             page.goto(url+'lessons/'+slug+'.html')
