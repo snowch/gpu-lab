@@ -14,10 +14,10 @@ export function launchExcerpt(source,name) {
 export function renderLaunchFromInput(source) {
   const code=(name,label)=>codePanel({id:'launch-'+name.toLowerCase(),source:launchExcerpt(source,name),label:'CUDA C++ · '+label});
   return `<section class="book-start"><h2>Turn the input length into a launch</h2>
-<p>This optional practice follows Chapters 1 and 2. You have traced threads and copied values between CPU and GPU memory. Now use the same doubling calculation to connect the input array to the storage and launch settings supplied by a CPU program.</p>
+<p>Chapter 2 followed the values through CPU and GPU storage. Now use the same doubling calculation to connect the input array to the storage and launch settings supplied by a CPU program.</p>
 ${openingCode(deviceOpening)}
 <p>PyTorch handles allocation and kernel launches for these tensor operations. In our own CUDA C++ program, we supply those steps. The code below illustrates the same result; PyTorch does not call our <code>runKernel</code> function.</p>
-<p class="chapter-browser-note">No installation or GPU is required to read the worked example and complete the practice here. This page does not execute CUDA. The complete program is available for optional local execution.</p>
+<p class="chapter-browser-note">No installation or GPU is required to read the worked example and complete the exercises here. This page does not execute CUDA. The complete program is available for optional local execution.</p>
 <p>By the end, given a different input length, you should be able to choose matching output storage, calculate enough blocks and pass the correct element count to the kernel.</p></section>
 
 <section class="book-section" id="input-count"><h2>1. Count the existing input values</h2>
@@ -42,13 +42,14 @@ ${code('BLOCK_SIZE','chosen block size')}
 <p>C++ integer division discards the remainder. Adding one less than the block size before dividing rounds the required block count up: <code>(5 + 4 - 1) / 4 = 2</code>.</p>
 ${code('LAUNCH','CPU launch for the existing input')}
 <p>Two blocks launch eight threads, but the argument <code>n</code> remains 5. It tells each thread how many array elements are valid. Changing the block size changes the grouping, while the count still comes from <code>input.size()</code>.</p>
-${code('KERNEL','complete doubling kernel')}
+<details><summary>Revisit Chapter 1’s doubling kernel</summary>${code('KERNEL','complete doubling kernel from Chapter 1')}</details>
 <p>Indices 0–4 read inputs and write outputs. Indices 5–7 fail <code>i &lt; n</code> and skip both array accesses. The guard trusts the supplied count; the CPU program must keep it consistent with the allocated storage.</p></section>
 
 <section class="book-section" id="input-result"><h2>4. Copy the results into the CPU output</h2>
 <p>The launch queues GPU work. To read its result on the CPU, copy the GPU output into the already-sized CPU vector.</p>
 ${code('COPY_OUT','GPU-to-CPU result copy')}
 <p>In this program, this blocking device-to-host copy waits for the preceding kernel and returns with the CPU result available: <code>[2.0, 4.0, 6.0, 8.0, 10.0]</code>. Allocating output storage alone would not copy the result.</p>
+<h3>Release the GPU allocations after the copy</h3>${code('FREE','CPU cleanup after result read-back')}<p><code>cudaFree</code> releases the GPU input and output storage. The CPU result remains in <code>output</code>. C++ releases the CPU vectors when they leave their scope at the end of the program.</p>
 <details><summary>Read the complete CUDA program</summary><p>The surrounding program supplies headers, error checking, empty-input and size checks, output verification and cleanup. Its tiny four-thread blocks are for tracing, rather than a performance recommendation.</p>${codePanel({id:'launch-complete',source,label:'CUDA C++ · complete program',explainedLocally:true})}</details>
 <p><a href="../examples/launch-from-input.cu" download>Download the complete CUDA program</a>. Installation and execution commands are in the <a href="desktop.html#first-cuda">desktop setup appendix</a>.</p></section>
 
@@ -65,5 +66,5 @@ ${table(['Quantity','New case'],[['n and CPU output elements','9 each'],['Bytes 
 <p>Expected output: <code>[2.0, 4.0, 6.0, 8.0, 10.0, -2.0, 0.0, 1.0, 24.0]</code>. Changing 12.0 to 20.0 would change only its result to 40.0; the sizes and launch settings would stay the same.</p>
 <p>If you left <code>n</code> hard-coded to 5, extra blocks alone would not fix the result: the guard would still prevent indices 5–8 from writing. This is why the CPU derives the count from the actual data.</p></details>
 <p>The equal input and output counts belong to this elementwise calculation. Summing all inputs into one total needs only one output; selecting a subset can also change the output count. Derive counts and storage from what the calculation reads and writes.</p>
-<p>Want to diagnose indexing mistakes next? Try <a href="kernel.html">Repair a kernel</a>. You can also return to <a href="devices.html#device-2">Chapter 2’s result copy</a> or continue to Chapter 3.</p></section>`;
+<p>Want to diagnose indexing mistakes next? Try <a href="kernel.html">Repair a kernel</a>. You can also return to <a href="devices.html#device-2">Chapter 2’s result copy</a> or continue to Chapter 4’s tensor selections.</p></section>`;
 }

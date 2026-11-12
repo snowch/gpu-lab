@@ -50,7 +50,7 @@ def check_sm_hardware(browser,url,root,errors):
             page.wait_for_function('document.querySelector("#sm-video").currentTime>=45')
             assert page.locator('#sm-video').evaluate('v=>v.paused&&v.playbackRate===1.25')
             expect(page.locator('#sm-transcript')).to_have_attribute('open','')
-            # The advanced value trace is local to Chapter 6, behind a disclosure.
+            # The advanced value trace is local to Chapter 7, behind a disclosure.
             page.goto(url+'lessons/scheduling.html')
             expect(page.locator('#sm-hardware-basics .sm-hardware-overview')).to_be_visible()
             expect(page.locator('#sm-walkthrough')).not_to_have_attribute('open','')
@@ -79,7 +79,7 @@ def check_sm_hardware(browser,url,root,errors):
     page.locator('#reading-index-row').select_option('2');page.locator('#reading-run-row').click()
     result=page.locator('#reading-feedback-row').inner_text()
     page.locator('.lesson-nav a[href="inside-sm.html"]').click()
-    expect(page.locator('#sm-return')).to_have_text('Return to Chapter 3')
+    expect(page.locator('#sm-return')).to_have_text('Return to Chapter 4')
     page.locator('#sm-return').click()
     expect(page).to_have_url(url+'lessons/reading.html?keep=sidebar')
     expect(page.locator('#reading-index-row')).to_have_value('2')
@@ -116,4 +116,4 @@ def check_sm_hardware(browser,url,root,errors):
     expect(page.locator('#sm-explorer noscript details')).to_contain_text('Reuse the arithmetic units for Warp B')
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     context.close()
-    print('PASS: captioned SM recording, native playback/seeking, transcript, return/state migration, Chapter 6 warp trace, layouts/themes and no-JavaScript access')
+    print('PASS: captioned SM recording, native playback/seeking, transcript, return/state migration, Chapter 7 warp trace, layouts/themes and no-JavaScript access')

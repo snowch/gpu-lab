@@ -1,3 +1,6 @@
+> Historical review: chapter numbers below use the order at the time of review.
+> See [the current CUDA and sequence review](cuda-learning-review.md) for the fourteen-chapter course.
+
 # Prediction before results
 
 Copyright © 2026 Christopher Snow.

@@ -5,7 +5,7 @@
     "lead": "How do values from different threads meet?",
     "stage": "inputs",
     "captions": [
-      "A sum combines values handled by different threads. Follow the four inputs from Chapter Eight: one, two, three and four.",
+      "A sum combines values handled by different threads. Follow the four inputs from Chapter Nine: one, two, three and four.",
       "There are four threads in one block. A block is a group whose threads can cooperate. Each thread has one input.",
       "This is our teaching algorithm for the sum, not a trace of the implementation PyTorch selects."
     ]
@@ -118,7 +118,7 @@
     "captions": [
       "All eight threads must reach the block barrier. That includes the four threads that did no addition.",
       "Thread one first reads shared word five. Thread five's input write must precede that read; the initial barrier establishes the ordering.",
-      "Return to Chapter Eight. Set the input count to eight and inspect the tree. Follow the writes, barriers and partner distances. Explain each read using the write that supplies its value."
+      "Return to Chapter Nine. Set the input count to eight and inspect the tree. Follow the writes, barriers and partner distances. Explain each read using the write that supplies its value."
     ]
   }
 ]

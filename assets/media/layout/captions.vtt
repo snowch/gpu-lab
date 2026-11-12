@@ -1,49 +1,49 @@
 WEBVTT
 
-00:00:00.600 --> 00:00:09.368
-Chapter Four follows the selected values into storage. An element offset counts values from the start of that storage, beginning at zero.
+00:00:00.600 --> 00:00:09.347
+Chapter Five follows the selected values into storage. An element offset counts values from the start of that storage, beginning at zero.
 
-00:00:09.588 --> 00:00:21.919
+00:00:09.567 --> 00:00:21.897
 Our five by five FP32 tensor stores one row after another: row-major order. Each value uses four bytes. Large labels show values; small labels show element offsets.
 
-00:00:23.939 --> 00:00:34.008
+00:00:23.917 --> 00:00:33.987
 Selecting row zero makes a view into the original storage. Its five values occupy consecutive element offsets. Making this view copies no values.
 
-00:00:34.228 --> 00:00:45.279
+00:00:34.207 --> 00:00:45.257
 Stride is the distance, in elements, between successive selected values. Here stride one means four bytes. A byte offset measures distance in bytes from the storage's start.
 
-00:00:47.299 --> 00:00:57.987
+00:00:47.277 --> 00:00:57.965
 Column zero uses offsets zero, five, ten, fifteen and twenty. The next selected value is five element positions away, so this view has stride five.
 
-00:00:58.207 --> 00:01:09.513
+00:00:58.185 --> 00:01:09.492
 Five FP32 elements span twenty bytes, so its byte stride is twenty. The highlighted values stay in the original storage; selecting the column has not moved them together.
 
-00:01:11.533 --> 00:01:21.709
+00:01:11.512 --> 00:01:21.688
 Choose column one instead. Its first selected value begins one element into the same storage. The starting offset changes, but the stride remains five.
 
-00:01:21.929 --> 00:01:30.207
+00:01:21.908 --> 00:01:30.185
 Changing the column index still gives a view. To put the selected values next to one another, we need a different layout in separate storage.
 
-00:01:32.227 --> 00:01:42.509
+00:01:32.205 --> 00:01:42.488
 Calling contiguous on this column creates a packed copy: a new buffer with the same selected values in consecutive positions. The original storage is unchanged.
 
-00:01:42.729 --> 00:01:53.673
+00:01:42.708 --> 00:01:53.652
 The copy has stride one and new element offsets zero through four. Five four-byte values mean twenty bytes of values copied; copying also reads and writes memory.
 
-00:01:55.693 --> 00:02:05.635
+00:01:55.672 --> 00:02:05.613
 A row already has consecutive values. In row one, they begin at offset five and have stride one. Calling contiguous can return this row without copying.
 
-00:02:05.855 --> 00:02:16.372
+00:02:05.833 --> 00:02:16.351
 Contiguous describes the order of the values. A contiguous view can share another tensor's storage and start at a non-zero offset; it need not own a separate buffer.
 
-00:02:18.392 --> 00:02:28.077
+00:02:18.371 --> 00:02:28.056
 Now take column three and make a packed copy. Predict the new copy's element offsets and stride. Do its offsets keep the original column's starting position?
 
-00:02:28.297 --> 00:02:37.023
+00:02:28.276 --> 00:02:37.001
 How many bytes of values are copied, and does the original tensor change? Use the four-byte value size, then pause and explain before checking.
 
-00:02:42.843 --> 00:02:52.080
+00:02:42.821 --> 00:02:52.059
 The new buffer starts at its own offset zero. Its five element offsets are zero through four, with stride one. Twenty bytes of values are copied.
 
-00:02:52.300 --> 00:03:04.673
-The original tensor, selected values and multiplication results are unchanged. Return to Chapter Four and compare a view with a packed copy, separating layout, copy cost and measured performance.
+00:02:52.279 --> 00:03:04.737
+The original tensor, selected values and multiplication results are unchanged. Return to Chapter Five and compare a view with a packed copy, separating layout, copy cost and measured performance.

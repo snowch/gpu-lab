@@ -1,53 +1,53 @@
 {
   "durationSeconds": 255,
-  "bytes": 12097076,
+  "bytes": 12098119,
   "scenes": [
     {
       "id": "s01",
       "start": 0,
-      "end": 32.107,
+      "end": 32.384,
       "title": "Conversion happens before the products."
     },
     {
       "id": "s02",
-      "start": 32.107,
-      "end": 63.723,
+      "start": 32.384,
+      "end": 64.0,
       "title": "The small excess can disappear."
     },
     {
       "id": "s03",
-      "start": 63.723,
-      "end": 91.52,
+      "start": 64.0,
+      "end": 91.797,
       "title": "Compare two FP32 running sums."
     },
     {
       "id": "s04",
-      "start": 91.52,
-      "end": 122.091,
+      "start": 91.797,
+      "end": 122.368,
       "title": "Cancellation exposes the lost excess."
     },
     {
       "id": "s05",
-      "start": 122.091,
-      "end": 156.843,
+      "start": 122.368,
+      "end": 157.141,
       "title": "Range is a separate question."
     },
     {
       "id": "s06",
-      "start": 156.843,
-      "end": 194.944,
+      "start": 157.141,
+      "end": 195.243,
       "title": "Arithmetic work does not identify the hardware."
     },
     {
       "id": "s07",
-      "start": 194.944,
-      "end": 225.347,
+      "start": 195.243,
+      "end": 225.645,
       "title": "Pause: test exactly representable inputs."
     },
     {
       "id": "s08",
-      "start": 225.347,
-      "end": 254.808,
+      "start": 225.645,
+      "end": 255.235,
       "title": "Agreement applies to the tested inputs."
     }
   ],
@@ -55,98 +55,98 @@
     {
       "id": "s01-c1",
       "start": 0.6,
-      "end": 13.016,
-      "text": "Chapter Ten separates input representation from accumulation. Our matrix A repeats one row sixteen times; matrix B contains only ones, so every output uses the same row sum."
+      "end": 13.272,
+      "text": "Chapter Eleven separates input representation from accumulation. Our matrix A repeats one row sixteen times; matrix B contains only ones, so every output uses the same row sum."
     },
     {
       "id": "s01-c2",
-      "start": 13.236,
-      "end": 30.687,
+      "start": 13.492,
+      "end": 30.964,
       "text": "The row begins with eight values written as one point zero zero zero three, followed by eight negative ones. They enter FP32 storage first, then convert to FP16 or BF16. Each smaller format uses two bytes per input instead of four."
     },
     {
       "id": "s02-c1",
-      "start": 32.707,
-      "end": 46.787,
+      "start": 32.984,
+      "end": 47.064,
       "text": "For these inputs, both FP16 and BF16 round the near-one values to exactly one. The negative ones stay unchanged because they are exactly representable. Eight of the sixteen row inputs change."
     },
     {
       "id": "s02-c2",
-      "start": 47.007,
-      "end": 62.303,
+      "start": 47.284,
+      "end": 62.58,
       "text": "Keeping FP32 preserves the original stored values. Once a smaller input has rounded to one, converting it back to FP32 cannot restore the discarded excess. The loss has happened before the products are accumulated."
     },
     {
       "id": "s03-c1",
-      "start": 64.323,
-      "end": 76.547,
+      "start": 64.6,
+      "end": 76.824,
       "text": "An accumulator is a running sum. This model multiplies each input by B's value of one, then rounds each addition to FP32, advancing through positions zero to fifteen."
     },
     {
       "id": "s03-c2",
-      "start": 76.767,
-      "end": 90.1,
+      "start": 77.044,
+      "end": 90.377,
       "text": "After the first eight additions, converted inputs sum to eight. The original-input reference is slightly larger. Both sums use FP32 accumulation; their difference comes from the earlier input conversion."
     },
     {
       "id": "s04-c1",
-      "start": 92.12,
-      "end": 103.597,
+      "start": 92.397,
+      "end": 103.875,
       "text": "Now add the eight negative ones. They cancel the converted-input sum to zero. The original-input reference keeps a small positive remainder, about zero point zero zero two four."
     },
     {
       "id": "s04-c2",
-      "start": 103.817,
-      "end": 120.671,
+      "start": 104.095,
+      "end": 120.948,
       "text": "FP32 accumulation cannot recover input information already discarded. Printing the final result as FP32 cannot recover it either. These are the model's chosen sequential sums, not the accumulation order of a real matrix kernel."
     },
     {
       "id": "s05-c1",
-      "start": 122.691,
-      "end": 136.664,
+      "start": 122.968,
+      "end": 136.941,
       "text": "Try sixteen positive inputs, each written as ten to the power minus eight. In this example, conversion to FP16 makes every input zero. BF16 keeps them non-zero, though their values still round."
     },
     {
       "id": "s05-c2",
-      "start": 136.884,
-      "end": 155.423,
+      "start": 137.161,
+      "end": 155.721,
       "text": "Both formats use two bytes. FP16 distinguishes finer nearby values around one, while BF16 preserves a wider magnitude range, similar to FP32. Choose accuracy checks for the actual values and calculations, rather than treating all sixteen-bit inputs alike."
     },
     {
       "id": "s06-c1",
-      "start": 157.443,
-      "end": 173.336,
+      "start": 157.741,
+      "end": 173.635,
       "text": "A tensor core is specialised GPU hardware for supported matrix multiply-and-accumulate operations. A sixteen by sixteen output tile with sixteen shared positions expresses four thousand and ninety-six scalar multiply\u2013accumulates."
     },
     {
       "id": "s06-c2",
-      "start": 173.556,
-      "end": 193.524,
+      "start": 173.855,
+      "end": 193.823,
       "text": "That is an arithmetic-work count, not a hardware instruction count or timing. Threads cooperate over matrix groups, and PyTorch chooses its implementation. This browser's sequential arithmetic neither executes tensor cores nor identifies the instructions selected for a real matrix multiplication."
     },
     {
       "id": "s07-c1",
-      "start": 195.544,
-      "end": 208.813,
+      "start": 195.843,
+      "end": 209.112,
       "text": "Apply the conversion rule to a new row alternating one and negative one half. Keep sixteen positions and B's values of one. Predict whether FP16 or BF16 changes these inputs."
     },
     {
       "id": "s07-c2",
-      "start": 209.033,
-      "end": 220.127,
+      "start": 209.332,
+      "end": 220.425,
       "text": "What final running sum should each format produce? Would agreement on this row establish the same accuracy for the near-one or very small inputs? Pause before checking the comparison."
     },
     {
       "id": "s08-c1",
-      "start": 225.947,
-      "end": 236.251,
+      "start": 226.245,
+      "end": 236.549,
       "text": "One and negative one half are exactly representable in both smaller formats. No row inputs change, and the converted-input and original-input sums are both four."
     },
     {
       "id": "s08-c2",
-      "start": 236.471,
-      "end": 253.388,
-      "text": "That agreement applies to this row; the cancellation and small-value cases exposed different conversion effects. Return to Chapter Ten and separate input format, accumulation rules and evidence of hardware execution. Accuracy and performance need their own checks."
+      "start": 236.769,
+      "end": 253.815,
+      "text": "That agreement applies to this row; the cancellation and small-value cases exposed different conversion effects. Return to Chapter Eleven and separate input format, accumulation rules and evidence of hardware execution. Accuracy and performance need their own checks."
     }
   ],
   "speech": {
@@ -163,8 +163,8 @@
       "provider": "CPUExecutionProvider"
     },
     "durations": {
-      "s01-c1": 12.416,
-      "s01-c2": 17.451,
+      "s01-c1": 12.672,
+      "s01-c2": 17.472,
       "s02-c1": 14.08,
       "s02-c2": 15.296,
       "s03-c1": 12.224,
@@ -172,13 +172,13 @@
       "s04-c1": 11.477,
       "s04-c2": 16.853,
       "s05-c1": 13.973,
-      "s05-c2": 18.539,
+      "s05-c2": 18.56,
       "s06-c1": 15.893,
       "s06-c2": 19.968,
       "s07-c1": 13.269,
       "s07-c2": 11.093,
       "s08-c1": 10.304,
-      "s08-c2": 16.917
+      "s08-c2": 17.045
     }
   }
 }

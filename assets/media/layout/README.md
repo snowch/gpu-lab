@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 4 links to this optional recap after its explanation exercise. Eight
+Chapter 5 links to this optional recap after its explanation exercise. Eight
 slides distinguish values from element/byte offsets, follow row and column views
 through row-major storage, compare a packed copy, and show an already-contiguous
 row sharing storage at a non-zero offset. A column-3 copy question applies these

@@ -6,11 +6,14 @@ import {desktopExamples} from '../src/desktop-catalog.mjs';
 import {pythonProgram} from '../src/desktop-program.mjs';
 import {runnableSource} from '../src/hello-model.mjs';
 import {cudaSource} from '../src/kernel-model.mjs';
+import {courseCudaProgram,nativeWmmaProgram} from '../src/course-cuda-source.mjs';
 export async function exportDesktop(destination){
   await mkdir(destination,{recursive:true});
   const examples=desktopExamples();
   for(const example of examples)await writeFile(`${destination}/${example.filename}`,pythonProgram(example.source));
   await writeFile(`${destination}/hello.cu`,runnableSource(2));
+  await writeFile(`${destination}/course-bridges.cu`,courseCudaProgram());
+  await writeFile(`${destination}/wmma.cu`,nativeWmmaProgram());
   for(const [name,operation] of [['kernel-scale','multiply'],['kernel-vector-add','vector-add']])await writeFile(`${destination}/${name}.cu`,cudaSource({index:'global',guard:true,operation,task:operation==='vector-add'?'vector-add':'scale',blockSize:32}));
   await writeFile(`${destination}/manifest.json`,JSON.stringify(examples.map(({slug,id,filename})=>({slug,id,filename,execution:'PyTorch; CPU value/layout checks; CUDA hardware unvalidated'})),null,2));
   return examples;
@@ -18,5 +21,5 @@ export async function exportDesktop(destination){
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
   const destination=process.argv[2]??'test-results/desktop-examples';
   const examples=await exportDesktop(destination);
-  console.log(`Exported ${examples.length} PyTorch examples and three CUDA programs to ${destination}`);
+  console.log(`Exported ${examples.length} PyTorch examples and five CUDA programs to ${destination}`);
 }

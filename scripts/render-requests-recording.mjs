@@ -23,5 +23,5 @@ export function requestsFigure(stage){
  return out+t(360,534,`${load.usefulBytes} useful bytes · ${load.sectors.length} sector${load.sectors.length===1?'':'s'} · ${load.coveredBytes} covered bytes`,'body');
 }
 const notes={warp:'All five threads belong to the same warp.',sector:'Every named allocation starts at a 32-byte boundary.',row:'Useful bytes count requested FP32 values.',column:'A sector groups addresses, not tensor coordinates.',packed:'Copy construction and output stores are excluded.','row-one':'The original row-major storage has not moved.',question:'Pause before revealing the sector groups.',answer:'Sector coverage is not a measurement of DRAM traffic.'};
-export const requestsDeck=()=>recordingDeck({chapter:5,title:'Group five reads into memory sectors',scenes:scenes.map(s=>({...s,note:notes[s.stage]})),figure:requestsFigure,scope:'Aligned allocations · one modelled input read · no cache or timing model'});
+export const requestsDeck=()=>recordingDeck({chapter:6,title:'Group five reads into memory sectors',scenes:scenes.map(s=>({...s,note:notes[s.stage]})),figure:requestsFigure,scope:'Aligned allocations · one modelled input read · no cache or timing model'});
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)await writeRecordingDeck(process.argv[2]||'test-results/requests-recording',requestsDeck(),scenes);

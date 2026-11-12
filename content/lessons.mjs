@@ -82,7 +82,7 @@ if (i < n) {
   {
     slug: 'shared-memory', number: '04', title: 'Sharing work within a block', workedExample: 'shared-memory',
     subtitle: 'A small change in layout can change bank conflicts.',
-    prerequisite: 'Chapters 5 and 8: warps, active lanes, shared memory and block barriers. This optional lab explores the layout of that shared workspace.',
+    prerequisite: 'Chapters 6 and 9: warps, active lanes, shared memory and block barriers. This optional lab explores the layout of that shared workspace.',
     intro: `<p>A tiled tensor operation can load data once and reuse it across threads in the same block. The layout of that reusable data matters.</p><!-- NEW_CONCEPTS --><p>This model uses 32 banks. Successive four-byte words map to successive banks, wrapping around at bank zero. For word index <code>w</code>, the bank is <code>w % 32</code>, where <code>%</code> means remainder.</p><p>These bank rules describe reads; broadcasting a word does not make simultaneous writes safe.</p>`,
     setup: `<p>Imagine a square tile with 32 rows and 32 useful columns. Threads read one column, so successive lanes are separated by the row pitch: the number of allocated words per row. A pitch of 33 adds one unused padding word to each row.</p>
       <p>Each round serves at most one distinct word from each bank. Banks work in parallel; the busiest bank determines the number of rounds. The worked example already compares the full-warp column and padded reads. Inspect those cases, then choose 8 active lanes for a new round-count prediction. Compare a row read and a broadcast afterward.</p>`,
@@ -102,7 +102,7 @@ if (i < n) {
       'Choose every other word and reduce the active lanes to sixteen. Can this subset avoid the conflict that appears with a full warp?',
     ],
     takeaway: `<p>Bank conflicts depend on both the bank and the word address. A count of requests per bank would incorrectly penalise broadcasts. Padding changes the row pitch, which changes the bank mapping for column reads.</p>
-      <p>Padding uses extra shared memory. That can affect how many blocks fit on an SM, connecting this layout choice to resident work in chapter 6. <a href="reduction.html">Revisit the cooperation chapter</a> to apply block barriers to a computed tree and inspect an unsafe interleaving. The bank model on this page covers reads only.</p>`,
+      <p>Padding uses extra shared memory. That can affect how many blocks fit on an SM, connecting this layout choice to resident work in chapter 7. <a href="reduction.html">Revisit the cooperation chapter</a> to apply block barriers to a computed tree and inspect an unsafe interleaving. The bank model on this page covers reads only.</p>`,
     limits: 'We model one warp instruction reading aligned FP32 words through 32 banks of four-byte width, one distinct word per bank per round, with read broadcast. Rounds express conflict multiplicity, not measured cycles. Global-memory traffic, shared-memory writes, barriers, races, allocation limits, 64-bit accesses and matrix-specific load instructions are not simulated.',
     source: 'https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-and-memory-banks',
     sourceLabel: 'CUDA Best Practices Guide: shared memory and memory banks',

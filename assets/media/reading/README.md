@@ -2,12 +2,12 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 3 links to this optional recap after its explanation exercise. Eight
+Chapter 4 links to this optional recap after its explanation exercise. Eight
 slides connect zero-based coordinates and colons to five selected inputs, then
 to their elementwise results. A new column-3 question checks interpretation
 before its answer. Grid values, coordinates and outputs come from `readTensor`
 in `src/foundations-model.mjs`. The diagrams describe logical selections; storage
-offsets are left to Chapter 4, and no thread mapping or GPU timing is inferred.
+offsets are left to Chapter 5, and no thread mapping or GPU timing is inferred.
 
 Assets: native 3840 × 2160 / 30 fps H.264 video with AAC sound, embedded English
 subtitles and scene chapters; browser `captions.vtt`; eight-slide `slides.pdf`;

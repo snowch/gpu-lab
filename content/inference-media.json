@@ -1,53 +1,53 @@
 {
   "durationSeconds": 289,
-  "bytes": 14478663,
+  "bytes": 14487856,
   "scenes": [
     {
       "id": "s01",
       "start": 0,
-      "end": 32.256,
+      "end": 32.427,
       "title": "Keep keys and values for later tokens."
     },
     {
       "id": "s02",
-      "start": 32.256,
-      "end": 66.944,
+      "start": 32.427,
+      "end": 67.115,
       "title": "Count the existing cache payload."
     },
     {
       "id": "s03",
-      "start": 66.944,
-      "end": 102.613,
+      "start": 67.115,
+      "end": 102.784,
       "title": "Decode appends one new token."
     },
     {
       "id": "s04",
-      "start": 102.613,
-      "end": 138.517,
+      "start": 102.784,
+      "end": 138.688,
       "title": "Prefill starts with an empty cache."
     },
     {
       "id": "s05",
-      "start": 138.517,
-      "end": 177.003,
+      "start": 138.688,
+      "end": 177.173,
       "title": "Compare two ideal time bounds."
     },
     {
       "id": "s06",
-      "start": 177.003,
-      "end": 213.205,
+      "start": 177.173,
+      "end": 213.376,
       "title": "A batch can share a weight read."
     },
     {
       "id": "s07",
-      "start": 213.205,
-      "end": 247.171,
+      "start": 213.376,
+      "end": 247.341,
       "title": "Pause: make the context four times longer."
     },
     {
       "id": "s08",
-      "start": 247.171,
-      "end": 288.771,
+      "start": 247.341,
+      "end": 289.133,
       "title": "Larger capacity does not scale every cost."
     }
   ],
@@ -55,98 +55,98 @@
     {
       "id": "s01-c1",
       "start": 0.6,
-      "end": 14.083,
-      "text": "Chapter Twelve connects cached keys and values to inference budgets. A decoder reuses these stored tensors when processing a later token. This model-managed cache is separate from the GPU's hardware caches."
+      "end": 14.275,
+      "text": "Chapter Thirteen connects cached keys and values to inference budgets. A decoder reuses these stored tensors when processing a later token. This model-managed cache is separate from the GPU's hardware caches."
     },
     {
       "id": "s01-c2",
-      "start": 14.303,
-      "end": 30.836,
+      "start": 14.495,
+      "end": 31.007,
       "text": "The chapter opens with a small PyTorch append example. Our budget instead uses a synthetic decoder: thirty-two layers, seven billion parameters, and two-byte weights and cache values. These are declared assumptions, not a named model or measured GPU."
     },
     {
       "id": "s02-c1",
-      "start": 32.856,
-      "end": 47.064,
+      "start": 33.027,
+      "end": 47.235,
       "text": "Start with one sequence and five hundred and twelve cached tokens. Each layer stores a key and a value, each with one thousand and twenty-four components, for every token. Multiply all those counts by two bytes per value."
     },
     {
       "id": "s02-c2",
-      "start": 47.284,
-      "end": 65.524,
+      "start": 47.455,
+      "end": 65.695,
       "text": "The existing payload is sixty-four mebibytes. One mebibyte means one million, forty-eight thousand, five hundred and seventy-six bytes. This is occupied payload, excluding spare allocation and metadata. Capacity alone does not tell us how much work an invocation performs."
     },
     {
       "id": "s03-c1",
-      "start": 67.544,
-      "end": 83.565,
+      "start": 67.715,
+      "end": 83.736,
       "text": "Decode processes one new token for each sequence. Here the cache grows from five hundred and twelve to five hundred and thirteen tokens. The budget reads the existing sixty-four mebibytes and writes one hundred and twenty-eight kibibytes of new keys and values."
     },
     {
       "id": "s03-c2",
-      "start": 83.785,
-      "end": 101.193,
+      "start": 83.956,
+      "end": 101.364,
       "text": "It also counts one read of the fourteen-gigabyte weight payload. Gigabytes here are decimal; cache mebibytes and kibibytes use powers of two. The budget excludes activation transfers and other work. These are selected model counts, not a capture of actual memory traffic."
     },
     {
       "id": "s04-c1",
-      "start": 103.213,
-      "end": 118.723,
+      "start": 103.384,
+      "end": 118.893,
       "text": "Prefill processes all five hundred and twelve prompt tokens from an empty cache. It reads no previous cache entries and writes the whole sixty-four-mebibyte payload. The ideal weight read is still fourteen gigabytes, shared across the invocation."
     },
     {
       "id": "s04-c2",
-      "start": 118.943,
-      "end": 137.097,
+      "start": 119.113,
+      "end": 137.268,
       "text": "Arithmetic increases because many tokens are processed. Dense-weight work grows with token count; attention work also grows with context. This synthetic count uses a hidden width of four thousand and ninety-six and full square prompt attention, without causal triangular savings."
     },
     {
       "id": "s05-c1",
-      "start": 139.117,
-      "end": 155.608,
+      "start": 139.288,
+      "end": 155.779,
       "text": "Assume one thousand decimal gigabytes per second and one hundred trillion floating-point operations per second. A floating-point operation is one arithmetic operation in this count. Divide the selected bytes by bandwidth and the operation count by compute rate."
     },
     {
       "id": "s05-c2",
-      "start": 155.828,
-      "end": 175.583,
+      "start": 155.999,
+      "end": 175.753,
       "text": "For decode, the memory bound is about fourteen point zero six seven milliseconds and the compute bound about zero point one four three. Prefill's compute bound rises to about seventy-three point zero five four. Take the larger bound, not their sum. These are ideal minimum budgets, not elapsed-time predictions."
     },
     {
       "id": "s06-c1",
-      "start": 177.603,
-      "end": 192.109,
+      "start": 177.773,
+      "end": 192.28,
       "text": "Increase decode batch from one sequence to four, keeping five hundred and twelve cached tokens per sequence. The ideal model shares the same weight read across the batch. Each sequence still needs its own cache, and total arithmetic grows."
     },
     {
       "id": "s06-c2",
-      "start": 192.329,
-      "end": 211.785,
+      "start": 192.5,
+      "end": 211.956,
       "text": "The invocation bound grows slightly, while dividing it by four gives about three point five six seven milliseconds per produced token. That is an amortised budget, not one user's next-token latency or measured throughput. These are four independent sequences, not four successive tokens from one sequence."
     },
     {
       "id": "s07-c1",
-      "start": 213.805,
-      "end": 227.693,
+      "start": 213.976,
+      "end": 227.864,
       "text": "Keep the four independent decode sequences. Change only their previous cache length from five hundred and twelve to two thousand and forty-eight tokens each. Keep the same layers, widths, value size, parameters and rates."
     },
     {
       "id": "s07-c2",
-      "start": 227.913,
-      "end": 241.951,
+      "start": 228.084,
+      "end": 242.121,
       "text": "Predict the existing cache payload. Must the whole invocation's ideal lower bound also grow fourfold? Separate the old cache read, each sequence's new entry and the shared weight read. Pause before comparing the answer."
     },
     {
       "id": "s08-c1",
-      "start": 247.771,
-      "end": 266.032,
+      "start": 247.941,
+      "end": 266.203,
       "text": "The cache grows from two hundred and fifty-six to one thousand and twenty-four mebibytes. The new entries stay five hundred and twelve kibibytes in total, and weights stay fourteen gigabytes. Recomputing both bounds gives about fifteen point zero seven four milliseconds, not four times the earlier bound."
     },
     {
       "id": "s08-c2",
-      "start": 266.252,
-      "end": 287.351,
-      "text": "Under these assumptions the weight read still dominates counted bytes. This does not identify a real GPU bottleneck. Return to Chapter Twelve and distinguish capacity, work per invocation and ideal time limits. A real timing comparison needs a named model, implementation, timing scope and repeated hardware measurements."
+      "start": 266.423,
+      "end": 287.713,
+      "text": "Under these assumptions the weight read still dominates counted bytes. This does not identify a real GPU bottleneck. Return to Chapter Thirteen and distinguish capacity, work per invocation and ideal time limits. A real timing comparison needs a named model, implementation, timing scope and repeated hardware measurements."
     }
   ],
   "speech": {
@@ -163,8 +163,8 @@
       "provider": "CPUExecutionProvider"
     },
     "durations": {
-      "s01-c1": 13.483,
-      "s01-c2": 16.533,
+      "s01-c1": 13.675,
+      "s01-c2": 16.512,
       "s02-c1": 14.208,
       "s02-c2": 18.24,
       "s03-c1": 16.021,
@@ -178,7 +178,7 @@
       "s07-c1": 13.888,
       "s07-c2": 14.037,
       "s08-c1": 18.261,
-      "s08-c2": 21.099
+      "s08-c2": 21.291
     }
   }
 }

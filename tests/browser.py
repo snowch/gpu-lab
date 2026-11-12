@@ -1,3 +1,4 @@
+from course_flow import check_course_flow
 from lesson_completion import check_lesson_completion
 from version_check import mock_version, check_version
 from navigation import check_navigation
@@ -63,7 +64,7 @@ try:
                 page.goto(URL)
                 expect(page.locator("#simulator")).to_have_count(0)
                 expect(page.locator("#prediction")).to_have_count(0)
-                expect(page.locator(".roadmap h3")).to_have_count(13)
+                expect(page.locator(".roadmap h3")).to_have_count(14)
                 expect(page.locator("html")).to_have_attribute("data-theme", theme)
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Introduction overflows"
                 expect(page.locator('.architecture-layer, #work-map')).to_have_count(0)
@@ -190,7 +191,7 @@ try:
                 page.locator(".book-pager a").first.click()
                 expect(page.locator("h1")).to_have_text("How do threads read tensor values?")
                 page.goto(URL)
-                expect(page.locator(".roadmap h3")).to_have_count(13)
+                expect(page.locator(".roadmap h3")).to_have_count(14)
                 page.goto(URL + "#lab")
                 expect(page).to_have_url(URL + "lessons/memory.html#lab")
                 expect(page.locator("#lanes button")).to_have_count(32)
@@ -210,7 +211,7 @@ try:
         mock_version(context)
         page = context.new_page()
         page.goto(URL)
-        expect(page.locator(".roadmap h3")).to_have_count(13)
+        expect(page.locator(".roadmap h3")).to_have_count(14)
         expect(page.locator("#simulator")).to_have_count(0)
         expect(page.locator('.architecture-layer')).to_have_count(0)
         page.locator('.sidebar nav').get_by_role('link',name='GPU map',exact=True).click()
@@ -246,6 +247,7 @@ try:
         check_reference_practice(browser, URL, ROOT)
         check_desktop(browser, URL, ROOT)
         check_launch_from_input(browser, URL, ROOT)
+        check_course_flow(browser, URL, ROOT)
         check_code_explanations(browser, URL, ROOT)
         check_profiling(browser, URL, ROOT, errors)
         check_sm_hardware(browser, URL, ROOT, errors)

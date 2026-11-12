@@ -1,49 +1,49 @@
 WEBVTT
 
-00:00:00.600 --> 00:00:11.821
-Chapter Eleven starts with eight queries and eight keys, each four components wide. Query–key comparisons produce scores. Softmax turns the scores into weights that sum to one.
+00:00:00.600 --> 00:00:11.651
+Chapter Twelve starts with eight queries and eight keys, each four components wide. Query–key comparisons produce scores. Softmax turns the scores into weights that sum to one.
 
-00:00:12.041 --> 00:00:25.225
+00:00:11.871 --> 00:00:25.055
 Each output component combines those weights with the matching components of the value rows. We follow query zero's component zero. Higher scores receive more weight, but the result depends on the value rows too.
 
-00:00:27.245 --> 00:00:39.149
+00:00:27.075 --> 00:00:38.979
 Materialising means storing a temporary result in full for a later operation to read. Here both scores and weights have eight rows and eight columns, one entry for every query–key pair.
 
-00:00:39.369 --> 00:00:55.284
+00:00:39.199 --> 00:00:55.113
 Count one write and one read for each matrix, assuming four-byte storage. That gives one thousand and twenty-four intermediate bytes. This selected accounting excludes the inputs, outputs, caching and other traffic; it is not measured DRAM traffic.
 
-00:00:57.304 --> 00:01:09.443
+00:00:57.133 --> 00:01:09.293
 Online softmax visits a few keys at a time. Keep the largest score seen, a normalisation total, and four weighted output totals. The diagrams show just weighted component zero.
 
-00:01:09.663 --> 00:01:24.361
+00:01:09.513 --> 00:01:24.212
 Subtract the current largest score before exponentiating. Add these unnormalised weights to the normalisation total, and their value products to the weighted total. Divide the two totals for an estimate using the keys visited so far.
 
-00:01:26.381 --> 00:01:38.200
+00:01:26.232 --> 00:01:38.051
 The next tile raises the largest score from negative one to one point five. Earlier contributions now need a new common scale: exponentiate the old maximum minus the new maximum.
 
-00:01:38.420 --> 00:01:53.908
+00:01:38.271 --> 00:01:53.759
 The factor is about zero point zero eight two. Multiply both retained totals by that factor, then add this tile's contributions on the new scale. Scaling both together preserves their previous ratio; scaling only one would change the meaning.
 
-00:01:55.928 --> 00:02:08.728
+00:01:55.779 --> 00:02:08.579
 Later tiles can raise the maximum again. Update both totals each time, using factor one when the maximum stays unchanged. Only after every key is included is the estimate the final output.
 
-00:02:08.948 --> 00:02:23.903
+00:02:08.799 --> 00:02:23.753
 The final ratio agrees with the full-matrix reference. All eight output vectors are compared, not just the component drawn here. The tiny difference reflects floating-point operation order in JavaScript doubles, not measured GPU error.
 
-00:02:25.923 --> 00:02:39.448
+00:02:25.773 --> 00:02:39.299
 With two keys per tile, the single-query algorithm needs eight floating-point slots: two tile scores, four weighted totals, the largest score and the normalisation total. Four-byte accounting makes that thirty-two bytes.
 
-00:02:39.668 --> 00:02:57.076
+00:02:39.519 --> 00:02:56.927
 Online mode writes no full score or weight matrix in this accounting. Inputs and outputs still exist, and tile rereads and the browser's inspection arrays are excluded. This is an algorithmic scratch budget, not a production kernel allocation or total memory traffic.
 
-00:02:59.096 --> 00:03:10.893
+00:02:58.947 --> 00:03:10.744
 Apply the update rule with four keys per tile. The first tile's largest score is one point five; the second tile includes a score of two. Will both retained totals need the same new scale?
 
-00:03:11.113 --> 00:03:23.764
+00:03:10.964 --> 00:03:23.615
 Predict whether regrouping changes the final weighted result. Then count the single-query scratch using tile width plus four weighted components plus two scalars. Pause before checking the comparison.
 
-00:03:29.584 --> 00:03:42.512
+00:03:29.435 --> 00:03:42.363
 The new factor is about zero point six zero seven. Both retained totals use it before the second tile is added. The final ratio matches the same full-matrix reference, within floating-point roundoff.
 
-00:03:42.732 --> 00:04:02.295
-Four plus four plus two gives ten floats, or forty bytes in the chosen accounting. Return to Chapter Eleven and separate saved intermediates, temporary scratch and complete traffic. This small recurrence illustrates the algorithm; it does not execute a production FlashAttention kernel or predict GPU time.
+00:03:42.583 --> 00:04:01.932
+Four plus four plus two gives ten floats, or forty bytes in the chosen accounting. Return to Chapter Twelve and separate saved intermediates, temporary scratch and complete traffic. This small recurrence illustrates the algorithm; it does not execute a production FlashAttention kernel or predict GPU time.

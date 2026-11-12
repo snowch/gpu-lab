@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 9 links to this optional recap after its transfer exercise. Ten slides
+Chapter 10 links to this optional recap after its transfer exercise. Ten slides
 connect one output's dot product to shared input tiles, reuse across output rows
 and columns, private partial sums retained between K phases, and complete input
 load counts. A separate 8 × 8 question asks about one phase and the scope of sharing.
@@ -43,7 +43,7 @@ The source generator supplies a pronunciation override for the letter A in
 deck locally, renders at device scale 3, joins exact audio cues and normalises
 to −16 LUFS with a −1.5 dB true-peak target. It generates captions, chapters,
 PDF, poster and measured metadata. Use `--slides-only` to review frames before
-encoding. The Chapter 8 wrapper continues to use this exporter with `reduction`.
+encoding. The Chapter 9 wrapper continues to use this exporter with `reduction`.
 Ordinary course builds use committed media and never download speech models.
 
 Review every slide and encoded scene boundary, phonemes and the independent

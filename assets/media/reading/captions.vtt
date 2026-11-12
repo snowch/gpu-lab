@@ -1,49 +1,49 @@
 WEBVTT
 
-00:00:00.600 --> 00:00:09.837
-Chapter Three keeps the floating-point values on the GPU and arranges them in a five by five tensor. Row and column numbers start at zero.
+00:00:00.600 --> 00:00:09.901
+Chapter Four keeps the floating-point values on the GPU and arranges them in a five by five tensor. Row and column numbers start at zero.
 
-00:00:10.057 --> 00:00:21.172
+00:00:10.121 --> 00:00:21.236
 The first coordinate selects a row; the second selects a column. These logical coordinates identify inputs. PyTorch chooses execution details for the CUDA operation.
 
-00:00:23.192 --> 00:00:32.088
+00:00:23.256 --> 00:00:32.152
 Read x, zero, colon. Row zero is fixed, while the colon includes all columns. Trace the five highlighted inputs from left to right.
 
-00:00:32.308 --> 00:00:40.777
+00:00:32.372 --> 00:00:40.841
 Selecting the row chooses the inputs. Multiplying each selected value by two is a separate calculation, which we will inspect next.
 
-00:00:42.797 --> 00:00:51.523
+00:00:42.861 --> 00:00:51.587
 Each output is twice its selected input. The source coordinates beside the values show where every input came from in the original tensor.
 
-00:00:51.743 --> 00:01:02.815
+00:00:51.807 --> 00:01:02.879
 This multiplication creates a new result tensor. It leaves the original x unchanged. Selecting a row and calculating its outputs are different parts of the expression.
 
-00:01:04.835 --> 00:01:12.557
+00:01:04.899 --> 00:01:12.621
 Now read x, colon, zero. The column is fixed, while the colon includes all rows. We take one input from each row.
 
-00:01:12.777 --> 00:01:20.564
+00:01:12.841 --> 00:01:20.607
 The first row and first column share their first value, but the other inputs differ. Both selections still contain five values.
 
-00:01:22.584 --> 00:01:31.331
+00:01:22.627 --> 00:01:31.395
 Multiply each column input by two. Each result uses one highlighted input; we are not adding the five values into a single total.
 
-00:01:31.551 --> 00:01:43.220
+00:01:31.615 --> 00:01:43.284
 This is elementwise multiplication: apply the operation separately to each selected value. Changing from a row to a column changes the inputs, while the multiplier stays fixed.
 
-00:01:45.240 --> 00:01:54.819
+00:01:45.304 --> 00:01:54.883
 With index one, a row selection chooses the second row. A column selection chooses the second column. Compare their five inputs in the diagram.
 
-00:01:55.039 --> 00:02:06.196
+00:01:55.103 --> 00:02:06.260
 Keep the multiplier fixed and explain which coordinates changed. A different selection can change the values without changing the number of inputs or the calculation applied to each.
 
-00:02:08.216 --> 00:02:17.048
+00:02:08.280 --> 00:02:17.112
 Try x, colon, three, then multiply by two. Before checking, identify which dimension is fixed and which dimension the colon includes.
 
-00:02:17.268 --> 00:02:25.951
+00:02:17.332 --> 00:02:26.036
 Trace the five input cells, then predict their five outputs. Does index three mean the fourth row or the fourth column here? Pause and explain.
 
-00:02:31.771 --> 00:02:42.501
+00:02:31.856 --> 00:02:42.587
 Index three fixes the fourth column because counting starts at zero. The colon includes every row. The diagram follows those five inputs into their doubled results.
 
-00:02:42.721 --> 00:02:52.449
-The original tensor is unchanged. Return to Chapter Three, change only a row or column index, and explain the selected inputs before pressing Run.
+00:02:42.807 --> 00:02:52.577
+The original tensor is unchanged. Return to Chapter Four, change only a row or column index, and explain the selected inputs before pressing Run.

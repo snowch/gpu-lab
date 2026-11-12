@@ -63,4 +63,4 @@ def check_reduction_video(browser, url, root, errors):
     expect(page.locator('#reduction-return')).to_have_attribute('href','reduction.html#reduction-recording-link')
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     context.close()
-    print('PASS: Chapter 8 recording playback, captions, keyboard return, saved experiment/video state, six layouts/themes and no-JavaScript transcript')
+    print('PASS: Chapter 9 recording playback, captions, keyboard return, saved experiment/video state, six layouts/themes and no-JavaScript transcript')

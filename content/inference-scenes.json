@@ -5,7 +5,7 @@
     "lead": "A model-managed cache preserves earlier attention inputs.",
     "stage": "overview",
     "captions": [
-      "Chapter Twelve connects cached keys and values to inference budgets. A decoder reuses these stored tensors when processing a later token. This model-managed cache is separate from the GPU's hardware caches.",
+      "Chapter Thirteen connects cached keys and values to inference budgets. A decoder reuses these stored tensors when processing a later token. This model-managed cache is separate from the GPU's hardware caches.",
       "The chapter opens with a small PyTorch append example. Our budget instead uses a synthetic decoder: thirty-two layers, seven billion parameters, and two-byte weights and cache values. These are declared assumptions, not a named model or measured GPU."
     ]
   },
@@ -77,7 +77,7 @@
     "stage": "answer",
     "captions": [
       "The cache grows from two hundred and fifty-six to one thousand and twenty-four mebibytes. The new entries stay five hundred and twelve kibibytes in total, and weights stay fourteen gigabytes. Recomputing both bounds gives about fifteen point zero seven four milliseconds, not four times the earlier bound.",
-      "Under these assumptions the weight read still dominates counted bytes. This does not identify a real GPU bottleneck. Return to Chapter Twelve and distinguish capacity, work per invocation and ideal time limits. A real timing comparison needs a named model, implementation, timing scope and repeated hardware measurements."
+      "Under these assumptions the weight read still dominates counted bytes. This does not identify a real GPU bottleneck. Return to Chapter Thirteen and distinguish capacity, work per invocation and ideal time limits. A real timing comparison needs a named model, implementation, timing scope and repeated hardware measurements."
     ]
   }
 ]

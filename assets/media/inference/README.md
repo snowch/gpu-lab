@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 12 links to this optional eight-slide recap after its independent exercise.
+Chapter 13 links to this optional eight-slide recap after its independent exercise.
 It distinguishes model-managed keys and values from hardware caches, counts occupied
 payload, then compares one-token decode, whole-prompt prefill and batch reuse.
 A longer-context question for four independent sequences separates fourfold cache

@@ -1,5 +1,6 @@
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
+import {definitions} from './chapter-view.mjs';
 import { escape, fmt, metrics, table } from './continuation-ui.mjs';
 import {recordingLink} from './recording-view.mjs';
 import {renderSmWalkthrough} from './sm-walkthrough-view.mjs';
@@ -48,16 +49,16 @@ const patternControl = {
 
 export const chapters = [
   {
-    slug: 'scheduling', number: 6, title: 'What runs while a warp waits for data?',
+    slug: 'scheduling', number:7, title: 'What runs while a warp waits for data?',
     lead: 'Follow a warp waiting for an input value, then see when another ready warp can run.',
     source: scaleSource,
     openingHTML: `<p>Each of the five input values is multiplied by two, then multiplied by two again. You choose the tensors and operations; PyTorch selects implementations, allocates the results and arranges their launches.</p>
+      ${definitions([['Instruction','One operation in the GPU program, such as a load, multiply or store.']])}
       <p>A calculation may have to wait for a loaded input. We will model that dependency with two repetitions of <code>LD → MUL → ST</code>: load, multiply, store. This is a deliberately chosen instruction stream, not a compiler trace of the PyTorch program. The model does not compute its tensor values or infer how PyTorch assigns them to warps.</p>`,
     sections: [
       {
         id: 'scheduling-wait', title: 'Wait for an input value to load',
         terms: [
-          ['Instruction', 'One operation in the GPU program, such as a load, multiply or store.'],
           ['Streaming multiprocessor (SM)', 'A GPU unit on which a block’s threads run, grouped into warps. This model begins with warps assigned to one SM.'],
           ['Scheduler', 'The hardware that chooses a ready warp instruction to start on the appropriate execution units.'],
           ['Registers', 'Small, fast storage locations on the SM that hold each thread’s working values between instructions.'],
@@ -99,7 +100,7 @@ export const chapters = [
   },
   {
     closingHTML: recordingLink('divergence','follow active masks through different paths','Distinguish lanes on another path from unused positions, then explain a new mask. The recording follows the declared positive-first arithmetic model; its operation counts are not compiler output or GPU timings.'),
-    slug: 'divergence', number: 7, title: 'What if lanes need different calculations?',
+    slug: 'divergence', number:8, title: 'What if lanes need different calculations?',
     lead: 'Double positive inputs and negate negative inputs, then compare lanes taking different paths with lanes that have no input.',
     source: branchSource(),
     openingHTML: `<p>The operation doubles positive inputs and negates negative inputs, a simple conditional calculation like those used in activation functions. The opening has 32 inputs so we can inspect one full warp.</p>
@@ -137,7 +138,7 @@ export const chapters = [
       {
         id: 'divergence-tail', title: 'Separate unused lanes from different paths',
         body: `<p>Return to the five-value scale of earlier chapters. Here only the first five lanes have inputs. The remaining positions are unused throughout the calculation. That differs from a participating lane masked off for one path that later takes part in its own path.</p>
-          <p>Keep all inputs positive and vary the input count first. Five inputs leave 27 unused lane positions even when there is only one path. Then keep five inputs and switch to alternating signs to see both effects together. Empty positions in this warp are not filled with another block’s threads; other resident warps may still make progress, as chapter 6 showed.</p>`,
+          <p>Keep all inputs positive and vary the input count first. Five inputs leave 27 unused lane positions even when there is only one path. Then keep five inputs and switch to alternating signs to see both effects together. Empty positions in this warp are not filled with another block’s threads; other resident warps may still make progress, as chapter 7 showed.</p>`,
         task: 'With five positive inputs, predict whether the low participation means divergence. Run, then change only the signs to alternating. Explain which lane positions are unused throughout and which participate on a different path.',
         experiment: {
           model: 'divergence', defaults: { pattern: 'positive', activeLanes: 5, negativeOps: 1 }, focus: 'tail',
@@ -154,7 +155,7 @@ export const chapters = [
     },
   },
   {
-    slug: 'reduction', number: 8, title: 'How do threads add values together?',
+    slug: 'reduction', number:9, title: 'How do threads add values together?',
     lead: 'Add four input values, then check which writes must finish before another thread reads them.',
     source: sumSource(),
     openingHTML: `<p>This reduction combines many inputs into one sum. PyTorch selects its implementation and launches.</p>

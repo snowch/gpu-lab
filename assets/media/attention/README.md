@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 11 links to this optional eight-slide recap after its independent exercise.
+Chapter 12 links to this optional eight-slide recap after its independent exercise.
 Weighted value products lead into full score/weight intermediate reads and writes,
 then a two-key online recurrence. Later larger scores rescale both non-empty
 retained totals. A four-key tile question applies the same update while changing

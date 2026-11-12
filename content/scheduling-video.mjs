@@ -2,4 +2,4 @@
 import scenes from './scheduling-scenes.json' with {type:'json'};
 import media from './scheduling-media.json' with {type:'json'};
 import {recordingContent} from '../src/recording-view.mjs';
-export const renderSchedulingVideo=()=>recordingContent({slug:'scheduling',chapter:6,title:'Choose a ready warp while another waits',scenes,media});
+export const renderSchedulingVideo=()=>recordingContent({slug:'scheduling',chapter:7,title:'Choose a ready warp while another waits',scenes,media});

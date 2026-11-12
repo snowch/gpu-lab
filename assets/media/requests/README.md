@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 5 links to this optional eight-slide recap after its explanation and
+Chapter 6 links to this optional eight-slide recap after its explanation and
 memory-explorer sections. It groups five FP32 input reads into aligned 32-byte
 sectors, compares a row, column and packed copy, and demonstrates a row crossing
 a sector boundary. A different row is left as a question before its answer.

@@ -62,4 +62,4 @@ def check_remaining(browser,base_url,root,errors):
         expect(page.locator('.chapter-definition').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     context.close()
-    print('PASS: chapters 6–13, independent runs, invalidation, keyboard stepping, mobile/tablet/desktop, themes and static examples')
+    print('PASS: chapters 7–14, independent runs, invalidation, keyboard stepping, mobile/tablet/desktop, themes and static examples')
