@@ -82,7 +82,7 @@ export function renderLaunchPractice() {
 export function renderBoundsChallenge() {
  return `<p>For <code>n = 5</code>, the correct condition <code>i &lt; n</code> permits indices 0–4 and rejects indices 5–7:</p>
  ${codePanel({id:'hello-bounds-code-3',source:boundsSource(2),label:'CUDA C++ · body excerpt from runKernel · correct check',explainedLocally:true})}
- <p>The braces enclose the statements controlled by <code>if</code>. Threads 5–7 skip both the read and the write.</p>
+ <p>Threads 5–7 skip both the read and the write.</p>
  <div class="hello-visual"><p class="hello-figure-title">Worked check · i &lt; 5</p>${renderIntroMap(3,inspectLaunch(5,4,2),null,true,false)}<p class="hello-note">Values are outputs. “Skipped” means no array access.</p></div>
  <h3>Investigate one changed character</h3>
  <p>Keep five inputs and two blocks of four threads. Someone changes the condition to <code>i &lt;= n</code>, allowing an index equal to the input count.</p>
@@ -131,7 +131,7 @@ export function renderCodeBridge(stage,factor) {
  <h3>Keep extra threads out of the arrays</h3>
  <p>The launch creates threads with indices 0–7, but the five inputs have indices 0–4. The kernel needs a check before reading or writing so the extra threads skip the arrays.</p>
  ${definitions([['Bounds check','A check that an index refers to an element that exists before accessing it.']])}
- <p>Each thread calculates its own array index <code>i</code> from its block number and position. The condition <code>if (i &lt; n)</code> runs the enclosed array accesses only when <code>i</code> is smaller than the supplied count. With <code>n = 5</code>, indices 0–4 proceed and indices 5–7 skip both accesses. The check trusts <code>n</code>; an incorrect count can still allow an access beyond the allocated arrays.</p>
+ <p>Each thread calculates its own array index <code>i</code> from its block number and position. The condition <code>if (i &lt; n)</code> runs the enclosed array accesses only when <code>i</code> is smaller than the supplied count. The braces <code>{ }</code> group the statements controlled by <code>if</code>. With <code>n = 5</code>, indices 0–4 proceed and indices 5–7 skip both accesses. The check trusts <code>n</code>; an incorrect count can still allow an access beyond the allocated arrays.</p>
  <details id="hello-bridge-complete-2"><summary>Complete CUDA kernel for this example</summary>
  <p>The complete function calculates each thread’s index and applies this bounds check before doubling an input. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
