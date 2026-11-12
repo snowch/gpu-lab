@@ -50,7 +50,7 @@ def check_lesson_completion(browser, base_url, root, errors):
             expect(completed).to_be_visible()
             expect(completed).to_have_attribute('aria-current','page')
             assert other.evaluate('document.documentElement.scrollWidth<=innerWidth')
-            for slug in ['putting-it-together','kernel','shared-memory','memory']:
+            for slug in ['putting-it-together','launch-from-input','kernel','shared-memory','memory']:
                 other.goto(base_url+'lessons/'+slug+'.html')
                 expect(other.locator('#lesson-complete')).to_be_visible()
                 other.locator('#lesson-complete').check()

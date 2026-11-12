@@ -14,6 +14,7 @@ from matmul_video import check_matmul_video
 from foundations_recordings import check_foundations_recordings
 from map_loading import assert_map_fits, check_map_loading
 from profiling import check_profiling
+from launch_from_input import check_launch_from_input
 # Copyright © 2026 Christopher Snow.
 """Browser checks against the built course, including the GitHub Pages subpath."""
 import os
@@ -244,6 +245,7 @@ try:
         check_book_opening(browser, URL, ROOT, errors)
         check_reference_practice(browser, URL, ROOT)
         check_desktop(browser, URL, ROOT)
+        check_launch_from_input(browser, URL, ROOT)
         check_code_explanations(browser, URL, ROOT)
         check_profiling(browser, URL, ROOT, errors)
         check_sm_hardware(browser, URL, ROOT, errors)

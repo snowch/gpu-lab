@@ -4,7 +4,8 @@ import {escape,table} from '../src/continuation-ui.mjs';
 import {chapters} from '../src/book-chapters.mjs';
 const shell=(id,source)=>codePanel({id,source,language:'shell',label:'Terminal · shell commands'});
 const cudaLinks={'putting-it-together':['ai-kernels.cu','Self-checking naive and tiled matrix products'],hello:['desktop/hello.cu','Five-input kernel; eight launched threads'],reduction:['ai-kernels.cu','Self-checking eight-input reduction'],matmul:['ai-kernels.cu','Self-checking naive and tiled matrix products'],memory:['gather.cu','Self-checking gather; configurable stride, offset and count'],'shared-memory':['shared-memory.cu','Self-checking padded column read'],kernel:['desktop/kernel-scale.cu','Safe repaired scale kernel; vector addition also available below']};
-const titles=Object.fromEntries([...chapters.map((chapter,i)=>[chapter.slug,`${i+1}. ${chapter.title}`]),['memory','Optional memory-access lab']]);
+cudaLinks['launch-from-input']=['launch-from-input.cu','Input-derived count, matching output storage and rounded-up launch'];
+const titles=Object.fromEntries([...chapters.map((chapter,i)=>[chapter.slug,`${i+1}. ${chapter.title}`]),['launch-from-input','Practice: from input to a CUDA launch'],['memory','Optional memory-access lab']]);
 export function renderDesktop(examples,{revision,image}) {
   const grouped=Object.entries(titles).map(([slug,title])=>{
     const files=examples.filter(example=>example.slug===slug),opening=files.find(example=>example.id==='opening');

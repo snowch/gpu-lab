@@ -232,3 +232,17 @@ every query against stable materialised attention across supported sizes, tiles
 and scales; the generated CPU PyTorch example independently checks the shown
 calculation. These checks do not establish production FlashAttention execution or
 GPU numerical/performance agreement.
+
+
+## Input-derived CUDA launch practice
+
+The optional practice after Chapter 2 uses CUDA's
+[explicit memory management example](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#explicit-memory-management)
+for allocation and byte-counted copies, and
+[Triple Chevron Notation](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#triple-chevron-notation)
+for launch dimensions versus ordinary arguments. Both sections and their examples
+were checked on 12 November 2026. The C++ CPU vector reports its element count;
+the GPU pointer carries no length. Equal input/output counts are specific to the
+elementwise doubling operation. A blocking device-to-host copy in the default
+stream completes the preceding kernel work before CPU result use. The examples
+check correctness, with no hardware performance claim.
