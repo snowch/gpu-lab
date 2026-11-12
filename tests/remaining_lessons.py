@@ -10,7 +10,7 @@ def check_remaining(browser,base_url,root,errors):
         context=browser.new_context(viewport={'width':width,'height':950},color_scheme=theme,service_workers='block')
         mock_version(context)
         page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)))
-        for number,slug in enumerate(SLUGS,6):
+        for number,slug in enumerate(SLUGS,7):
             page.goto(base_url+'lessons/'+slug+'.html')
             expect(page.locator('.intro .eyebrow')).to_have_text(f'CHAPTER {number}')
             expect(page.locator('html')).to_have_attribute('data-theme',theme)
