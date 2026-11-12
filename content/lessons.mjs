@@ -92,7 +92,8 @@ if (i < n) {
     figureTitle: 'Requests grouped by bank',
     figureHint: 'Select a round. Each bank card counts its distinct requested words; highlighted cards serve a word in this round. Select a lane to inspect its word and bank.',
     code: '// Extracted from examples/shared-memory.cu by the build.',
-    codeNote: `<p>This function assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
+    codeNote: `<p>The CPU program must allocate GPU storage for a 32 × 32 FP32 input and 32 FP32 outputs, copy the input values there, and launch this function with one block of 32 threads. There is no bounds check: those dimensions are part of this function’s requirements. The kernel declares its separate shared-memory workspace with <code>__shared__</code>.</p>
+      <p>This fixed function uses a padded column and all 32 threads. The controls above change the modelled read pattern and participating lanes; they do not rewrite this CUDA function.</p>
       <p>Every thread in the block must reach the barrier. A barrier inside a condition taken by only some block threads can hang or behave incorrectly. The bank model covers the final read; it does not simulate the loop or barrier.</p>`,
     exercises: [
       'For a new prediction, choose 8 active lanes and a column read with pitch 32. Then select lanes 0 and 1. They read different words: which banks receive them?',

@@ -174,7 +174,7 @@ export const chapters = [
       },
       {
         id: 'reduction-size', title: 'Extend the sum to eight inputs',
-        body: `<p>The synchronised algorithm starts at partner distance <code>N / 2</code>, then halves the distance down to 1. Each new partial sum combines disjoint sets of input contributions. The final node should contain every input index exactly once.</p>
+        body: `<p>Here <code>N</code> is the number of inputs and threads in our single block: four or eight, as selected below. The synchronised algorithm starts at partner distance <code>N / 2</code>, then halves the distance down to 1. Each new partial sum combines disjoint sets of input contributions. The final node should contain every input index exactly once.</p>
           <p>Change from four to eight inputs. Follow the same write, barrier and combine sequence, now with one more arithmetic stage. Both examples use one block with one partially filled warp. The small input count does not remove the need to express the required ordering.</p>`,
         task: 'Predict how the partner distances change for eight inputs. Run with four, then change only the size to eight and run again. Inspect the final contribution list and explain why every original value is included once.',
         experiment: {

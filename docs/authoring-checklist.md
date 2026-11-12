@@ -134,6 +134,13 @@ Use the book’s existing audience, curriculum and shared components as constrai
   operation, static explanations and current values in dynamic examples. Remove
   duplicate syntax prose; familiar one-line operations and documentation questions
   do not need another walkthrough.
+- [ ] For each parameter or formula symbol, say who supplies it and what it counts
+  before relying on it. Connect host launch arguments to kernel parameters; distinguish
+  element counts from bytes and launch dimensions. State allocation requirements and
+  initial accumulator values beside excerpts. A pointer carries no array length, and a
+  guard trusts the supplied count; strided input addresses can need more storage than
+  the output count. Explain which controls change the displayed source and which only
+  change a teaching model.
 - [ ] Lead browser guidance with “no installation or GPU required”. Explain simulation
   versus local execution once at the appropriate point. State validation limits
   accurately; compiler/simulator checks are not physical GPU performance evidence.
