@@ -30,7 +30,7 @@ do not introduce another walkthrough or hide essential setup in a reference link
 | Page | Finding and action |
 | --- | --- |
 | Overview | Prerequisites name Python indexing, loops and nested comprehensions; CUDA is introduced by the book. Browser/local execution and optional paths are distinguished. No added explanation needed. |
-| 1 — Double five values | The guard named `n` without explaining who supplied it. Connect the launch's third argument `5` to `int n`, and the pointer arguments to their parameters, before relying on them. State that the CPU program determines the count, allocates GPU arrays and copies inputs. Pointers carry no length, and guards trust the supplied count. The nine-input transfer now explicitly supplies 9. Explain queued launches versus completion/read-back in the complete-program disclosure. |
+| 1 — Double five values | The guard named `n` without explaining who supplied it. Section 03 now declares `int n = 5;`, explains the CPU's count/allocation/copy responsibilities before the launch, and passes `n` as the third ordinary argument. Its visible walkthrough explains how every thread receives that value, independently of launch dimensions. Section 04 recalls `n = 5` only to apply the guard, without a backward reference for essential setup. Pointers carry no length, and guards trust the supplied count. The nine-input transfer explicitly supplies 9. Explain queued launches versus completion/read-back in the complete-program disclosure. |
 | 2 — Storage | Checked original versus copied buffers, FP32 bytes, result allocation, `.to()` and `.cpu()` responsibilities. Existing text explains PyTorch's preparation and the CPU copy's wait. No change. |
 | 3 — Selection | Checked construction of `x`, zero-based row/column notation, excluded endpoint, selection count and independence of dynamic examples. Existing source and explanations supply the inputs. No change. |
 | 4 — Layout | Checked element/byte offsets, shared storage, strides, packed allocation, copy cost and already-contiguous behaviour. No change. |
@@ -54,8 +54,10 @@ do not introduce another walkthrough or hide essential setup in a reference link
 ## Reading-order and verification evidence
 
 Review chapter 1 as grouping → launch/parameters → regrouping → bounds check →
-nine-input transfer. Check that `n` is explained with the guard visible, without
-opening the complete kernel. Keep the correct guard before its diagnostic variant.
+nine-input transfer. Check that the CPU's count and storage responsibilities are
+explained in section 03 before its launch, without opening the complete kernel or
+reading section 04. The guard section then applies the known count locally. Keep
+the correct guard before its diagnostic variant.
 Review requests as layout/warp/sector rules → equal-count comparison → boundary
 case; reduction as four-input tree → N/2 extension → unsafe ordering; matrix reuse
 as dot product → explicit mapping/zero sums → load-count derivation.

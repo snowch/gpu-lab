@@ -81,8 +81,7 @@ export function renderLaunchPractice() {
 }
 
 export function renderBoundsChallenge() {
- return `<p>The CPU program must determine the input count from its data and pass that count to the kernel. CUDA does not infer an array’s length from its pointer. In the launch above, the final argument <code>5</code> supplies the kernel parameter <code>int n</code>; every thread receives the same value. For a different input length, the CPU program must update that argument and allocate enough input and output storage.</p>
- <p>Each thread calculates its own array index <code>i</code> from its block number and position. Here <code>n = 5</code>, so the correct check permits only indices 0–4. The check relies on the count supplied by the CPU program; an incorrect count can still allow an invalid access.</p>
+ return `<p>Every thread has received the same input count, <code>n = 5</code>. Each thread calculates its own array index <code>i</code> from its block number and position. Comparing <code>i &lt; n</code> permits only indices 0–4. The check trusts the supplied count; if that count is larger than the allocated arrays, an invalid access can still pass the check.</p>
  ${codePanel({id:'hello-bounds-code-3',source:boundsSource(2),label:'CUDA C++ · body excerpt from runKernel · correct check',explainedLocally:true})}
  <p>The braces enclose the statements controlled by <code>if</code>. Threads 5–7 skip both the read and the write.</p>
  <div class="hello-visual"><p class="hello-figure-title">Worked check · i &lt; 5</p>${renderIntroMap(3,inspectLaunch(5,4,2),null,true,false)}<p class="hello-note">Values are outputs. “Skipped” means no array access.</p></div>
@@ -121,14 +120,15 @@ export function renderCodeBridge(stage,factor) {
  ${definitions([['Kernel','A GPU function whose body contains the instructions each thread executes.'],['Launch','A request to execute a kernel. In CUDA, the launch specifies the number of blocks and threads per block.']])}
  <p>Ordinary PyTorch GPU operations usually handle kernel selection and launches for you. One operation may launch several kernels. Tensor layout and data type can still affect performance.</p>
  <p>When you launch a CUDA C++ kernel directly, you specify the block and thread counts. Our <code>runKernel</code> example doubles the inputs using a separate implementation; it is not PyTorch’s internal kernel.</p>
+ <p>The CPU program must also determine how many input values it has. Here it stores that count in an integer variable named <code>n</code>: <code>int n = 5;</code>. We chose the name <code>n</code>; it is not a CUDA keyword. CUDA does not infer an array’s length from its address. For different data, the CPU program must set the count to match, allocate enough input and output storage in GPU memory, and copy the inputs there before launching.</p>
  <p>The launch below is a call in the CPU program, outside the kernel definition. It requests the two blocks of four threads shown in the diagram:</p>
  ${codePanel({id:'hello-bridge-launch-2',source:launchSource(),label:'CUDA C++ · launch from the CPU program',explainedLocally:true})}
  <div class="code-explanations hello-launch-explanations"><p class="code-explanation-heading">What each part does</p><ul>
+ <li><code>int n = 5;</code> — Stores the count of five input values. This is separate from how many threads are launched.</li>
  <li><code>int threadsPerBlock = 4;</code> — Sets four threads per block; <code>int</code> declares an integer variable.</li>
  <li><code>int blocks = 2;</code> — Requests two blocks: eight threads in total.</li>
  <li><code>runKernel&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> — Starts our kernel with those settings.</li>
- <li><code>d_input, d_output</code> — Pass the locations of the input and output arrays already in GPU memory. The CPU program must allocate them and copy the inputs there before this launch.</li>
- <li><code>5</code> — Passes the input count to the kernel’s <code>int n</code> parameter. Arguments in parentheses match the function’s parameters in order: <code>d_input</code> supplies <code>input</code>, <code>d_output</code> supplies <code>output</code>, and <code>5</code> supplies <code>n</code>.</li></ul></div>
+ <li><code>d_input, d_output, n</code> — Supply the kernel’s inputs in order: the input array’s location, the output array’s location and the element count. The value of the CPU variable <code>n</code> is copied into the kernel’s integer input, also named <code>n</code>, for every thread. Changing blocks or threads per block does not change that value.</li></ul></div>
  <details id="hello-bridge-complete-2"><summary>Complete CUDA kernel for this example</summary>
  <p>Each thread calculates its index, checks whether an input exists, then doubles it. The next section explains that check. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
