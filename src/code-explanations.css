@@ -5,7 +5,7 @@ body pre,body pre.chapter-opening-code,body pre.hello-operation,body .book-code,
 [data-code-line].is-code-highlighted { background:var(--accent-soft); box-shadow:inset 3px 0 var(--accent); }
 .chapter-code-panel[data-language="pytorch"] .is-code-highlighted { background:color-mix(in srgb,var(--accent) 16%,transparent); }
 .chapter-code-panel[data-language="cuda"] .is-code-highlighted { background:color-mix(in srgb,var(--cuda-ink) 16%,transparent); box-shadow:inset 3px 0 var(--cuda-ink); }
-.code-explanations { margin:16px 0 24px; color:var(--ink); font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.code-explanations { margin:16px 0 24px; color:var(--ink); font-size:16px; line-height:1.45; font-family:inherit; }
 .code-explanation-heading { margin:0 0 5px; font-weight:650; }
 .code-explanation-hint { margin:0 0 6px; font-size:14px; color:var(--muted); }
 .code-explanations ul { margin:0; padding-left:22px; }
@@ -15,7 +15,7 @@ body pre,body pre.chapter-opening-code,body pre.hello-operation,body .book-code,
 .code-explanations button:disabled { cursor:default; opacity:1; }
 .code-explanations button[aria-pressed="true"] { background:var(--accent-soft); }
 .code-explanations button:hover code { text-decoration:underline; text-underline-offset:3px; }
-.code-explanations code { font-weight:600; overflow-wrap:anywhere; }
+.code-explanations code { font-family:"IBM Plex Mono",monospace; font-weight:600; overflow-wrap:anywhere; }
 .code-panel>.code-explanations { margin:0; padding:14px 16px; background:var(--bg); border-top:1px solid var(--line); }
 .chapter-code-panel[data-language="pytorch"] .code-explanations code { color:var(--accent); }
 .chapter-code-panel[data-language="cuda"] .code-explanations code { color:var(--cuda-ink); }

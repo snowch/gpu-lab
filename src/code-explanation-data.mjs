@@ -32,11 +32,12 @@ export function codeExplanations(source) {
     } else if(source.includes('scaled_dot_product_attention')) {
       add('k_cache = torch.arange(', 'Creates three cached key rows with four components each. v_cache supplies the corresponding value rows.');
       add('q_new = torch.tensor(', 'Supplies the new query. k_new and v_new supply its key and value; each row has four components.');
-      add('k_cache = torch.cat((k_cache, k_new), dim=-2)', 'Appends the new key along the token-row dimension. The matching v_cache call appends its value; torch.cat makes new tensors and copies the entries.');
+      add('k_cache = torch.cat((k_cache, k_new), dim=-2)', 'Appends the new key along the token-row dimension. Negative dimensions count from the end: -1 is the component axis and -2 is the row axis here. The matching v_cache call appends its value; torch.cat makes new tensors and copies the entries.');
       add('out = F.scaled_dot_product_attention(', 'Combines the cached values according to their keys’ matches with q_new. PyTorch selects the attention implementation.');
       add('dropout_p=0.0, is_causal=False', 'Disables dropout and an additional causal mask. This single query may attend to every supplied cache row, including its new row.');
     } else if(source.includes('weights = torch.softmax')) {
       const scale=source.match(/\) \* (1000|1)\n/);
+      match(/n, d = \d+, 4/, 'Sets the number of query/key/value rows n and the four components per row d. These are chosen example dimensions, not values supplied by CUDA.');
       add('q = torch.tensor(', `Creates deterministic query inputs. k and v supply matching key and value rows${scale?`, then multiplication by ${scale[1]} scales all query components`:''}.`);
       if(scale)entries.at(-1).lines.push(source.slice(0,source.indexOf(scale[0])).split('\n').length-1);
       add('scores = q @ k.T / d**0.5', 'Transposes the keys with .T, multiplies queries by keys with @, then divides by the square root of their width. Each score compares one query with one key.');
@@ -64,6 +65,7 @@ export function codeExplanations(source) {
       add('print(c.cpu())', 'Copies the result to CPU memory for printing.');
     } else if(source.includes('torch.where')) {
       match(/values = [^\n]+/, 'Sets the input sign pattern for the lane comparison.');
+      match(/values\[:\d+\]/, 'Takes this many entries from the start of the Python list. Their count determines the tensor length and the participating lanes in this teaching mapping.');
       add('device="cuda"', 'Places the input tensor in NVIDIA GPU memory.');
       match(/y = torch\.where\([^\n]+/, 'Selects the positive expression where x > 0 and the other expression elsewhere. Python evaluates both supplied expressions; this does not establish that a GPU branch is used.');
       add('print(y.cpu())', 'Copies the selected results to CPU memory and prints them.');
@@ -96,13 +98,17 @@ export function codeExplanations(source) {
   } else if(source.includes('__global__')||source.includes('<<<')) {
     add('__global__ void', 'Declares a GPU kernel. Each launched thread executes this function. void means the function returns no value; this example writes results into output arrays.');
     if(!source.includes('tile[32][33]')) {
-      add('const float*', 'Passes the location of an array of FP32 values. const prevents this function from changing values through that input pointer.');
+      add('const float*', 'Receives the location of FP32 input values from the CPU launch. The * means pointer: an address, without an array length. const prevents this function from changing values through that pointer.');
+      add('int n', source.includes('void gather(')
+        ? 'Receives the output element count supplied by the CPU program. The CPU program must also ensure every selected strided input address is within its input allocation.'
+        : 'Receives the element count supplied by the CPU program at launch. The CPU program must determine this count and allocate enough input and output storage; CUDA does not infer it from the pointers.');
+      add('float factor', 'Receives the scalar supplied by the CPU program. This workshop passes 2.0f; vector addition uses b[i] instead.');
       match(/int i = [^\n;]+;/, m=>[
         'Declares an integer i and calculates this thread’s array index.',
         ...[['blockIdx.x','the block number'],['blockDim.x','the number of threads per block'],['threadIdx.x','the thread’s position within its block']]
           .filter(([term])=>m[0].includes(term)).map(([term,meaning])=>`${term} is ${meaning}.`),
       ].join(' '));
-      add('if (i < n)', 'Runs the enclosed array accesses only when i is smaller than the input count n. Otherwise this thread skips them.');
+      add('if (i < n)', `Runs the enclosed array accesses only when i is smaller than the ${source.includes('void gather(')?'output':'input'} count n. Otherwise this thread skips them. The check trusts the supplied count.`);
       match(/(?:output|y)\[i\] = [^;]+;/, m=>source.includes('void gather(')
         ? 'Reads the selected input element and copies it to y[i]. Brackets select array elements. The semicolon ends the statement.'
         : 'Reads the indexed input value or values, performs the shown arithmetic, then writes the indexed result. '+(/\b(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?f\b/i.test(m[0])?'A trailing f marks an FP32 literal. ':'')+'The semicolon ends the statement.');

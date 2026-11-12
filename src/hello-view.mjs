@@ -70,25 +70,19 @@ export function renderLaunchPractice() {
       <label for="hello-launch-guess">Your block count<select id="hello-launch-guess"><option value="">Choose…</option><option>1</option><option>2</option><option>3</option></select></label>
       ${choice('hello-position-guess','Where is the thread handling input[4]?',[['0:4','Block 0, position 4'],['1:0','Block 1, position 0']])}
       ${choice('hello-values-guess','The five output values…',[['same','Stay the same'],['different','Change with the block size']])}
-      <button type="button" class="primary" id="hello-launch-run" disabled>Check and run simulation</button>
+      <button type="button" class="primary" id="hello-launch-run" disabled>Check predictions</button>
     </div>
 
     <p id="hello-launch-feedback" role="status">Make your three predictions, then check.</p>
     <details><summary>Hint</summary><p>The array index is block number × threads per block + position in the block. Regrouping changes these coordinates; each valid index still doubles the same input.</p></details>
     <details><summary>Compare a worked explanation</summary><p>With eight threads per block, one block covers the five inputs. Input index 4 belongs to block 0, position 4. With four per block, it belongs to block 1, position 0. Both calculate 5.0 × 2 = 10.0.</p></details>
-    <div id="hello-launch-answer" hidden>
-      ${codePanel({id:'hello-launch-example',source:'',label:'CUDA C++ · launch for your settings'})}
-      <button type="button" id="hello-launch-download">Download this launch as a CUDA program</button>
-      <div id="hello-launch-map" aria-label="Thread grouping for the checked launch"></div>
-      <p id="hello-launch-output"></p>
-      <div id="hello-launch-index" class="hello-index-panel" role="status"></div>
-
-    </div>
+    <p id="hello-launch-answer" class="hello-note" hidden></p>
   </div>`;
 }
 
 export function renderBoundsChallenge() {
- return `<p>Here <code>i</code> is the array index and <code>n</code> is the input count, 5. The correct check permits only indices 0–4:</p>
+ return `<p>The CPU program must determine the input count from its data and pass that count to the kernel. CUDA does not infer an array’s length from its pointer. In the launch above, the final argument <code>5</code> supplies the kernel parameter <code>int n</code>; every thread receives the same value. For a different input length, the CPU program must update that argument and allocate enough input and output storage.</p>
+ <p>Each thread calculates its own array index <code>i</code> from its block number and position. Here <code>n = 5</code>, so the correct check permits only indices 0–4. The check relies on the count supplied by the CPU program; an incorrect count can still allow an invalid access.</p>
  ${codePanel({id:'hello-bounds-code-3',source:boundsSource(2),label:'CUDA C++ · body excerpt from runKernel · correct check',explainedLocally:true})}
  <p>The braces enclose the statements controlled by <code>if</code>. Threads 5–7 skip both the read and the write.</p>
  <div class="hello-visual"><p class="hello-figure-title">Worked check · i &lt; 5</p>${renderIntroMap(3,inspectLaunch(5,4,2),null,true,false)}<p class="hello-note">Values are outputs. “Skipped” means no array access.</p></div>
@@ -107,7 +101,7 @@ export function renderBoundsChallenge() {
 
 export function renderIntroTransfer() {
   return `<section class="hello-section hello-section-end" id="hello-transfer"><p class="eyebrow">05 · Apply it</p><h2>Can every input get a result?</h2>
-  <p>A new tensor has nine inputs, 1.0–9.0. Each thread doubles one input. Use four threads per block and the correct <code>i &lt; n</code> check, with <code>n = 9</code>.</p>
+  <p>A new tensor has nine inputs, 1.0–9.0. Each thread doubles one input. The CPU program supplies <code>9</code> for <code>n</code> and allocates space for nine inputs and outputs. Use four threads per block and the correct <code>i &lt; n</code> check.</p>
   ${readerTask('A launch uses only two blocks. Predict what happens, then choose the smallest block count that safely processes all nine inputs.','Investigate')}
   <div class="hello-launch-controls">
   ${choice('hello-coverage-guess','With two blocks…',[['all','All nine inputs get results'],['missing','An input gets no result'],['invalid','A thread accesses beyond the arrays']])}
@@ -133,9 +127,10 @@ export function renderCodeBridge(stage,factor) {
  <li><code>int threadsPerBlock = 4;</code> — Sets four threads per block; <code>int</code> declares an integer variable.</li>
  <li><code>int blocks = 2;</code> — Requests two blocks: eight threads in total.</li>
  <li><code>runKernel&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> — Starts our kernel with those settings.</li>
- <li><code>d_input, d_output</code> — Refer to arrays already in GPU memory; <code>5</code> is the input count.</li></ul></div>
+ <li><code>d_input, d_output</code> — Pass the locations of the input and output arrays already in GPU memory. The CPU program must allocate them and copy the inputs there before this launch.</li>
+ <li><code>5</code> — Passes the input count to the kernel’s <code>int n</code> parameter. Arguments in parentheses match the function’s parameters in order: <code>d_input</code> supplies <code>input</code>, <code>d_output</code> supplies <code>output</code>, and <code>5</code> supplies <code>n</code>.</li></ul></div>
  <details id="hello-bridge-complete-2"><summary>Complete CUDA kernel for this example</summary>
- <p>Each thread calculates its index, checks whether an input exists, then doubles it. The next section explains that check.</p>
+ <p>Each thread calculates its index, checks whether an input exists, then doubles it. The next section explains that check. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
  <button type="button" id="hello-bridge-download-2">Download complete CUDA program</button> <a href="desktop.html#first-cuda">Desktop setup</a></details>
  </div>`;

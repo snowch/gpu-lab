@@ -142,7 +142,6 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 page.locator('#hello-values-guess').select_option('same')
                 page.locator('#hello-launch-guess').select_option('1')
                 page.locator('#hello-launch-run').click()
-                page.locator('#hello-launch-map [data-thread="4"]').click()
                 page.locator('#hello-bounds-guess').select_option('5');page.locator('#hello-bounds-check').click()
                 page.locator('#hello-coverage-guess').select_option('missing')
                 page.locator('#hello-repair-blocks').select_option('2')
@@ -270,7 +269,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(page.locator('#hello-launch-answer')).to_be_visible()
                 expect(page.locator('#hello-launch-size')).to_have_value('8')
                 expect(page.locator('#hello-launch-feedback')).to_contain_text('All three predictions match')
-                expect(page.locator('#hello-launch-index')).to_contain_text('index = 0 × 8 + 4 = 4')
+                expect(page.locator('#hello-launch-answer')).to_contain_text('Index = 0 × 8 + 4 = 4')
                 expect(second).to_have_url(url+'lessons/memory.html?keep=1#simulator')
                 expect(second.locator('#stride')).to_have_value('8');expect(second.locator('#sector-count')).to_have_text('32')
                 expect(second.locator('#lanes button').nth(5)).to_have_attribute('aria-pressed','true')
@@ -305,8 +304,13 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 panel(page);ready(page)
                 # Eviction is detected on focus; repair retains/reuses remaining assets.
                 cache=f"gpu-lab:{url}:release-{releases['two']['id']}"
-                page.evaluate('''async ({cache,url}) => {await (await caches.open(cache)).delete(url+'examples/gather.cu');dispatchEvent(new Event('focus'));}''',{'cache':cache,'url':url})
-                expect(page.locator('#offline-status')).to_have_text('Offline download incomplete')
+                assert page.evaluate('''async ({cache,url}) => {const removed=await (await caches.open(cache)).delete(url+'examples/gather.cu');dispatchEvent(new Event('focus'));return removed;}''',{'cache':cache,'url':url}), 'Eviction must remove an existing file from the selected release'
+                # Focus verifies the whole release, including its recordings. Give
+                # this asynchronous scan the same budget as the ready() check.
+                try:expect(page.locator('#offline-status')).to_have_text('Offline download incomplete',timeout=30000)
+                except AssertionError:
+                    print('Eviction check diagnostics:',page.locator('#app-status-dialog').inner_text(),flush=True)
+                    raise
                 context.set_offline(False);CourseHandler.corrupt='examples/gather.cu'
                 assert not page.evaluate('''async url => (await fetch(url+'examples/gather.cu')).ok''',url)
                 CourseHandler.corrupt=None;page.locator('#save-offline').click();ready(page)

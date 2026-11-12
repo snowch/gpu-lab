@@ -92,7 +92,8 @@ if (i < n) {
     figureTitle: 'Requests grouped by bank',
     figureHint: 'Select a round. Each bank card counts its distinct requested words; highlighted cards serve a word in this round. Select a lane to inspect its word and bank.',
     code: '// Extracted from examples/shared-memory.cu by the build.',
-    codeNote: `<p>This function assumes a full tile, one block of 32 threads, and valid input and output allocations.</p>
+    codeNote: `<p>The CPU program must allocate GPU storage for a 32 × 32 FP32 input and 32 FP32 outputs, copy the input values there, and launch this function with one block of 32 threads. There is no bounds check: those dimensions are part of this function’s requirements. The kernel declares its separate shared-memory workspace with <code>__shared__</code>.</p>
+      <p>This fixed function uses a padded column and all 32 threads. The controls above change the modelled read pattern and participating lanes; they do not rewrite this CUDA function.</p>
       <p>Every thread in the block must reach the barrier. A barrier inside a condition taken by only some block threads can hang or behave incorrectly. The bank model covers the final read; it does not simulate the loop or barrier.</p>`,
     exercises: [
       'For a new prediction, choose 8 active lanes and a column read with pitch 32. Then select lanes 0 and 1. They read different words: which banks receive them?',
@@ -124,9 +125,10 @@ export function renderLesson(lesson, index) {
 <meta name="description" content="${lesson.subtitle}"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,">
 <title>${lesson.title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css"><link rel="stylesheet" href="../src/mechanism-visuals.css"><link rel="stylesheet" href="../src/worked-examples.css">
 ${lesson.slug==='scheduling'?'<link rel="stylesheet" href="../src/scheduling-relationships.css">':''}
+<link rel="stylesheet" href="../src/chapter.css">
 <script type="module" src="../src/${lesson.engine === 'ai' ? 'ai-lesson' : 'lesson'}.mjs"></script></head>
-<body data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
-<header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
+<body class="book-chapter" data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive book</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
 <div class="layout"><aside class="sidebar"><p class="eyebrow">HOW GPUS RUN AI</p><p class="sidebar-title">Under the hood.</p>
 <nav class="lesson-nav" aria-label="Course lessons"><a href="../index.html">Course overview</a><a href="../index.html#meet-gpu">Meet the GPU</a><a href="hello.html">Start here: Hello, GPU</a><a href="kernel.html">Repair a kernel</a><a href="memory.html">01 Reading a tensor</a>${lessons.map(l => `<a href="${l.slug}.html" ${l.slug === lesson.slug ? 'class="current" aria-current="page"' : ''}>${l.number} ${l.title}</a>`).join('')}<a href="../index.html#curriculum">Course roadmap</a></nav>
 <div class="sidebar-bottom"><span class="status-label">INTERACTIVE DRAFT</span><p>Computed models.<br>No GPU required.</p></div></aside>

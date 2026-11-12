@@ -6,12 +6,40 @@ import {createHash,webcrypto} from 'node:crypto';
 import vm from 'node:vm';
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 
+test('eviction during a shared readiness scan is detected before reporting a complete release',async()=>{
+  const base='https://example.test/gpu-lab/';
+  const bodies=new Map([['examples/gather.cu','kernel source'],['video.mp4','recording bytes']]);
+  const release={id:'3'.repeat(64),files:[...bodies].map(([path,body])=>({path,bytes:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex')}))};
+  const started=deferred(),resume=deferred();
+  const present=new Set(bodies.keys());
+  let pause=true;
+  const cache={
+    async match(url){
+      const path=String(url).slice(base.length);
+      if(path==='video.mp4'&&pause){pause=false;started.resolve();await resume.promise;}
+      return present.has(path)?new Response(bodies.get(path)):undefined;
+    },
+    async keys(){return [...present].map(path=>new Request(new URL(path,base)));},
+  };
+  const context=vm.createContext({release,URL,Request,Response,AbortController,AbortSignal,crypto:webcrypto,console,setTimeout,clearTimeout,
+    caches:{async open(){return cache;}},self:{registration:{scope:base},addEventListener(){}}});
+  const contract=(await readFile(new URL('../src/release-contract.mjs',import.meta.url),'utf8')).replaceAll('export ','');
+  vm.runInContext(contract+'\n'+await readFile(new URL('../scripts/service-worker.js',import.meta.url),'utf8'),context);
+  const check=()=>vm.runInContext('complete(release)',context);
+  const first=check();await started.promise;
+  // This file already passed its byte/hash check. Evict it while the large
+  // recording is still being read, then let another tab join the same scan.
+  present.delete('examples/gather.cu');const joined=check();resume.resolve();
+  assert.deepEqual(await Promise.all([first,joined]),[false,false]);
+  present.add('examples/gather.cu');assert.equal(await check(),true);
+});
+
 test('concurrent readiness checks share byte verification but later checks detect eviction and recover from errors',async()=>{
   const base='https://example.test/gpu-lab/',body='recording bytes';
   const release={id:'1'.repeat(64),files:[{path:'video.mp4',bytes:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex')}]};
   const started=deferred(),resume=deferred();
   let reads=0,present=true,denied=false;
-  const cache={async match(){
+  const cache={async keys(){return present?[new Request(new URL('video.mp4',base))]:[];},async match(){
     reads++;
     if(reads===1){started.resolve();await resume.promise;}
     if(denied){denied=false;throw new Error('Storage temporarily unavailable');}
@@ -42,7 +70,7 @@ test('background cache pruning finishes before an update can create its staging 
     async open(name){
       if(!stores.has(name)) stores.set(name,new Map());
       const entries=stores.get(name);
-      return {async match(url){return entries.get(String(url))?.clone();},async put(url,response){entries.set(String(url),response.clone());}};
+      return {async keys(){return [...entries.keys()].map(url=>new Request(url));},async match(url){return entries.get(String(url))?.clone();},async put(url,response){entries.set(String(url),response.clone());}};
     },
     async keys(){
       if(++keysCalls===2){prunePaused=true;paused.resolve();await resume.promise;prunePaused=false;}

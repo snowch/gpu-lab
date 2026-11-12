@@ -12,11 +12,12 @@
   <link rel="stylesheet" href="../src/lessons.css">
   <link rel="stylesheet" href="../src/tensor-layout.css">
   <script type="module" src="../src/app.mjs"></script>
+  <link rel="stylesheet" href="../src/chapter.css">
 </head>
-<body>
+<body class="book-chapter">
   <a class="skip" href="#main">Skip to lesson</a>
   <header class="topbar">
-    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive book</span></a>
     <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
   </header>
   <div class="layout">
@@ -156,7 +157,7 @@
         </div>
       </section>
       <section id="cuda" class="two-col section-space">
-        <div><p class="eyebrow">CONNECT THE MODEL TO CODE</p><h2>A small CUDA kernel.</h2><p>CUDA lets you write the program each GPU thread runs. This kernel copies selected input values into consecutive output positions. Change stride or offset above and the input indexing below changes with it.</p><p>Threads are also grouped into <strong>blocks</strong>. Here, <code>threadIdx.x</code> is a thread’s index in its block; <code>blockIdx.x</code> identifies the block; <code>blockDim.x</code> is its thread count. Together they calculate <code>i</code>, the output index.</p><p>The simulator shows the input load for the first warp of the first block. Its active-lane control corresponds to a bound <code>n</code> smaller than a warp. The output store is not counted.</p></div>
+        <div><p class="eyebrow">CONNECT THE MODEL TO CODE</p><h2>A small CUDA kernel.</h2><p>CUDA lets you write the program each GPU thread runs. This kernel copies selected input values into consecutive output positions. Change stride or offset above and the input indexing below changes with it.</p><p>Threads are also grouped into <strong>blocks</strong>. Here, <code>threadIdx.x</code> is a thread’s index in its block; <code>blockIdx.x</code> identifies the block; <code>blockDim.x</code> is its thread count. Together they calculate <code>i</code>, the output index.</p><p>The CPU program supplies <code>n</code>, the number of output values, when it launches this kernel. It must allocate at least <code>n</code> output elements and enough input storage for the largest selected index, <code>offset + (n - 1) * stride</code>. The input can therefore be longer than the output. The <code>i &lt; n</code> check alone does not check the strided input address.</p><p>The simulator shows the input load for the first warp of the first block. Its active-lane control corresponds to <code>n</code> between 1 and 32, including a full warp at 32. The output store is not counted. The downloadable program supplies allocation, copies and launch setup.</p></div>
         <div class="code-panel"><div class="code-title"><span>gather.cu · illustrative source</span><button id="copy" type="button">Copy</button></div><pre><code id="kernel"></code></pre><div class="code-footer"><span id="copy-status" role="status">The browser models addresses; it does not compile CUDA.</span><a href="../examples/gather.cu" download>Download runnable example ↓</a></div></div>
       </section>
       <section id="challenge" class="challenge section-space">

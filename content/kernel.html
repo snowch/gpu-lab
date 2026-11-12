@@ -12,11 +12,12 @@
   <link rel="stylesheet" href="../src/lessons.css">
   <link rel="stylesheet" href="../src/kernel.css">
   <script type="module" src="../src/kernel-lesson.mjs"></script>
+  <link rel="stylesheet" href="../src/chapter.css">
 </head>
-<body>
+<body class="book-chapter">
   <a class="skip" href="#main">Skip to lesson</a>
   <header class="topbar">
-    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a>
+    <a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive book</span></a>
     <div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
   </header>
   <div class="layout">
@@ -60,7 +61,7 @@
         <label for="kernel-size">Threads per block<select id="kernel-size"><option>8</option><option>16</option><option selected>32</option><option>64</option></select></label>
           <label for="kernel-task">Output goal<select id="kernel-task"><option value="scale">y = 2 * x</option><option value="vector-add">y = x + b</option></select></label>
         </fieldset>
-        <p><code>n</code> is the vector length. <code>factor</code> is 2.</p>
+        <p>The browser supplies <code>n</code> as the vector length for each test: 8, 32 or 35. It supplies <code>factor = 2.0f</code> and prepares the input arrays and output storage. In the downloaded CUDA program, the CPU program performs this setup and passes the array pointers, count and factor to the kernel. CUDA does not infer the count from a pointer. For vector addition, <code>b</code> is a second input array of the same length; the replay below shows its values.</p>
         <div class="code-panel"><div class="code-title">Your kernel · CUDA C++</div><pre id="kernel-source-panel" tabindex="-1" aria-label="Current CUDA kernel"><code id="kernel-source">Enable JavaScript to build the source.</code></pre></div>
         <div id="challenge-active" hidden>
           <p id="challenge-goal"></p>

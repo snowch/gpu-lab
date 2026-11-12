@@ -65,9 +65,9 @@ export const referenceTasks = {
     title:'CUDA thread indices', page:'indices', label:'CUDA: Thread and Grid Index Intrinsics (§2.1.2.3)',
     code:'runKernel<<<2, 4>>>(d_input, d_output, 5);',
     prompt:'In “Thread and Grid Index Intrinsics”, find threadIdx, blockIdx and blockDim. Which gives a thread’s position inside its block? Which gives the block’s size?',
-    followUp:'Open “Triple Chevron Notation” to interpret <<<2, 4>>>. Which value is the block count, and which is the number of threads per block? Is runKernel a CUDA keyword?',
+    followUp:'Open “Triple Chevron Notation” to interpret <<<2, 4>>>. Which value is the block count, and which is the number of threads per block? In our function, the third parameter is int n. Which argument in parentheses supplies it? Would changing only the block count update n? Is runKernel a CUDA keyword?',
     followUpPage:'launch',followUpLabel:'CUDA: Triple Chevron Notation (§2.1.2.2.1)',
-    answer:'threadIdx gives the position within the block; blockDim gives its dimensions. blockIdx identifies the block in the grid. The launch requests two blocks with four threads each. runKernel is the name we chose for our function; it is not a CUDA keyword or an official API entry.',
+    answer:'threadIdx gives the position within the block; blockDim gives its dimensions. blockIdx identifies the block in the grid. The launch requests two blocks with four threads each. The CPU program separately supplies 5 as the third ordinary argument, which becomes n in the kernel. Changing the launch dimensions does not change that count or allocate longer arrays. runKernel is the name we chose for our function; it is not a CUDA keyword or an official API entry.',
   },
   'hello-dispatch': {
     title:'Who chooses the implementation?', page:'dispatcher', label:'PyTorch: selecting backend implementations',
