@@ -2,7 +2,7 @@
 import {tensorValue} from './value-format.mjs';
 import {registerExperiment} from './experiment-state.mjs';
 import './theme.mjs';
-import {simulateIntro,runnableSource,launchPlan,launchSource,introPrompt,inspectLaunch} from './hello-model.mjs';
+import {simulateIntro,runnableSource,launchPlan,introPrompt,inspectLaunch} from './hello-model.mjs';
 import {downloadCuda} from './cuda-program.mjs';
 import {renderIntroMap,renderIndexSubstitution} from './hello-view.mjs';
 const byId=id=>document.getElementById(id);
@@ -68,45 +68,26 @@ const positionGuess=document.getElementById('hello-position-guess');
 const valuesGuess=document.getElementById('hello-values-guess');
 const launchFeedback=document.getElementById('hello-launch-feedback');
 const launchAnswer=document.getElementById('hello-launch-answer');
-const launchMap=document.getElementById('hello-launch-map');
-let launchRevealed=false,launchSelected=4;
-function inspectGrouping(){
-  const state=simulateIntro(4,2,true,Number(launchSize.value));
-  const t=state.threads[launchSelected];
-  document.getElementById('hello-launch-index').innerHTML=renderIndexSubstitution(t,state);
-}
+let launchRevealed=false;
 function showLaunch(){
   launchAnswer.hidden=!launchRevealed;
   if(!launchRevealed){launchFeedback.textContent='Make your three predictions, then check.';return;}
   const state=simulateIntro(4,2,true,Number(launchSize.value));
   const target=state.threads[4];
   const correct=Number(launchGuess.value)===state.blocks&&positionGuess.value===`${target.block}:${target.local}`&&valuesGuess.value==='same';
-  launchFeedback.textContent=`${correct?'All three predictions match.':'Compare your predictions with the grouping below.'} ${state.blocks} × ${state.size} = ${state.threads.length} threads covers five inputs. Input[4] is handled by block ${target.block}, position ${target.local}. Its index is still 4, so it still doubles 5.0 to 10.0. All five output values stay the same.`;
-  document.getElementById('hello-launch-example').textContent=launchSource(state.blocks,state.size);
-  launchMap.innerHTML=renderIntroMap(4,state,launchSelected,true);
-  document.getElementById('hello-launch-output').textContent='Output: ['+state.output.map(tensorValue).join(', ')+']';
-  inspectGrouping();
+  launchFeedback.textContent=`${correct?'All three predictions match.':'Compare your predictions with the result.'} ${state.blocks} × ${state.size} = ${state.threads.length} threads covers five inputs. Input[4] is handled by block ${target.block}, position ${target.local}. The five output values stay the same.`;
+  launchAnswer.textContent=`Index = ${target.block} × ${state.size} + ${target.local} = 4. This thread still calculates 5.0 × 2 = 10.0. Output: [${state.output.map(tensorValue).join(', ')}].`;
 }
 launchSize.addEventListener('change',()=>{launchRevealed=false;launchGuess.value='';positionGuess.value='';valuesGuess.value='';showLaunch();});
 for(const control of [launchGuess,positionGuess,valuesGuess])control.addEventListener('change',()=>{launchRevealed=false;showLaunch();});
-launchMap.addEventListener('click',event=>{
-  const button=event.target.closest('[data-thread]');if(!button)return;
-  launchSelected=Number(button.dataset.thread);
-  for(const card of launchMap.querySelectorAll('[data-thread]'))card.setAttribute('aria-pressed',String(card===button));
-  inspectGrouping();
-});
 document.getElementById('hello-launch-run').addEventListener('click',()=>{
   const missing=[launchGuess,positionGuess,valuesGuess].find(el=>!el.value);
   if(missing){launchFeedback.textContent='Choose all three predictions first.';missing.focus();return;}
   launchRevealed=true;showLaunch();
 });
-document.getElementById('hello-launch-download').addEventListener('click',()=>{
-  if(launchRevealed)downloadCuda(runnableSource(2,Number(launchSize.value)),'hello-grouping.cu');
-});
 document.getElementById('hello-launch-run').disabled=false;
-registerExperiment('hello-launch',()=>({version:2,revealed:launchRevealed,selected:launchSelected}),state=>{
+registerExperiment('hello-launch',()=>({version:2,revealed:launchRevealed}),state=>{
   launchRevealed=state.version===2&&state.revealed===true&&[launchGuess,positionGuess,valuesGuess].every(el=>el.value);
-  launchSelected=Number.isInteger(state.selected)&&state.selected>=0&&state.selected<8?state.selected:4;
   showLaunch();
 });
 

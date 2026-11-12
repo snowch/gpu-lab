@@ -3,6 +3,8 @@
 Copyright © 2026 Christopher Snow.
 
 Chapters 1–5 use `src/chapter.css` and the helpers in `src/chapter-view.mjs`.
+Extra practice pages also load `chapter.css` and use the `book-chapter` body
+class, including the memory explorer, kernel workshop and shared-memory lab.
 Use the same components when extending the book rather than copying a chapter's
 colours, type sizes or spacing into another stylesheet.
 
@@ -19,7 +21,9 @@ colours, type sizes or spacing into another stylesheet.
   Mark other prediction-only code with `data-code-question` to avoid giving its answer.
   For a short bridge with its own diagram-linked explanation, use
   `codePanel({explainedLocally: true, ...})` to avoid a second generic walkthrough.
-  Use 1.5 line spacing in code, 1.45 in explanation lists and 6px list-item padding.
+  Use the inherited IBM Plex Sans for explanations and IBM Plex Mono for source
+  fragments on every page. Use 1.5 line spacing in code, 1.45 in explanation lists
+  and 6px list-item padding.
 - Code language: label PyTorch and CUDA C++ explicitly. Green identifies PyTorch;
   blue identifies CUDA, with suitable accents in both themes. Colour supplements
   the language label. Use `codePanel()` for labelled explanatory code.
@@ -139,3 +143,8 @@ shrink the shared code/body text, or stack four-thread blocks into two-column gr
 Keep the three reasoning challenges and their independent reveal/saved states.
 The complete kernel, desktop extension and documentation practice use labelled
 native disclosures. The opening example and required CUDA bridges stay visible.
+
+The Chapter 1 regrouping prediction ends with compact checked feedback and the
+index/output calculation. Keep its hint and worked comparison; reuse the preceding
+launch reference and download rather than adding another code walkthrough or
+thread map after Check. Preserve checked predictions when restoring older snapshots.

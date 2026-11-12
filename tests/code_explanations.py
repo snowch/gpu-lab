@@ -10,13 +10,17 @@ def check_code_explanations(browser,url,root):
         context=browser.new_context(viewport={'width':width,'height':1000},color_scheme=theme,service_workers='block')
         mock_version(context)
         page=context.new_page()
-        slugs=CHAPTERS+['memory','kernel','shared-memory'] if (width,theme)==(820,'light') else ['hello','matmul','inference']
+        slugs=CHAPTERS+['memory','kernel','shared-memory'] if (width,theme)==(820,'light') else ['hello','matmul','inference','memory','kernel','shared-memory']
+        shared_typography=None
         for slug in slugs:
             page.goto(url+'lessons/'+slug+'.html')
             pre=page.locator('pre[data-explained-code]').first
             expect(pre).to_be_visible()
             listing=pre.locator('xpath=following-sibling::*[1]')
             expect(listing).to_have_class('code-explanations')
+            typography=listing.evaluate('el=>[getComputedStyle(el).fontFamily,getComputedStyle(el).fontSize,getComputedStyle(el).lineHeight,getComputedStyle(el.querySelector("code")).fontFamily]')
+            if shared_typography is None:shared_typography=typography
+            assert typography==shared_typography,(slug,width,theme,typography,shared_typography)
             source=pre.text_content()
             for button in listing.locator('button').all():
                 fragment=button.get_attribute('data-code-fragment')

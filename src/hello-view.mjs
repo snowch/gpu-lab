@@ -70,20 +70,13 @@ export function renderLaunchPractice() {
       <label for="hello-launch-guess">Your block count<select id="hello-launch-guess"><option value="">Choose…</option><option>1</option><option>2</option><option>3</option></select></label>
       ${choice('hello-position-guess','Where is the thread handling input[4]?',[['0:4','Block 0, position 4'],['1:0','Block 1, position 0']])}
       ${choice('hello-values-guess','The five output values…',[['same','Stay the same'],['different','Change with the block size']])}
-      <button type="button" class="primary" id="hello-launch-run" disabled>Check and run simulation</button>
+      <button type="button" class="primary" id="hello-launch-run" disabled>Check predictions</button>
     </div>
 
     <p id="hello-launch-feedback" role="status">Make your three predictions, then check.</p>
     <details><summary>Hint</summary><p>The array index is block number × threads per block + position in the block. Regrouping changes these coordinates; each valid index still doubles the same input.</p></details>
     <details><summary>Compare a worked explanation</summary><p>With eight threads per block, one block covers the five inputs. Input index 4 belongs to block 0, position 4. With four per block, it belongs to block 1, position 0. Both calculate 5.0 × 2 = 10.0.</p></details>
-    <div id="hello-launch-answer" hidden>
-      ${codePanel({id:'hello-launch-example',source:'',label:'CUDA C++ · launch for your settings'})}
-      <button type="button" id="hello-launch-download">Download this launch as a CUDA program</button>
-      <div id="hello-launch-map" aria-label="Thread grouping for the checked launch"></div>
-      <p id="hello-launch-output"></p>
-      <div id="hello-launch-index" class="hello-index-panel" role="status"></div>
-
-    </div>
+    <p id="hello-launch-answer" class="hello-note" hidden></p>
   </div>`;
 }
 

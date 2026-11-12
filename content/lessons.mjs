@@ -124,9 +124,10 @@ export function renderLesson(lesson, index) {
 <meta name="description" content="${lesson.subtitle}"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,">
 <title>${lesson.title} · GPU Lab</title><link rel="stylesheet" href="../src/style.css"><link rel="stylesheet" href="../src/lessons.css"><link rel="stylesheet" href="../src/mechanism-visuals.css"><link rel="stylesheet" href="../src/worked-examples.css">
 ${lesson.slug==='scheduling'?'<link rel="stylesheet" href="../src/scheduling-relationships.css">':''}
+<link rel="stylesheet" href="../src/chapter.css">
 <script type="module" src="../src/${lesson.engine === 'ai' ? 'ai-lesson' : 'lesson'}.mjs"></script></head>
-<body data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
-<header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive course</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
+<body class="book-chapter" data-lesson="${lesson.slug}"><a class="skip" href="#main">Skip to lesson</a>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-icon" aria-hidden="true">▦</span> GPU Lab <span class="brand-note">/ interactive book</span></a><div class="top-actions"><a href="https://github.com/snowch/gpu-lab">Source ↗</a><button id="theme" type="button" aria-label="Switch colour theme">Theme</button></div></header>
 <div class="layout"><aside class="sidebar"><p class="eyebrow">HOW GPUS RUN AI</p><p class="sidebar-title">Under the hood.</p>
 <nav class="lesson-nav" aria-label="Course lessons"><a href="../index.html">Course overview</a><a href="../index.html#meet-gpu">Meet the GPU</a><a href="hello.html">Start here: Hello, GPU</a><a href="kernel.html">Repair a kernel</a><a href="memory.html">01 Reading a tensor</a>${lessons.map(l => `<a href="${l.slug}.html" ${l.slug === lesson.slug ? 'class="current" aria-current="page"' : ''}>${l.number} ${l.title}</a>`).join('')}<a href="../index.html#curriculum">Course roadmap</a></nav>
 <div class="sidebar-bottom"><span class="status-label">INTERACTIVE DRAFT</span><p>Computed models.<br>No GPU required.</p></div></aside>
