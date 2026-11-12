@@ -58,11 +58,12 @@ export function launchPlan(count,size=4) {
 
 export function launchSource(blocks=2,size=4) {
   if(!Number.isInteger(blocks)||blocks<1||!Number.isInteger(size)||size<1||size>32) throw new RangeError('Invalid launch settings');
-  return `int threadsPerBlock = ${size};
+  return `int n = 5;
+int threadsPerBlock = ${size};
 int blocks = ${blocks};
 
 runKernel<<<blocks, threadsPerBlock>>>(
-    d_input, d_output, 5
+    d_input, d_output, n
 );`;
 }
 

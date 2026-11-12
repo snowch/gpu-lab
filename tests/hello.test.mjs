@@ -70,6 +70,14 @@ test('CUDA bridges stay with their diagrams and provide a local complete functio
   assert.match(bounds,/body excerpt from runKernel/);
   assert.match(bounds,/if \(i &lt; n\)/);
   assert.doesNotMatch(html,/role="tablist"|The final CUDA section shows/);
+  // Review the launch in isolation, with optional details closed and without
+  // borrowing the following guard section to supply its setup.
+  const launch=html.split('id="idea-5"')[1].split('id="idea-4"')[0];
+  const visible=launch.replace(/<details\b[\s\S]*?<\/details>/g,'');
+  const introduction=visible.indexOf('int n = 5;');
+  assert.ok(introduction>=0&&introduction<visible.indexOf('id="hello-bridge-launch-2"'));
+  assert.match(visible,/d_input, d_output, n/);
+  assert.doesNotMatch(bounds,/In the launch above/);
 });
 
 test('bounds excerpts match the guarded function and expose only the diagnostic body without a check',()=>{
@@ -116,6 +124,12 @@ test('regrouping preserves outputs and array indices while changing block member
   assert.throws(()=>simulateIntro(4,2,true,size));
   assert.throws(()=>launchPlan(5,size));
  }
+ const source=launchSource(1,8);
+ const declaration=source.match(/int n = (\d+);/);
+ assert.ok(declaration);
+ assert.equal(Number(declaration[1]),simulateIntro(0,2).input.length);
+ assert.ok(source.indexOf(declaration[0])<source.indexOf('runKernel<<<'));
+ assert.match(source,/d_input, d_output, n/);
  assert.match(launchSource(1,8),/int threadsPerBlock = 8;/);
  assert.match(launchSource(1,8),/int blocks = 1;/);
  assert.match(launchSource(1,8),/runKernel<<<blocks, threadsPerBlock>>>/);
