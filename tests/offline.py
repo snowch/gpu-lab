@@ -304,8 +304,13 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 panel(page);ready(page)
                 # Eviction is detected on focus; repair retains/reuses remaining assets.
                 cache=f"gpu-lab:{url}:release-{releases['two']['id']}"
-                page.evaluate('''async ({cache,url}) => {await (await caches.open(cache)).delete(url+'examples/gather.cu');dispatchEvent(new Event('focus'));}''',{'cache':cache,'url':url})
-                expect(page.locator('#offline-status')).to_have_text('Offline download incomplete')
+                assert page.evaluate('''async ({cache,url}) => {const removed=await (await caches.open(cache)).delete(url+'examples/gather.cu');dispatchEvent(new Event('focus'));return removed;}''',{'cache':cache,'url':url}), 'Eviction must remove an existing file from the selected release'
+                # Focus verifies the whole release, including its recordings. Give
+                # this asynchronous scan the same budget as the ready() check.
+                try:expect(page.locator('#offline-status')).to_have_text('Offline download incomplete',timeout=30000)
+                except AssertionError:
+                    print('Eviction check diagnostics:',page.locator('#app-status-dialog').inner_text(),flush=True)
+                    raise
                 context.set_offline(False);CourseHandler.corrupt='examples/gather.cu'
                 assert not page.evaluate('''async url => (await fetch(url+'examples/gather.cu')).ok''',url)
                 CourseHandler.corrupt=None;page.locator('#save-offline').click();ready(page)
