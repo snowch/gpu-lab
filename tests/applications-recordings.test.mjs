@@ -30,3 +30,24 @@ test('attention recap rescales non-empty totals and distinguishes tile scratch f
  assert.doesNotMatch(attentionFigure('question'),/After rescaling|New totals|10 scratch floats|40 bytes/);
  assert.match(attentionFigure('answer'),/10 scratch floats × 4 bytes = 40 bytes/);
 });
+
+import {inferenceRecordingData as budget,inferenceRecordingFrame,inferenceFigure} from '../scripts/render-inference-recording.mjs';
+test('inference recap separates payload, invocation work, ideal bounds and batch amortisation',()=>{
+ const {decode:d,prefill:p,batch:b,long:l}=budget;
+ assert.equal(d.kvCacheBytes,64*1024**2);assert.equal(d.kvWriteBytes,128*1024);
+ assert.equal(d.cacheTokensAfter-d.cacheTokensBefore,1);assert.equal(d.tokens,1);
+ assert.equal(p.cacheTokensBefore,0);assert.equal(p.tokens,512);assert.equal(p.kvReadBytes,0);assert.equal(p.kvWriteBytes,d.kvCacheBytes);
+ assert.equal(p.weightBytes,d.weightBytes);assert.ok(p.computeMs>p.memoryMs);
+ assert.equal(b.weightBytes,d.weightBytes);assert.equal(b.kvCacheBytes,4*d.kvCacheBytes);assert.equal(b.tokens,4);
+ assert.ok(b.boundMs>d.boundMs);assert.ok(b.boundMs/b.tokens<d.boundMs);
+ assert.equal(l.kvCacheBytes,4*b.kvCacheBytes);assert.equal(l.kvWriteBytes,b.kvWriteBytes);assert.equal(l.weightBytes,d.weightBytes);
+ assert.ok(l.boundMs>b.boundMs&&l.boundMs<4*b.boundMs);
+ for(const r of Object.values(budget)){
+  assert.equal(r.boundMs,Math.max(r.memoryMs,r.computeMs));assert.equal(r.bytes,r.weightBytes+r.kvReadBytes+r.kvWriteBytes);
+  assert.equal(r.measuredMs,0);assert.equal(r.measurementRatio,null);
+ }
+ assert.equal(inferenceRecordingFrame('question').source,l);
+ assert.doesNotMatch(inferenceFigure('question'),/1,024 MiB|15\.074|512 KiB/);
+ assert.match(inferenceFigure('answer'),/256 MiB → 1,024 MiB/);
+ assert.match(inferenceFigure('bounds'),/73\.054 ms/);
+});
