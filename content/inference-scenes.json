@@ -1,0 +1,83 @@
+[
+  {
+    "id": "s01",
+    "title": "Keep keys and values for later tokens.",
+    "lead": "A model-managed cache preserves earlier attention inputs.",
+    "stage": "overview",
+    "captions": [
+      "Chapter Twelve connects cached keys and values to inference budgets. A decoder reuses these stored tensors when processing a later token. This model-managed cache is separate from the GPU's hardware caches.",
+      "The chapter opens with a small PyTorch append example. Our budget instead uses a synthetic decoder: thirty-two layers, seven billion parameters, and two-byte weights and cache values. These are declared assumptions, not a named model or measured GPU."
+    ]
+  },
+  {
+    "id": "s02",
+    "title": "Count the existing cache payload.",
+    "lead": "Count keys and values across layers, sequences and cached tokens.",
+    "stage": "capacity",
+    "captions": [
+      "Start with one sequence and five hundred and twelve cached tokens. Each layer stores a key and a value, each with one thousand and twenty-four components, for every token. Multiply all those counts by two bytes per value.",
+      "The existing payload is sixty-four mebibytes. One mebibyte means one million, forty-eight thousand, five hundred and seventy-six bytes. This is occupied payload, excluding spare allocation and metadata. Capacity alone does not tell us how much work an invocation performs."
+    ]
+  },
+  {
+    "id": "s03",
+    "title": "Decode appends one new token.",
+    "lead": "Read the previous cache and write one new entry per sequence.",
+    "stage": "decode",
+    "captions": [
+      "Decode processes one new token for each sequence. Here the cache grows from five hundred and twelve to five hundred and thirteen tokens. The budget reads the existing sixty-four mebibytes and writes one hundred and twenty-eight kibibytes of new keys and values.",
+      "It also counts one read of the fourteen-gigabyte weight payload. Gigabytes here are decimal; cache mebibytes and kibibytes use powers of two. The budget excludes activation transfers and other work. These are selected model counts, not a capture of actual memory traffic."
+    ]
+  },
+  {
+    "id": "s04",
+    "title": "Prefill starts with an empty cache.",
+    "lead": "Process the whole prompt and build its cache entries.",
+    "stage": "prefill",
+    "captions": [
+      "Prefill processes all five hundred and twelve prompt tokens from an empty cache. It reads no previous cache entries and writes the whole sixty-four-mebibyte payload. The ideal weight read is still fourteen gigabytes, shared across the invocation.",
+      "Arithmetic increases because many tokens are processed. Dense-weight work grows with token count; attention work also grows with context. This synthetic count uses a hidden width of four thousand and ninety-six and full square prompt attention, without causal triangular savings."
+    ]
+  },
+  {
+    "id": "s05",
+    "title": "Compare two ideal time bounds.",
+    "lead": "Divide counted bytes and operations by the stated rates.",
+    "stage": "bounds",
+    "captions": [
+      "Assume one thousand decimal gigabytes per second and one hundred trillion floating-point operations per second. A floating-point operation is one arithmetic operation in this count. Divide the selected bytes by bandwidth and the operation count by compute rate.",
+      "For decode, the memory bound is about fourteen point zero six seven milliseconds and the compute bound about zero point one four three. Prefill's compute bound rises to about seventy-three point zero five four. Take the larger bound, not their sum. These are ideal minimum budgets, not elapsed-time predictions."
+    ]
+  },
+  {
+    "id": "s06",
+    "title": "A batch can share a weight read.",
+    "lead": "Four sequences produce four new tokens in one invocation.",
+    "stage": "batch",
+    "captions": [
+      "Increase decode batch from one sequence to four, keeping five hundred and twelve cached tokens per sequence. The ideal model shares the same weight read across the batch. Each sequence still needs its own cache, and total arithmetic grows.",
+      "The invocation bound grows slightly, while dividing it by four gives about three point five six seven milliseconds per produced token. That is an amortised budget, not one user's next-token latency or measured throughput. These are four independent sequences, not four successive tokens from one sequence."
+    ]
+  },
+  {
+    "id": "s07",
+    "title": "Pause: make the context four times longer.",
+    "lead": "Keep four sequences, the same weights and the same assumed rates.",
+    "stage": "question",
+    "hold": 5,
+    "captions": [
+      "Keep the four independent decode sequences. Change only their previous cache length from five hundred and twelve to two thousand and forty-eight tokens each. Keep the same layers, widths, value size, parameters and rates.",
+      "Predict the existing cache payload. Must the whole invocation's ideal lower bound also grow fourfold? Separate the old cache read, each sequence's new entry and the shared weight read. Pause before comparing the answer."
+    ]
+  },
+  {
+    "id": "s08",
+    "title": "Larger capacity does not scale every cost.",
+    "lead": "The cache quadruples; the weight read and appended entries stay fixed.",
+    "stage": "answer",
+    "captions": [
+      "The cache grows from two hundred and fifty-six to one thousand and twenty-four mebibytes. The new entries stay five hundred and twelve kibibytes in total, and weights stay fourteen gigabytes. Recomputing both bounds gives about fifteen point zero seven four milliseconds, not four times the earlier bound.",
+      "Under these assumptions the weight read still dominates counted bytes. This does not identify a real GPU bottleneck. Return to Chapter Twelve and distinguish capacity, work per invocation and ideal time limits. A real timing comparison needs a named model, implementation, timing scope and repeated hardware measurements."
+    ]
+  }
+]

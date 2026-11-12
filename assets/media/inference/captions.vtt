@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:14.083
+Chapter Twelve connects cached keys and values to inference budgets. A decoder reuses these stored tensors when processing a later token. This model-managed cache is separate from the GPU's hardware caches.
+
+00:00:14.303 --> 00:00:30.836
+The chapter opens with a small PyTorch append example. Our budget instead uses a synthetic decoder: thirty-two layers, seven billion parameters, and two-byte weights and cache values. These are declared assumptions, not a named model or measured GPU.
+
+00:00:32.856 --> 00:00:47.064
+Start with one sequence and five hundred and twelve cached tokens. Each layer stores a key and a value, each with one thousand and twenty-four components, for every token. Multiply all those counts by two bytes per value.
+
+00:00:47.284 --> 00:01:05.524
+The existing payload is sixty-four mebibytes. One mebibyte means one million, forty-eight thousand, five hundred and seventy-six bytes. This is occupied payload, excluding spare allocation and metadata. Capacity alone does not tell us how much work an invocation performs.
+
+00:01:07.544 --> 00:01:23.565
+Decode processes one new token for each sequence. Here the cache grows from five hundred and twelve to five hundred and thirteen tokens. The budget reads the existing sixty-four mebibytes and writes one hundred and twenty-eight kibibytes of new keys and values.
+
+00:01:23.785 --> 00:01:41.193
+It also counts one read of the fourteen-gigabyte weight payload. Gigabytes here are decimal; cache mebibytes and kibibytes use powers of two. The budget excludes activation transfers and other work. These are selected model counts, not a capture of actual memory traffic.
+
+00:01:43.213 --> 00:01:58.723
+Prefill processes all five hundred and twelve prompt tokens from an empty cache. It reads no previous cache entries and writes the whole sixty-four-mebibyte payload. The ideal weight read is still fourteen gigabytes, shared across the invocation.
+
+00:01:58.943 --> 00:02:17.097
+Arithmetic increases because many tokens are processed. Dense-weight work grows with token count; attention work also grows with context. This synthetic count uses a hidden width of four thousand and ninety-six and full square prompt attention, without causal triangular savings.
+
+00:02:19.117 --> 00:02:35.608
+Assume one thousand decimal gigabytes per second and one hundred trillion floating-point operations per second. A floating-point operation is one arithmetic operation in this count. Divide the selected bytes by bandwidth and the operation count by compute rate.
+
+00:02:35.828 --> 00:02:55.583
+For decode, the memory bound is about fourteen point zero six seven milliseconds and the compute bound about zero point one four three. Prefill's compute bound rises to about seventy-three point zero five four. Take the larger bound, not their sum. These are ideal minimum budgets, not elapsed-time predictions.
+
+00:02:57.603 --> 00:03:12.109
+Increase decode batch from one sequence to four, keeping five hundred and twelve cached tokens per sequence. The ideal model shares the same weight read across the batch. Each sequence still needs its own cache, and total arithmetic grows.
+
+00:03:12.329 --> 00:03:31.785
+The invocation bound grows slightly, while dividing it by four gives about three point five six seven milliseconds per produced token. That is an amortised budget, not one user's next-token latency or measured throughput. These are four independent sequences, not four successive tokens from one sequence.
+
+00:03:33.805 --> 00:03:47.693
+Keep the four independent decode sequences. Change only their previous cache length from five hundred and twelve to two thousand and forty-eight tokens each. Keep the same layers, widths, value size, parameters and rates.
+
+00:03:47.913 --> 00:04:01.951
+Predict the existing cache payload. Must the whole invocation's ideal lower bound also grow fourfold? Separate the old cache read, each sequence's new entry and the shared weight read. Pause before comparing the answer.
+
+00:04:07.771 --> 00:04:26.032
+The cache grows from two hundred and fifty-six to one thousand and twenty-four mebibytes. The new entries stay five hundred and twelve kibibytes in total, and weights stay fourteen gigabytes. Recomputing both bounds gives about fifteen point zero seven four milliseconds, not four times the earlier bound.
+
+00:04:26.252 --> 00:04:47.351
+Under these assumptions the weight read still dominates counted bytes. This does not identify a real GPU bottleneck. Return to Chapter Twelve and distinguish capacity, work per invocation and ideal time limits. A real timing comparison needs a named model, implementation, timing scope and repeated hardware measurements.

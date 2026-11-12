@@ -13,6 +13,7 @@ import {renderSchedulingVideo} from '../content/scheduling-video.mjs';
 import {renderDivergenceVideo} from '../content/divergence-video.mjs';
 import {renderPrecisionVideo} from '../content/tensor-cores-video.mjs';
 import {renderAttentionVideo} from '../content/attention-video.mjs';
+import {renderInferenceVideo} from '../content/inference-video.mjs';
 import {renderProfiling} from '../content/profiling.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 import {memorySetup,memoryExample} from '../src/book-code.mjs';
@@ -65,6 +66,8 @@ await writeFile('dist/lessons/divergence-video.html',renderBookPage({slug:'diver
 await writeFile('dist/lessons/tensor-cores-video.html',renderBookPage({slug:'tensor-cores-video',appendix:true,title:'Follow input rounding into FP32 sums',lead:'Compare input conversion, cancellation and range, then distinguish sequential arithmetic from tensor-core execution.',content:renderPrecisionVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/attention-video.html',renderBookPage({slug:'attention-video',appendix:true,title:'Update attention totals without full score matrices',lead:'Follow weighted outputs and online rescaling, then compare key-tile grouping and single-query scratch.',content:renderAttentionVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
+
+await writeFile('dist/lessons/inference-video.html',renderBookPage({slug:'inference-video',appendix:true,title:'Connect cache capacity to inference budgets',lead:'Count stored keys and values, compare prefill and decode, then separate batch reuse from measured latency.',content:renderInferenceVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))

@@ -289,11 +289,20 @@ chapter and recording share the revised key fixture; both retain the distinction
 between JavaScript double arithmetic and assumed four-byte storage. Common
 playback and offline features apply. See `assets/media/attention/README.md`.
 
+Chapter 12's optional recap connects model-managed keys and values to payload
+capacity, decode and prefill accounting, ideal time bounds and batch reuse. A
+longer-context question for four sequences separates cache growth from fixed weight reads and
+new cache entries. Counts come from the existing synthetic decoder, with explicit
+decimal rates, binary cache units, excluded transfers and no measured GPU timing.
+Common playback, captions, transcript, downloads, return and offline features
+apply. See `assets/media/inference/README.md`.
+
 ## Course recording review
 
 Short recaps can support recall after a chapter's independent exercise. Each
 should trace one example and end with a fresh explanation question. This review
-uses the current thirteen-chapter book; recommendations below are future work.
+uses the current thirteen-chapter book; entries marked as recommendations remain
+future work.
 
 | Chapter | Recording goal | State |
 | --- | --- | --- |
@@ -308,7 +317,7 @@ uses the current thirteen-chapter book; recommendations below are future work.
 | 9 | Follow shared input reuse and partial sums across K phases. | Recap included. |
 | 10 | Trace input conversion before accumulation, including cancellation and a range-sensitive case. | Recap included. |
 | 11 | Explain weighted outputs, then tile updates and rescaling of both running totals. | Recap included; later larger scores now rescale retained totals. |
-| 12 | Connect KV payload, prefill/decode and batch reuse; distinguish capacity, work and ideal time bounds. | Recommended. |
+| 12 | Connect KV payload, prefill/decode and batch reuse; distinguish capacity, work and ideal time bounds. | Recap included. |
 | 13 | Model how to form a hypothesis, check outputs and choose a fair measurement. | Optional investigation guide; preserve the learner's independent recommendation. |
 
 Chapter 11 now uses a shifted deterministic key fixture in both the browser
@@ -317,7 +326,7 @@ scores and both non-empty retained totals visibly rescale. Every query output
 is checked against the materialised reference for the same inputs. The recurrence,
 byte-accounting scope and implementation/timing qualifiers remain unchanged.
 
-Chapter 5's recap should include the row crossing a sector boundary as well as a
-packed column. Chapter 6 must retain its explicit scheduler assumptions; Chapter
-7 must label its chosen path order. Chapters 10–12 need the same separation of
-arithmetic/storage models from measured GPU execution as their parent lessons.
+Chapter 5's recap includes a row crossing a sector boundary and a packed column.
+Chapter 6 retains its explicit scheduler assumptions; Chapter 7 labels its chosen
+path order. Chapters 10–12 keep the same separation of arithmetic/storage models
+from measured GPU execution as their parent lessons.

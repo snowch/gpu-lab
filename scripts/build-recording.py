@@ -24,11 +24,11 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument('chapter',choices=['reduction','matmul','devices','reading','layout','requests','scheduling','divergence','tensor-cores','attention'],nargs='?',default='reduction')
+parser.add_argument('chapter',choices=['reduction','matmul','devices','reading','layout','requests','scheduling','divergence','tensor-cores','attention','inference'],nargs='?',default='reduction')
 parser.add_argument('--slides-only',action='store_true',help='Export slide frames and PDF for review before encoding')
 args=parser.parse_args()
 chapter=args.chapter
-title={'reduction':'Shared memory and barriers','matmul':'How matrix tiles reuse inputs','devices':'Follow tensor values between CPU and GPU','reading':'Select tensor rows and columns','layout':'Follow tensor views into memory','requests':'Group five reads into memory sectors','scheduling':'Choose a ready warp while another waits','divergence':'Follow active masks through different paths','tensor-cores':'Follow input rounding into FP32 sums','attention':'Update attention totals without full score matrices'}[chapter]
+title={'reduction':'Shared memory and barriers','matmul':'How matrix tiles reuse inputs','devices':'Follow tensor values between CPU and GPU','reading':'Select tensor rows and columns','layout':'Follow tensor views into memory','requests':'Group five reads into memory sectors','scheduling':'Choose a ready warp while another waits','divergence':'Follow active masks through different paths','tensor-cores':'Follow input rounding into FP32 sums','attention':'Update attention totals without full score matrices','inference':'Connect cache capacity to inference budgets'}[chapter]
 WORK = ROOT / f'test-results/{chapter}-recording'
 DEST = ROOT / f'assets/media/{chapter}'
 DEST.mkdir(parents=True, exist_ok=True)
