@@ -37,7 +37,10 @@ async function complete(release) {
   const scan = (async () => {
     const cache = await caches.open(cacheName(release.id));
     for (const file of release.files) if (!await verified(await cache.match(new URL(file.path, BASE)), file)) return false;
-    return true;
+    // A file checked early can be evicted while a later recording is hashed.
+    // Recheck presence at the end without rereading every large response.
+    const present = new Set((await cache.keys()).map(request => request.url));
+    return release.files.every(file => present.has(new URL(file.path, BASE).href));
   })();
   verifying.set(release.id, scan);
   try { return await scan; }
