@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 244,
+  "bytes": 11997060,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 26.645,
+      "title": "Attention combines weighted values."
+    },
+    {
+      "id": "s02",
+      "start": 26.645,
+      "end": 56.704,
+      "title": "Full intermediates need reads and writes."
+    },
+    {
+      "id": "s03",
+      "start": 56.704,
+      "end": 85.781,
+      "title": "Keep totals while visiting key tiles."
+    },
+    {
+      "id": "s04",
+      "start": 85.781,
+      "end": 115.328,
+      "title": "A later larger score changes the scale."
+    },
+    {
+      "id": "s05",
+      "start": 115.328,
+      "end": 145.323,
+      "title": "Include every key before taking the final result."
+    },
+    {
+      "id": "s06",
+      "start": 145.323,
+      "end": 178.496,
+      "title": "Count the scratch for one query."
+    },
+    {
+      "id": "s07",
+      "start": 178.496,
+      "end": 208.984,
+      "title": "Pause: use four keys per tile."
+    },
+    {
+      "id": "s08",
+      "start": 208.984,
+      "end": 243.715,
+      "title": "Regrouping preserves the final calculation."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 11.821,
+      "text": "Chapter Eleven starts with eight queries and eight keys, each four components wide. Query\u2013key comparisons produce scores. Softmax turns the scores into weights that sum to one."
+    },
+    {
+      "id": "s01-c2",
+      "start": 12.041,
+      "end": 25.225,
+      "text": "Each output component combines those weights with the matching components of the value rows. We follow query zero's component zero. Higher scores receive more weight, but the result depends on the value rows too."
+    },
+    {
+      "id": "s02-c1",
+      "start": 27.245,
+      "end": 39.149,
+      "text": "Materialising means storing a temporary result in full for a later operation to read. Here both scores and weights have eight rows and eight columns, one entry for every query\u2013key pair."
+    },
+    {
+      "id": "s02-c2",
+      "start": 39.369,
+      "end": 55.284,
+      "text": "Count one write and one read for each matrix, assuming four-byte storage. That gives one thousand and twenty-four intermediate bytes. This selected accounting excludes the inputs, outputs, caching and other traffic; it is not measured DRAM traffic."
+    },
+    {
+      "id": "s03-c1",
+      "start": 57.304,
+      "end": 69.443,
+      "text": "Online softmax visits a few keys at a time. Keep the largest score seen, a normalisation total, and four weighted output totals. The diagrams show just weighted component zero."
+    },
+    {
+      "id": "s03-c2",
+      "start": 69.663,
+      "end": 84.361,
+      "text": "Subtract the current largest score before exponentiating. Add these unnormalised weights to the normalisation total, and their value products to the weighted total. Divide the two totals for an estimate using the keys visited so far."
+    },
+    {
+      "id": "s04-c1",
+      "start": 86.381,
+      "end": 98.2,
+      "text": "The next tile raises the largest score from negative one to one point five. Earlier contributions now need a new common scale: exponentiate the old maximum minus the new maximum."
+    },
+    {
+      "id": "s04-c2",
+      "start": 98.42,
+      "end": 113.908,
+      "text": "The factor is about zero point zero eight two. Multiply both retained totals by that factor, then add this tile's contributions on the new scale. Scaling both together preserves their previous ratio; scaling only one would change the meaning."
+    },
+    {
+      "id": "s05-c1",
+      "start": 115.928,
+      "end": 128.728,
+      "text": "Later tiles can raise the maximum again. Update both totals each time, using factor one when the maximum stays unchanged. Only after every key is included is the estimate the final output."
+    },
+    {
+      "id": "s05-c2",
+      "start": 128.948,
+      "end": 143.903,
+      "text": "The final ratio agrees with the full-matrix reference. All eight output vectors are compared, not just the component drawn here. The tiny difference reflects floating-point operation order in JavaScript doubles, not measured GPU error."
+    },
+    {
+      "id": "s06-c1",
+      "start": 145.923,
+      "end": 159.448,
+      "text": "With two keys per tile, the single-query algorithm needs eight floating-point slots: two tile scores, four weighted totals, the largest score and the normalisation total. Four-byte accounting makes that thirty-two bytes."
+    },
+    {
+      "id": "s06-c2",
+      "start": 159.668,
+      "end": 177.076,
+      "text": "Online mode writes no full score or weight matrix in this accounting. Inputs and outputs still exist, and tile rereads and the browser's inspection arrays are excluded. This is an algorithmic scratch budget, not a production kernel allocation or total memory traffic."
+    },
+    {
+      "id": "s07-c1",
+      "start": 179.096,
+      "end": 190.893,
+      "text": "Apply the update rule with four keys per tile. The first tile's largest score is one point five; the second tile includes a score of two. Will both retained totals need the same new scale?"
+    },
+    {
+      "id": "s07-c2",
+      "start": 191.113,
+      "end": 203.764,
+      "text": "Predict whether regrouping changes the final weighted result. Then count the single-query scratch using tile width plus four weighted components plus two scalars. Pause before checking the comparison."
+    },
+    {
+      "id": "s08-c1",
+      "start": 209.584,
+      "end": 222.512,
+      "text": "The new factor is about zero point six zero seven. Both retained totals use it before the second tile is added. The final ratio matches the same full-matrix reference, within floating-point roundoff."
+    },
+    {
+      "id": "s08-c2",
+      "start": 222.732,
+      "end": 242.295,
+      "text": "Four plus four plus two gives ten floats, or forty bytes in the chosen accounting. Return to Chapter Eleven and separate saved intermediates, temporary scratch and complete traffic. This small recurrence illustrates the algorithm; it does not execute a production FlashAttention kernel or predict GPU time."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 11.221,
+      "s01-c2": 13.184,
+      "s02-c1": 11.904,
+      "s02-c2": 15.915,
+      "s03-c1": 12.139,
+      "s03-c2": 14.699,
+      "s04-c1": 11.819,
+      "s04-c2": 15.488,
+      "s05-c1": 12.8,
+      "s05-c2": 14.955,
+      "s06-c1": 13.525,
+      "s06-c2": 17.408,
+      "s07-c1": 11.797,
+      "s07-c2": 12.651,
+      "s08-c1": 12.928,
+      "s08-c2": 19.563
+    }
+  }
+}

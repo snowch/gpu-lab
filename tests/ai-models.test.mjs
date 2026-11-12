@@ -87,3 +87,10 @@ test('reduction barriers preserve all contributions; an unsafe interleaving is r
 test('models reject unsupported and nonfinite inputs',()=>{
   for(const call of [()=>tiledMatmul({n:7}),()=>quantize(1,'fp8'),()=>attention({tile:3}),()=>inferenceBudget({bandwidth:0}),()=>inferenceBudget({measuredMs:NaN}),()=>reduceBlock({size:3})])assert.throws(call);
 });
+
+test('attention example encounters later larger scores with non-empty retained totals',()=>{
+ const r=attention();assert.deepEqual(r.scores[0],[-1.75,-1,1.5,0.5,-2.25,2,1,-1.75]);
+ assert.deepEqual(r.trace.map(t=>t.m),[-1,1.5,2,2]);
+ for(const t of r.trace.slice(1,3)){assert.ok(t.rescale>0&&t.rescale<1);assert.ok(t.previous.l>0);assert.notEqual(t.previous.acc[0],0);}
+ assert.equal(r.trace.at(-1).rescale,1);
+});

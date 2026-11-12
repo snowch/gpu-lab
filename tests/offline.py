@@ -173,7 +173,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 requests=context.new_page();requests.goto(url+'lessons/requests.html')
                 requests.locator('#reading-pattern-sectors').select_option('column');requests.locator('#reading-run-sectors').click()
                 recordings=[]
-                for route,recording_id,folder in [('inside-sm','sm','inside-sm'),('reduction-video','reduction','reduction'),('matmul-video','matmul','matmul'),('devices-video','devices','devices'),('reading-video','reading','reading'),('layout-video','layout','layout'),('requests-video','requests','requests'),('scheduling-video','scheduling','scheduling'),('divergence-video','divergence','divergence'),('tensor-cores-video','tensor-cores','tensor-cores')]:
+                for route,recording_id,folder in [('inside-sm','sm','inside-sm'),('reduction-video','reduction','reduction'),('matmul-video','matmul','matmul'),('devices-video','devices','devices'),('reading-video','reading','reading'),('layout-video','layout','layout'),('requests-video','requests','requests'),('scheduling-video','scheduling','scheduling'),('divergence-video','divergence','divergence'),('tensor-cores-video','tensor-cores','tensor-cores'),('attention-video','attention','attention')]:
                     tab=context.new_page();tab.goto(url+'lessons/'+route+'.html')
                     video=tab.locator('#'+recording_id+'-video')
                     video.evaluate('v=>v.load()')
@@ -221,24 +221,30 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 # Input composition in ANY window blocks everyone without resetting state.
                 second.evaluate("dispatchEvent(new CompositionEvent('compositionstart'))")
                 panel(page);page.locator('#restart-update').click()
-                expect(page.locator('#app-status-error')).to_contain_text('Finish the current input')
+                # Restart verifies the full release before asking every window.
+                # Allow the existing 15-second RPC budget on slower CI disks.
+                expect(page.locator('#app-status-error')).to_contain_text('Finish the current input',timeout=20000)
                 second.evaluate("dispatchEvent(new CompositionEvent('compositionend'))")
                 expect(second.locator('#sector-count')).to_have_text('32')
                 # A busy/unsaved participant or denied snapshot storage blocks all tabs.
                 second.evaluate("window.updateGuard=e=>{e.detail.reason='Finish the unsaved operation first.'};addEventListener('gpu-lab:before-restart',updateGuard)")
-                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('unsaved operation')
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('unsaved operation',timeout=20000)
                 second.evaluate("() => {removeEventListener('gpu-lab:before-restart',updateGuard);window.originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('Storage denied','SecurityError')};}")
-                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('Storage denied')
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('Storage denied',timeout=20000)
                 second.evaluate('() => {Storage.prototype.setItem=window.originalSet;}')
                 # A tab with its JS disabled never receives a forced navigation.
                 blocked=context.new_page();blocked.goto(url+'index.html');blocked.wait_for_load_state('networkidle')
                 blocked_cdp=context.new_cdp_session(blocked);blocked_cdp.send('Emulation.setScriptExecutionDisabled',{'value':True})
-                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('did not respond',timeout=10000)
+                page.locator('#restart-update').click();expect(page.locator('#app-status-error')).to_contain_text('did not respond',timeout=20000)
                 blocked_cdp.detach();blocked.close()
                 # Activation works offline and restores each tab's independent work/route.
                 context.set_offline(True);page.locator('#restart-update').click()
                 for tab in [page,second,kernel,lesson,devices,reading,layout,requests,concept_map,final]:
-                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
+                    try:
+                        expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'],timeout=20000)
+                    except AssertionError:
+                        print('Restart diagnostics:', {'route':tab.url,'error':page.locator('#app-status-error').inner_text(),'status':page.locator('#app-status-summary').inner_text()},flush=True)
+                        raise
                     assert tab.evaluate('''id=>[...document.scripts].filter(s=>s.type==='module').every(s=>s.src.includes('/releases/'+id+'/'))''',releases['two']['id'])
                 expect(concept_map.locator('#a-w1-lane-7')).to_have_attribute('open','')
                 expect(concept_map.locator('#a-w1-lane-7')).to_contain_text('thread 39')
@@ -271,7 +277,7 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(lesson.locator('#sm-position')).to_have_text('Event 4 of 8')
                 expect(lesson.locator('#sm-explorer [data-sm-unit=arithmetic]')).to_contain_text('1.0 × 2 → 2.0')
                 for tab,recording_id,folder in recordings:
-                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'])
+                    expect(tab.locator('meta[name="gpu-release"]')).to_have_attribute('content',releases['two']['id'],timeout=20000)
                     expect(tab.locator('#'+recording_id+'-transcript')).to_have_attribute('open','')
                     tab.wait_for_function('id=>Math.abs(document.getElementById(id).currentTime-45)<.5',arg=recording_id+'-video')
                     video=tab.locator('#'+recording_id+'-video')
