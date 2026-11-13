@@ -1,0 +1,83 @@
+[
+  {
+    "id": "s01",
+    "title": "Hold the matrix operation fixed.",
+    "lead": "Compare algorithms for the same four-by-four FP32 inputs.",
+    "stage": "baseline",
+    "captions": [
+      "Chapter Fourteen investigates one matrix multiplication. Keep the inputs, dimensions, number format and final output fixed while changing how input values are reused.",
+      "The baseline computes sixteen outputs separately. Its teaching algorithm explicitly loads one hundred and twenty-eight input values and stores sixteen results."
+    ]
+  },
+  {
+    "id": "s02",
+    "title": "Share input tiles without changing the result.",
+    "lead": "Tile widths two and four reduce explicit input loads.",
+    "stage": "reuse",
+    "captions": [
+      "A tile width of two shares loaded inputs across several outputs and reduces the count to sixty-four input loads. A width of four reduces it to thirty-two.",
+      "Every choice produces the same complete output matrix in this model. These are explicit algorithm loads with cache reuse excluded; they are not measured physical memory traffic."
+    ]
+  },
+  {
+    "id": "s03",
+    "title": "Larger tiles also consume block resources.",
+    "lead": "Fewer loads do not establish the fastest implementation.",
+    "stage": "resources",
+    "captions": [
+      "With the chapter’s synthetic resource budgets, tile width two uses thirty-two shared-memory bytes and two hundred and fifty-six registers per block. Four blocks fit those budgets.",
+      "Tile width four uses one hundred and twenty-eight shared-memory bytes and one thousand and twenty-four registers per block. Only one block fits. This capacity bound is not a schedule or a timing measurement."
+    ]
+  },
+  {
+    "id": "s04",
+    "title": "Write a hypothesis and its uncertainty.",
+    "lead": "Choose what to investigate, then name the missing evidence.",
+    "stage": "hypothesis",
+    "captions": [
+      "A useful recommendation states both the benefit and the cost. A larger tile reduces explicit input loads while using more registers and shared memory per block.",
+      "Either tile can be a hypothesis worth investigating. Neither a lower load count nor a higher block capacity proves which implementation is faster on a physical GPU."
+    ]
+  },
+  {
+    "id": "s05",
+    "title": "Pause: double the matrix dimension.",
+    "lead": "Use eight-by-eight inputs and tile width two.",
+    "stage": "question",
+    "captions": [
+      "Now use eight-by-eight inputs with tile width two and the same resource budgets. Predict input loads, output stores and resident-block capacity.",
+      "Does doubling the matrix dimension double every count? Separate complete-operation counts from resources needed by one block before comparing the answer."
+    ],
+    "hold": 5
+  },
+  {
+    "id": "s06",
+    "title": "Different counts grow at different rates.",
+    "lead": "The per-block resource requirement stays the same.",
+    "stage": "answer",
+    "captions": [
+      "This eight-by-eight case loads five hundred and twelve input values and stores sixty-four outputs. Four blocks still fit the stated teaching budgets.",
+      "At fixed tile width, input loads grow with the cube of the matrix dimension, while output stores grow with its square. The resources used by one block do not change here."
+    ]
+  },
+  {
+    "id": "s07",
+    "title": "Measure equivalent implementations fairly.",
+    "lead": "Check results, define the timed interval, then repeat.",
+    "stage": "measure",
+    "captions": [
+      "To compare real implementations, first check both outputs against a suitable reference. Keep inputs and number format comparable, and change one proposed optimisation at a time.",
+      "Define whether timing includes allocation and transfers. Warm up, wait for the GPU work in the chosen interval, repeat measurements, and inspect actual operations with a profiler."
+    ]
+  },
+  {
+    "id": "s08",
+    "title": "Turn the model into a testable recommendation.",
+    "lead": "Record evidence, assumptions and the next experiment.",
+    "stage": "summary",
+    "captions": [
+      "The browser supports a reuse argument and a resource trade-off. It does not identify the fastest kernel or measure physical GPU performance.",
+      "Return to Chapter Fourteen and write your recommendation: which tile would you test first, what evidence supports it, what uncertainty remains, and what measurement would resolve it?"
+    ]
+  }
+]

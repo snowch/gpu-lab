@@ -1,0 +1,83 @@
+[
+  {
+    "id": "s01",
+    "title": "Start with the CPU input array.",
+    "lead": "The existing data supplies the element count.",
+    "stage": "input",
+    "captions": [
+      "Chapter Three follows the manual CUDA workflow for the same five inputs. The CPU program already has a vector containing those values.",
+      "It obtains the element count from the vector size and passes that count to the kernel. A GPU pointer carries an address, not an automatically discoverable array length."
+    ]
+  },
+  {
+    "id": "s02",
+    "title": "Elements and bytes answer different questions.",
+    "lead": "Five FP32 values occupy twenty bytes.",
+    "stage": "bytes",
+    "captions": [
+      "The element count is five. Each FP32 value occupies four bytes, so each five-element array needs twenty bytes of value storage.",
+      "Allocation and copy calls take byte counts. The kernel bounds check takes an element count. For this one-input, one-output operation, both arrays have the same number of positions."
+    ]
+  },
+  {
+    "id": "s03",
+    "title": "Allocate GPU storage, then copy inputs.",
+    "lead": "Input storage and output storage are separate allocations.",
+    "stage": "allocate",
+    "captions": [
+      "The CPU allocates twenty bytes for GPU inputs and twenty bytes for GPU outputs. Allocation reserves storage; it does not copy the CPU vector values.",
+      "A host-to-device copy then fills the GPU input allocation. The kernel will write the separate output allocation. The original CPU input remains available."
+    ]
+  },
+  {
+    "id": "s04",
+    "title": "Derive a launch that covers the data.",
+    "lead": "Two blocks of four cover five input positions.",
+    "stage": "launch",
+    "captions": [
+      "Choose four threads per block for tracing. Round the input count up to whole blocks: five inputs need two blocks, creating eight threads.",
+      "The CPU passes the GPU pointers and element count as ordinary arguments. The bounds check permits indices zero through four and excludes the three extra threads."
+    ]
+  },
+  {
+    "id": "s05",
+    "title": "Copy results back, then release GPU storage.",
+    "lead": "The CPU result remains after the GPU allocations are freed.",
+    "stage": "result",
+    "captions": [
+      "After the kernel, a device-to-host copy places five results in a CPU output vector. This blocking copy in the default stream completes the preceding calculation before the CPU uses those results.",
+      "The program checks the result and frees both GPU allocations. Freeing GPU storage does not erase the CPU result or the original CPU input."
+    ]
+  },
+  {
+    "id": "s06",
+    "title": "Pause: change the input array to nine values.",
+    "lead": "Keep FP32 values and four threads per block.",
+    "stage": "question",
+    "captions": [
+      "Suppose the CPU input vector now contains nine values. Predict the element count, bytes per array and minimum number of four-thread blocks.",
+      "Would changing only the block count provide larger GPU allocations or update the kernel argument? Pause and connect each setting to the data that supplies it."
+    ],
+    "hold": 5
+  },
+  {
+    "id": "s07",
+    "title": "Derive all three sizes from the input.",
+    "lead": "Nine elements need thirty-six bytes and three blocks.",
+    "stage": "answer",
+    "captions": [
+      "The vector supplies a count of nine. Nine times four gives thirty-six bytes for each array. Three blocks of four create twelve threads, with indices nine through eleven excluded.",
+      "The program must provide the larger allocations, byte-counted copies and count argument too. Launch dimensions alone cannot update these separate responsibilities."
+    ]
+  },
+  {
+    "id": "s08",
+    "title": "Follow the complete ownership chain.",
+    "lead": "Input size → storage and copies → launch → result → cleanup.",
+    "stage": "summary",
+    "captions": [
+      "The input array supplies the count. The operation determines the output shape. From those choices, the CPU program supplies storage, copies and launch arguments.",
+      "Return to Chapter Three and trace its complete program. For later reductions or matrix operations, derive the required output size from that operation instead of assuming it always equals the input length."
+    ]
+  }
+]
