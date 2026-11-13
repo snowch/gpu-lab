@@ -71,3 +71,11 @@ numbers using the pinned record-demo workflow (Kokoro ONNX, `af_heart`, speed 1.
 The recording exporter checks slide overflow, media dimensions and cue timing.
 Phoneme and automated ASR reports screen the regenerated narration; these are
 machine checks, not human listening approval or learner testing.
+
+The offline update review also found that an independently restored iframe could
+overwrite the parent reader's map state. The reader now captures the map's open
+node IDs and scroll position and reapplies them after the iframe's load/restore.
+A browser regression injects an older child snapshot: it fails before this fix
+and preserves the parent's disclosures and scroll afterwards. Offline test setup
+also waits for the map controls to finish loading and verifies the expanded node
+before beginning the update.

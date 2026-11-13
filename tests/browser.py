@@ -1,3 +1,4 @@
+from nested_map import check_nested_map
 from course_flow import check_course_flow
 from lesson_completion import check_lesson_completion
 from version_check import mock_version, check_version
@@ -241,6 +242,7 @@ try:
         check_navigation(browser, URL, ROOT, errors)
         check_lesson_completion(browser, URL, ROOT, errors)
         check_overview(browser, URL, ROOT, errors)
+        check_nested_map(browser, URL, ROOT)
         check_kernel(browser, URL, ROOT, errors)
         check_hello(browser, URL, ROOT, errors)
         check_book_opening(browser, URL, ROOT, errors)

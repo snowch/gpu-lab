@@ -21,7 +21,8 @@ references for the implemented lab, not evidence that this browser model reprodu
 - [CUDA Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/index.html).
   Allocation, copies, error handling and synchronisation in Chapter 3 and the CUDA downloads.
 
-The CUDA example has not yet been compiled or run on a real GPU in this project.
+CUDA downloads are compiled and checked in functional simulation. Physical NVIDIA
+GPU execution remains unvalidated in this project.
 The model tests establish its specified address arithmetic, not performance agreement with
 hardware. Each additional teaching model distinguishes its assumptions from hardware claims.
 

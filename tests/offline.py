@@ -187,8 +187,10 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                     concept_map.locator('#'+disclosure+' > summary').click()
                 page.locator('.gpu-map-link').click()
                 embedded=page.frame_locator('#gpu-map-frame')
+                expect(embedded.locator('.map-tools')).to_be_visible()
                 for disclosure in ['gpu','sm-0','block-a','a-warp-1','a-w1-lane-7']:
                     embedded.locator('#'+disclosure+' > summary').click()
+                expect(embedded.locator('#a-w1-lane-7')).to_have_attribute('open','')
                 context.set_offline(False);CourseHandler.revision='two';check(page)
                 expect(page.locator('#version-status')).to_have_text('Update available')
                 expect(page.locator('#app-status-summary')).to_contain_text('Update available')
