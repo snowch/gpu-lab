@@ -36,25 +36,10 @@ tracks and model-derived slide previews are prepared for the record-demo
 workflow's required script approval; this section styling does not publish an
 unavailable video or imply that it has already been recorded.
 
-The offline checks exposed a remaining map restart race: the worker independently
-restarted the embedded map as well as its parent reader. Restart participation
-now includes top-level and auxiliary course windows; embedded frames follow their
-parent. The reader already captures map disclosures and scroll, and the stale-child
-snapshot regression remains in place. A worker contract checks participant
-ownership, while the complete offline browser suite checks coordinated updates.
-
-The embedded-map client also ignores an independent reload request from an older
-already-active worker, allowing its parent to perform the coordinated reload. The
-map browser regression exercises this older-worker message sequence as well as
-stale child snapshots, preserving the map view through deployment transitions.
-
-The reader's restart lock also covers its map panel, so the embedded controls
-cannot change after capture while the update transaction is committing. The map
-regression checks that this lock is applied and released on an aborted restart.
-
-A throttled reproduction retained the correct parent snapshot and ultimately
-restored every expected map node, but exceeded the assertion's five-second
-window while the iframe was still loading. The offline and map regression
-checks now wait for the visible map-loading state to finish before asserting
-restored content. They retain the node-state assertion and failure diagnostics;
-no fixed sleep or unconditional retry replaces state verification.
+The offline CI assertion could run while the restored embedded map was still
+loading. A throttled reproduction showed a correct saved snapshot and all
+expected nodes restored after the old five-second assertion window. The offline
+and map regression checks now wait for the visible map-loading state to finish
+before verifying restored content. They retain the node-state assertion and
+failure diagnostics; no fixed sleep or unconditional retry replaces verification.
+The existing production restart protocol is unchanged by this styling update.
