@@ -57,6 +57,7 @@ def check_nested_map(browser, url, root):
     }""")
     page.reload()
     expect(page.locator('#gpu-map-panel')).to_be_visible()
+    expect(page.locator('#gpu-map-panel .map-loading')).to_be_hidden(timeout=20000)
     expect(frame.locator('#a-w1-lane-7')).to_have_attribute('open','')
     child=next(f for f in page.frames if 'meet-gpu.html' in f.url)
     child.wait_for_function('(y)=>scrollY===y',arg=scroll)

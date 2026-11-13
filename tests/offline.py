@@ -266,6 +266,9 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(concept_map.locator('#hardware-panel')).to_be_visible()
                 expect(concept_map.locator('#a-warp-1')).to_have_attribute('open','')
                 expect(page.locator('#gpu-map-panel')).to_be_visible()
+                # The reading document can finish before its restored iframe.
+                # Wait for the same loading state that readers see, then check state.
+                expect(page.locator('#gpu-map-panel .map-loading')).to_be_hidden(timeout=20000)
                 try:
                     expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
                 except AssertionError:
