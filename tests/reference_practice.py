@@ -33,6 +33,7 @@ def check_reference_practice(browser,url,root):
         context.set_offline(False)
         for slug in ['devices','launch-from-input','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','putting-it-together','desktop','profiling']:
             page.goto(url+'lessons/'+slug+'.html')
+            page.locator('#documentation-practice > summary').click()
             expect(page.locator('.reference-task')).to_have_count(2)
             expect(page.locator('.chapter-references h2')).to_have_text('References')
             expect(page.locator('.documentation-exercises h2')).to_have_text('Use the documentation')
@@ -55,7 +56,7 @@ def check_reference_practice(browser,url,root):
     for slug in ['hello','devices','reading','layout','requests','memory','kernel','scheduling','divergence','shared-memory','reduction','matmul','tensor-cores','attention','inference','putting-it-together','desktop','profiling']:
         page.goto(url+'lessons/'+slug+'.html')
         expect(page.locator('.chapter-references')).to_be_visible()
-        if slug=='hello':page.locator('.hello-doc-practice > summary').click()
+        page.locator('#documentation-practice > summary').click()
         for task in page.locator('.reference-task').all():
             task.locator('summary').click()
             expect(task.locator('details p').first).to_be_visible()
