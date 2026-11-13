@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 190,
+  "bytes": 8973135,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 23.531,
+      "title": "Hold the matrix operation fixed."
+    },
+    {
+      "id": "s02",
+      "start": 23.531,
+      "end": 46.869,
+      "title": "Share input tiles without changing the result."
+    },
+    {
+      "id": "s03",
+      "start": 46.869,
+      "end": 73.28,
+      "title": "Larger tiles also consume block resources."
+    },
+    {
+      "id": "s04",
+      "start": 73.28,
+      "end": 97.131,
+      "title": "Write a hypothesis and its uncertainty."
+    },
+    {
+      "id": "s05",
+      "start": 97.131,
+      "end": 121.773,
+      "title": "Pause: double the matrix dimension."
+    },
+    {
+      "id": "s06",
+      "start": 121.773,
+      "end": 143.341,
+      "title": "Different counts grow at different rates."
+    },
+    {
+      "id": "s07",
+      "start": 143.341,
+      "end": 168.792,
+      "title": "Measure equivalent implementations fairly."
+    },
+    {
+      "id": "s08",
+      "start": 168.792,
+      "end": 190.467,
+      "title": "Turn the model into a testable recommendation."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 12.099,
+      "text": "Chapter Fourteen investigates one matrix multiplication. Keep the inputs, dimensions, number format and final output fixed while changing how input values are reused."
+    },
+    {
+      "id": "s01-c2",
+      "start": 12.319,
+      "end": 22.111,
+      "text": "The baseline computes sixteen outputs separately. Its teaching algorithm explicitly loads one hundred and twenty-eight input values and stores sixteen results."
+    },
+    {
+      "id": "s02-c1",
+      "start": 24.131,
+      "end": 34.243,
+      "text": "A tile width of two shares loaded inputs across several outputs and reduces the count to sixty-four input loads. A width of four reduces it to thirty-two."
+    },
+    {
+      "id": "s02-c2",
+      "start": 34.463,
+      "end": 45.449,
+      "text": "Every choice produces the same complete output matrix in this model. These are explicit algorithm loads with cache reuse excluded; they are not measured physical memory traffic."
+    },
+    {
+      "id": "s03-c1",
+      "start": 47.469,
+      "end": 58.477,
+      "text": "With the chapter\u2019s synthetic resource budgets, tile width two uses thirty-two shared-memory bytes and two hundred and fifty-six registers per block. Four blocks fit those budgets."
+    },
+    {
+      "id": "s03-c2",
+      "start": 58.697,
+      "end": 71.86,
+      "text": "Tile width four uses one hundred and twenty-eight shared-memory bytes and one thousand and twenty-four registers per block. Only one block fits. This capacity bound is not a schedule or a timing measurement."
+    },
+    {
+      "id": "s04-c1",
+      "start": 73.88,
+      "end": 84.355,
+      "text": "A useful recommendation states both the benefit and the cost. A larger tile reduces explicit input loads while using more registers and shared memory per block."
+    },
+    {
+      "id": "s04-c2",
+      "start": 84.575,
+      "end": 95.711,
+      "text": "Either tile can be a hypothesis worth investigating. Neither a lower load count nor a higher block capacity proves which implementation is faster on a physical GPU."
+    },
+    {
+      "id": "s05-c1",
+      "start": 97.731,
+      "end": 107.053,
+      "text": "Now use eight-by-eight inputs with tile width two and the same resource budgets. Predict input loads, output stores and resident-block capacity."
+    },
+    {
+      "id": "s05-c2",
+      "start": 107.273,
+      "end": 116.553,
+      "text": "Does doubling the matrix dimension double every count? Separate complete-operation counts from resources needed by one block before comparing the answer."
+    },
+    {
+      "id": "s06-c1",
+      "start": 122.373,
+      "end": 131.483,
+      "text": "This eight-by-eight case loads five hundred and twelve input values and stores sixty-four outputs. Four blocks still fit the stated teaching budgets."
+    },
+    {
+      "id": "s06-c2",
+      "start": 131.703,
+      "end": 141.921,
+      "text": "At fixed tile width, input loads grow with the cube of the matrix dimension, while output stores grow with its square. The resources used by one block do not change here."
+    },
+    {
+      "id": "s07-c1",
+      "start": 143.941,
+      "end": 155.355,
+      "text": "To compare real implementations, first check both outputs against a suitable reference. Keep inputs and number format comparable, and change one proposed optimisation at a time."
+    },
+    {
+      "id": "s07-c2",
+      "start": 155.575,
+      "end": 167.372,
+      "text": "Define whether timing includes allocation and transfers. Warm up, wait for the GPU work in the chosen interval, repeat measurements, and inspect actual operations with a profiler."
+    },
+    {
+      "id": "s08-c1",
+      "start": 169.392,
+      "end": 178.416,
+      "text": "The browser supports a reuse argument and a resource trade-off. It does not identify the fastest kernel or measure physical GPU performance."
+    },
+    {
+      "id": "s08-c2",
+      "start": 178.636,
+      "end": 189.047,
+      "text": "Return to Chapter Fourteen and write your recommendation: which tile would you test first, what evidence supports it, what uncertainty remains, and what measurement would resolve it?"
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 11.499,
+      "s01-c2": 9.792,
+      "s02-c1": 10.112,
+      "s02-c2": 10.987,
+      "s03-c1": 11.008,
+      "s03-c2": 13.163,
+      "s04-c1": 10.475,
+      "s04-c2": 11.136,
+      "s05-c1": 9.323,
+      "s05-c2": 9.28,
+      "s06-c1": 9.109,
+      "s06-c2": 10.219,
+      "s07-c1": 11.413,
+      "s07-c2": 11.797,
+      "s08-c1": 9.024,
+      "s08-c2": 10.411
+    }
+  }
+}

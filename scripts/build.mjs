@@ -1,3 +1,6 @@
+import {renderHelloVideo} from '../content/hello-video.mjs';
+import {renderLaunchFromInputVideo} from '../content/launch-from-input-video.mjs';
+import {renderInvestigationVideo} from '../content/putting-it-together-video.mjs';
 import {renderLessonCompletion} from '../src/lesson-completion-view.mjs';
 // Copyright © 2026 Christopher Snow.
 import {exportDesktop} from './export-desktop.mjs';
@@ -70,6 +73,14 @@ await writeFile('dist/lessons/attention-video.html',renderBookPage({slug:'attent
 
 await writeFile('dist/lessons/inference-video.html',renderBookPage({slug:'inference-video',appendix:true,title:'Connect cache capacity to inference budgets',lead:'Count stored keys and values, compare prefill and decode, then separate batch reuse from measured latency.',content:renderInferenceVideo(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 
+// Every numbered chapter has its own optional narrated recap.
+for(const recap of [
+  {slug:'hello',title:'Trace five values through GPU threads',lead:'Follow values, global indices, blocks and guards, then cover a nine-input case.',render:renderHelloVideo},
+  {slug:'launch-from-input',title:'Derive CUDA storage and launches from inputs',lead:'Derive element counts, byte counts and launch coverage, then collect results and release GPU storage.',render:renderLaunchFromInputVideo},
+  {slug:'putting-it-together',title:'Turn matrix reuse into a testable hypothesis',lead:'Compare input reuse and resource costs, then design a fair hardware measurement.',render:renderInvestigationVideo},
+]){
+  await writeFile(`dist/lessons/${recap.slug}-video.html`,renderBookPage({slug:recap.slug+'-video',appendix:true,title:recap.title,lead:recap.lead,content:recap.render(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
+}
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))
   .replace('<!-- INTRO_SECTIONS -->', renderIntroSections())

@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:12.099
+Chapter Fourteen investigates one matrix multiplication. Keep the inputs, dimensions, number format and final output fixed while changing how input values are reused.
+
+00:00:12.319 --> 00:00:22.111
+The baseline computes sixteen outputs separately. Its teaching algorithm explicitly loads one hundred and twenty-eight input values and stores sixteen results.
+
+00:00:24.131 --> 00:00:34.243
+A tile width of two shares loaded inputs across several outputs and reduces the count to sixty-four input loads. A width of four reduces it to thirty-two.
+
+00:00:34.463 --> 00:00:45.449
+Every choice produces the same complete output matrix in this model. These are explicit algorithm loads with cache reuse excluded; they are not measured physical memory traffic.
+
+00:00:47.469 --> 00:00:58.477
+With the chapter’s synthetic resource budgets, tile width two uses thirty-two shared-memory bytes and two hundred and fifty-six registers per block. Four blocks fit those budgets.
+
+00:00:58.697 --> 00:01:11.860
+Tile width four uses one hundred and twenty-eight shared-memory bytes and one thousand and twenty-four registers per block. Only one block fits. This capacity bound is not a schedule or a timing measurement.
+
+00:01:13.880 --> 00:01:24.355
+A useful recommendation states both the benefit and the cost. A larger tile reduces explicit input loads while using more registers and shared memory per block.
+
+00:01:24.575 --> 00:01:35.711
+Either tile can be a hypothesis worth investigating. Neither a lower load count nor a higher block capacity proves which implementation is faster on a physical GPU.
+
+00:01:37.731 --> 00:01:47.053
+Now use eight-by-eight inputs with tile width two and the same resource budgets. Predict input loads, output stores and resident-block capacity.
+
+00:01:47.273 --> 00:01:56.553
+Does doubling the matrix dimension double every count? Separate complete-operation counts from resources needed by one block before comparing the answer.
+
+00:02:02.373 --> 00:02:11.483
+This eight-by-eight case loads five hundred and twelve input values and stores sixty-four outputs. Four blocks still fit the stated teaching budgets.
+
+00:02:11.703 --> 00:02:21.921
+At fixed tile width, input loads grow with the cube of the matrix dimension, while output stores grow with its square. The resources used by one block do not change here.
+
+00:02:23.941 --> 00:02:35.355
+To compare real implementations, first check both outputs against a suitable reference. Keep inputs and number format comparable, and change one proposed optimisation at a time.
+
+00:02:35.575 --> 00:02:47.372
+Define whether timing includes allocation and transfers. Warm up, wait for the GPU work in the chosen interval, repeat measurements, and inspect actual operations with a profiler.
+
+00:02:49.392 --> 00:02:58.416
+The browser supports a reuse argument and a resource trade-off. It does not identify the fastest kernel or measure physical GPU performance.
+
+00:02:58.636 --> 00:03:09.047
+Return to Chapter Fourteen and write your recommendation: which tile would you test first, what evidence supports it, what uncertainty remains, and what measurement would resolve it?

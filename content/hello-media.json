@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 172,
+  "bytes": 8025621,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 20.992,
+      "title": "One input, one doubled result."
+    },
+    {
+      "id": "s02",
+      "start": 20.992,
+      "end": 43.541,
+      "title": "A thread executes the GPU program."
+    },
+    {
+      "id": "s03",
+      "start": 43.541,
+      "end": 64.747,
+      "title": "Blocks group the threads."
+    },
+    {
+      "id": "s04",
+      "start": 64.747,
+      "end": 85.909,
+      "title": "The CPU supplies the launch and count."
+    },
+    {
+      "id": "s05",
+      "start": 85.909,
+      "end": 108.459,
+      "title": "A bounds check protects the arrays."
+    },
+    {
+      "id": "s06",
+      "start": 108.459,
+      "end": 130.307,
+      "title": "Pause: cover nine inputs."
+    },
+    {
+      "id": "s07",
+      "start": 130.307,
+      "end": 150.381,
+      "title": "Three blocks cover all nine inputs."
+    },
+    {
+      "id": "s08",
+      "start": 150.381,
+      "end": 172.056,
+      "title": "Trace values, indices and coverage."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 8.835,
+      "text": "Chapter One starts with five floating-point inputs: one, two, three, four and five. Doubling gives two, four, six, eight and ten."
+    },
+    {
+      "id": "s01-c2",
+      "start": 9.055,
+      "end": 19.572,
+      "text": "PyTorch chooses the implementation for its tensor operation. Our manual CUDA example performs the same calculation, so we can trace how each result is produced."
+    },
+    {
+      "id": "s02-c1",
+      "start": 21.592,
+      "end": 32.003,
+      "text": "A thread is one execution of a GPU program. In this example, each participating thread reads one input, doubles it and writes the matching output position."
+    },
+    {
+      "id": "s02-c2",
+      "start": 32.223,
+      "end": 42.121,
+      "text": "Thread four reads input index four, whose value is five. It writes ten at output index four. An index chooses a position; it is not the stored value."
+    },
+    {
+      "id": "s03-c1",
+      "start": 44.141,
+      "end": 53.187,
+      "text": "With four threads per block, local positions start again at zero in each block. Block one, position zero therefore needs a global array index."
+    },
+    {
+      "id": "s03-c2",
+      "start": 53.407,
+      "end": 63.327,
+      "text": "Multiply the block number by the block size, then add the local position. One times four plus zero gives index four, so this thread doubles the fifth input."
+    },
+    {
+      "id": "s04-c1",
+      "start": 65.347,
+      "end": 74.179,
+      "text": "The CPU requests two blocks of four threads and passes an input count of five. The eight launched threads have indices zero through seven."
+    },
+    {
+      "id": "s04-c2",
+      "start": 74.399,
+      "end": 84.489,
+      "text": "The count is an ordinary kernel argument supplied by the CPU program. Changing the number of blocks does not change that count or allocate longer arrays."
+    },
+    {
+      "id": "s05-c1",
+      "start": 86.509,
+      "end": 95.512,
+      "text": "The correct check permits only indices smaller than five: zero through four. Threads five, six and seven skip both the read and the write."
+    },
+    {
+      "id": "s05-c2",
+      "start": 95.732,
+      "end": 107.039,
+      "text": "A check allowing index five would access positions that do not exist. The guard trusts the supplied count; the CPU must also provide enough input and output storage."
+    },
+    {
+      "id": "s06-c1",
+      "start": 109.059,
+      "end": 116.504,
+      "text": "Now there are nine inputs, with indices zero through eight. Keep four threads per block. Would two blocks cover every input?"
+    },
+    {
+      "id": "s06-c2",
+      "start": 116.724,
+      "end": 125.087,
+      "text": "Predict the smallest block count that covers all nine values. Which launched indices must then skip the arrays? Pause before comparing."
+    },
+    {
+      "id": "s07-c1",
+      "start": 130.907,
+      "end": 139.355,
+      "text": "Two blocks create only eight threads, leaving input index eight without a thread. Three blocks create twelve threads, covering all nine inputs."
+    },
+    {
+      "id": "s07-c2",
+      "start": 139.575,
+      "end": 148.961,
+      "text": "With the count set to nine, indices nine, ten and eleven skip the arrays. A bounds check can prevent an access, but it cannot create a missing thread."
+    },
+    {
+      "id": "s08-c1",
+      "start": 150.981,
+      "end": 160.069,
+      "text": "Keep three questions separate: which input does this thread select, how many threads did the CPU launch, and which indices may safely access the arrays?"
+    },
+    {
+      "id": "s08-c2",
+      "start": 160.289,
+      "end": 170.636,
+      "text": "Return to Chapter One and compare four with eight threads per block. Explain why the grouping changes while each valid input still produces the same doubled result."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 8.235,
+      "s01-c2": 10.517,
+      "s02-c1": 10.411,
+      "s02-c2": 9.899,
+      "s03-c1": 9.045,
+      "s03-c2": 9.92,
+      "s04-c1": 8.832,
+      "s04-c2": 10.091,
+      "s05-c1": 9.003,
+      "s05-c2": 11.307,
+      "s06-c1": 7.445,
+      "s06-c2": 8.363,
+      "s07-c1": 8.448,
+      "s07-c2": 9.387,
+      "s08-c1": 9.088,
+      "s08-c2": 10.347
+    }
+  }
+}

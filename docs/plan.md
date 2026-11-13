@@ -344,3 +344,13 @@ Chapter 6's recap includes a row crossing a sector boundary and a packed column.
 Chapter 7 retains its explicit scheduler assumptions; Chapter 8 labels its chosen
 path order. Chapters 11–13 keep the same separation of arithmetic/storage models
 from measured GPU execution as their parent lessons.
+
+## Dedicated recaps for every chapter
+
+Chapters 1, 3 and 14 now use the same optional recap pattern as the other eleven
+chapters. Each follows the chapter’s application exercise, with native playback,
+English captions, transcript and slide downloads, and a return link preserving
+the learner’s work. Chapter 1’s separate Inside an SM appendix remains available
+for its narrower hardware purpose. The new scripts were approved on 13 November
+2026; their figures and new-case comparisons come from the existing chapter
+models. All fourteen numbered chapters must retain a dedicated recap link.
