@@ -1,3 +1,4 @@
+from complete_recaps import check_complete_recaps
 from section_cues import check_section_cues
 from nested_map import check_nested_map
 from course_flow import check_course_flow
@@ -258,6 +259,7 @@ try:
         check_reduction_video(browser, URL, ROOT, errors)
         check_matmul_video(browser, URL, ROOT, errors)
         check_foundations_recordings(browser, URL, ROOT, errors)
+        check_complete_recaps(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

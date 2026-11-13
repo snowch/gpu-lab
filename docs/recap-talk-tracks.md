@@ -1,4 +1,6 @@
-# Proposed chapter recap narration
+# Approved chapter recap narration
+
+Approved by the user on 13 November 2026 before narration generation.
 
 These are the complete talk tracks for the three missing chapter recaps. Each numbered slide has two caption/speech cues. The question slides pause before the answer. Existing recaps keep their current narration.
 

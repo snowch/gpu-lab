@@ -1,0 +1,184 @@
+{
+  "durationSeconds": 191,
+  "bytes": 9065217,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 21.824,
+      "title": "Start with the CPU input array."
+    },
+    {
+      "id": "s02",
+      "start": 21.824,
+      "end": 44.373,
+      "title": "Elements and bytes answer different questions."
+    },
+    {
+      "id": "s03",
+      "start": 44.373,
+      "end": 68.139,
+      "title": "Allocate GPU storage, then copy inputs."
+    },
+    {
+      "id": "s04",
+      "start": 68.139,
+      "end": 89.643,
+      "title": "Derive a launch that covers the data."
+    },
+    {
+      "id": "s05",
+      "start": 89.643,
+      "end": 115.605,
+      "title": "Copy results back, then release GPU storage."
+    },
+    {
+      "id": "s06",
+      "start": 115.605,
+      "end": 140.973,
+      "title": "Pause: change the input array to nine values."
+    },
+    {
+      "id": "s07",
+      "start": 140.973,
+      "end": 164.867,
+      "title": "Derive all three sizes from the input."
+    },
+    {
+      "id": "s08",
+      "start": 164.867,
+      "end": 190.808,
+      "title": "Follow the complete ownership chain."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 9.624,
+      "text": "Chapter Three follows the manual CUDA workflow for the same five inputs. The CPU program already has a vector containing those values."
+    },
+    {
+      "id": "s01-c2",
+      "start": 9.844,
+      "end": 20.404,
+      "text": "It obtains the element count from the vector size and passes that count to the kernel. A GPU pointer carries an address, not an automatically discoverable array length."
+    },
+    {
+      "id": "s02-c1",
+      "start": 22.424,
+      "end": 31.469,
+      "text": "The element count is five. Each FP32 value occupies four bytes, so each five-element array needs twenty bytes of value storage."
+    },
+    {
+      "id": "s02-c2",
+      "start": 31.689,
+      "end": 42.953,
+      "text": "Allocation and copy calls take byte counts. The kernel bounds check takes an element count. For this one-input, one-output operation, both arrays have the same number of positions."
+    },
+    {
+      "id": "s03-c1",
+      "start": 44.973,
+      "end": 55.789,
+      "text": "The CPU allocates twenty bytes for GPU inputs and twenty bytes for GPU outputs. Allocation reserves storage; it does not copy the CPU vector values."
+    },
+    {
+      "id": "s03-c2",
+      "start": 56.009,
+      "end": 66.719,
+      "text": "A host-to-device copy then fills the GPU input allocation. The kernel will write the separate output allocation. The original CPU input remains available."
+    },
+    {
+      "id": "s04-c1",
+      "start": 68.739,
+      "end": 76.845,
+      "text": "Choose four threads per block for tracing. Round the input count up to whole blocks: five inputs need two blocks, creating eight threads."
+    },
+    {
+      "id": "s04-c2",
+      "start": 77.065,
+      "end": 88.223,
+      "text": "The CPU passes the GPU pointers and element count as ordinary arguments. The bounds check permits indices zero through four and excludes the three extra threads."
+    },
+    {
+      "id": "s05-c1",
+      "start": 90.243,
+      "end": 103.683,
+      "text": "After the kernel, a device-to-host copy places five results in a CPU output vector. This blocking copy in the default stream completes the preceding calculation before the CPU uses those results."
+    },
+    {
+      "id": "s05-c2",
+      "start": 103.903,
+      "end": 114.185,
+      "text": "The program checks the result and frees both GPU allocations. Freeing GPU storage does not erase the CPU result or the original CPU input."
+    },
+    {
+      "id": "s06-c1",
+      "start": 116.205,
+      "end": 125.251,
+      "text": "Suppose the CPU input vector now contains nine values. Predict the element count, bytes per array and minimum number of four-thread blocks."
+    },
+    {
+      "id": "s06-c2",
+      "start": 125.471,
+      "end": 135.753,
+      "text": "Would changing only the block count provide larger GPU allocations or update the kernel argument? Pause and connect each setting to the data that supplies it."
+    },
+    {
+      "id": "s07-c1",
+      "start": 141.573,
+      "end": 152.496,
+      "text": "The vector supplies a count of nine. Nine times four gives thirty-six bytes for each array. Three blocks of four create twelve threads, with indices nine through eleven excluded."
+    },
+    {
+      "id": "s07-c2",
+      "start": 152.716,
+      "end": 163.447,
+      "text": "The program must provide the larger allocations, byte-counted copies and count argument too. Launch dimensions alone cannot update these separate responsibilities."
+    },
+    {
+      "id": "s08-c1",
+      "start": 165.467,
+      "end": 176.027,
+      "text": "The input array supplies the count. The operation determines the output shape. From those choices, the CPU program supplies storage, copies and launch arguments."
+    },
+    {
+      "id": "s08-c2",
+      "start": 176.247,
+      "end": 189.388,
+      "text": "Return to Chapter Three and trace its complete program. For later reductions or matrix operations, derive the required output size from that operation instead of assuming it always equals the input length."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 9.024,
+      "s01-c2": 10.56,
+      "s02-c1": 9.045,
+      "s02-c2": 11.264,
+      "s03-c1": 10.816,
+      "s03-c2": 10.709,
+      "s04-c1": 8.107,
+      "s04-c2": 11.157,
+      "s05-c1": 13.44,
+      "s05-c2": 10.283,
+      "s06-c1": 9.045,
+      "s06-c2": 10.283,
+      "s07-c1": 10.923,
+      "s07-c2": 10.731,
+      "s08-c1": 10.56,
+      "s08-c2": 13.141
+    }
+  }
+}

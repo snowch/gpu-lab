@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:08.835
+Chapter One starts with five floating-point inputs: one, two, three, four and five. Doubling gives two, four, six, eight and ten.
+
+00:00:09.055 --> 00:00:19.572
+PyTorch chooses the implementation for its tensor operation. Our manual CUDA example performs the same calculation, so we can trace how each result is produced.
+
+00:00:21.592 --> 00:00:32.003
+A thread is one execution of a GPU program. In this example, each participating thread reads one input, doubles it and writes the matching output position.
+
+00:00:32.223 --> 00:00:42.121
+Thread four reads input index four, whose value is five. It writes ten at output index four. An index chooses a position; it is not the stored value.
+
+00:00:44.141 --> 00:00:53.187
+With four threads per block, local positions start again at zero in each block. Block one, position zero therefore needs a global array index.
+
+00:00:53.407 --> 00:01:03.327
+Multiply the block number by the block size, then add the local position. One times four plus zero gives index four, so this thread doubles the fifth input.
+
+00:01:05.347 --> 00:01:14.179
+The CPU requests two blocks of four threads and passes an input count of five. The eight launched threads have indices zero through seven.
+
+00:01:14.399 --> 00:01:24.489
+The count is an ordinary kernel argument supplied by the CPU program. Changing the number of blocks does not change that count or allocate longer arrays.
+
+00:01:26.509 --> 00:01:35.512
+The correct check permits only indices smaller than five: zero through four. Threads five, six and seven skip both the read and the write.
+
+00:01:35.732 --> 00:01:47.039
+A check allowing index five would access positions that do not exist. The guard trusts the supplied count; the CPU must also provide enough input and output storage.
+
+00:01:49.059 --> 00:01:56.504
+Now there are nine inputs, with indices zero through eight. Keep four threads per block. Would two blocks cover every input?
+
+00:01:56.724 --> 00:02:05.087
+Predict the smallest block count that covers all nine values. Which launched indices must then skip the arrays? Pause before comparing.
+
+00:02:10.907 --> 00:02:19.355
+Two blocks create only eight threads, leaving input index eight without a thread. Three blocks create twelve threads, covering all nine inputs.
+
+00:02:19.575 --> 00:02:28.961
+With the count set to nine, indices nine, ten and eleven skip the arrays. A bounds check can prevent an access, but it cannot create a missing thread.
+
+00:02:30.981 --> 00:02:40.069
+Keep three questions separate: which input does this thread select, how many threads did the CPU launch, and which indices may safely access the arrays?
+
+00:02:40.289 --> 00:02:50.636
+Return to Chapter One and compare four with eight threads per block. Explain why the grouping changes while each valid input still produces the same doubled result.

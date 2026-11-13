@@ -43,3 +43,6 @@ and map regression checks now wait for the visible map-loading state to finish
 before verifying restored content. They retain the node-state assertion and
 failure diagnostics; no fixed sleep or unconditional retry replaces verification.
 The existing production restart protocol is unchanged by this styling update.
+
+Follow-up: the user approved the three new recap scripts on 13 November 2026.
+Their completion and validation are recorded in [recap-completion-review.md](recap-completion-review.md).
