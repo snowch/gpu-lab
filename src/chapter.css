@@ -58,3 +58,25 @@
  .chapter-code-label { padding-inline:16px; }
  .chapter-opening-code,.book-chapter .chapter-code-panel[data-language="cuda"]>pre { padding-inline:16px; }
 }
+
+/* Repeated supporting sections have visible roles, without changing lesson headings. */
+.book-chapter { --recap-ink:#694a8a; --recap-soft:#f5f1f9; --desktop-ink:#365b7b; --desktop-soft:#f0f5f9; }
+:root[data-theme="dark"] .book-chapter { --recap-ink:#d4b9f2; --recap-soft:#272332; --desktop-ink:#b5d6f4; --desktop-soft:#203039; }
+.book-chapter .chapter-resource { max-width:960px; --section-ink:var(--muted); --section-soft:var(--soft); border:1px solid var(--line); border-left:3px solid var(--section-ink); border-radius:0 10px 10px 0; background:var(--section-soft); padding:24px; margin-block:40px; }
+.book-chapter .chapter-resource[data-section-kind="recap"] { --section-ink:var(--recap-ink); --section-soft:var(--recap-soft); }
+.book-chapter .chapter-resource[data-section-kind="desktop"] { --section-ink:var(--desktop-ink); --section-soft:var(--desktop-soft); }
+.book-chapter .chapter-resource[data-section-kind="references"] { background:transparent; }
+.book-chapter .chapter-resource[data-section-kind="documentation"] { --section-ink:var(--accent); --section-soft:var(--accent-soft); }
+.book-chapter .chapter-resource .section-cue-heading { display:flex; align-items:flex-start; gap:12px; margin:0 0 16px; font-size:clamp(23px,2.6vw,29px); line-height:1.3; }
+.section-cue-icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 32px; width:32px; height:36px; color:var(--section-ink); }
+.section-cue-icon svg { display:block; }
+.chapter-resource>p:last-child { margin-bottom:0; }
+.chapter-resource .chapter-reference-list { padding-left:22px; }
+.book-chapter .hello-doc-practice.chapter-resource>summary { align-items:flex-start; }
+.book-chapter .hello-doc-practice.chapter-resource>summary .section-cue-heading { display:inline-flex; margin-bottom:0; }
+@media(max-width:600px) {
+ .book-chapter .chapter-resource { padding:20px 16px; margin-block:32px; }
+ .book-chapter .chapter-resource .section-cue-heading { gap:8px; }
+ .section-cue-icon { flex-basis:26px; width:26px; height:31px; }
+}
+@media(forced-colors:active) { .book-chapter .chapter-resource { border-color:CanvasText; } .section-cue-icon { color:CanvasText; } }

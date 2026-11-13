@@ -253,7 +253,18 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(concept_map.locator('#hardware-panel')).to_be_visible()
                 expect(concept_map.locator('#a-warp-1')).to_have_attribute('open','')
                 expect(page.locator('#gpu-map-panel')).to_be_visible()
-                expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
+                # The reading document can finish before its restored iframe.
+                expect(page.locator('#gpu-map-panel .map-loading')).to_be_hidden(timeout=20000)
+                try:
+                    expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
+                except AssertionError:
+                    print('Embedded map restore diagnostics:',page.evaluate("""() => {
+                      const frame=document.querySelector('#gpu-map-frame'),doc=frame.contentDocument;
+                      return {width:innerWidth,frameURL:frame.contentWindow.location.href,ready:doc.readyState,
+                        open:[...doc.querySelectorAll('.map-node[open]')].map(n=>n.id),
+                        notice:doc.querySelector('.restore-notice')?.textContent};
+                    }"""),flush=True)
+                    raise
                 page.locator('.gpu-map-link').click()
                 expect(page.locator('#gpu-map-panel')).to_be_hidden()
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')

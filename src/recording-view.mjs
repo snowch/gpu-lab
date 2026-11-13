@@ -1,7 +1,8 @@
+import {sectionHeading} from './section-cues.mjs';
 // Copyright © 2026 Christopher Snow.
 import {escape} from './continuation-ui.mjs';
 export function recordingLink(slug,title,description){
- return `<section class="book-section" id="${slug}-recording-link"><h2>Watch the chapter recap</h2><p>Optional recap: <a id="${slug}-watch" data-reading-link href="${slug}-video.html?from=${slug}">${escape(title)}</a>. ${escape(description)}</p></section>`;
+ return `<section class="book-section chapter-resource" data-section-kind="recap" id="${slug}-recording-link">${sectionHeading('recap','Watch the chapter recap')}<p>Optional recap: <a id="${slug}-watch" data-reading-link href="${slug}-video.html?from=${slug}">${escape(title)}</a>. ${escape(description)}</p></section>`;
 }
 export function recordingContent({slug,chapter,title,scenes,media}){
  const duration=`${Math.floor(media.durationSeconds/60)} min ${media.durationSeconds%60} sec`,base=`../assets/media/${slug}`;
