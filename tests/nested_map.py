@@ -23,6 +23,18 @@ def check_nested_map(browser, url, root):
     child=next(f for f in page.frames if 'meet-gpu.html' in f.url)
     scroll=child.evaluate('() => {scrollTo(0,300);return scrollY}')
     assert scroll>0
+    child.wait_for_function("document.readyState==='complete'")
+    ready=child.evaluate("""() => new Promise(resolve=>{
+      window.ownedMapMarker='retained';const channel=new MessageChannel();
+      channel.port1.onmessage=e=>{channel.port1.close();resolve(e.data)};
+      navigator.serviceWorker.dispatchEvent(new MessageEvent('message',{
+        data:{type:'PREPARE_RESTART',token:'older-worker'},ports:[channel.port2]}));
+    })""")
+    assert ready['ready'],ready
+    child.evaluate("""() => navigator.serviceWorker.dispatchEvent(new MessageEvent('message',{
+      data:{type:'COMMIT_RESTART',token:'older-worker'}}))""")
+    page.wait_for_function("document.querySelector('#gpu-map-frame').contentDocument.querySelector('main')?.inert===false")
+    assert child.evaluate("window.ownedMapMarker==='retained'"),'An older worker must not independently reload the owned map'
     page.evaluate(SAVE);child.evaluate(SAVE)
     # A child can also be restarted by the worker. Its consumed or older snapshot
     # must not overwrite the map state owned by the parent reading window.
