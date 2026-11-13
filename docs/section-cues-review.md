@@ -47,3 +47,7 @@ The embedded-map client also ignores an independent reload request from an older
 already-active worker, allowing its parent to perform the coordinated reload. The
 map browser regression exercises this older-worker message sequence as well as
 stale child snapshots, preserving the map view through deployment transitions.
+
+The reader's restart lock also covers its map panel, so the embedded controls
+cannot change after capture while the update transaction is committing. The map
+regression checks that this lock is applied and released on an aborted restart.
