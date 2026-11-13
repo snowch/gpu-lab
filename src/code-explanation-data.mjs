@@ -13,14 +13,14 @@ export function codeExplanations(source) {
   const match=(pattern,meaning)=>{const m=source.match(pattern);if(m)add(m[0].trim(),typeof meaning==='function'?meaning(m):meaning);};
   const python=/^import torch\b/.test(source.trimStart());
   if(source.includes('std::vector<float> input')||source.includes('input.size()')||source.includes('cudaMalloc(&d_input')||source.includes('output.data()')||source.includes('cudaFree(d_input)')||source.trim()==='int threadsPerBlock = 4;') {
-    add('std::vector<float> input', 'Declares a CPU array named input using the C++ standard library. float stores FP32 values; the braces supply its entries. A trailing f marks a float literal.');
-    add('int n = static_cast<int>(input.size());', 'Reads the input element count with .size() and converts it to the integer type int. These small counts fit int; the complete program checks its size limit before converting. n is our chosen variable name.');
+    add('std::vector<float> input', 'Provides the FP32 input values in CPU memory. Their count determines the GPU storage and launch coverage.');
+    add('int n = static_cast<int>(input.size());', 'Derives n from the actual CPU input length. The complete program checks that the count fits the kernel’s indexing range.');
     add('std::vector<float> output(input.size());', 'Allocates a separate CPU array with one float position per input. It will receive the copied GPU result.');
-    add('std::size_t bytes = input.size() * sizeof(float);', 'Multiplies the element count by the bytes per float. std::size_t is a C++ type for sizes; sizeof(float) is four bytes here. bytes is the size of each allocation, rather than both allocations together.');
+    add('std::size_t bytes = input.size() * sizeof(float);', 'Calculates the bytes required by each GPU array: the input count times four bytes per FP32 value. The two allocations each need this capacity.');
     add('cudaFree(d_input)', 'Releases the GPU input allocation after the result has been copied back.');
     add('cudaFree(d_output)', 'Releases the separate GPU output allocation. It does not delete the CPU result.');
-    add('float *d_input, *d_output;', 'Declares two pointers for GPU addresses. The * marks a pointer; declaring these variables allocates no GPU arrays. The d_ prefix is a naming choice.');
-    add('cudaMalloc(&d_input, bytes)', 'Allocates bytes of GPU storage. & lets cudaMalloc store the allocation’s address in d_input. The surrounding CUDA_CHECK checks for failure.');
+    add('float *d_input, *d_output;', 'Holds the GPU input and output addresses. Their storage is allocated separately by cudaMalloc below.');
+    add('cudaMalloc(&d_input, bytes)', 'Allocates bytes of GPU storage and stores its address in d_input. The surrounding CUDA_CHECK checks for failure.');
     add('cudaMalloc(&d_output, bytes)', 'Allocates a separate GPU output array of the same byte size, because this kernel writes one result per input.');
     add('cudaMemcpy(\n    d_input, input.data(), bytes,\n    cudaMemcpyHostToDevice)', 'Copies bytes from the CPU input to the GPU input. The destination comes first, then the source, byte count and direction. input.data() supplies the CPU array’s address; it does not supply its length.');
     add('int threadsPerBlock = 4;', 'Chooses four threads per block. This is independent of the array length.');
@@ -29,7 +29,7 @@ export function codeExplanations(source) {
     add('from torch.profiler import ProfilerActivity, profile, record_function', 'Imports the CPU/CUDA activity selectors, the profile recording context and record_function for naming the captured operation.');
     add('print("PyTorch:", torch.__version__)', 'Records the installed PyTorch version. The following prints record its CUDA build and the actual GPU model.');
     add('x = torch.arange(\n    1, 4097, dtype=torch.float32, device="cuda",\n)', 'Creates 4,096 FP32 inputs, from 1.0 to 4096.0, on the NVIDIA GPU. The endpoint 4097 is excluded.');
-    add('for _ in range(5):', 'Runs five warm-up multiplications before capture. The underscore is a loop variable whose value is unused.');
+    add('for _ in range(5):', 'Runs five warm-up multiplications before capture.');
     add('torch.cuda.synchronize()', 'Waits for earlier CUDA work to finish. The later synchronisation inside capture also waits for the recorded multiplication.');
     add('activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA]', 'Requests CPU events and supported CUDA activity from the profiler.');
     add('with profile(activities=activities) as prof:', 'Records events within this context; exiting ends capture.');
@@ -110,22 +110,22 @@ export function codeExplanations(source) {
       add('print(z.cpu())', 'Waits for the needed GPU work, copies z to CPU memory and prints it.');
     }
   } else if(source.includes('__global__')||source.includes('<<<')) {
-    add('__global__ void', 'Declares a GPU kernel. Each launched thread executes this function. void means the function returns no value; this example writes results into output arrays.');
+    add('__global__ void', 'Defines the GPU kernel executed by each launched thread. Results are written to the output arrays.');
     if(!source.includes('tile[32][33]')) {
-      add('const float*', 'Receives the location of FP32 input values from the CPU launch. The * means pointer: an address, without an array length. const prevents this function from changing values through that pointer.');
+      add('const float*', 'Receives the GPU address of read-only FP32 inputs. The CPU must provide storage for this function’s input shape; the pointer does not record that shape.');
       add('int n', source.includes('void gather(')
         ? 'Receives the output element count supplied by the CPU program. The CPU program must also ensure every selected strided input address is within its input allocation.'
         : 'Receives the element count supplied by the CPU program at launch. The CPU program must determine this count and allocate enough input and output storage; CUDA does not infer it from the pointers.');
       add('float factor', 'Receives the scalar supplied by the CPU program. This workshop passes 2.0f; vector addition uses b[i] instead.');
       match(/int i = [^\n;]+;/, m=>[
-        'Declares an integer i and calculates this thread’s array index.',
+        'Calculates this thread’s array index.',
         ...[['blockIdx.x','the block number'],['blockDim.x','the number of threads per block'],['threadIdx.x','the thread’s position within its block']]
           .filter(([term])=>m[0].includes(term)).map(([term,meaning])=>`${term} is ${meaning}.`),
       ].join(' '));
-      add('if (i < n)', `Runs the enclosed array accesses only when i is smaller than the ${source.includes('void gather(')?'output':'input'} count n. Otherwise this thread skips them. The check trusts the supplied count.`);
-      match(/(?:output|y)\[i\] = [^;]+;/, m=>source.includes('void gather(')
-        ? 'Reads the selected input element and copies it to y[i]. Brackets select array elements. The semicolon ends the statement.'
-        : 'Reads the indexed input value or values, performs the shown arithmetic, then writes the indexed result. '+(/\b(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?f\b/i.test(m[0])?'A trailing f marks an FP32 literal. ':'')+'The semicolon ends the statement.');
+      add('if (i < n)', `Keeps surplus threads out of the arrays. The CPU-supplied ${source.includes('void gather(')?'output':'input'} count n sets the valid range; the allocated storage must match it.`);
+      match(/(?:output|y)\[i\] = [^;]+;/, source.includes('void gather(')
+        ? 'Copies this thread’s selected FP32 input into y[i].'
+        : 'Computes this thread’s result from its indexed FP32 input values and writes the matching output position.');
       match(/x\[\d+ \+ i \* \d+\]/, 'Selects an input element using the starting offset plus index times stride. These are element positions, not byte offsets.');
     }
     if(source.includes('tile[32][33]')) {
@@ -136,10 +136,10 @@ export function codeExplanations(source) {
       add('__syncthreads();', 'Makes all threads in the block wait until the shared tile has been filled, before any starts the column read.');
       add('output[lane] = tile[lane][0];', 'Reads row lane of shared column 0 and writes that value to the output. Thread 0 filled this column before the barrier.');
     }
-    match(/int threadsPerBlock = \d+;/, 'Sets the number of threads in each block. threadsPerBlock is a variable name we chose.');
-    match(/int blocks = \d+;/, 'Sets the number of blocks. blocks is a variable name we chose.');
-    add('int blocks = (n + threadsPerBlock - 1)\n    / threadsPerBlock;', 'Divides the element count by the block size, rounding up so a final partial block is included. The / operator performs integer division here. blocks is a chosen variable name.');
-    match(/\w+<<<[\s\S]*?;/, 'Launches the kernel from the CPU. Between <<< and >>> are the block count and threads per block; arguments in parentheses are passed to the kernel. Device arrays must already be allocated.');
+    match(/int threadsPerBlock = \d+;/, 'Chooses the number of threads in each block, independently of the input count.');
+    match(/int blocks = \d+;/, 'Chooses how many blocks the CPU launches.');
+    add('int blocks = (n + threadsPerBlock - 1)\n    / threadsPerBlock;', 'Rounds up the block count so every input has a thread, including a final partial block.');
+    match(/\w+<<<[\s\S]*?;/, 'Launches the kernel from the CPU. CUDA’s <<<...>>> configuration chooses blocks and threads per block; the kernel’s arguments are supplied separately. GPU buffers must already be allocated.');
   } else if(/^(?:values = |column = |packed = |transposed = )/.test(source)) {
     match(/x\[\d+, :\]/, 'Selects all columns of the chosen row. The row number starts at zero; the result shares x’s storage.');
     match(/x\[:, \d+\]/, 'Selects the chosen column across all rows. Its values remain separated in x’s original storage.');

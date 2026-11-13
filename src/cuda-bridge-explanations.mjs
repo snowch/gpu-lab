@@ -4,7 +4,7 @@ export function courseCudaExplanations(source){
  const items=[];
  const add=(fragment,meaning)=>{if(source.includes(fragment))items.push([fragment,meaning]);};
  if(source.includes('void doubleRow(')||source.includes('void doubleColumn(')){
-  add('const float input[5][5]','Receives the address of a five-row, five-column GPU array, rather than copying its values. The CPU must provide all 25 FP32 values; const prevents changing them through this parameter.');
+  add('const float input[5][5]','Receives the GPU address of the read-only 5 × 5 input. The CPU must provide all 25 FP32 values.');
   if(source.includes('void doubleRow(')){
    add('int row','Receives the row number chosen by the CPU, from 0 to 4. It is the same for every thread in this launch.');
    add('int column = blockIdx.x * blockDim.x + threadIdx.x;','Gives each thread its own column number by the global-index rule from Chapter 1.');
@@ -22,7 +22,7 @@ export function courseCudaExplanations(source){
   add('int stride, int offset','Receive the element step and starting element position chosen by the CPU. They count elements, rather than bytes.');
   add('if (i < n)','Checks output coverage. The CPU must separately ensure every offset + i * stride is inside the input allocation.');
   add('packed[i] = input[offset + i * stride];','Reads a strided input and writes the same value to neighbouring packed output position i.');
-  add('float value = input[offset + i * stride];','Reads one selected input into this thread’s local FP32 variable. The input address is the one studied by the sector model.');
+  add('float value = input[offset + i * stride];','Reads one selected input into this thread’s private FP32 value. The input address is the one studied by the sector model.');
  }
  if(source.includes('scale<<<')){
   add('scale<<<blocks, threadsPerBlock>>>(\n    d_input, d_intermediate, n);','Launches the first doubling calculation. Its result goes to the separately allocated intermediate GPU array.');
@@ -32,7 +32,6 @@ export function courseCudaExplanations(source){
  if(source.includes('void chooseCalculation(')){
   add('float value = input[i];','Reads this thread’s input after the array-bounds check.');
   add('if (value > 0.0f)','Chooses the doubling expression only for a positive input.');
-  add('else','Selects the other calculation for an input that did not pass the inner condition.');
   add('output[i] = -value;','Negates this thread’s input. This fixed reference uses the one-operation negative path.');
  }
  if(source.includes('void sumEight(')){
@@ -40,17 +39,17 @@ export function courseCudaExplanations(source){
   add('int t = threadIdx.x;','Uses a position from 0 to 7 inside the single eight-thread block.');
   add('partial[t] = input[t];','Gives each thread one initial write into the shared workspace.');
   add('__syncthreads();','Makes every block thread wait and orders preceding shared-memory writes before later reads. The call appears after the initial writes and after each addition stage.');
-  add('for (int stride = 8 / 2; stride > 0; stride /= 2)','Starts partner distance at 4, repeats while it is positive, and halves it after each stage: 4, 2, 1. The three for clauses are initial value, repeat condition and update.');
+  add('for (int stride = 8 / 2; stride > 0; stride /= 2)','Combines partial sums over partner distances 4, 2 and 1, with a block barrier after each stage.');
   add('if (t < stride)','Only the lower-index threads add at this stage; every thread still reaches the following barrier outside this condition.');
-  add('partial[t] += partial[t + stride];','Adds the partner’s partial sum into this thread’s shared position. += reads, adds and writes back.');
+  add('partial[t] += partial[t + stride];','Combines the partner’s partial sum with this thread’s value in the shared workspace.');
   add('if (t == 0) output[0] = partial[0];','Lets only thread 0 write the one final output after all stages.');
  }
  if(source.includes('void separateProducts(')){
   add('int row = blockIdx.y * blockDim.y + threadIdx.y;','Combines the block and thread y coordinates into the output row.');
   add('int col = blockIdx.x * blockDim.x + threadIdx.x;','Combines the x coordinates into the output column.');
-  add('if (row < 4 && col < 4)','Requires both coordinates to fit the fixed 4 × 4 output. && means both conditions must hold.');
+  add('if (row < 4 && col < 4)','Keeps threads whose row or column lies outside the fixed 4 × 4 output from accessing the arrays.');
   add('float sum = 0.0f;','Initialises this thread’s private FP32 dot-product sum to zero.');
-  add('for (int k = 0; k < 4; ++k)','Visits K positions 0–3. ++k increases k by one after each iteration.');
+  add('for (int k = 0; k < 4; ++k)','Visits K positions 0–3 to complete this thread’s output dot product.');
   add('sum += a[row * 4 + k] * b[k * 4 + col];','Adds the product of A’s row entry and B’s column entry. Each row contains four elements in this flat row-major representation.');
   add('c[row * 4 + col] = sum;','Stores the completed dot product in this thread’s output position.');
  }
@@ -103,7 +102,6 @@ export function courseCudaExplanations(source){
   add('cudaEventDestroy(start)','Releases the start event; the next call releases the stop event.');
  }
  if(source.includes('wmma::fragment')){
-  add('using namespace nvcuda;','Makes names in CUDA’s nvcuda group available, so calls can start with wmma:: instead of nvcuda::wmma::.');
   add('wmma::fragment<wmma::matrix_a, 16, 16, 16,\n        half, wmma::row_major> aTile;','Declares an FP16 A fragment for a 16 × 16 × 16 operation using row-major input. Its elements are distributed across the warp. The following declaration supplies the matching B fragment.');
   add('wmma::fragment<wmma::accumulator, 16, 16, 16,\n        float> result;','Declares the warp’s FP32 accumulator fragment for the output tile.');
   add('wmma::fill_fragment(result, 0.0f);','Initialises every accumulator entry to zero.');

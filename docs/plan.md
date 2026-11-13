@@ -5,8 +5,10 @@ Copyright © 2026 Christopher Snow.
 ## Audience and outcome
 
 The learner works with AI models and tensors, can read Python and array indexing, and wants
-to explain what happens below a framework operation. No CUDA or computer-architecture
-background is assumed. Introduce C/CUDA syntax when an experiment needs it.
+to explain what happens below a framework operation. Assume basic programming knowledge:
+variables, types, conditionals, loops and function calls. No CUDA or computer-architecture
+background is assumed. Explain CUDA-specific notation, execution, memory ownership and API
+contracts beside the examples. Keep C/C++ language tutorials out of the course.
 
 The outcome: explain where the time and memory go in an AI operation, predict which changes
 might help, and test those predictions against a model and eventually a real GPU.

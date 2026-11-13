@@ -50,14 +50,16 @@ test('repair explanations follow the actual guard and arithmetic instead of asse
  }
 });
 
-test('CUDA arithmetic explanations only explain a float suffix when its statement contains one',()=>{
+test('CUDA arithmetic explanations identify the per-thread FP32 data flow',()=>{
  const literal=codeExplanations(kernelSource(2)).find(e=>e.fragment.startsWith('output[i] ='));
  assert.match(literal.fragment,/2\.0f/);
- assert.match(literal.meaning,/trailing f/);
+ assert.match(literal.meaning,/FP32/);
+ assert.match(literal.meaning,/thread/);
  for(const operation of ['multiply','add','vector-add']){
   const expression=codeExplanations(kernelBody({index:'global',guard:true,operation})).find(e=>e.fragment.startsWith('y[i] ='));
   assert.ok(expression);
-  assert.doesNotMatch(expression.meaning,/trailing f/);
+  assert.match(expression.meaning,/FP32/);
+  assert.match(expression.meaning,/thread/);
  }
 });
 test('formatted tensor openings explain the arange input range without changing copyable source',()=>{
