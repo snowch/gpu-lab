@@ -42,3 +42,8 @@ now includes top-level and auxiliary course windows; embedded frames follow thei
 parent. The reader already captures map disclosures and scroll, and the stale-child
 snapshot regression remains in place. A worker contract checks participant
 ownership, while the complete offline browser suite checks coordinated updates.
+
+The embedded-map client also ignores an independent reload request from an older
+already-active worker, allowing its parent to perform the coordinated reload. The
+map browser regression exercises this older-worker message sequence as well as
+stale child snapshots, preserving the map view through deployment transitions.

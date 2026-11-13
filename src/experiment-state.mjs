@@ -56,7 +56,12 @@ navigator.serviceWorker?.addEventListener('message', ({ data, ports }) => {
     } catch (error) { ports[0].postMessage({ ready: false, error: error.message }); }
   }
   if (data?.type === 'ABORT_RESTART' && data.token === lock) { releaseLock(); sessionStorage.removeItem(snapshotKey()); }
-  if (data?.type === 'COMMIT_RESTART' && data.token === lock) location.reload();
+  if (data?.type === 'COMMIT_RESTART' && data.token === lock) {
+    // Older workers may still include the embedded map in their transaction.
+    // Its reader owns the reload and the map's disclosure/scroll snapshot.
+    if (window.parent !== window && document.getElementById('gpu-map')) releaseLock();
+    else location.reload();
+  }
 });
 function restore() {
   const key = incomingSnapshotKey;
