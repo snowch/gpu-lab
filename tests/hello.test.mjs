@@ -74,7 +74,7 @@ test('CUDA bridges stay with their diagrams and provide a local complete functio
   // borrowing the following guard section to supply its setup.
   const launch=html.split('id="idea-5"')[1].split('id="idea-4"')[0];
   const visible=launch.replace(/<details\b[\s\S]*?<\/details>/g,'');
-  const introduction=visible.indexOf('int n = 5;');
+  const introduction=visible.indexOf('n = 5');
   assert.ok(introduction>=0&&introduction<visible.indexOf('id="hello-bridge-launch-2"'));
   assert.match(visible,/d_input, d_output, n/);
   assert.doesNotMatch(bounds,/In the launch above/);

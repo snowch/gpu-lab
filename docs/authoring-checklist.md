@@ -64,9 +64,12 @@ Use the book’s existing audience, curriculum and shared components as constrai
   they need it. Connect the last observable result to the next question. Ground
   execution terms in a specific input, calculation and output before generalising
   about many executions or parallel progress.
-- [ ] Match explanations to the ML audience: assume basic Python, array indexing and
-  floating-point familiarity. Explain unfamiliar PyTorch arguments and GPU mechanisms;
-  use a short contextual note where prerequisite knowledge needs clarification.
+- [ ] Match explanations to the ML audience: assume basic programming, Python, array
+  indexing and floating-point familiarity. Explain unfamiliar PyTorch arguments, CUDA
+  notation and GPU mechanisms. Keep walkthroughs focused on thread participation,
+  data movement, storage/count contracts and synchronisation. Omit tutorials on
+  variables, braces, semicolons, ordinary conditionals, loop clauses, arithmetic
+  operators and namespaces. Explain the algorithm’s GPU consequence instead.
   Keep deeper compiler, optimisation and profiling discussion optional until needed.
   Put detailed scheduler policy, arithmetic rules and secondary accounting behind
   labelled native disclosures when the main activity does not require them.

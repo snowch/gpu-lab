@@ -22,7 +22,7 @@ ${openingCode(deviceOpening)}
 <p>By the end, given a different input length, you should be able to choose matching output storage, calculate enough blocks and pass the correct element count to the kernel.</p></section>
 
 <section class="book-section" id="input-count"><h2>1. Count the existing input values</h2>
-<p>Start with five values in CPU memory. A C++ <code>std::vector</code> is a resizable array that keeps track of its length. Unlike a pointer, it can report that length.</p>
+<p>Start with five FP32 values in the CPU array <code>input</code>. Its <code>input.size()</code> supplies the element count used below.</p>
 ${code('INPUT','CPU input array')}
 <p>The <code>input</code> name belongs to the CPU array here. Later, the kernel’s separate parameter named <code>input</code> will receive the address of the GPU copy.</p>
 <p>This kernel produces one output for each input, so the CPU program uses the input length to size both arrays. It does not need an output array to discover that count.</p>
@@ -40,7 +40,7 @@ ${code('COPY_IN','GPU allocation and CPU-to-GPU copy')}
 <section class="book-section" id="input-launch"><h2>3. Derive the block count and pass n</h2>
 <p>Choose four threads per block for this small example. The element count comes from the data; the block size is a separate choice.</p>
 ${code('BLOCK_SIZE','chosen block size')}
-<p>C++ integer division discards the remainder. Adding one less than the block size before dividing rounds the required block count up: <code>(5 + 4 - 1) / 4 = 2</code>.</p>
+<p>Round the block count up so the launch also covers a final partial block: <code>(5 + 4 - 1) / 4 = 2</code>.</p>
 ${code('LAUNCH','CPU launch for the existing input')}
 <p>Two blocks launch eight threads, but the argument <code>n</code> remains 5. It tells each thread how many array elements are valid. Changing the block size changes the grouping, while the count still comes from <code>input.size()</code>.</p>
 <details><summary>Revisit Chapter 1’s doubling kernel</summary>${code('KERNEL','complete doubling kernel from Chapter 1')}</details>

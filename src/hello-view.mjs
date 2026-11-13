@@ -120,19 +120,19 @@ export function renderCodeBridge(stage,factor) {
  ${definitions([['Kernel','A GPU function whose body contains the instructions each thread executes.'],['Launch','A request to execute a kernel. In CUDA, the launch specifies the number of blocks and threads per block.']])}
  <p>Ordinary PyTorch GPU operations usually handle kernel selection and launches for you. One operation may launch several kernels. Tensor layout and data type can still affect performance.</p>
  <p>When you launch a CUDA C++ kernel directly, you specify the block and thread counts. Our <code>runKernel</code> example doubles the inputs using a separate implementation; it is not PyTorch’s internal kernel.</p>
- <p>The CPU program must also determine how many input values it has. Here it stores that count in an integer variable named <code>n</code>: <code>int n = 5;</code>. We chose the name <code>n</code>; it is not a CUDA keyword. CUDA does not infer an array’s length from its address. For different data, the CPU program must set the count to match, allocate enough input and output storage in GPU memory, and copy the inputs there before launching.</p>
+ <p>The CPU program supplies the input count <code>n = 5</code> as a kernel argument. CUDA does not infer an array’s length from its address. For different data, the CPU program must set the count to match, allocate enough input and output storage in GPU memory, and copy the inputs there before launching.</p>
  <p>The launch below is a call in the CPU program, outside the kernel definition. It requests the two blocks of four threads shown in the diagram:</p>
  ${codePanel({id:'hello-bridge-launch-2',source:launchSource(),label:'CUDA C++ · launch from the CPU program',explainedLocally:true})}
  <div class="code-explanations hello-launch-explanations"><p class="code-explanation-heading">What each part does</p><ul>
  <li><code>int n = 5;</code> — Stores the count of five input values. This is separate from how many threads are launched.</li>
- <li><code>int threadsPerBlock = 4;</code> — Sets four threads per block; <code>int</code> declares an integer variable.</li>
+ <li><code>int threadsPerBlock = 4;</code> — Chooses four threads per block.</li>
  <li><code>int blocks = 2;</code> — Requests two blocks: eight threads in total.</li>
  <li><code>runKernel&lt;&lt;&lt;blocks, threadsPerBlock&gt;&gt;&gt;</code> — Starts our kernel with those settings.</li>
  <li><code>d_input, d_output, n</code> — Supply the kernel’s inputs in order: the input array’s location, the output array’s location and the element count. The value of the CPU variable <code>n</code> is copied into the kernel’s integer input, also named <code>n</code>, for every thread. Changing blocks or threads per block does not change that value.</li></ul></div>
  <h3>Keep extra threads out of the arrays</h3>
  <p>The launch creates threads with indices 0–7, but the five inputs have indices 0–4. The kernel needs a check before reading or writing so the extra threads skip the arrays.</p>
  ${definitions([['Bounds check','A check that an index refers to an element that exists before accessing it.']])}
- <p>Each thread calculates its own array index <code>i</code> from its block number and position. The condition <code>if (i &lt; n)</code> runs the enclosed array accesses only when <code>i</code> is smaller than the supplied count. The braces <code>{ }</code> group the statements controlled by <code>if</code>. With <code>n = 5</code>, indices 0–4 proceed and indices 5–7 skip both accesses. The check trusts <code>n</code>; an incorrect count can still allow an access beyond the allocated arrays.</p>
+ <p>Each thread calculates its own array index <code>i</code> from its block number and position. With the guard <code>i &lt; n</code> and <code>n = 5</code>, threads at indices 0–4 read inputs and write results; extra threads at indices 5–7 skip both accesses. The check trusts <code>n</code>; an incorrect count can still allow an access beyond the allocated arrays.</p>
  <details id="hello-bridge-complete-2"><summary>Complete CUDA kernel for this example</summary>
  <p>The complete function calculates each thread’s index and applies this bounds check before doubling an input. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
