@@ -51,3 +51,10 @@ stale child snapshots, preserving the map view through deployment transitions.
 The reader's restart lock also covers its map panel, so the embedded controls
 cannot change after capture while the update transaction is committing. The map
 regression checks that this lock is applied and released on an aborted restart.
+
+A throttled reproduction retained the correct parent snapshot and ultimately
+restored every expected map node, but exceeded the assertion's five-second
+window while the iframe was still loading. The offline and map regression
+checks now wait for the visible map-loading state to finish before asserting
+restored content. They retain the node-state assertion and failure diagnostics;
+no fixed sleep or unconditional retry replaces state verification.
