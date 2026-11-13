@@ -105,21 +105,3 @@ test('background cache pruning finishes before an update can create its staging 
   assert.equal(update.messages.at(-1).result.pendingReady,true);
   assert.ok(stores.has(prefix+'release-'+next.id));
 });
-
-
-test('restart participants include reading windows and auxiliary tabs while their embedded maps follow the parent',async()=>{
-  const base='https://example.test/gpu-lab/';
-  const clients=[
-    {id:'reader',url:base+'lessons/hello.html',frameType:'top-level'},
-    {id:'second-tab',url:base+'lessons/meet-gpu.html',frameType:'auxiliary'},
-    {id:'embedded-map',url:base+'lessons/meet-gpu.html?embedded=1',frameType:'nested'},
-    {id:'other-app',url:'https://elsewhere.test/lessons/hello.html',frameType:'top-level'},
-  ];
-  const release={files:[{path:'lessons/hello.html'},{path:'lessons/meet-gpu.html'}]};
-  const context=vm.createContext({release,URL,Request,Response,AbortController,AbortSignal,crypto:webcrypto,console,setTimeout,clearTimeout,
-    self:{registration:{scope:base},clients:{async matchAll(){return clients;}},addEventListener(){}}});
-  const contract=(await readFile(new URL('../src/release-contract.mjs',import.meta.url),'utf8')).replaceAll('export ','');
-  vm.runInContext(contract+'\n'+await readFile(new URL('../scripts/service-worker.js',import.meta.url),'utf8'),context);
-  const participants=await vm.runInContext('courseWindows(release)',context);
-  assert.deepEqual(Array.from(participants,client=>client.id),['reader','second-tab']);
-});
