@@ -1,3 +1,4 @@
+from section_cues import check_section_cues
 from nested_map import check_nested_map
 from course_flow import check_course_flow
 from lesson_completion import check_lesson_completion
@@ -251,6 +252,7 @@ try:
         check_launch_from_input(browser, URL, ROOT)
         check_course_flow(browser, URL, ROOT)
         check_code_explanations(browser, URL, ROOT)
+        check_section_cues(browser, URL, ROOT)
         check_profiling(browser, URL, ROOT, errors)
         check_sm_hardware(browser, URL, ROOT, errors)
         check_reduction_video(browser, URL, ROOT, errors)

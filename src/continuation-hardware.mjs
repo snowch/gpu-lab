@@ -1,3 +1,4 @@
+import {sectionHeading} from './section-cues.mjs';
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {definitions} from './chapter-view.mjs';
@@ -200,7 +201,7 @@ export const chapters = [
       answer: '<p>Thread 2’s write must happen before thread 0 reads shared word 2. The initial block barrier establishes that ordering when all threads take part. A barrier after an early read cannot make that read safe retroactively. The stage barriers also order partial-sum writes before subsequent stages read them.</p>',
     },
     optionalHTML: '<section class="book-section"><h2>Optional: how does shared-memory layout affect reads?</h2><p>The barriers establish when a shared value may be read. The <a href="shared-memory.html">shared-memory banks lab</a> explores a different question: how the addresses requested together affect the service of those reads. You can continue directly to matrix multiplication and return to that layout experiment later.</p></section>',
-    closingHTML: '<section class="book-section" id="reduction-recording-link"><h2>Watch the shared-memory sequence</h2><p>Optional recap: <a id="reduction-watch" data-reading-link href="reduction-video.html?from=reduction">watch shared memory and barriers</a>. Follow the four-input tree, inspect a read before its write, then apply the ordering rules to eight threads. The narrated diagrams explain this teaching algorithm; they are not a trace of PyTorch’s implementation.</p></section>',
+    closingHTML: `<section class="book-section chapter-resource" data-section-kind="recap" id="reduction-recording-link">${sectionHeading('recap','Watch the shared-memory sequence')}<p>Optional recap: <a id="reduction-watch" data-reading-link href="reduction-video.html?from=reduction">watch shared memory and barriers</a>. Follow the four-input tree, inspect a read before its write, then apply the ordering rules to eight threads. The narrated diagrams explain this teaching algorithm; they are not a trace of PyTorch’s implementation.</p></section>`,
   },
 ];
 

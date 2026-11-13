@@ -45,8 +45,8 @@ test('every published chapter and lab has annotated references before two or mor
     }
     const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
     assert.equal(ids.length,new Set(ids).size,slug);
-    assert.ok(html.indexOf('>References</h2>')<html.indexOf('>Use the documentation</h2>'));
-    assert.ok(html.indexOf('>Use the documentation</h2>')<html.indexOf('class="reference-task"'));
+    assert.ok(html.indexOf('id="chapter-references-title"')<html.indexOf('id="documentation-exercises-title"'));
+    assert.ok(html.indexOf('id="documentation-exercises-title"')<html.indexOf('class="reference-task"'));
     assert.doesNotMatch(html,/href="undefined"/);
   }
   assert.throws(()=>renderChapterReferences('missing'));
@@ -56,6 +56,6 @@ test('every published chapter and lab has annotated references before two or mor
   lessons.forEach((lesson,i)=>{
     const html=renderLesson(lesson,i);
     assert.match(html,new RegExp('id="reference-'+lesson.slug+'"'));
-    assert.ok(html.indexOf('>References</h2>')>html.indexOf('>Change one thing. Explain the result.</h2>'));
+    assert.ok(html.indexOf('id="chapter-references-title"')>html.indexOf('>Change one thing. Explain the result.</h2>'));
   });
 });

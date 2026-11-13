@@ -1,3 +1,4 @@
+import {sectionHeading} from './section-cues.mjs';
 // Copyright © 2026 Christopher Snow.
 import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
@@ -277,11 +278,11 @@ export function renderChapterReferences(slug,{compact=false}={}) {
   const chapter=chapterReferences[slug];
   if(!chapter) throw new Error('Missing chapter references: '+slug);
   const entries=sources=>`<ul class="chapter-reference-list">${sources.map(([key,label,description])=>`<li>${link(key,label)}<p>${escape(description)}</p></li>`).join('')}</ul>`;
-  const references=`<section class="chapter-references section-space" aria-labelledby="chapter-references-title"><h2 id="chapter-references-title">References</h2><p>Use these official references to check the concepts and code on this page.</p>${chapter.note?`<p>${escape(chapter.note)}</p>`:''}${entries(chapter.sources)}${chapter.optional?`<details><summary>Optional later reading</summary>${entries(chapter.optional)}</details>`:''}<p class="reference-version">These browser exercises do not run an installed PyTorch or CUDA toolkit. For optional local execution, choose documentation matching your installed tools. Links open online in a new tab; the questions and answer comparisons below work offline.</p></section>`;
-  const heading='<h2 id="documentation-exercises-title">Use the documentation</h2>';
+  const references=`<section class="chapter-references section-space chapter-resource" data-section-kind="references" aria-labelledby="chapter-references-title">${sectionHeading('references','References','chapter-references-title')}<p>Use these official references to check the concepts and code on this page.</p>${chapter.note?`<p>${escape(chapter.note)}</p>`:''}${entries(chapter.sources)}${chapter.optional?`<details><summary>Optional later reading</summary>${entries(chapter.optional)}</details>`:''}<p class="reference-version">These browser exercises do not run an installed PyTorch or CUDA toolkit. For optional local execution, choose documentation matching your installed tools. Links open online in a new tab; the questions and answer comparisons below work offline.</p></section>`;
+  const heading=sectionHeading('documentation','Use the documentation','documentation-exercises-title');
   const practice=`<p>Use the references to explain each answer, then apply it to this page’s example. No installation is needed.</p>${chapter.tasks.map(renderReferenceTask).join('\n')}`;
   const exercises=compact
-    ? `<details class="hello-doc-practice"><summary>${heading}<span> · ${chapter.tasks.length} optional questions</span></summary><div class="documentation-exercises section-space" aria-labelledby="documentation-exercises-title">${practice}</div></details>`
-    : `<section class="documentation-exercises section-space" aria-labelledby="documentation-exercises-title">${heading}${practice}</section>`;
+    ? `<details class="hello-doc-practice chapter-resource" data-section-kind="documentation"><summary>${heading}<span> · ${chapter.tasks.length} optional questions</span></summary><div class="documentation-exercises section-space" aria-labelledby="documentation-exercises-title">${practice}</div></details>`
+    : `<section class="documentation-exercises section-space chapter-resource" data-section-kind="documentation" aria-labelledby="documentation-exercises-title">${heading}${practice}</section>`;
   return references+exercises;
 }
