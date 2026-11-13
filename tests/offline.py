@@ -93,6 +93,19 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 url=f'http://127.0.0.1:{server.server_port}{prefix}'
                 context=browser.new_context(viewport={'width':width,'height':900},color_scheme=theme,has_touch=width<500,reduced_motion='reduce')
                 errors=[]; context.on('page',lambda page:page.on('pageerror',lambda error:errors.append(str(error))))
+                # Retain the parent's captured map state if an iframe restore fails
+                # on a CI browser. This records only the synthetic test map IDs.
+                context.add_init_script("""(() => {
+                  const set=Storage.prototype.setItem;
+                  Storage.prototype.setItem=function(key,value){
+                    const result=set.call(this,key,value);
+                    if(self===top&&key.startsWith('gpu-lab:restart:'))try{
+                      const map=JSON.parse(value).experiments?.['map-toggle'];
+                      if(map)set.call(sessionStorage,'gpu-lab:test-map-snapshot',JSON.stringify(map));
+                    }catch{}
+                    return result;
+                  };
+                })()""")
                 page=context.new_page(); page.goto(url+'lessons/hello.html?exercise=1#idea-2'); panel(page)
                 expect(page.locator('#version-status')).to_have_text('Up to date')
                 page.wait_for_function('navigator.serviceWorker.controller !== null')
@@ -253,7 +266,18 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
                 expect(concept_map.locator('#hardware-panel')).to_be_visible()
                 expect(concept_map.locator('#a-warp-1')).to_have_attribute('open','')
                 expect(page.locator('#gpu-map-panel')).to_be_visible()
-                expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
+                try:
+                    expect(page.frame_locator('#gpu-map-frame').locator('#a-w1-lane-7')).to_have_attribute('open','')
+                except AssertionError:
+                    print('Embedded map restore diagnostics:',page.evaluate("""() => {
+                      const frame=document.querySelector('#gpu-map-frame'),doc=frame.contentDocument;
+                      return {width:innerWidth,parentSnapshot:JSON.parse(sessionStorage.getItem('gpu-lab:test-map-snapshot')),
+                        frameURL:frame.contentWindow.location.href,ready:doc.readyState,
+                        open:[...doc.querySelectorAll('.map-node[open]')].map(n=>n.id),
+                        notice:doc.querySelector('.restore-notice')?.textContent,
+                        snapshots:Object.keys(sessionStorage).filter(k=>k.includes('restart:'))};
+                    }"""),flush=True)
+                    raise
                 page.locator('.gpu-map-link').click()
                 expect(page.locator('#gpu-map-panel')).to_be_hidden()
                 expect(page).to_have_url(url+'lessons/hello.html?exercise=1#idea-2')
