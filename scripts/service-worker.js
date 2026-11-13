@@ -138,6 +138,9 @@ async function prepare(release, save, port, signal) {
 async function courseWindows(release) {
   const paths = new Set(release.files.filter(f => f.path.endsWith('.html')).map(f => new URL(f.path, BASE).pathname));
   return (await self.clients.matchAll({ type: 'window', includeUncontrolled: true })).filter(client => {
+    // The reader snapshots and restores its embedded map. Restarting that frame
+    // independently can race the parent's reload and overwrite its saved view.
+    if (client.frameType === 'nested') return false;
     const url = new URL(client.url);
     return url.origin === BASE.origin && paths.has(url.pathname === BASE.pathname ? url.pathname + 'index.html' : url.pathname);
   });
