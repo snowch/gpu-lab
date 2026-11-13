@@ -1,3 +1,4 @@
+from course_flow import SLUGS
 # Copyright © 2026 Christopher Snow.
 """Recurring section roles stay visible, labelled and usable in the shared design."""
 from playwright.sync_api import expect
@@ -22,6 +23,12 @@ def check_section_cues(browser, url, root):
                     assert heading.inner_text().strip()
                     assert section.evaluate('el=>el.scrollWidth<=el.clientWidth'),(slug,width,theme)
                 assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(slug,width,theme)
+            if (width,theme)==(820,'light'):
+                for slug in SLUGS:
+                    page.goto(url+'lessons/'+slug+'.html')
+                    for section in page.locator('section[id$="-recording-link"]').all():
+                        expect(section).to_have_attribute('data-section-kind','recap')
+                        expect(section.locator('.section-cue-heading')).to_be_visible()
             page.goto(url+'lessons/reading.html')
             recap=page.locator('[data-section-kind="recap"]')
             recap.screenshot(path=str(root/f'test-results/resource-recap-{width}-{theme}.png'),style='.topbar{position:static!important}')
