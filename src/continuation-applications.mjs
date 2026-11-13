@@ -75,7 +75,7 @@ const transferCacheB = inferenceBudget({batch:1,sequence:512});
 
 export const chapters = [
   {
-    closingHTML:recordingLink('attention','update attention totals without full score matrices','Follow weighted results and rescaling of both retained totals, then compare a different tile width. The recording distinguishes selected intermediate transfers, single-query scratch and complete traffic; it does not execute a production FlashAttention kernel or predict GPU time.'),
+    closingHTML:recordingLink('attention','update attention totals without full score matrices'),
     slug:'attention', number:12, title:'How can attention use less memory?',
     lead:'Compute attention’s weighted sums, then compare storing full score and weight matrices with processing keys in tiles.',
     source:attentionCode(),
@@ -139,7 +139,7 @@ export const chapters = [
       },
     ],
     transfer:{prompt:'Compare a cache for batch 4 with 128 tokens per sequence against batch 1 with 512 tokens per sequence, keeping layers, width and value size fixed. Which needs more cache payload? Does equal cache payload imply equal per-token work or measured latency?',answer:`Both cache payloads are ${fmt(transferCacheA.kvCacheBytes)} bytes: batch × sequence length is 512 in each (${fmt(transferCacheB.kvCacheBytes)} bytes for the second case). Decode produces ${transferCacheA.tokens} new tokens in the first invocation and ${transferCacheB.tokens} in the second. Weight reuse and per-token accounting differ. Equal cache capacity alone does not establish equal work per token or measured latency.`},
-    closingHTML:recordingLink('inference','connect cache capacity to inference budgets','Follow existing cache payload, one-token decode, prompt prefill and ideal batch reuse. The recording ends with a longer-context question and distinguishes synthetic lower bounds from measured GPU time.'),
+    closingHTML:recordingLink('inference','connect cache capacity to inference budgets'),
     optionalHTML:`<details><summary>Optional: plan a real timing comparison</summary><p>Use a real model and document its shapes, datatype, batch, context, attention implementation and cache allocation strategy. Choose whether timing covers one invocation or the whole request. Warm up, account for asynchronous CUDA execution, synchronise the chosen interval, and repeat measurements. A result below this page's bound would first require checking units, counted work, assumed rates and timing scope. The browser exercises run no PyTorch or GPU benchmark.</p></details>`,
   },
 ];

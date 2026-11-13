@@ -1,4 +1,3 @@
-import {sectionHeading} from './section-cues.mjs';
 import {roundedTensorValue as tensorValue} from './value-format.mjs';
 // Copyright © 2026 Christopher Snow.
 import {definitions} from './chapter-view.mjs';
@@ -96,11 +95,11 @@ export const chapters = [
       prompt: 'A resident warp is waiting on a load, and another resident warp is ready. Must the next issue slot be idle? Explain what this model can tell you, and whether doubling the resident warp count proves a speedup.',
       answer: '<p>The ready warp can issue: the scheduler skips the waiting warp. Adding resident warps also adds six instructions per warp in this experiment. Compare issue-slot use and idle slots, but do not turn the elapsed cycles of different workloads into a speedup. Actual residency and performance need resource and hardware evidence beyond this model.</p>',
     },
-    closingHTML: recordingLink('scheduling','choose a ready warp while another waits','Follow the chosen single-issue teaching scheduler, distinguish waiting warps from idle slots and explain a new load latency. The model begins with resident warps and makes no GPU speed prediction.'),
+    closingHTML: recordingLink('scheduling','choose a ready warp while another waits'),
     optionalHTML: `<section class="book-section"><h2>Optional: see which blocks and SMs contain the warps</h2><p>The experiments began with warps already resident. This separate diagram places their blocks on two SMs. It uses three blocks of 64 threads, rather than the five tensor inputs in the opening. Compare blocks A and C on SM 0 with block B on SM 1. Each block has two warps; available resources constrain which blocks can share an SM.</p>${renderSchedulingRelationships()}</section>${renderSmWalkthrough()}`,
   },
   {
-    closingHTML: recordingLink('divergence','follow active masks through different paths','Distinguish lanes on another path from unused positions, then explain a new mask. The recording follows the declared positive-first arithmetic model; its operation counts are not compiler output or GPU timings.'),
+    closingHTML: recordingLink('divergence','follow active masks through different paths'),
     slug: 'divergence', number:8, title: 'What if lanes need different calculations?',
     lead: 'Double positive inputs and negate negative inputs, then compare lanes taking different paths with lanes that have no input.',
     source: branchSource(),
@@ -201,7 +200,7 @@ export const chapters = [
       answer: '<p>Thread 2’s write must happen before thread 0 reads shared word 2. The initial block barrier establishes that ordering when all threads take part. A barrier after an early read cannot make that read safe retroactively. The stage barriers also order partial-sum writes before subsequent stages read them.</p>',
     },
     optionalHTML: '<section class="book-section"><h2>Optional: how does shared-memory layout affect reads?</h2><p>The barriers establish when a shared value may be read. The <a href="shared-memory.html">shared-memory banks lab</a> explores a different question: how the addresses requested together affect the service of those reads. You can continue directly to matrix multiplication and return to that layout experiment later.</p></section>',
-    closingHTML: `<section class="book-section chapter-resource" data-section-kind="recap" id="reduction-recording-link">${sectionHeading('recap','Watch the shared-memory sequence')}<p>Optional recap: <a id="reduction-watch" data-reading-link href="reduction-video.html?from=reduction">watch shared memory and barriers</a>. Follow the four-input tree, inspect a read before its write, then apply the ordering rules to eight threads. The narrated diagrams explain this teaching algorithm; they are not a trace of PyTorch’s implementation.</p></section>`,
+    closingHTML: recordingLink('reduction','follow threads adding values together'),
   },
 ];
 

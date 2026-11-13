@@ -148,3 +148,13 @@ The Chapter 1 regrouping prediction ends with compact checked feedback and the
 index/output calculation. Keep its hint and worked comparison; reuse the preceding
 launch reference and download rather than adding another code walkthrough or
 thread map after Check. Preserve checked predictions when restoring older snapshots.
+
+## Optional chapter resources
+
+Use the compact rows in `recordingLink`, `desktopLinks` and
+`renderChapterReferences`. Keep the recap directly visible with its measured
+running time; keep local setup, annotated references and documentation practice in
+independent native disclosures. Do not add a coloured card, long introductory
+paragraph or an outer accordion around these rows. Keep the main explanation and
+application exercises visible. Progression uses a quiet completion checkbox and
+an evergreen next-chapter link. See [the review](quiet-resources-review.md).

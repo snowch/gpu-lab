@@ -111,7 +111,7 @@ export function renderIntroTransfer() {
   <div id="hello-transfer-diagram" hidden></div>
   <details><summary>Hint</summary><p>Multiply blocks by threads per block to count executions. Indices start at zero. A bounds check can stop an access; it cannot launch another thread.</p></details>
   <details><summary>Compare a worked explanation</summary><p>Two blocks provide only eight threads: input index 8 has no thread. Three blocks provide twelve threads: indices 0–8 write results, while 9–11 skip the arrays. The guard prevents extra threads from accessing nonexistent elements.</p></details>
-  <p><a href="kernel.html">Optional practice: repair a kernel →</a></p></section>`+recordingLink('hello','trace five values through GPU threads','Follow each value through its array index, block and bounds check, then explain a launch for nine inputs. The recording uses the chapter’s explicit thread mapping.');
+  <p><a href="kernel.html">Optional practice: repair a kernel →</a></p></section>`+recordingLink('hello','trace five values through GPU threads');
 }
 export function renderCodeBridge(stage,factor) {
  if(stage!==2)return '';

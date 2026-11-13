@@ -14,7 +14,7 @@ def check_matmul_video(browser,url,root,errors):
             page.locator('#matrix-reuse [data-next]').click()
             result=page.locator('#matrix-reuse [data-visual-output]').inner_text()
             expect(page.locator('#matrix-dot [data-results]')).to_be_hidden()
-            expect(page.locator('#matmul-recording-link')).to_contain_text('Optional recap')
+            expect(page.locator('#matmul-watch')).to_contain_text('Watch chapter recap')
             assert page.locator('#matmul-recording-link').evaluate('el=>el.previousElementSibling.matches(".continuation-transfer")&&el.nextElementSibling.matches(".desktop-links")')
             link=page.locator('#matmul-watch')
             link.evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-250,behavior:'instant'})")

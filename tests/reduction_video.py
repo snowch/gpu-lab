@@ -15,7 +15,7 @@ def check_reduction_video(browser, url, root, errors):
             result=page.locator('#reduction-size [data-visual-output]').inner_text()
             # Read the preceding transfer, recording recap and following local-run section.
             expect(page.locator('.continuation-transfer h2')).to_have_text('Try a new case')
-            expect(page.locator('#reduction-recording-link')).to_contain_text('Optional recap')
+            expect(page.locator('#reduction-watch')).to_contain_text('Watch chapter recap')
             link=page.locator('#reduction-watch')
             link.evaluate("el=>scrollTo({top:scrollY+el.getBoundingClientRect().top-250,behavior:'instant'})")
             position=page.evaluate('scrollY')

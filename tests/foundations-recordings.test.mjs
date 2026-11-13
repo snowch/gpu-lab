@@ -57,3 +57,12 @@ test('sector recap preserves useful bytes, accounts for alignment and excludes t
  assert.doesNotMatch(requestsFigure('question'),/20 useful bytes|64 covered bytes/);
  assert.match(requestsFigure('answer'),/20 useful bytes · 2 sectors · 64 covered bytes/);
 });
+
+test('compact recap durations match measured metadata for all fourteen recordings',async()=>{
+ const {recordingDurations}=await import('../src/recording-durations.mjs');
+ assert.equal(Object.keys(recordingDurations).length,14);
+ for(const [slug,seconds] of Object.entries(recordingDurations)){
+  const metadata=JSON.parse(await readFile(new URL(`../content/${slug}-media.json`,import.meta.url),'utf8'));
+  assert.equal(seconds,metadata.durationSeconds,slug);
+ }
+});

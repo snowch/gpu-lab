@@ -59,24 +59,48 @@
  .chapter-opening-code,.book-chapter .chapter-code-panel[data-language="cuda"]>pre { padding-inline:16px; }
 }
 
-/* Repeated supporting sections have visible roles, without changing lesson headings. */
-.book-chapter { --recap-ink:#694a8a; --recap-soft:#f5f1f9; --desktop-ink:#365b7b; --desktop-soft:#f0f5f9; }
-:root[data-theme="dark"] .book-chapter { --recap-ink:#d4b9f2; --recap-soft:#272332; --desktop-ink:#b5d6f4; --desktop-soft:#203039; }
-.book-chapter .chapter-resource { max-width:960px; --section-ink:var(--muted); --section-soft:var(--soft); border:1px solid var(--line); border-left:3px solid var(--section-ink); border-radius:0 10px 10px 0; background:var(--section-soft); padding:24px; margin-block:40px; }
-.book-chapter .chapter-resource[data-section-kind="recap"] { --section-ink:var(--recap-ink); --section-soft:var(--recap-soft); }
-.book-chapter .chapter-resource[data-section-kind="desktop"] { --section-ink:var(--desktop-ink); --section-soft:var(--desktop-soft); }
-.book-chapter .chapter-resource[data-section-kind="references"] { background:transparent; }
-.book-chapter .chapter-resource[data-section-kind="documentation"] { --section-ink:var(--accent); --section-soft:var(--accent-soft); }
-.book-chapter .chapter-resource .section-cue-heading { display:flex; align-items:flex-start; gap:12px; margin:0 0 16px; font-size:clamp(23px,2.6vw,29px); line-height:1.3; }
-.section-cue-icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 32px; width:32px; height:36px; color:var(--section-ink); }
-.section-cue-icon svg { display:block; }
-.chapter-resource>p:last-child { margin-bottom:0; }
+/* Optional resources form a quiet index after the chapter's application. */
+.book-chapter .chapter-resource { max-width:960px; border:0; border-bottom:1px solid var(--line); border-radius:0; background:transparent; padding:0; margin:0; scroll-margin-top:100px; }
+.book-chapter .chapter-resource[data-section-kind="recap"] { border-top:1px solid var(--line); margin-top:40px; }
+.book-chapter .chapter-resource .section-cue-heading { display:flex; align-items:center; gap:12px; min-width:0; margin:0; font-size:18px; font-weight:600; line-height:1.45; letter-spacing:0; }
+.section-cue-icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 24px; width:24px; height:24px; color:var(--muted); }
+.section-cue-icon svg { display:block; width:20px; height:20px; }
+.book-chapter .chapter-resource>summary { display:flex; align-items:center; gap:16px; min-height:64px; padding:18px 4px; cursor:pointer; list-style:none; }
+.chapter-resource>summary::-webkit-details-marker { display:none; }
+.chapter-resource>summary::marker { content:""; }
+.chapter-resource>summary .section-cue-heading { flex:1; }
+.chapter-resource>summary::after { content:""; flex:0 0 8px; width:8px; height:8px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:rotate(-45deg); margin-right:5px; }
+.chapter-resource[open]>summary::after { transform:rotate(45deg); }
+.resource-summary-note,.recap-duration { color:var(--muted); font-size:14px; font-weight:400; white-space:nowrap; }
+.recap-duration { margin-left:auto; font-variant-numeric:tabular-nums; }
+.book-chapter .recap-watch { display:flex; align-items:center; gap:12px; width:100%; min-height:68px; padding:18px 4px; color:var(--accent); text-decoration:none; }
+.recap-watch .section-cue-icon { color:var(--accent); }
+.resource-arrow { flex:0 0 16px; margin-left:4px; text-align:center; }
+.resource-body { padding:0 4px 24px 40px; }
+.resource-body>p:first-child { margin-top:0; }
+.resource-body>p:last-child { margin-bottom:0; }
+.resource-body>p { max-width:68ch; }
 .chapter-resource .chapter-reference-list { padding-left:22px; }
-.book-chapter .hello-doc-practice.chapter-resource>summary { align-items:flex-start; }
-.book-chapter .hello-doc-practice.chapter-resource>summary .section-cue-heading { display:inline-flex; margin-bottom:0; }
-@media(max-width:600px) {
- .book-chapter .chapter-resource { padding:20px 16px; margin-block:32px; }
- .book-chapter .chapter-resource .section-cue-heading { gap:8px; }
- .section-cue-icon { flex-basis:26px; width:26px; height:31px; }
+.book-chapter .chapter-resource>summary:focus-visible,.book-chapter .recap-watch:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; border-radius:4px; }
+@media(hover:hover) {
+ .book-chapter .chapter-resource>summary:hover,.book-chapter .recap-watch:hover { background:var(--soft); }
+ .recap-watch:hover>span:nth-child(2) { text-decoration:underline; text-underline-offset:4px; }
 }
-@media(forced-colors:active) { .book-chapter .chapter-resource { border-color:CanvasText; } .section-cue-icon { color:CanvasText; } }
+/* Progression is the primary action; resources remain available without dominating. */
+.book-chapter :is(.book-pager,.lesson-pagination) { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); align-items:end; gap:24px; border-top:0; margin-top:32px; padding-block:0 24px; }
+.book-chapter :is(.book-pager,.lesson-pagination)>a { border:0; border-radius:0; background:transparent; padding:12px 0; min-height:44px; font-size:16px; }
+.book-chapter .lesson-forward { align-items:stretch; gap:16px; }
+.book-chapter .lesson-completion label { border:0; border-radius:0; background:transparent; padding:0; font-size:15px; }
+.book-chapter .lesson-completion p { margin-top:0; text-align:left; }
+.book-chapter :is(.book-pager,.lesson-pagination)>.lesson-forward>a { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:64px; border:1px solid var(--accent); border-radius:8px; padding:16px 20px; background:var(--accent); color:var(--panel); font-size:17px; font-weight:600; line-height:1.5; text-align:left; text-decoration:none; }
+@media(max-width:600px) {
+ .book-chapter .chapter-resource .section-cue-heading { font-size:17px; }
+ .book-chapter .chapter-resource[data-section-kind="recap"] { margin-top:32px; }
+ .book-chapter .chapter-resource[data-section-kind="documentation"]>summary { display:grid; grid-template-columns:minmax(0,1fr) 12px; gap:2px 12px; }
+ .chapter-resource[data-section-kind="documentation"]>summary::after { grid-column:2; grid-row:1 / 3; }
+ .resource-summary-note { grid-column:1; padding-left:36px; font-size:13px; }
+ .resource-body { padding:4px 4px 20px; }
+ .book-chapter :is(.book-pager,.lesson-pagination) { grid-template-columns:minmax(0,1fr); gap:12px; margin-top:24px; }
+ .book-chapter .lesson-forward { gap:12px; }
+}
+@media(forced-colors:active) { .section-cue-icon { color:CanvasText; } .book-chapter :is(.book-pager,.lesson-pagination)>.lesson-forward>a { border-color:LinkText; color:LinkText; } }

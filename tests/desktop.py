@@ -15,7 +15,7 @@ def check_desktop(browser,url,root):
                 assert response.ok,link.get_attribute('href')
                 assert len(response.body())>100
             for details in page.locator('main details').all():
-                details.locator('summary').click()
+                details.locator(':scope > summary').click()
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
             page.screenshot(path=str(root/f'test-results/desktop-{width}-{theme}.png'),full_page=True)
             page.goto(url+'lessons/hello.html')
