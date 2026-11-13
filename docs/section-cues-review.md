@@ -35,3 +35,10 @@ The missing Chapter 1, 3 and 14 recaps are a separate recording task. Their talk
 tracks and model-derived slide previews are prepared for the record-demo
 workflow's required script approval; this section styling does not publish an
 unavailable video or imply that it has already been recorded.
+
+The offline checks exposed a remaining map restart race: the worker independently
+restarted the embedded map as well as its parent reader. Restart participation
+now includes top-level and auxiliary course windows; embedded frames follow their
+parent. The reader already captures map disclosures and scroll, and the stale-child
+snapshot regression remains in place. A worker contract checks participant
+ownership, while the complete offline browser suite checks coordinated updates.
