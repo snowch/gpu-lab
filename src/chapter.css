@@ -62,7 +62,7 @@
 /* Repeated supporting sections have visible roles, without changing lesson headings. */
 .book-chapter { --recap-ink:#694a8a; --recap-soft:#f5f1f9; --desktop-ink:#365b7b; --desktop-soft:#f0f5f9; }
 :root[data-theme="dark"] .book-chapter { --recap-ink:#d4b9f2; --recap-soft:#272332; --desktop-ink:#b5d6f4; --desktop-soft:#203039; }
-.book-chapter .chapter-resource { --section-ink:var(--muted); --section-soft:var(--soft); border:1px solid var(--line); border-left:3px solid var(--section-ink); border-radius:0 10px 10px 0; background:var(--section-soft); padding:24px; margin-block:40px; }
+.book-chapter .chapter-resource { max-width:960px; --section-ink:var(--muted); --section-soft:var(--soft); border:1px solid var(--line); border-left:3px solid var(--section-ink); border-radius:0 10px 10px 0; background:var(--section-soft); padding:24px; margin-block:40px; }
 .book-chapter .chapter-resource[data-section-kind="recap"] { --section-ink:var(--recap-ink); --section-soft:var(--recap-soft); }
 .book-chapter .chapter-resource[data-section-kind="desktop"] { --section-ink:var(--desktop-ink); --section-soft:var(--desktop-soft); }
 .book-chapter .chapter-resource[data-section-kind="references"] { background:transparent; }
