@@ -1,65 +1,65 @@
 {
   "durationSeconds": 265,
-  "bytes": 12787126,
+  "bytes": 12761874,
   "scenes": [
     {
       "id": "s01",
       "start": 0,
-      "end": 25.009,
+      "end": 24.988,
       "title": "One row meets one column."
     },
     {
       "id": "s02",
-      "start": 25.009,
-      "end": 47.565,
+      "start": 24.988,
+      "end": 47.544,
       "title": "Add four products."
     },
     {
       "id": "s03",
-      "start": 47.565,
-      "end": 74.089,
+      "start": 47.544,
+      "end": 74.068,
       "title": "Load two small input tiles."
     },
     {
       "id": "s04",
-      "start": 74.089,
-      "end": 96.965,
+      "start": 74.068,
+      "end": 96.944,
       "title": "Reuse an A value across columns."
     },
     {
       "id": "s05",
-      "start": 96.965,
-      "end": 121.313,
+      "start": 96.944,
+      "end": 121.292,
       "title": "Reuse a B value across rows."
     },
     {
       "id": "s06",
-      "start": 121.313,
-      "end": 149.523,
+      "start": 121.292,
+      "end": 149.48,
       "title": "Keep the sums. Replace the inputs."
     },
     {
       "id": "s07",
-      "start": 149.523,
-      "end": 176.793,
+      "start": 149.48,
+      "end": 176.751,
       "title": "Add the next phase's contribution."
     },
     {
       "id": "s08",
-      "start": 176.793,
-      "end": 206.517,
+      "start": 176.751,
+      "end": 206.475,
       "title": "Same output. Fewer explicit loads."
     },
     {
       "id": "s09",
-      "start": 206.517,
-      "end": 235.22,
+      "start": 206.475,
+      "end": 235.177,
       "title": "Pause: use a wider tile."
     },
     {
       "id": "s10",
-      "start": 235.22,
-      "end": 264.965,
+      "start": 235.177,
+      "end": 264.837,
       "title": "Sharing belongs to an output tile."
     }
   ],
@@ -67,182 +67,182 @@
     {
       "id": "s01-c1",
       "start": 0.6,
-      "end": 8.749,
-      "text": "Matrix multiplication combines inputs with weights in a neural network. Start with the four by four matrices from Chapter Nine."
+      "end": 8.728,
+      "text": "Matrix multiplication combines inputs with weights in a neural network. Start with the four by four matrices from Chapter Ten."
     },
     {
       "id": "s01-c2",
-      "start": 8.969,
-      "end": 17.097,
+      "start": 8.948,
+      "end": 17.076,
       "text": "One output combines a row from matrix A with a column from matrix B. The K index selects the matching pair of inputs."
     },
     {
       "id": "s01-c3",
-      "start": 17.317,
-      "end": 23.589,
+      "start": 17.296,
+      "end": 23.568,
       "text": "This is our teaching algorithm. PyTorch selects its own implementation for the matrix operation."
     },
     {
       "id": "s02-c1",
-      "start": 25.609,
-      "end": 33.503,
+      "start": 25.588,
+      "end": 33.481,
       "text": "For row zero and column zero, multiply each matching pair, then add the four products. The output is one point zero."
     },
     {
       "id": "s02-c2",
-      "start": 33.723,
-      "end": 40.187,
+      "start": 33.701,
+      "end": 40.165,
       "text": "Our first algorithm gives each output its own thread. Each thread loads both inputs for every product."
     },
     {
       "id": "s02-c3",
-      "start": 40.407,
-      "end": 46.145,
+      "start": 40.385,
+      "end": 46.124,
       "text": "Neighbouring outputs need some of the same inputs. Could a block load those inputs once and share them?"
     },
     {
       "id": "s03-c1",
-      "start": 48.165,
-      "end": 56.08,
+      "start": 48.144,
+      "end": 56.059,
       "text": "A tile is a small rectangular part of a matrix. Choose a two by two output tile, with one output per thread in our block."
     },
     {
       "id": "s03-c2",
-      "start": 56.3,
-      "end": 65.644,
+      "start": 56.279,
+      "end": 65.623,
       "text": "Load both input tiles into shared memory: four values from matrix A, and four from matrix B. These cover K positions zero and one."
     },
     {
       "id": "s03-c3",
-      "start": 65.864,
-      "end": 72.669,
+      "start": 65.843,
+      "end": 72.648,
       "text": "This group of K positions is one phase. The four threads use the input tiles to build four partial sums."
     },
     {
       "id": "s04-c1",
-      "start": 74.689,
-      "end": 80.087,
+      "start": 74.668,
+      "end": 80.065,
       "text": "Follow the highlighted value from matrix A: minus two, at row zero and K zero."
     },
     {
       "id": "s04-c2",
-      "start": 80.307,
-      "end": 87.603,
+      "start": 80.285,
+      "end": 87.581,
       "text": "It combines with two different values from matrix B, contributing to output columns zero and one in the same row."
     },
     {
       "id": "s04-c3",
-      "start": 87.823,
-      "end": 95.545,
+      "start": 87.801,
+      "end": 95.524,
       "text": "The block keeps the input in shared memory so both threads can use it. Our count includes both products, even when one is zero."
     },
     {
       "id": "s05-c1",
-      "start": 97.565,
-      "end": 102.003,
+      "start": 97.544,
+      "end": 101.981,
       "text": "Now follow minus one from matrix B, at K zero and column zero."
     },
     {
       "id": "s05-c2",
-      "start": 102.223,
-      "end": 109.199,
+      "start": 102.201,
+      "end": 109.177,
       "text": "It combines with different values from matrix A, contributing to output rows zero and one in the same column."
     },
     {
       "id": "s05-c3",
-      "start": 109.419,
-      "end": 119.893,
+      "start": 109.397,
+      "end": 119.872,
       "text": "Each loaded value serves two outputs in this phase. The two input tiles contain eight values; separate output threads would load sixteen inputs for those same products."
     },
     {
       "id": "s06-c1",
-      "start": 121.913,
-      "end": 130.148,
+      "start": 121.892,
+      "end": 130.127,
       "text": "We have included only the first two K positions. Each thread retains its own partial output sum while the block moves to the next phase."
     },
     {
       "id": "s06-c2",
-      "start": 130.368,
-      "end": 141.163,
+      "start": 130.347,
+      "end": 141.141,
       "text": "The shared input tiles can be replaced only after every thread using them has finished. A real shared-memory implementation needs ordering between these uses and writes."
     },
     {
       "id": "s06-c3",
-      "start": 141.383,
-      "end": 148.103,
-      "text": "The new input tiles must also be ready before threads read them, applying the barrier reasoning from Chapter Eight."
+      "start": 141.361,
+      "end": 148.06,
+      "text": "The new input tiles must also be ready before threads read them, applying the barrier reasoning from Chapter Nine."
     },
     {
       "id": "s07-c1",
-      "start": 150.123,
-      "end": 156.821,
+      "start": 150.08,
+      "end": 156.779,
       "text": "The next input tiles cover K positions two and three. Their products are added to the existing partial sums."
     },
     {
       "id": "s07-c2",
-      "start": 157.041,
-      "end": 165.532,
+      "start": 156.999,
+      "end": 165.489,
       "text": "For output row zero, column zero, the first phase contributed two. The second contributes minus one, leaving one point zero."
     },
     {
       "id": "s07-c3",
-      "start": 165.752,
-      "end": 175.373,
+      "start": 165.709,
+      "end": 175.331,
       "text": "All four K positions are now included. This output tile matches the separate-output algorithm. The remaining output tiles follow the same pattern."
     },
     {
       "id": "s08-c1",
-      "start": 177.393,
-      "end": 187.271,
+      "start": 177.351,
+      "end": 187.228,
       "text": "Across the complete multiplication, tile width one loads one hundred and twenty-eight input values. Width two loads sixty-four. Width four loads thirty-two."
     },
     {
       "id": "s08-c2",
-      "start": 187.491,
-      "end": 196.451,
+      "start": 187.448,
+      "end": 196.408,
       "text": "All three algorithms produce the same sixteen output values. Larger tiles share each loaded input across more outputs in one phase."
     },
     {
       "id": "s08-c3",
-      "start": 196.671,
-      "end": 205.097,
+      "start": 196.628,
+      "end": 205.055,
       "text": "These are explicit input-load counts. They exclude cache reuse and do not measure physical memory transactions or GPU speed."
     },
     {
       "id": "s09-c1",
-      "start": 207.117,
-      "end": 213.667,
+      "start": 207.075,
+      "end": 213.624,
       "text": "Try eight by eight matrices with tile width four. Focus on just one output tile and one K phase."
     },
     {
       "id": "s09-c2",
-      "start": 213.887,
-      "end": 222.015,
+      "start": 213.844,
+      "end": 221.972,
       "text": "First count the input values loaded for this phase. Then explain how one loaded input can contribute to several outputs in the tile."
     },
     {
       "id": "s09-c3",
-      "start": 222.235,
-      "end": 230.0,
+      "start": 222.192,
+      "end": 229.957,
       "text": "Consider a different output tile elsewhere in the matrix. Can it automatically use the same load? Pause here to explain your reasoning."
     },
     {
       "id": "s10-c1",
-      "start": 235.82,
-      "end": 245.143,
+      "start": 235.777,
+      "end": 245.1,
       "text": "The phase loads sixteen values from each input matrix: thirty-two in total. Each loaded value contributes to four outputs in this output tile."
     },
     {
       "id": "s10-c2",
-      "start": 245.363,
-      "end": 253.619,
+      "start": 245.32,
+      "end": 253.576,
       "text": "A different output tile can load the same input again. Sharing within one block does not automatically supply another block's workspace."
     },
     {
       "id": "s10-c3",
-      "start": 253.839,
-      "end": 263.545,
-      "text": "Return to Chapter Nine. Change only tile width, compare the complete output and input-load counts, and explain the reuse before making any performance claim."
+      "start": 253.796,
+      "end": 263.417,
+      "text": "Return to Chapter Ten. Change only tile width, compare the complete output and input-load counts, and explain the reuse before making any performance claim."
     }
   ],
   "speech": {
@@ -259,7 +259,7 @@
       "provider": "CPUExecutionProvider"
     },
     "durations": {
-      "s01-c1": 8.149,
+      "s01-c1": 8.128,
       "s01-c2": 8.128,
       "s01-c3": 6.272,
       "s02-c1": 7.893,
@@ -276,7 +276,7 @@
       "s05-c3": 10.475,
       "s06-c1": 8.235,
       "s06-c2": 10.795,
-      "s06-c3": 6.72,
+      "s06-c3": 6.699,
       "s07-c1": 6.699,
       "s07-c2": 8.491,
       "s07-c3": 9.621,
@@ -288,7 +288,7 @@
       "s09-c3": 7.765,
       "s10-c1": 9.323,
       "s10-c2": 8.256,
-      "s10-c3": 9.707
+      "s10-c3": 9.621
     }
   }
 }

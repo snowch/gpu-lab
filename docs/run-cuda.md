@@ -114,8 +114,11 @@ The suite is configured to check:
 - The 32-value padded shared-memory column read in
   `examples/shared-memory.cu`.
 
-Unsafe workshop configurations are excluded. This suite does not compile or
-validate tensor-core or attention CUDA kernels. The CUDA CI workflow uses the
+The self-checking course reference adds 215 outputs covering the later chapters,
+including FP16 conversion, online attention and cache append. The separate WMMA
+example is compiled for compute capability 7.0 but is not executed in the simulator.
+Unsafe workshop configurations are excluded; physical tensor-core execution remains
+unvalidated. The CUDA CI workflow uses the
 same Dockerfile and scripts and preserves compiler, simulator and run logs.
 The configured checks are not themselves evidence that a particular revision
 passed; inspect that revision's CI result and artifacts. See
@@ -150,7 +153,7 @@ python test-results/desktop-examples/hello.py --device cpu
 
 The generator writes to `test-results/desktop-examples/`; the site build places
 the same runnable sources under `examples/desktop/` in the built site. They
-include chapters 1–12, the memory lab and named experiment downloads such as
+include chapters 1–2 and 4–14, the memory lab and named experiment downloads such as
 `precision-accumulation.py`. Use the appendix links to choose a program.
 
 The repository also includes the opening companion:
@@ -202,3 +205,9 @@ the functional simulator constitutes a performance measurement.
 For a reproducible report, include the command, source file, expected values,
 compiler version, simulator revision and full failure log. Keep correctness,
 simulated behaviour and physical GPU performance as separate claims.
+
+The main-path Chapter 3 download is `launch-from-input.cu`. Later CUDA connections
+share the self-checking `course-bridges.cu` download; its 215 outputs cover selection,
+packing, strided reads, ordered launches, branching, reduction, matrix products,
+FP16 conversion, attention and cache append. The separate `wmma.cu` download is
+compiled in CI but requires supported native hardware for execution.

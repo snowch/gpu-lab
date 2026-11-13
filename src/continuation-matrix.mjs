@@ -64,7 +64,7 @@ const list = values => values.map(tensorValue).join(', ');
 
 export const chapters = [
   {
-    slug:'matmul',number:9,title:'How can matrix multiplication reuse its inputs?',
+    slug:'matmul',number:10,title:'How can matrix multiplication reuse its inputs?',
     lead:'Multiply matching entries of a row and a column, add their products, then reuse input values across several outputs.',
     source:matrixCode(matmulDefaults),
     openingHTML:`<p>In a neural-network layer, matrix multiplication combines many inputs with learned weights. Here <code>@</code> multiplies two ${basicMatmul.n} × ${basicMatmul.n} matrices. It produces a new ${basicMatmul.output.length} × ${basicMatmul.output[0].length} matrix, C.</p><p>A’s first row is [${escape(list(basicMatmul.a[0]))}]; B’s first column is [${escape(list(basicMatmul.b.map(row=>row[0])))}]. You choose the matrices and operation. PyTorch selects the implementation, allocates the result and launches the GPU work; this code leaves the grouping of GPU work to that implementation.</p>`,
@@ -92,7 +92,7 @@ export const chapters = [
   },
   {
     closingHTML:recordingLink('tensor-cores','follow input rounding into FP32 sums','Compare conversion, cancellation and small-value range before applying an exact-input case. The recording uses sequential arithmetic to explain accuracy; it does not identify tensor-core instructions or GPU timings.'),
-    slug:'tensor-cores',number:10,title:'What changes when matrix inputs use fewer bits?',
+    slug:'tensor-cores',number:11,title:'What changes when matrix inputs use fewer bits?',
     lead:'Convert FP32 inputs to FP16 or BF16, compare the resulting sums, then connect matrix operations to tensor cores.',
     source:precisionCode(precisionDefaults),
     openingHTML:`<p>A matrix multiplication in a neural network can store inputs in a smaller number format. <code>torch.float16</code> stores each input in two bytes instead of FP32’s four. The conversion with <code>.to(...)</code> may round a value before <code>@</code> uses it. Converting the result to FP32 for printing cannot restore discarded input information.</p><p>All rows of A are identical and all entries of B are one. Every output is therefore the same row–column dot product. The row starts with eight values written as 1.0003 and ends with eight −1.0 values. They first enter FP32 storage, then convert to FP16. You choose the inputs and format; PyTorch chooses the matrix implementation. The browser uses a declared arithmetic order to isolate conversion and accumulation.</p>`,

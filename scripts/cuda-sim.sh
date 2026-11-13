@@ -70,10 +70,15 @@ grep -q 'Verified 32 padded shared-memory column values.' "$run_dir/run.log"
 echo 'PASS: padded shared-memory column read'
 
 # Chapter 1 and safe workshop files use the exact browser-download generators.
+# Compile the native-only WMMA reference against the named toolkit. Its tensor-
+# core execution is deliberately outside the functional-simulation checks.
+nvcc -std=c++17 -O2 -gencode arch=compute_70,code=compute_70 \
+  -c "$output_root/../generated-cuda/native-only-wmma.cu" -o "$output_root/wmma.o"
 # Each JSON file is an independent arithmetic reference, including workshop add
 # variants whose operation differs from the workshop's multiply-by-two goal.
 for source_file in "$output_root"/../generated-cuda/*.cu; do
   case_name=$(basename "$source_file" .cu)
+  [[ "$case_name" == native-only-* ]] && continue
   case "$case_name" in
     workshop-*) log_name="$case_name" ;;
     *) log_name="hello-$case_name" ;;

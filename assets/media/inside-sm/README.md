@@ -3,7 +3,7 @@
 Copyright © 2026 Christopher Snow.
 
 The approved recording replaces the beginner value inspector in `inside-sm.html`.
-The separate warp/readiness walkthrough remains interactive in Chapter 6.
+The separate warp/readiness walkthrough remains interactive in Chapter 7.
 
 - `inside-sm.mp4`: 3840 × 2160, 30 fps, H.264/AAC; 209 seconds. Includes English
   subtitles and scene chapters. The browser also uses `captions.vtt` for native captions.

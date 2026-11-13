@@ -5,7 +5,7 @@
     "lead":"Build one output, then look for inputs it can share.",
     "stage":"dot-inputs",
     "captions":[
-      "Matrix multiplication combines inputs with weights in a neural network. Start with the four by four matrices from Chapter Nine.",
+      "Matrix multiplication combines inputs with weights in a neural network. Start with the four by four matrices from Chapter Ten.",
       "One output combines a row from matrix A with a column from matrix B. The K index selects the matching pair of inputs.",
       "This is our teaching algorithm. PyTorch selects its own implementation for the matrix operation."
     ]
@@ -62,7 +62,7 @@
     "captions":[
       "We have included only the first two K positions. Each thread retains its own partial output sum while the block moves to the next phase.",
       "The shared input tiles can be replaced only after every thread using them has finished. A real shared-memory implementation needs ordering between these uses and writes.",
-      "The new input tiles must also be ready before threads read them, applying the barrier reasoning from Chapter Eight."
+      "The new input tiles must also be ready before threads read them, applying the barrier reasoning from Chapter Nine."
     ]
   },
   {
@@ -107,7 +107,7 @@
     "captions":[
       "The phase loads sixteen values from each input matrix: thirty-two in total. Each loaded value contributes to four outputs in this output tile.",
       "A different output tile can load the same input again. Sharing within one block does not automatically supply another block's workspace.",
-      "Return to Chapter Nine. Change only tile width, compare the complete output and input-load counts, and explain the reuse before making any performance claim."
+      "Return to Chapter Ten. Change only tile width, compare the complete output and input-load counts, and explain the reuse before making any performance claim."
     ]
   }
 ]

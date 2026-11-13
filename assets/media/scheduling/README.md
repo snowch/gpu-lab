@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 6 links to this optional eight-slide recap after its independent transfer
+Chapter 7 links to this optional eight-slide recap after its independent transfer
 exercise. Loads, thread registers and shared execution hardware lead into the
 single-issue teaching scheduler. The slides follow one and two resident warps,
 compare idle slots alongside changing instruction counts, and ask about a new

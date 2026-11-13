@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapters 1–5 use `src/chapter.css` and the helpers in `src/chapter-view.mjs`.
+Chapters 1–6 use `src/chapter.css` and the helpers in `src/chapter-view.mjs`.
 Extra practice pages also load `chapter.css` and use the `book-chapter` body
 class, including the memory explorer, kernel workshop and shared-memory lab.
 Use the same components when extending the book rather than copying a chapter's
@@ -56,11 +56,11 @@ colours, type sizes or spacing into another stylesheet.
 
 The shared rules are loaded after chapter-specific styles. Keep model-specific
 layouts in their own stylesheets and put common visual decisions in `chapter.css`.
-Browser checks compare computed styles across all five chapters at phone, tablet
+Browser checks compare computed styles across the opening chapters at phone, tablet
 and desktop widths in both themes, and record opening screenshots. Review those
 screenshots as well as checking for overflow.
 
-Chapters 6–13 use `continuation-view.mjs` and `continuation.mjs` for local experiments.
+Chapters 7–14 use `continuation-view.mjs` and `continuation.mjs` for local experiments.
 Each `data-book-experiment` has its own configuration, Run feedback and result.
 Use `trace: false` when a result is a capacity/count comparison with no useful
 sequence to inspect; do not manufacture steps just because the underlying engine

@@ -2,6 +2,7 @@
 export const chapters=[
   {title:'How does a GPU double five values?',slug:'hello',summary:'Double five input values, then trace each result through threads, indices and a CUDA kernel.',opening:true},
   {title:'Where are tensor values stored?',slug:'devices',summary:'Copy five inputs from CPU to GPU memory, multiply them, then copy the results back.',opening:true},
+  {title:'How does a CUDA program manage GPU memory?',slug:'launch-from-input',summary:'Derive counts from an input array, allocate GPU storage, copy values, launch a kernel and read back the results.',opening:true},
   {title:'How do we select values from a tensor?',slug:'reading',summary:'Select rows and columns, then multiply the chosen values.',opening:true},
   {title:'How are tensor values arranged in memory?',slug:'layout',summary:'Locate row and column values in memory, compare strides, then make a packed copy.',opening:true},
   {title:'How do threads read tensor values?',slug:'requests',summary:'Compare the memory sectors read by five threads for a row, a column and a packed copy.',opening:true},

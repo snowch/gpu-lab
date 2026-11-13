@@ -1,53 +1,53 @@
 {
   "durationSeconds": 174,
-  "bytes": 8098369,
+  "bytes": 8107967,
   "scenes": [
     {
       "id": "s01",
       "start": 0,
-      "end": 22.592,
+      "end": 22.656,
       "title": "Choose values by coordinates."
     },
     {
       "id": "s02",
-      "start": 22.592,
-      "end": 42.197,
+      "start": 22.656,
+      "end": 42.261,
       "title": "A row fixes the first coordinate."
     },
     {
       "id": "s03",
-      "start": 42.197,
-      "end": 64.235,
+      "start": 42.261,
+      "end": 64.299,
       "title": "Multiply the selected row."
     },
     {
       "id": "s04",
-      "start": 64.235,
-      "end": 81.984,
+      "start": 64.299,
+      "end": 82.027,
       "title": "A column fixes the second coordinate."
     },
     {
       "id": "s05",
-      "start": 81.984,
-      "end": 104.64,
+      "start": 82.027,
+      "end": 104.704,
       "title": "Multiply the selected column."
     },
     {
       "id": "s06",
-      "start": 104.64,
-      "end": 127.616,
+      "start": 104.704,
+      "end": 127.68,
       "title": "Change only the index."
     },
     {
       "id": "s07",
-      "start": 127.616,
-      "end": 151.171,
+      "start": 127.68,
+      "end": 151.256,
       "title": "Pause: interpret this expression."
     },
     {
       "id": "s08",
-      "start": 151.171,
-      "end": 173.869,
+      "start": 151.256,
+      "end": 173.997,
       "title": "The second coordinate fixes the column."
     }
   ],
@@ -55,98 +55,98 @@
     {
       "id": "s01-c1",
       "start": 0.6,
-      "end": 9.837,
-      "text": "Chapter Three keeps the floating-point values on the GPU and arranges them in a five by five tensor. Row and column numbers start at zero."
+      "end": 9.901,
+      "text": "Chapter Four keeps the floating-point values on the GPU and arranges them in a five by five tensor. Row and column numbers start at zero."
     },
     {
       "id": "s01-c2",
-      "start": 10.057,
-      "end": 21.172,
+      "start": 10.121,
+      "end": 21.236,
       "text": "The first coordinate selects a row; the second selects a column. These logical coordinates identify inputs. PyTorch chooses execution details for the CUDA operation."
     },
     {
       "id": "s02-c1",
-      "start": 23.192,
-      "end": 32.088,
+      "start": 23.256,
+      "end": 32.152,
       "text": "Read x, zero, colon. Row zero is fixed, while the colon includes all columns. Trace the five highlighted inputs from left to right."
     },
     {
       "id": "s02-c2",
-      "start": 32.308,
-      "end": 40.777,
+      "start": 32.372,
+      "end": 40.841,
       "text": "Selecting the row chooses the inputs. Multiplying each selected value by two is a separate calculation, which we will inspect next."
     },
     {
       "id": "s03-c1",
-      "start": 42.797,
-      "end": 51.523,
+      "start": 42.861,
+      "end": 51.587,
       "text": "Each output is twice its selected input. The source coordinates beside the values show where every input came from in the original tensor."
     },
     {
       "id": "s03-c2",
-      "start": 51.743,
-      "end": 62.815,
+      "start": 51.807,
+      "end": 62.879,
       "text": "This multiplication creates a new result tensor. It leaves the original x unchanged. Selecting a row and calculating its outputs are different parts of the expression."
     },
     {
       "id": "s04-c1",
-      "start": 64.835,
-      "end": 72.557,
+      "start": 64.899,
+      "end": 72.621,
       "text": "Now read x, colon, zero. The column is fixed, while the colon includes all rows. We take one input from each row."
     },
     {
       "id": "s04-c2",
-      "start": 72.777,
-      "end": 80.564,
+      "start": 72.841,
+      "end": 80.607,
       "text": "The first row and first column share their first value, but the other inputs differ. Both selections still contain five values."
     },
     {
       "id": "s05-c1",
-      "start": 82.584,
-      "end": 91.331,
+      "start": 82.627,
+      "end": 91.395,
       "text": "Multiply each column input by two. Each result uses one highlighted input; we are not adding the five values into a single total."
     },
     {
       "id": "s05-c2",
-      "start": 91.551,
-      "end": 103.22,
+      "start": 91.615,
+      "end": 103.284,
       "text": "This is elementwise multiplication: apply the operation separately to each selected value. Changing from a row to a column changes the inputs, while the multiplier stays fixed."
     },
     {
       "id": "s06-c1",
-      "start": 105.24,
-      "end": 114.819,
+      "start": 105.304,
+      "end": 114.883,
       "text": "With index one, a row selection chooses the second row. A column selection chooses the second column. Compare their five inputs in the diagram."
     },
     {
       "id": "s06-c2",
-      "start": 115.039,
-      "end": 126.196,
+      "start": 115.103,
+      "end": 126.26,
       "text": "Keep the multiplier fixed and explain which coordinates changed. A different selection can change the values without changing the number of inputs or the calculation applied to each."
     },
     {
       "id": "s07-c1",
-      "start": 128.216,
-      "end": 137.048,
+      "start": 128.28,
+      "end": 137.112,
       "text": "Try x, colon, three, then multiply by two. Before checking, identify which dimension is fixed and which dimension the colon includes."
     },
     {
       "id": "s07-c2",
-      "start": 137.268,
-      "end": 145.951,
+      "start": 137.332,
+      "end": 146.036,
       "text": "Trace the five input cells, then predict their five outputs. Does index three mean the fourth row or the fourth column here? Pause and explain."
     },
     {
       "id": "s08-c1",
-      "start": 151.771,
-      "end": 162.501,
+      "start": 151.856,
+      "end": 162.587,
       "text": "Index three fixes the fourth column because counting starts at zero. The colon includes every row. The diagram follows those five inputs into their doubled results."
     },
     {
       "id": "s08-c2",
-      "start": 162.721,
-      "end": 172.449,
-      "text": "The original tensor is unchanged. Return to Chapter Three, change only a row or column index, and explain the selected inputs before pressing Run."
+      "start": 162.807,
+      "end": 172.577,
+      "text": "The original tensor is unchanged. Return to Chapter Four, change only a row or column index, and explain the selected inputs before pressing Run."
     }
   ],
   "speech": {
@@ -163,22 +163,22 @@
       "provider": "CPUExecutionProvider"
     },
     "durations": {
-      "s01-c1": 9.237,
+      "s01-c1": 9.301,
       "s01-c2": 11.115,
       "s02-c1": 8.896,
       "s02-c2": 8.469,
       "s03-c1": 8.725,
       "s03-c2": 11.072,
       "s04-c1": 7.723,
-      "s04-c2": 7.787,
-      "s05-c1": 8.747,
+      "s04-c2": 7.765,
+      "s05-c1": 8.768,
       "s05-c2": 11.669,
       "s06-c1": 9.579,
       "s06-c2": 11.157,
       "s07-c1": 8.832,
-      "s07-c2": 8.683,
+      "s07-c2": 8.704,
       "s08-c1": 10.731,
-      "s08-c2": 9.728
+      "s08-c2": 9.771
     }
   }
 }

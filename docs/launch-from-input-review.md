@@ -1,3 +1,6 @@
+> Historical review for the optional version introduced in #115. The main-path
+> placement and current sequence are reviewed in [cuda-learning-review.md](cuda-learning-review.md).
+
 # Input-derived launch practice review
 
 Copyright © 2026 Christopher Snow.

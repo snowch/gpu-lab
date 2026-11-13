@@ -1,4 +1,4 @@
-# Chapters 6–12: migration decisions
+# Chapters 7–13: migration decisions
 
 Copyright © 2026 Christopher Snow.
 
@@ -60,9 +60,9 @@ Keep a resource prominent only when it has a distinct learner outcome:
   Keep it under Extra practice and link it from chapter 1.
 - **Shared-memory banks:** explore conflicts, broadcasts and padding beyond the
   reduction and matrix-reuse chapters. Keep it under Extra practice, linked from
-  chapter 8.
-- **Memory access explorer:** its introductory prose overlaps chapters 3–5.
-  Link directly to its flexible stride/offset/active-lane controls from chapter 5,
+  chapter 9.
+- **Memory access explorer:** its introductory prose overlaps chapters 4–6.
+  Link directly to its flexible stride/offset/active-lane controls from chapter 6,
   rather than presenting the old lab as another course entry. Retain its route,
   recap and downloads for existing links and offline use. Show its current-page
   entry when visiting the explorer.

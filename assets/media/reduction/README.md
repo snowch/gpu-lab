@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 8 links to this optional recap after its transfer exercise. The recording
+Chapter 9 links to this optional recap after its transfer exercise. The recording
 follows four inputs through shared-memory writes, the initial block barrier,
 partner-distance-2 additions, another barrier and the final addition. A separate
 diagnostic shows an unwritten partner read and assigns no numeric result. An

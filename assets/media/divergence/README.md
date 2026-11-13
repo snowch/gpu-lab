@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 7 links to this eight-slide recap after its independent exercise. Uniform,
+Chapter 8 links to this eight-slide recap after its independent exercise. Uniform,
 alternating and rare paths lead into five-input examples, where other-path lanes
 and unused positions are distinguished explicitly. A new 17-input example asks
 for masks and arithmetic operations before its answer. All masks, input signs,

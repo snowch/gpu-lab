@@ -12,7 +12,7 @@ function configurations(experiment) {
 }
 
 test('hardware chapters render every offered configuration and trace position from the unchanged models', () => {
-  assert.deepEqual(chapters.map(chapter => chapter.number), [6, 7, 8]);
+  assert.deepEqual(chapters.map(chapter => chapter.number), [7, 8, 9]);
   const ids = new Set();
   for (const chapter of chapters) {
     assert.match(chapter.source, /^import torch/);

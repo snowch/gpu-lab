@@ -12,8 +12,8 @@ def check_launch_from_input(browser, url, root):
             page.locator('#device-factor-2').fill('3')
             page.locator('#device-run-2').click()
             page.locator('#cuda-practice a').click()
-            expect(page.locator('h1')).to_have_text('From an input array to a CUDA launch')
-            expect(page.locator('main > header .eyebrow')).to_have_text('EXTRA PRACTICE')
+            expect(page.locator('h1')).to_have_text('How does a CUDA program manage GPU memory?')
+            expect(page.locator('main > header .eyebrow')).to_have_text('CHAPTER 3')
             expect(page.locator('#launch-sizes')).to_contain_text('input.size()')
             expect(page.locator('#launch-copy_in + .code-explanations li')).to_have_count(4)
             explanation = page.locator('#launch-sizes + .code-explanations button').first
@@ -44,4 +44,4 @@ def check_launch_from_input(browser, url, root):
     expect(page.locator('#launch-comparison')).to_contain_text('extra blocks alone would not fix')
     expect(page.get_by_role('link', name='Download the complete CUDA program', exact=True)).to_be_visible()
     context.close()
-    print('PASS: input-derived launch practice, keyboard/no-JavaScript answers, exact-source download, return state and phone/tablet/desktop in both themes')
+    print('PASS: Chapter 3 CUDA memory workflow, keyboard/no-JavaScript answers, exact-source download, return state and phone/tablet/desktop in both themes')

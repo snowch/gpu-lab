@@ -33,7 +33,7 @@ Map chapter links navigate the reading window. Direct map routes also use the fu
 Hardware terms follow NVIDIA CUDA conventions; boxes distinguish resident work from
 physical resources and do not imply a chip floor plan or simultaneous execution.
 
-## Architecture ownership diagrams (chapter 6)
+## Architecture ownership diagrams (chapter 7)
 
 The introduction's ownership view and work map share a declared example: four blocks
 with 64 threads each, placed on two SMs by block index modulo two. This placement is
@@ -318,7 +318,7 @@ outputs fail validation. No physical NVIDIA GPU execution has been validated.
 
 ## Book opening: devices, selection, layout and memory requests
 
-`foundations-model.mjs` supplies each chapter 2–5 diagram, byte count and result.
+`foundations-model.mjs` supplies the chapters 2 and 4–6 diagrams, byte counts and results.
 `deviceJourney` models separate CPU and GPU allocations for five or eight FP32
 values. Its three snapshots show a CPU-to-GPU copy, out-of-place multiplication
 on the GPU, and a GPU-to-CPU copy. Earlier setup is included in each independent
@@ -377,7 +377,7 @@ participation and sectors. Each page supplies its own setup and stores experimen
 under its own route. Repeated row/column IDs retain their meanings within that route.
 The new pages are included in offline release generation and update restoration tests.
 
-## Progressive continuation, chapters 6–12
+## Progressive continuation, chapters 7–13
 
 The continuation uses the unchanged architecture and AI engines above. Each local
 experiment fixes most settings and exposes only those needed for its question.
@@ -389,7 +389,7 @@ remain authoritative for numerical invariants; chapter checks additionally verif
 configuration coverage and model-derived presentation. The earlier Lab numbers in
 this document identify engine provenance, not the current chapter numbering.
 
-## Final investigation (chapter 13)
+## Final investigation (chapter 14)
 
 The capstone reuses tiledMatmul unchanged with N=4, shared budget=128 bytes and
 64 registers per output thread. Tile widths 1, 2 and 4 count 128, 64 and 32
@@ -407,6 +407,19 @@ stores write the output array. Values and hardware roles are conceptual, not a
 schedule or compiler trace. Caches, unit counts, latency and throughput are omitted.
 
 The existing generated 64-input/two-warp readiness sequence remains unchanged in
-Chapter 6’s optional hardware walkthrough. Its cursor is saved independently of
+Chapter 7’s optional hardware walkthrough. Its cursor is saved independently of
 the chapter’s teaching scheduler. The video saves time and playback preferences,
 restores paused, and retires old inspector snapshots without replaying them.
+
+## CUDA connections and host workflow
+
+Chapter 3 follows the original five-value host workflow using a CPU C++ vector.
+It derives the element count from `input.size()`, derives bytes from element size,
+allocates matching output storage for this elementwise operation, and distinguishes
+launch coverage from valid indices. New CUDA excerpts for chapters 4–14 and their
+complete downloads share `course-cuda-source.mjs`; `cuda-bridges.mjs` supplies their
+launch/allocation contracts and `cuda-bridge-explanations.mjs` supplies the shared
+walkthrough fragments. These reference implementations do not change browser model
+numerics or claim to be PyTorch-generated source. The 215-output functional check
+uses independent CPU references; WMMA is compiled separately. Physical GPU execution
+and timing remain outside this review's validation.

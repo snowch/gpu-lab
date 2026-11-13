@@ -22,5 +22,5 @@ export function inferenceFigure(stage){
  throw new Error('Unknown inference recording stage: '+stage);
 }
 const notes={overview:'Model-managed tensors are separate from hardware caches.',capacity:'1 MiB = 1,048,576 bytes; 1 KiB = 1,024 bytes.',decode:'One invocation processes one new token per sequence.',prefill:'Full square attention count; no causal triangular savings.',bounds:'Hidden width 4,096 · rates and arithmetic are synthetic.',batch:'Each batch member is an independent sequence.',question:'Distinguish the old payload from the appended entries.',answer:'A real bottleneck needs evidence from the actual implementation.'};
-export const inferenceDeck=()=>recordingDeck({chapter:12,title:'Connect cache capacity to inference budgets',scenes:scenes.map(s=>({...s,note:notes[s.stage]})),figure:inferenceFigure,scope:'Synthetic decoder · ideal weight reuse · selected transfers · no measured GPU time'});
+export const inferenceDeck=()=>recordingDeck({chapter:13,title:'Connect cache capacity to inference budgets',scenes:scenes.map(s=>({...s,note:notes[s.stage]})),figure:inferenceFigure,scope:'Synthetic decoder · ideal weight reuse · selected transfers · no measured GPU time'});
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)await writeRecordingDeck(process.argv[2]||'test-results/inference-recording',inferenceDeck(),scenes);

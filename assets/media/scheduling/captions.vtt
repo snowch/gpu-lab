@@ -1,49 +1,49 @@
 WEBVTT
 
-00:00:00.600 --> 00:00:12.867
-Chapter Six asks what can run while a warp waits for data. A load brings an input into a thread's registers. The multiply uses that working value, and a store writes the result to memory.
+00:00:00.600 --> 00:00:12.952
+Chapter Seven asks what can run while a warp waits for data. A load brings an input into a thread's registers. The multiply uses that working value, and a store writes the result to memory.
 
-00:00:13.087 --> 00:00:31.689
+00:00:13.172 --> 00:00:31.775
 Our teaching scheduler gives each resident warp two repetitions of load, multiply, store. Resident means already assigned resources on one streaming multiprocessor, or SM. This chosen instruction stream does not trace PyTorch's implementation or compute its tensor values.
 
-00:00:33.709 --> 00:00:46.381
+00:00:33.795 --> 00:00:46.467
 A model cycle is one discrete step. Our machine can start at most one instruction per cycle. Load latency six means the dependent multiply cannot start until six cycles after its load.
 
-00:00:46.601 --> 00:01:00.660
+00:00:46.687 --> 00:01:00.745
 Warp zero starts its load at cycle zero. At cycles one through five it is waiting, so the issue slots are idle. The multiply starts at cycle six. These cycles are teaching assumptions, not measured GPU time.
 
-00:01:02.680 --> 00:01:13.155
+00:01:02.765 --> 00:01:13.240
 Now begin with two resident warps, both ready at cycle zero. The scheduler selects warp zero first, then searches from the following warp for the next ready instruction.
 
-00:01:13.375 --> 00:01:26.153
+00:01:13.460 --> 00:01:26.239
 At cycle one, warp zero is waiting but warp one is ready. Warp one starts its load. The SM can issue useful work while another warp waits; it does not need a separate arithmetic unit for each warp.
 
-00:01:28.173 --> 00:01:38.627
+00:01:28.259 --> 00:01:38.712
 At cycle two, both warps are waiting for their loaded inputs. Neither can start its multiply, so this issue slot is idle. Cycles three through five are idle too.
 
-00:01:38.847 --> 00:01:50.409
+00:01:38.932 --> 00:01:50.495
 Another resident warp helps only when it has an instruction ready to start. This scheduler skips waiting and completed warps. It never leaves a slot idle when an unfinished warp is ready.
 
-00:01:52.429 --> 00:02:02.755
+00:01:52.515 --> 00:02:02.840
 At cycle six, warp zero's first load is usable. Warp one's load started a cycle later, so it is still waiting. The scheduler starts warp zero's multiply.
 
-00:02:02.975 --> 00:02:16.372
+00:02:03.060 --> 00:02:16.457
 At cycle seven, warp one becomes ready and starts its multiply. The cards show state before the selected instruction starts. Registers belong to threads; the execution hardware is shared by resident warps.
 
-00:02:18.392 --> 00:02:29.251
+00:02:18.477 --> 00:02:29.336
 Keep load latency at six and compare one, two and four resident warps. Idle slots fall from ten to eight to four. Four warps still do not fill every wait in this example.
 
-00:02:29.471 --> 00:02:43.060
+00:02:29.556 --> 00:02:43.145
 Each warp adds six instructions, so issued work rises from six to twelve to twenty-four. These different workloads do not establish a speedup. The model ends when the final store starts, without a later store-completion wait.
 
-00:02:45.080 --> 00:02:55.981
+00:02:45.165 --> 00:02:56.067
 Apply the readiness rule to a new case: two resident warps, with load latency three instead of six. Warp zero loads at cycle zero and warp one loads at cycle one.
 
-00:02:56.201 --> 00:03:06.911
+00:02:56.287 --> 00:03:06.996
 Predict whether cycle two is idle. Then choose which warp can start its multiply at cycle three. Pause and explain using the load start times, before checking the answer.
 
-00:03:12.731 --> 00:03:24.848
+00:03:12.816 --> 00:03:24.933
 At cycle two, neither load is ready, so the slot is idle. At cycle three, warp zero's input is usable, while warp one must wait until cycle four. Warp zero starts its multiply.
 
-00:03:25.068 --> 00:03:42.967
-Return to Chapter Six and distinguish a waiting warp from an idle issue slot. This single-issue, round-robin machine omits resource-limited residency, bandwidth competition and real instruction latencies. More resident warps alone do not prove higher GPU performance.
+00:03:25.153 --> 00:03:43.159
+Return to Chapter Seven and distinguish a waiting warp from an idle issue slot. This single-issue, round-robin machine omits resource-limited residency, bandwidth competition and real instruction latencies. More resident warps alone do not prove higher GPU performance.

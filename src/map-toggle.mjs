@@ -13,7 +13,7 @@ if(link&&!standalone){
  const status=document.createElement('p');status.setAttribute('role','status');status.className='map-loading';
  const frame=document.createElement('iframe');frame.title='GPU map';frame.id='gpu-map-frame';
  panel.append(status,frame);reading.after(panel);
- let opened=false,ready=false,position=[0,0],pendingURL=mapURL.href;
+ let opened=false,ready=false,position=[0,0],pendingURL=mapURL.href,pendingFrameState=null;
  const resize=()=>panel.style.setProperty('--map-header-height',document.querySelector('.topbar').getBoundingClientRect().height+'px');
  new ResizeObserver(resize).observe(document.querySelector('.topbar'));
  function theme(){if(ready)frame.contentDocument.documentElement.dataset.theme=document.documentElement.dataset.theme;}
@@ -28,7 +28,7 @@ if(link&&!standalone){
  }
  function open(saved){
   if(opened)return;
-  position=saved?.position??[scrollX,scrollY];opened=true;
+  position=saved?.position??[scrollX,scrollY];pendingFrameState=saved?.frameState??null;opened=true;
   if(!frame.hasAttribute('src')){
    const url=new URL(saved?.url??pendingURL,location);
    // A restored frame may only load this book's map.
@@ -63,9 +63,19 @@ if(link&&!standalone){
    }
   });
   if(opened)frame.contentWindow.focus();
+  // The worker may restart the iframe as well as this reading window. Restore
+  // the parent's captured map after the child's own load/restore handlers.
+  if(pendingFrameState){
+   const saved=pendingFrameState;pendingFrameState=null;
+   if(Array.isArray(saved.open))for(const node of doc.querySelectorAll('#gpu-map .map-node'))node.open=saved.open.includes(node.id);
+   const scroll=saved.scroll??[0,0];
+   frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.scrollTo({left:scroll[0],top:scroll[1],behavior:'instant'}));
+  }
  });
  toggle.addEventListener('click',()=>opened?close():open());
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&opened&&!document.querySelector('dialog[open]')){event.preventDefault();close();}});
  addEventListener('gpu-lab:before-restart',event=>{if(frame.hasAttribute('src')&&!ready)event.detail.reason='Wait for the GPU map to finish loading, then retry the update.';});
- registerExperiment('map-toggle',()=>({open:opened,position,url:ready?frame.contentWindow.location.href:mapURL.href}),saved=>{pendingURL=saved.url??mapURL.href;if(saved.open)open(saved);});
+ registerExperiment('map-toggle',()=>({open:opened,position,url:ready?frame.contentWindow.location.href:mapURL.href,
+  frameState:ready?{open:[...frame.contentDocument.querySelectorAll('#gpu-map .map-node[open]')].map(node=>node.id),scroll:[frame.contentWindow.scrollX,frame.contentWindow.scrollY]}:null,
+ }),saved=>{pendingURL=saved.url??mapURL.href;if(saved.open)open(saved);});
 }

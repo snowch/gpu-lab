@@ -2,7 +2,7 @@
 
 Copyright © 2026 Christopher Snow.
 
-Chapter 10 links to this optional eight-slide recap after its independent exercise.
+Chapter 11 links to this optional eight-slide recap after its independent exercise.
 It traces near-one input conversion before sequential FP32 accumulation, exposes
 lost information through cancellation, compares very small FP16/BF16 inputs, and
 asks about exactly representable inputs before showing their result. All displayed

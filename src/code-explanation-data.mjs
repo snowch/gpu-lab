@@ -1,5 +1,6 @@
 // Copyright © 2026 Christopher Snow.
 // Explanations are curated for the book's examples, not guesses about arbitrary code.
+import {courseCudaExplanations} from './cuda-bridge-explanations.mjs';
 export function codeExplanations(source) {
   const entries=[];
   const add=(fragment,meaning)=>{
@@ -11,11 +12,13 @@ export function codeExplanations(source) {
   };
   const match=(pattern,meaning)=>{const m=source.match(pattern);if(m)add(m[0].trim(),typeof meaning==='function'?meaning(m):meaning);};
   const python=/^import torch\b/.test(source.trimStart());
-  if(source.includes('std::vector<float> input')||source.includes('input.size()')||source.includes('cudaMalloc(&d_input')||source.includes('output.data()')||source.trim()==='int threadsPerBlock = 4;') {
+  if(source.includes('std::vector<float> input')||source.includes('input.size()')||source.includes('cudaMalloc(&d_input')||source.includes('output.data()')||source.includes('cudaFree(d_input)')||source.trim()==='int threadsPerBlock = 4;') {
     add('std::vector<float> input', 'Declares a CPU array named input using the C++ standard library. float stores FP32 values; the braces supply its entries. A trailing f marks a float literal.');
     add('int n = static_cast<int>(input.size());', 'Reads the input element count with .size() and converts it to the integer type int. These small counts fit int; the complete program checks its size limit before converting. n is our chosen variable name.');
     add('std::vector<float> output(input.size());', 'Allocates a separate CPU array with one float position per input. It will receive the copied GPU result.');
     add('std::size_t bytes = input.size() * sizeof(float);', 'Multiplies the element count by the bytes per float. std::size_t is a C++ type for sizes; sizeof(float) is four bytes here. bytes is the size of each allocation, rather than both allocations together.');
+    add('cudaFree(d_input)', 'Releases the GPU input allocation after the result has been copied back.');
+    add('cudaFree(d_output)', 'Releases the separate GPU output allocation. It does not delete the CPU result.');
     add('float *d_input, *d_output;', 'Declares two pointers for GPU addresses. The * marks a pointer; declaring these variables allocates no GPU arrays. The d_ prefix is a naming choice.');
     add('cudaMalloc(&d_input, bytes)', 'Allocates bytes of GPU storage. & lets cudaMalloc store the allocation’s address in d_input. The surrounding CUDA_CHECK checks for failure.');
     add('cudaMalloc(&d_output, bytes)', 'Allocates a separate GPU output array of the same byte size, because this kernel writes one result per input.');
@@ -144,6 +147,10 @@ export function codeExplanations(source) {
     add('transposed = x.T', 'Swaps the row and column interpretation. This transpose is a view: its values stay in the same storage.');
     add('transposed[0, :]', 'Reads the first row of the transposed view: the original tensor’s first column.');
     match(/y = (?:values|packed|transposed\[0, :\]) \* [^\n]+/, 'Multiplies each selected value by the shown amount to create the result tensor y.');
+  }
+  for(const [fragment,meaning] of courseCudaExplanations(source)){
+    const existing=entries.find(entry=>entry.fragment===fragment);
+    if(existing)existing.meaning=meaning;else add(fragment,meaning);
   }
   return entries.sort((a,b)=>source.indexOf(a.fragment)-source.indexOf(b.fragment));
 }

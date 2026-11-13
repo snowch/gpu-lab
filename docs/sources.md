@@ -19,9 +19,10 @@ references for the implemented lab, not evidence that this browser model reprodu
 - [CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/index.html).
   Thread hierarchy, block/grid indexing, warp size, global memory and kernel launches.
 - [CUDA Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/index.html).
-  Allocation, copies, error handling and synchronisation in the optional CUDA example.
+  Allocation, copies, error handling and synchronisation in Chapter 3 and the CUDA downloads.
 
-The CUDA example has not yet been compiled or run on a real GPU in this project.
+CUDA downloads are compiled and checked in functional simulation. Physical NVIDIA
+GPU execution remains unvalidated in this project.
 The model tests establish its specified address arithmetic, not performance agreement with
 hardware. Each additional teaching model distinguishes its assumptions from hardware claims.
 
@@ -76,7 +77,7 @@ Browser tests exercise supported CUDA expressions in an explicit CPU teaching mo
 including the concept-first thread mapping, prediction/repair checks, invalid accesses, generated downloads and
 offline use. There is no in-browser CUDA compiler. CI compiles chapter 1 downloads with nvcc and checks their output in GPGPU-Sim
 using the shared desktop runner. Physical NVIDIA GPU execution remains unvalidated.
-Workshop downloads are not yet included in these compilation checks. The previous WGSL/WebGPU prototype and its
+The repair-workshop downloads are included in the generated CUDA compilation and output checks. The previous WGSL/WebGPU prototype and its
 software-adapter execution tests have been retired rather than treated as CUDA evidence.
 
 
@@ -105,7 +106,7 @@ reference checks do not claim to execute PyTorch or CUDA or validate GPU timing.
 
 The chapter 2 copy rules follow [Tensor.to](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html)
 and [Tensor.cpu](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.cpu.html).
-The chapter 3 packing rule follows [Tensor.contiguous](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.contiguous.html),
+The chapter 5 packing rule follows [Tensor.contiguous](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.contiguous.html),
 alongside the stride and tensor-view references above. These pages were checked
 on 2026-10-24; stable resolved to PyTorch 2.14. Device/dtype-preserving `to()` and
 already-contiguous `contiguous()` can return the existing tensor. The teaching
@@ -144,7 +145,7 @@ Documentation links do not imply that the browser runs an installed toolkit vers
 
 The learner-facing references now connect PyTorch `torch.where`, `Tensor.sum`,
 `torch.matmul`, `torch.softmax`, `torch.cat` and scaled dot-product attention to
-chapters 6–12. Official stable pages were checked (redirecting to PyTorch 2.14).
+chapters 7–13. Official stable pages were checked (redirecting to PyTorch 2.14).
 The reference catalogue keeps the CUDA mechanisms distinct from framework APIs:
 `torch.where` does not promise a divergent branch, `@` does not select a tile size,
 and the sequential precision model does not establish tensor-core execution.
@@ -160,7 +161,7 @@ the map does not represent an integrated GPU with shared system memory.
 
 ## Final investigation
 
-Chapter 13 combines the existing matrix-reuse model and its synthetic resource
+Chapter 14 combines the existing matrix-reuse model and its synthetic resource
 budgets; its numerical scope is unchanged. Where next links to the official
 PyTorch profiler recipe, CUDA kernel programming and Triton tutorials. These are
 optional external learning paths, not features executed by the browser. Its
@@ -189,18 +190,18 @@ it requires a physical NVIDIA GPU. Its syntax and the standard-library trace
 reader's synthetic schema fixtures are checked in CI. These checks do not validate
 CUPTI capture, Nsight execution, a PyTorch launch configuration or GPU performance.
 
-## Inside an SM recording and Chapter 6 walkthrough
+## Inside an SM recording and Chapter 7 walkthrough
 
 The recording and hardware overview use the CUDA Programming Guide’s hardware multithreading
 section linked above: per-thread working registers, shared execution units and
 ready warp instruction selection. FP32 arithmetic units and load/store units are
 separate roles in the diagram. No unit counts, ISA lowering or latency values are
-claimed. Chapter 6’s optional functional worked sequence is generated locally from 64 FP32 inputs;
+claimed. Chapter 7’s optional functional worked sequence is generated locally from 64 FP32 inputs;
 its chosen event order is not a captured PyTorch or CUDA compiler trace.
 
 ## Related CPU and logic exercises
 
-The Chapter 6 hardware walkthrough links optionally to Assembly Lab's One addition and Memory
+The Chapter 7 hardware walkthrough links optionally to Assembly Lab's One addition and Memory
 and addresses lessons, and Bit Lab's ALU lesson. Their source and routes were
 checked on 2026-11-06. Assembly Lab uses Arm CPU instructions; Bit Lab uses a
 four-bit integer ALU, not GPU FP32 multiplication. These links reinforce working
@@ -224,7 +225,7 @@ use verified heading anchors.
 
 ## Attention example with visible rescaling
 
-The deterministic key inputs in Chapter 11 and its generated PyTorch source use
+The deterministic key inputs in Chapter 12 and its generated PyTorch source use
 the same shifted index formula, `((2*i+j+4)%7-3)/2`. For query zero, the two-key
 trace reaches later larger scores, rescaling non-empty denominator and weighted
 totals. The recurrence and scope remain those documented above. Model tests compare
@@ -236,7 +237,7 @@ GPU numerical/performance agreement.
 
 ## Input-derived CUDA launch practice
 
-The optional practice after Chapter 2 uses CUDA's
+Chapter 3 uses CUDA's
 [explicit memory management example](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#explicit-memory-management)
 for allocation and byte-counted copies, and
 [Triple Chevron Notation](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html#triple-chevron-notation)
@@ -246,3 +247,24 @@ the GPU pointer carries no length. Equal input/output counts are specific to the
 elementwise doubling operation. A blocking device-to-host copy in the default
 stream completes the preceding kernel work before CPU result use. The examples
 check correctness, with no hardware performance claim.
+
+## CUDA connections throughout the fourteen-chapter course
+
+Chapter 3 is the main-path host/memory workflow, between device placement and
+selection. Later chapters reuse that allocation/copy/launch/cleanup contract.
+The canonical source in `src/course-cuda-source.mjs` generates both displayed
+functions and the downloadable `course-bridges.cu`. Its 215 results are checked
+against independent CPU references, including a materialised softmax reference
+for the online attention recurrence. CI compiles with CUDA 12.8 and runs in the
+pinned GPGPU-Sim functional configuration; this establishes values, not GPU time.
+The WMMA download is compiled separately for compute capability 7.0; execution
+on tensor-core hardware remains unvalidated.
+
+The CUDA Math API documents
+[half conversions](https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH____HALF__MISC.html)
+and [single-precision functions](https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH__SINGLE.html).
+The [Runtime event API](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EVENT.html)
+documents recording, synchronisation and elapsed-time queries. These pages and
+the named functions were checked on 12 November 2026. Event timing is offered
+for native GPU investigation; neither browser counts nor simulator event
+results establish physical GPU performance.

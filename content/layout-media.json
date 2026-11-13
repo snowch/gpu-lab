@@ -1,53 +1,53 @@
 {
   "durationSeconds": 186,
-  "bytes": 9463675,
+  "bytes": 9495893,
   "scenes": [
     {
       "id": "s01",
       "start": 0,
-      "end": 23.339,
+      "end": 23.317,
       "title": "Values and offsets are different."
     },
     {
       "id": "s02",
-      "start": 23.339,
-      "end": 46.699,
+      "start": 23.317,
+      "end": 46.677,
       "title": "A row uses consecutive positions."
     },
     {
       "id": "s03",
-      "start": 46.699,
-      "end": 70.933,
+      "start": 46.677,
+      "end": 70.912,
       "title": "A column keeps the gaps."
     },
     {
       "id": "s04",
-      "start": 70.933,
-      "end": 91.627,
+      "start": 70.912,
+      "end": 91.605,
       "title": "Change the start, keep the stride."
     },
     {
       "id": "s05",
-      "start": 91.627,
-      "end": 115.093,
+      "start": 91.605,
+      "end": 115.072,
       "title": "Make a packed copy."
     },
     {
       "id": "s06",
-      "start": 115.093,
-      "end": 137.792,
+      "start": 115.072,
+      "end": 137.771,
       "title": "A contiguous view can share storage."
     },
     {
       "id": "s07",
-      "start": 137.792,
-      "end": 162.243,
+      "start": 137.771,
+      "end": 162.221,
       "title": "Pause: pack a different column."
     },
     {
       "id": "s08",
-      "start": 162.243,
-      "end": 186.093,
+      "start": 162.221,
+      "end": 186.157,
       "title": "New offsets belong to new storage."
     }
   ],
@@ -55,98 +55,98 @@
     {
       "id": "s01-c1",
       "start": 0.6,
-      "end": 9.368,
-      "text": "Chapter Four follows the selected values into storage. An element offset counts values from the start of that storage, beginning at zero."
+      "end": 9.347,
+      "text": "Chapter Five follows the selected values into storage. An element offset counts values from the start of that storage, beginning at zero."
     },
     {
       "id": "s01-c2",
-      "start": 9.588,
-      "end": 21.919,
+      "start": 9.567,
+      "end": 21.897,
       "text": "Our five by five FP32 tensor stores one row after another: row-major order. Each value uses four bytes. Large labels show values; small labels show element offsets."
     },
     {
       "id": "s02-c1",
-      "start": 23.939,
-      "end": 34.008,
+      "start": 23.917,
+      "end": 33.987,
       "text": "Selecting row zero makes a view into the original storage. Its five values occupy consecutive element offsets. Making this view copies no values."
     },
     {
       "id": "s02-c2",
-      "start": 34.228,
-      "end": 45.279,
+      "start": 34.207,
+      "end": 45.257,
       "text": "Stride is the distance, in elements, between successive selected values. Here stride one means four bytes. A byte offset measures distance in bytes from the storage's start."
     },
     {
       "id": "s03-c1",
-      "start": 47.299,
-      "end": 57.987,
+      "start": 47.277,
+      "end": 57.965,
       "text": "Column zero uses offsets zero, five, ten, fifteen and twenty. The next selected value is five element positions away, so this view has stride five."
     },
     {
       "id": "s03-c2",
-      "start": 58.207,
-      "end": 69.513,
+      "start": 58.185,
+      "end": 69.492,
       "text": "Five FP32 elements span twenty bytes, so its byte stride is twenty. The highlighted values stay in the original storage; selecting the column has not moved them together."
     },
     {
       "id": "s04-c1",
-      "start": 71.533,
-      "end": 81.709,
+      "start": 71.512,
+      "end": 81.688,
       "text": "Choose column one instead. Its first selected value begins one element into the same storage. The starting offset changes, but the stride remains five."
     },
     {
       "id": "s04-c2",
-      "start": 81.929,
-      "end": 90.207,
+      "start": 81.908,
+      "end": 90.185,
       "text": "Changing the column index still gives a view. To put the selected values next to one another, we need a different layout in separate storage."
     },
     {
       "id": "s05-c1",
-      "start": 92.227,
-      "end": 102.509,
+      "start": 92.205,
+      "end": 102.488,
       "text": "Calling contiguous on this column creates a packed copy: a new buffer with the same selected values in consecutive positions. The original storage is unchanged."
     },
     {
       "id": "s05-c2",
-      "start": 102.729,
-      "end": 113.673,
+      "start": 102.708,
+      "end": 113.652,
       "text": "The copy has stride one and new element offsets zero through four. Five four-byte values mean twenty bytes of values copied; copying also reads and writes memory."
     },
     {
       "id": "s06-c1",
-      "start": 115.693,
-      "end": 125.635,
+      "start": 115.672,
+      "end": 125.613,
       "text": "A row already has consecutive values. In row one, they begin at offset five and have stride one. Calling contiguous can return this row without copying."
     },
     {
       "id": "s06-c2",
-      "start": 125.855,
-      "end": 136.372,
+      "start": 125.833,
+      "end": 136.351,
       "text": "Contiguous describes the order of the values. A contiguous view can share another tensor's storage and start at a non-zero offset; it need not own a separate buffer."
     },
     {
       "id": "s07-c1",
-      "start": 138.392,
-      "end": 148.077,
+      "start": 138.371,
+      "end": 148.056,
       "text": "Now take column three and make a packed copy. Predict the new copy's element offsets and stride. Do its offsets keep the original column's starting position?"
     },
     {
       "id": "s07-c2",
-      "start": 148.297,
-      "end": 157.023,
+      "start": 148.276,
+      "end": 157.001,
       "text": "How many bytes of values are copied, and does the original tensor change? Use the four-byte value size, then pause and explain before checking."
     },
     {
       "id": "s08-c1",
-      "start": 162.843,
-      "end": 172.08,
+      "start": 162.821,
+      "end": 172.059,
       "text": "The new buffer starts at its own offset zero. Its five element offsets are zero through four, with stride one. Twenty bytes of values are copied."
     },
     {
       "id": "s08-c2",
-      "start": 172.3,
-      "end": 184.673,
-      "text": "The original tensor, selected values and multiplication results are unchanged. Return to Chapter Four and compare a view with a packed copy, separating layout, copy cost and measured performance."
+      "start": 172.279,
+      "end": 184.737,
+      "text": "The original tensor, selected values and multiplication results are unchanged. Return to Chapter Five and compare a view with a packed copy, separating layout, copy cost and measured performance."
     }
   ],
   "speech": {
@@ -163,7 +163,7 @@
       "provider": "CPUExecutionProvider"
     },
     "durations": {
-      "s01-c1": 8.768,
+      "s01-c1": 8.747,
       "s01-c2": 12.331,
       "s02-c1": 10.069,
       "s02-c2": 11.051,
@@ -178,7 +178,7 @@
       "s07-c1": 9.685,
       "s07-c2": 8.725,
       "s08-c1": 9.237,
-      "s08-c2": 12.373
+      "s08-c2": 12.459
     }
   }
 }

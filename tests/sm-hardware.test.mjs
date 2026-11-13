@@ -27,8 +27,8 @@ test('appendix returns retain local chapter URLs and reject outside or unrelated
  const base='https://example.org/gpu-lab/lessons/inside-sm.html?from=hello';
  assert.deepEqual(readingReturn(base+'&return='+encodeURIComponent('/gpu-lab/lessons/hello.html?keep=1#idea-3')),{href:'https://example.org/gpu-lab/lessons/hello.html?keep=1#idea-3',chapter:1,label:'Return to Chapter 1'});
  for(const path of ['https://evil.example/hello.html','/other/hello.html','/gpu-lab/lessons/kernel.html','javascript:alert(1)'])assert.equal(readingReturn(base+'&return='+encodeURIComponent(path)).href,'https://example.org/gpu-lab/lessons/hello.html#hello-sm-title');
- assert.equal(readingReturn(base.replace('from=hello','from=scheduling')).chapter,6);
- assert.equal(readingReturn(base.replace('from=hello','from=reading')).chapter,3);
+ assert.equal(readingReturn(base.replace('from=hello','from=scheduling')).chapter,7);
+ assert.equal(readingReturn(base.replace('from=hello','from=reading')).chapter,4);
  assert.equal(readingReturn(base.replace('from=hello','from=index')).label,'Return to the book contents');
  assert.equal(readingReturn(base.replace('from=hello','from=unknown')),null);
 });

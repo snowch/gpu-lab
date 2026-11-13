@@ -63,4 +63,4 @@ def check_matmul_video(browser,url,root,errors):
     expect(page.locator('#matmul-return')).to_have_attribute('href','matmul.html#matmul-recording-link')
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     context.close()
-    print('PASS: Chapter 9 recording playback, captions, keyboard return, saved tile/trace/video state, six layouts/themes and no-JavaScript transcript')
+    print('PASS: Chapter 10 recording playback, captions, keyboard return, saved tile/trace/video state, six layouts/themes and no-JavaScript transcript')

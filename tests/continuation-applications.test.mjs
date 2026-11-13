@@ -8,7 +8,7 @@ import {fmt,escape} from '../src/continuation-ui.mjs';
 const models={attention,inference:inferenceBudget};
 
 test('application chapters have complete real PyTorch openings and independent narrow experiments',()=>{
-  assert.deepEqual(chapters.map(c=>[c.number,c.slug]),[[11,'attention'],[12,'inference']]);
+  assert.deepEqual(chapters.map(c=>[c.number,c.slug]),[[12,'attention'],[13,'inference']]);
   const ids=chapters.flatMap(c=>c.sections.map(s=>s.id));
   assert.equal(new Set(ids).size,ids.length);
   for(const chapter of chapters){

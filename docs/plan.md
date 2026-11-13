@@ -30,7 +30,7 @@ Questions and comparisons remain available offline; official sites require inter
 Every visual value comes from model state. Counts and timing estimates must be visibly
 different. Each lab records what its model leaves out.
 
-## Book opening: chapters 1–5
+## Book opening: chapters 1–6
 
 Build the book from familiar operations: see the operation, predict, run, change
 one thing, explain, inspect the code, and apply the idea to a new case. Keep each
@@ -55,13 +55,20 @@ experiment and visual beside its own explanation in a continuous downward flow.
    Each action has its own setup, prediction prompt, control, diagram and result.
    Compare five/eight-input copy sizes and change the multiplier. Explain allocation
    separately from transfers; retain the original tensors in the diagram.
-3. **How do we select values from a tensor?** (`reading.html`): apply familiar shape and
+3. **How does a CUDA program manage GPU memory?** (`launch-from-input.html`):
+   follow the same five inputs through a complete CPU/CUDA workflow. Derive the
+   element count from the existing CPU array, allocate matching output storage,
+   distinguish elements from bytes, copy inputs, derive the launch dimensions,
+   call the familiar kernel, copy results back and release the GPU allocations.
+   Keep the complete program available locally and the installation steps in the
+   appendix. Apply the workflow to nine inputs before continuing to selection.
+4. **How do we select values from a tensor?** (`reading.html`): apply familiar shape and
    slicing notation to a 5×5 tensor. Select rows and columns and multiply five values.
    Keep memory offsets and warp terminology for the following chapters.
-4. **How are tensor values arranged in memory?** (`layout.html`): follow the same
+5. **How are tensor values arranged in memory?** (`layout.html`): follow the same
    values into a memory strip, introduce views and strides, then compare a column
    with a packed copy. Transpose is optional practice after those ideas.
-5. **How do threads read tensor values?** (`requests.html`): introduce a warp and its
+6. **How do threads read tensor values?** (`requests.html`): introduce a warp and its
    lanes visually, then sectors. Compare five-value row, column and packed reads;
    finish with a row crossing a sector boundary. Counts are not timing claims.
 
@@ -72,35 +79,35 @@ Reference exercises introduce `torch.tensor`, `Tensor.to`, indexing and strides
 beside the operations that need them. Version guidance remains beside the first
 lookup task.
 
-## Continuing the journey: chapters 6–13
+## Continuing the journey: chapters 7–14
 
-All thirteen chapters are published working drafts in the common book navigation.
+All fourteen chapters are published working drafts in the common book navigation.
 The remaining chapters reuse tested numerical engines and replace the legacy
 single-dashboard teaching flow with local, independent experiments:
 
-6. **What runs while a warp waits for data?** (`scheduling.html`): follow one load
+7. **What runs while a warp waits for data?** (`scheduling.html`): follow one load
    dependency, then compare ready warps. Introduce resident work and issue slots
    when needed. More warps also add work; model cycles are not hardware timings.
-7. **What if lanes need different calculations?** (`divergence.html`): begin with
+8. **What if lanes need different calculations?** (`divergence.html`): begin with
    uniform signs, then mixed masks, then five active inputs. Distinguish a chosen
    branch model from PyTorch's evaluation of tensor expressions in `torch.where`.
-8. **How do threads add values together?** (`reduction.html`): start with a safe
+9. **How do threads add values together?** (`reduction.html`): start with a safe
    four-input sum, extend to eight, then diagnose missing ordering. Shared memory
    and barriers serve a visible dependency; no invented result is given for a race.
-9. **How can matrix multiplication reuse its inputs?** (`matmul.html`): build one
+10. **How can matrix multiplication reuse its inputs?** (`matmul.html`): build one
    dot product before sharing tiles. Compare equal outputs and explicit loads.
    Resource trade-offs are optional; they do not crowd the reuse experiment.
-10. **What changes when matrix inputs use fewer bits?** (`tensor-cores.html`):
+11. **What changes when matrix inputs use fewer bits?** (`tensor-cores.html`):
     inspect conversion before FP32 accumulation. Connect this to cooperative
     matrix hardware without representing the sequential model as tensor-core execution.
-11. **How can attention use less memory?** (`attention.html`): scores, weights and a
+12. **How can attention use less memory?** (`attention.html`): scores, weights and a
     weighted result come before full-intermediate accounting and online tiles.
     The recurrence is optional after its purpose is understood.
-12. **What limits an inference step?** (`inference.html`): a real small
+13. **What limits an inference step?** (`inference.html`): a real small
     cache example motivates separate cache-capacity, phase-budget and batch-reuse
     experiments. Synthetic rates produce lower bounds, never fabricated timings.
 
-13. **Investigate a matrix multiplication** (`putting-it-together.html`): use the tested 4 × 4
+14. **Investigate a matrix multiplication** (`putting-it-together.html`): use the tested 4 × 4
     matmul engine as a final independent investigation. Establish a baseline,
     compare reuse with per-block resources, defend a hypothesis, then design a
     hardware measurement. Finish with PyTorch profiling, CUDA/Triton and local
@@ -111,16 +118,12 @@ map remain supplementary resources. Existing chapter URLs stay valid. Each new
 chapter ends with a transfer question, references and applied documentation tasks.
 See [migration decisions](chapter-migration.md) for the reuse/rewrite rationale.
 
-After Chapter 2, **From an input array to a CUDA launch**
-(`launch-from-input.html`) offers optional guided practice for readers writing
-CUDA. Reuse the five-input doubling calculation, derive `n` from a CPU vector,
-allocate matching output storage, distinguish element counts from byte sizes,
-derive the block count and copy the result back. A nine-input transfer task checks
-counts, coverage and safe skips. The complete CUDA download is the source for the
-displayed excerpts and is checked with both input lengths in functional simulation.
-Keep Chapter 1's explanation of who supplies `n` in the main reading path; this
-practice adds application rather than a missing prerequisite. Keep Chapter 2's
-next-page link directed to Chapter 3 and installation in the desktop appendix.
+Chapter 3 is part of the main reading sequence. Its previous practice URL remains
+stable, and existing completion marks continue to identify the same lesson.
+Chapters 4–14 retain their established URLs. Their visible CUDA connections explain
+how the studied operation can be programmed, with caller-supplied shapes, counts
+and storage stated beside the source. Hardware scheduling, compiler choices and
+physical performance remain separate from a source-level reference.
 
 Automated checks cover functions, interactions, layout and offline restoration.
 They do not establish learner comprehension. Newcomer observations remain needed:
@@ -231,39 +234,39 @@ parent-state return and offline update restoration. The separate-memory example
 counts tensor payloads and makes no timing claim. Rebuild instructions are in
 `assets/media/devices/README.md`.
 
-Chapter 3 follows with `reading-video.html`, after its explanation exercise.
+Chapter 4 follows with `reading-video.html`, after its explanation exercise.
 Eight slides connect row/column coordinates and colon syntax to selected inputs
 and elementwise results. A new column-3 question checks interpretation. The
-recording preserves Chapter 3's distinction between logical coordinates and the
+recording preserves Chapter 4's distinction between logical coordinates and the
 storage positions introduced next. Playback, downloads, saved-state return and
 offline coverage match Chapter 2. See `assets/media/reading/README.md`.
 
-Chapter 4 adds `layout-video.html`, following its explanation exercise. Eight
+Chapter 5 adds `layout-video.html`, following its explanation exercise. Eight
 slides distinguish values, element offsets and byte offsets; follow strides in
 shared storage; then compare a packed copy and an already-contiguous row. The
 new column-3 copy question checks new offsets and payload while preserving the
 original values. The same playback, transcript, downloads, return and offline
 features apply. See `assets/media/layout/README.md`.
 
-Chapter 6's optional narrated recap follows one and two resident warps through
+Chapter 7's optional narrated recap follows one and two resident warps through
 loads, waits and instruction issue. Its comparison keeps added work visible, and
 a new latency question tests readiness before revealing the answer. It reuses the
 common captions, transcript, downloads and offline player without changing the
 scheduler. See `assets/media/scheduling/README.md`.
 
-The interactive two-warp readiness walkthrough is local to Chapter 6, behind an
-optional disclosure reached from its hardware overview. Chapter 6 retains its
+The interactive two-warp readiness walkthrough is local to Chapter 7, behind an
+optional disclosure reached from its hardware overview. Chapter 7 retains its
 visible core diagram and teaching-scheduler experiments. The optional trace keeps
 its own saved cursor; moving it has not changed its values or event semantics.
 No instruction timing, execution-unit count or captured PyTorch trace is implied.
 
-Chapter 7's optional recap follows uniform, mixed and rare arithmetic paths, then
+Chapter 8's optional recap follows uniform, mixed and rare arithmetic paths, then
 distinguishes other-path lanes from positions without input. A 17-input question
 applies the mask rule before the answer. It keeps the positive-first teaching
 order and arithmetic-only scope explicit, with common playback and offline
 features. See `assets/media/divergence/README.md`.
 
-Chapter 8 offers an optional narrated recap after its transfer exercise, at
+Chapter 9 offers an optional narrated recap after its transfer exercise, at
 `reduction-video.html`. Eleven model-derived slides follow the four-input tree,
 block barriers and one unsafe read-before-write interleaving, then ask about eight
 threads. The page reuses native playback, English captions, a source-generated
@@ -271,7 +274,7 @@ transcript, PDF/video downloads and a return link preserving chapter state.
 Offline coverage includes playback, range seeking and paused restoration across
 updates. See `assets/media/reduction/README.md` for the reproducible media workflow.
 
-Chapter 9 offers a matching optional recap at `matmul-video.html`, after its
+Chapter 10 offers a matching optional recap at `matmul-video.html`, after its
 transfer exercise. Ten model-derived slides connect one dot product to shared
 input tiles, reuse across output rows and columns, and private partial sums kept
 across K phases. A new 8 × 8 case checks phase loads and the scope of sharing.
@@ -279,28 +282,28 @@ Counts describe the teaching algorithm, excluding caches and GPU timing. The
 recording has the same accessible playback, downloads, return-state preservation
 and offline update coverage. See `assets/media/matmul/README.md` for its sources.
 
-Chapter 5's optional recap follows five model-derived input reads into aligned
+Chapter 6's optional recap follows five model-derived input reads into aligned
 32-byte sectors. It compares row and column reads with a packed copy, includes a
 neighbouring row crossing a sector boundary, and asks about a different row before
 revealing its groups. Useful bytes, covered bytes and physical traffic remain
 separate. Packing and output stores are outside the input-load count. Captions,
 transcript, slides, downloads and offline state restoration use the common player.
 
-Chapter 10's optional recap compares converted and original-input FP32 running
+Chapter 11's optional recap compares converted and original-input FP32 running
 sums through cancellation, then tests very small and exactly representable inputs.
 It separates number format, accumulation and hardware execution. All displayed
 values come from the existing precision model; common playback, captions,
 transcript, downloads and offline return checks apply. See
 `assets/media/tensor-cores/README.md`.
 
-Chapter 11's optional recap follows one weighted component, full intermediate
+Chapter 12's optional recap follows one weighted component, full intermediate
 reads/writes, online totals and later-maximum rescaling. A four-key tile question
 applies the same recurrence while changing the single-query scratch count. The
 chapter and recording share the revised key fixture; both retain the distinction
 between JavaScript double arithmetic and assumed four-byte storage. Common
 playback and offline features apply. See `assets/media/attention/README.md`.
 
-Chapter 12's optional recap connects model-managed keys and values to payload
+Chapter 13's optional recap connects model-managed keys and values to payload
 capacity, decode and prefill accounting, ideal time bounds and batch reuse. A
 longer-context question for four sequences separates cache growth from fixed weight reads and
 new cache entries. Counts come from the existing synthetic decoder, with explicit
@@ -312,7 +315,7 @@ apply. See `assets/media/inference/README.md`.
 
 Short recaps can support recall after a chapter's independent exercise. Each
 should trace one example and end with a fresh explanation question. This review
-uses the current thirteen-chapter book; entries marked as recommendations remain
+uses the current fourteen-chapter book; entries marked as recommendations remain
 future work.
 
 | Chapter | Recording goal | State |
@@ -331,13 +334,13 @@ future work.
 | 12 | Connect KV payload, prefill/decode and batch reuse; distinguish capacity, work and ideal time bounds. | Recap included. |
 | 13 | Model how to form a hypothesis, check outputs and choose a fair measurement. | Optional investigation guide; preserve the learner's independent recommendation. |
 
-Chapter 11 now uses a shifted deterministic key fixture in both the browser
+Chapter 12 now uses a shifted deterministic key fixture in both the browser
 model and PyTorch source. With two-key tiles, query zero encounters later larger
 scores and both non-empty retained totals visibly rescale. Every query output
 is checked against the materialised reference for the same inputs. The recurrence,
 byte-accounting scope and implementation/timing qualifiers remain unchanged.
 
-Chapter 5's recap includes a row crossing a sector boundary and a packed column.
-Chapter 6 retains its explicit scheduler assumptions; Chapter 7 labels its chosen
-path order. Chapters 10–12 keep the same separation of arithmetic/storage models
+Chapter 6's recap includes a row crossing a sector boundary and a packed column.
+Chapter 7 retains its explicit scheduler assumptions; Chapter 8 labels its chosen
+path order. Chapters 11–13 keep the same separation of arithmetic/storage models
 from measured GPU execution as their parent lessons.

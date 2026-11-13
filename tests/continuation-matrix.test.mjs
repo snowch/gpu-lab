@@ -6,7 +6,7 @@ import {tiledMatmul,precisionMatmul} from '../src/ai-models.mjs';
 import {roundedTensorValue as tensorValue} from '../src/value-format.mjs';
 
 test('matrix chapters keep independent, valid focused experiments',()=>{
-  assert.deepEqual(chapters.map(chapter=>[chapter.number,chapter.slug]),[[9,'matmul'],[10,'tensor-cores']]);
+  assert.deepEqual(chapters.map(chapter=>[chapter.number,chapter.slug]),[[10,'matmul'],[11,'tensor-cores']]);
   const ids=new Set();
   for(const chapter of chapters) {
     assert.match(chapter.source,/import torch/);

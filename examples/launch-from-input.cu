@@ -82,8 +82,10 @@ int main() {
         if (output[i] != input[i] * 2.0f) correct = false;
     }
     std::printf("]\n");
+    // BEGIN FREE
     CUDA_CHECK(cudaFree(d_input));
     CUDA_CHECK(cudaFree(d_output));
+    // END FREE
     if (!correct) {
         std::fprintf(stderr, "Output differs from the CPU reference.\n");
         return 1;

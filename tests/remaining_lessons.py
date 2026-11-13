@@ -10,7 +10,7 @@ def check_remaining(browser,base_url,root,errors):
         context=browser.new_context(viewport={'width':width,'height':950},color_scheme=theme,service_workers='block')
         mock_version(context)
         page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)))
-        for number,slug in enumerate(SLUGS,6):
+        for number,slug in enumerate(SLUGS,7):
             page.goto(base_url+'lessons/'+slug+'.html')
             expect(page.locator('.intro .eyebrow')).to_have_text(f'CHAPTER {number}')
             expect(page.locator('html')).to_have_attribute('data-theme',theme)
@@ -62,4 +62,4 @@ def check_remaining(browser,base_url,root,errors):
         expect(page.locator('.chapter-definition').first).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     context.close()
-    print('PASS: chapters 6–13, independent runs, invalidation, keyboard stepping, mobile/tablet/desktop, themes and static examples')
+    print('PASS: chapters 7–14, independent runs, invalidation, keyboard stepping, mobile/tablet/desktop, themes and static examples')
