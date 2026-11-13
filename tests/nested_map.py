@@ -35,6 +35,17 @@ def check_nested_map(browser, url, root):
       data:{type:'COMMIT_RESTART',token:'older-worker'}}))""")
     page.wait_for_function("document.querySelector('#gpu-map-frame').contentDocument.querySelector('main')?.inert===false")
     assert child.evaluate("window.ownedMapMarker==='retained'"),'An older worker must not independently reload the owned map'
+    ready=page.evaluate("""() => new Promise(resolve=>{
+      const channel=new MessageChannel();
+      channel.port1.onmessage=e=>{channel.port1.close();resolve(e.data)};
+      navigator.serviceWorker.dispatchEvent(new MessageEvent('message',{
+        data:{type:'PREPARE_RESTART',token:'reader-transaction'},ports:[channel.port2]}));
+    })""")
+    assert ready['ready'],ready
+    expect(page.locator('#gpu-map-panel')).to_have_attribute('inert','')
+    page.evaluate("""() => navigator.serviceWorker.dispatchEvent(new MessageEvent('message',{
+      data:{type:'ABORT_RESTART',token:'reader-transaction'}}))""")
+    assert not page.locator('#gpu-map-panel').evaluate('el=>el.inert')
     page.evaluate(SAVE);child.evaluate(SAVE)
     # A child can also be restarted by the worker. Its consumed or older snapshot
     # must not overwrite the map state owned by the parent reading window.

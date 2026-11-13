@@ -50,7 +50,7 @@ navigator.serviceWorker?.addEventListener('message', ({ data, ports }) => {
     try {
       if (lock) throw new Error('This window is already restarting.');
       snapshot(); lock = data.token;
-      for (const el of document.querySelectorAll('main,.sidebar,.topbar')) if (!el.inert) { el.inert = true; el.dataset.updateLocked = ''; }
+      for (const el of document.querySelectorAll('main,.sidebar,.topbar,#gpu-map-panel')) if (!el.inert) { el.inert = true; el.dataset.updateLocked = ''; }
       unlockTimer = setTimeout(releaseLock, 12000);
       ports[0].postMessage({ ready: true });
     } catch (error) { ports[0].postMessage({ ready: false, error: error.message }); }
