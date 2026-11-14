@@ -1,3 +1,4 @@
+import {renderInvestigation} from './pattern-investigation.mjs';
 import {renderPipelines} from './pipelines.mjs';
 import {renderProgress} from './progress.mjs';
 import {renderCompaction} from './compaction.mjs';
@@ -9,6 +10,7 @@ const section=(title,body)=>`<section class="book-section section-space"><h2>${t
 const compare=(prompt,answer)=>readerTask(prompt,'Apply it')+`<details><summary>Compare your answer</summary><p>${answer}</p></details>`;
 export function renderParallel(chapter){
  const notice='<noscript><p class="notice">Enable JavaScript to run the experiments. Worked comparisons, code and documentation questions remain readable.</p></noscript>';
+ if(chapter.slug==='pattern-investigation')return notice+renderInvestigation(chapter);
  if(chapter.slug==='pipelines')return notice+renderPipelines(chapter);
  if(chapter.slug==='progress')return notice+renderProgress(chapter);
  if(chapter.slug==='compaction')return notice+renderCompaction(chapter);

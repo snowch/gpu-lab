@@ -43,7 +43,7 @@ experiment and visual beside its own explanation in a continuous downward flow.
    compact input-to-output table. Add block boundaries with small thread tiles and
    one shared, selectable index substitution. Keep five short sections in a continuous
    reading flow: threads, blocks, launch settings, bounds checks and a nine-input case.
-   Put launch syntax and an optional complete kernel immediately after grouping;
+   Put launch syntax and the visible complete kernel immediately after grouping;
    define launch and kernel before using them. Avoid a second full worked trace at
    the end. Retain all three reasoning challenges: regroup four/eight threads per
    block, diagnose an off-by-one condition after teaching the correct guard, then
@@ -359,7 +359,7 @@ models. All fourteen numbered chapters must retain a dedicated recap link.
 
 ## Part II: Parallel patterns
 
-Optional follow-on chapters leave the fourteen core chapters unchanged. Publish
+Optional follow-on chapters keep extra pattern content outside the fourteen core chapters. Publish
 one chapter at a time, with model/build/browser checks, a reviewed PR, merge and
 live verification before implementing the next. Chapter 15 (histograms) introduces
 atomic updates, contention and per-block partials using eight integer category IDs.
@@ -371,5 +371,9 @@ Chapter 18 (synchronisation and progress) separates a three-philosopher resource
 cycle from invalid barrier participation and unscheduled-producer waits.
 Chapter 19 (pipelines) separates two-stream correctness from a synthetic two-slot
 copy/compute schedule, including both ready and consumed dependencies.
-Planned, unpublished chapters: an investigation combining the patterns. No planned
-chapter has a learner-facing link before it works.
+Chapter 20 (pattern investigation) distinguishes counts-only and stable grouping
+contracts, combines histogram counts, exclusive bin starts and within-category ranks,
+then asks for a correctness check, hypothesis and real-hardware measurement plan.
+All six follow-on chapters are published. Chapter 1's complete kernel and completion
+explanation are visible in the main flow; the follow-on patterns add no new content
+to the core lessons.

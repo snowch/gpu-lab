@@ -56,4 +56,16 @@ if target.type == "cuda":
 else:
     out = host * 2.0
 print(out)`,expected:{out:[2,4,6,8,10,12,14,16]}},
+  {slug:'pattern-investigation',number:20,title:'Investigate stable token routing',summary:'Choose the required output, combine counts with unique stable destinations, then design a hardware measurement.',source:`import torch
+
+categories = torch.tensor(
+    [0, 1, 0, 2, 1, 0, 3, 0],
+    dtype=torch.int64, device="cuda",
+)
+token_ids = torch.arange(8, device="cuda")
+counts = torch.bincount(categories, minlength=4)
+order = torch.argsort(categories, stable=True)
+out = token_ids[order]
+print(counts.cpu())
+print(out.cpu())`,expected:{counts:[4,2,1,1],out:[0,2,5,7,1,4,3,6]}},
 ];

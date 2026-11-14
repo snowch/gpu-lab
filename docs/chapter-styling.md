@@ -141,8 +141,10 @@ selection and keyboard focus remain distinct. A single local detail panel follow
 each selectable map. Do not restore the old tall repeated input/arrow/output cards,
 shrink the shared code/body text, or stack four-thread blocks into two-column grids.
 Keep the three reasoning challenges and their independent reveal/saved states.
-The complete kernel, desktop extension and documentation practice use labelled
-native disclosures. The opening example and required CUDA bridges stay visible.
+The complete kernel, its annotations and the launch/completion distinction stay
+visible before the prediction exercises. Desktop extensions and documentation
+practice use labelled native disclosures. The opening example and required CUDA
+bridges stay visible.
 
 The Chapter 1 regrouping prediction ends with compact checked feedback and the
 index/output calculation. Keep its hint and worked comparison; reuse the preceding

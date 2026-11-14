@@ -2,7 +2,7 @@ import {readingReturn} from '../src/reading-return.mjs';
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {histogram,categories,scan,compaction,philosophers,barrier,pipeline} from '../src/parallel-models.mjs';
+import {histogram,categories,scan,compaction,philosophers,barrier,pipeline,routing} from '../src/parallel-models.mjs';
 import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {renderParallel} from '../content/parallel.mjs';
 test('histogram conserves inputs, private merge equals independent category counts',()=>{
@@ -83,4 +83,27 @@ test('pipeline obeys engine exclusion, producer readiness and slot lifetimes in 
  assert.equal(pipeline({mode:'pipeline'}).span,14);
  assert.equal(pipeline({mode:'pipeline',copy:'4'}).span,19);
  assert.throws(()=>pipeline({copy:'0'}),RangeError);
+});
+
+test('routing conserves identities, assigns unique destinations and preserves category order',()=>{
+ for(const distribution of ['mixed','hot']){
+  const input=categories[distribution],expectedCounts=[0,1,2,3].map(bin=>input.filter(x=>x===bin).length);
+  const countOnly=routing({distribution,goal:'counts'});
+  assert.deepEqual(countOnly.counts,expectedCounts);assert.equal(countOnly.writes,0);
+  assert.equal(countOnly.offsets,null);assert.equal(countOnly.ranks,null);assert.equal(countOnly.output,null);
+  const r=routing({distribution,goal:'group'});
+  const expected=[0,1,2,3].flatMap(bin=>input.map((x,i)=>x===bin?i:null).filter(i=>i!==null));
+  assert.deepEqual(r.output,expected);assert.deepEqual(r.counts,expectedCounts);
+  assert.equal(new Set(r.destinations).size,input.length);assert.equal(r.writes,input.length);
+  assert.deepEqual([...r.output].sort((a,b)=>a-b),input.map((_,i)=>i));
+  input.forEach((bin,i)=>{
+   assert.equal(r.ranks[i],input.slice(0,i).filter(x=>x===bin).length);
+   assert.equal(r.offsets[bin],input.filter(x=>x<bin).length);
+   assert.equal(r.output[r.destinations[i]],i);
+  });
+ }
+ const r=routing({goal:'group'});
+ assert.deepEqual(r.offsets,[0,4,6,7]);assert.deepEqual(r.destinations,[0,4,1,6,5,2,7,3]);
+ assert.deepEqual(routing({distribution:'hot',goal:'group'}).offsets,[0,8,8,8]);
+ assert.throws(()=>routing({goal:'unknown'}),RangeError);assert.throws(()=>routing({distribution:'unknown'}),RangeError);
 });

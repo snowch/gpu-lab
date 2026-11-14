@@ -96,3 +96,17 @@ export function pipeline({mode='serial',chunks='4',copy='2'}={}){
  return {events,span:computeFree,copyTime,computeTime,steps,columns:['Chunk','Slot','Copy','Compute'],rows:events.map(e=>[`Chunk ${e.chunk}`,e.slot,`${e.copyStart}–${e.copyEnd}`,`${e.computeStart}–${e.computeEnd}`]),rowCaption:'Complete synthetic schedule; all intervals in time units',rowColumns:['Chunk','Slot','Copy','Compute'],summary:`Synthetic completion: ${computeFree} time units. ${n} copies and ${n} compute operations. These are model durations, not GPU measurements.`,note:'One copy engine, one compute queue, two reusable slots; copy duration '+copyTime+' units and compute duration 3 units per equal chunk. Intervals show start–finish in arbitrary time units. Operations on the same engine never overlap, and a slot is not reused until its previous computation finishes.'};
 }
 parallelModels.pipeline=pipeline;
+
+export function routing({distribution='mixed',goal='counts'}={}){
+ if(!Object.hasOwn(categories,distribution)||!['counts','group'].includes(goal))throw new RangeError('Unknown routing configuration');
+ const input=[...categories[distribution]],counts=Array(4).fill(0),steps=[];
+ input.forEach((bin,i)=>{counts[bin]++;if(goal==='counts')steps.push({label:`Token ${i} contributes to category ${bin}`,cells:[...counts]});});
+ if(goal==='counts')return {input,counts,offsets:null,ranks:null,destinations:null,output:null,writes:0,steps,columns:['Category 0','Category 1','Category 2','Category 3'],summary:`Counts [${counts.join(', ')}]. Only counts requested: no prefix offsets or grouping; 0 scatter writes.`,note:'Eight integer category IDs contribute once each. This result supplies category sizes, not token identities or their order. Operation counts do not predict GPU runtime.'};
+ let start=0;const offsets=counts.map(count=>{const old=start;start+=count;return old;}),seen=Array(4).fill(0),ranks=[],destinations=[],output=Array(input.length).fill('Unwritten');
+ input.forEach((bin,i)=>{
+  const rank=seen[bin]++,destination=offsets[bin]+rank;ranks.push(rank);destinations.push(destination);output[destination]=i;
+  steps.push({label:`Token ${i}: category ${bin}, destination ${destination}`,cells:[i,bin,offsets[bin],rank,destination],detail:'Output token positions so far: ['+output.join(', ')+']'});
+ });
+ return {input,counts,offsets,ranks,destinations,output,writes:input.length,steps,columns:['Token','Category','Bin start','Rank','Write to'],rows:counts.map((count,bin)=>[`Category ${bin}`,count,offsets[bin]]),rowCaption:'Completed counts and exclusive bin starts before scatter',rowColumns:['Category','Count','Bin start'],summary:`Counts [${counts.join(', ')}]. Stable output token positions [${output.join(', ')}]. ${input.length} unique destinations; ${input.length} scatter writes.`,note:'Counts, exclusive bin starts and each token’s within-category rank are complete before scatter. The trace visits input order to explain placement; it is not a GPU instruction schedule. Every token belongs to exactly one of four categories, with no dropping or capacity limit. No runtime or physical traffic is simulated.'};
+}
+parallelModels.routing=routing;

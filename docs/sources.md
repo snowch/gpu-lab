@@ -298,3 +298,13 @@ API page on 14 November 2026. Stream.synchronize is a CPU wait; stream event wai
 order future queued work. Pinned source memory must remain valid until a transfer
 finishes. CUDA event management supports the separate ready/consumed handoffs in
 the ordering sketch. None of these references measures the browser's synthetic budget.
+
+## Part II: pattern investigation
+
+Checked PyTorch 2.14 torch.argsort and CUDA asynchronous-execution documentation on
+14 November 2026. The stable flag preserves the relative order of equivalent elements;
+argsort returns indices rather than sorted values. torch.bincount supplies counts.
+The CUDA semantics guide explains completion-aware timing with synchronisation or
+CUDA events. These contracts support the stable-output checks and measurement plan;
+they do not identify a fastest grouping implementation. The browser's count/rank/scatter
+construction is an explicitly chosen teaching algorithm, independent of PyTorch sorting.

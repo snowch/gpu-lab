@@ -37,7 +37,16 @@ export function codeExplanations(source) {
     add('prof.export_chrome_trace("trace.json")', 'Writes the captured events to a Chrome JSON trace for a timeline viewer or the supplied reader.');
     add('torch.testing.assert_close(y, x + x)', 'Checks the captured multiplication against addition of the same inputs, outside the recorded interval.');
   } else if(python){
-    if(source.includes('target = torch.device("cuda")')) {
+    if(source.includes('torch.argsort(categories, stable=True)')) {
+      add('categories = torch.tensor(', 'Creates eight integer expert IDs in input order. Each ID is in the range 0–3.');
+      add('dtype=torch.int64, device="cuda"', 'Stores category IDs as 64-bit integers in GPU memory. The downloadable wrapper also supports CPU value checks.');
+      add('token_ids = torch.arange(8, device="cuda")', 'Creates integer token identities 0–7 on the same device, so equal categories can still be distinguished.');
+      add('counts = torch.bincount(categories, minlength=4)', 'Counts each category and retains zero entries for absent categories through ID 3.');
+      add('order = torch.argsort(categories, stable=True)', 'Returns indices sorting the categories in ascending order. stable=True preserves the relative input order of tokens with equal categories.');
+      add('out = token_ids[order]', 'Gathers the token identities using those indices. The output contains token positions grouped by category.');
+      add('print(counts.cpu())', 'Copies the finished counts to CPU for printing; this is not a timing measurement.');
+      add('print(out.cpu())', 'Copies the grouped identities to CPU for printing after their computation.');
+    } else if(source.includes('target = torch.device("cuda")')) {
       add('target = torch.device("cuda")', 'Chooses the CUDA device for this reference. The downloadable wrapper also accepts --device cpu and selects its CPU reference path.');
       add('host = torch.arange(1, 9, dtype=torch.float32)', 'Creates CPU FP32 values 1.0 through 8.0. The excluded endpoint is 9.');
       add('host = host.pin_memory()', 'Copies the host values into pinned CPU storage, enabling supported asynchronous host-to-device transfers. Keep this storage alive and unchanged until copies finish.');
