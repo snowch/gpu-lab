@@ -483,3 +483,17 @@ reported intervals/makespans are synthetic schedule values, not hardware times o
 real-overlap predictions. The complete PyTorch program instead uses two independent
 chunks/streams and no slot reuse; CPU checks only its reference path. The reusable-slot
 CUDA event excerpt omits its actual consumer launch and host setup and is unvalidated.
+
+## Part II: pattern investigation
+
+Eight integer category IDs each belong to one of four bins. Counts-only mode returns
+the histogram without constructing offsets, ranks or grouped output. Group mode
+exclusively scans counts for bin starts and counts earlier same-category tokens for
+within-bin ranks. Four per-category flag scans describe one source-level construction
+of those ranks; the browser derives their mathematical values, not GPU instructions.
+The sum of start and rank gives distinct destinations in 0–7. Every token is retained;
+no capacity constraint, multi-device transfer or dropping is modelled. Empty bins
+perform no writes. Stable grouping is checked against an independent per-category
+filter of token identities. The opening PyTorch program uses stable argsort, without
+claiming the model represents its implementation. No GPU execution, latency, physical
+traffic or speedup is inferred from placement or operation counts.

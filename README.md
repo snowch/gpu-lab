@@ -19,28 +19,38 @@ GPU code. Generated CUDA programs include their host setup but have not yet been
 compiled or validated on an NVIDIA GPU.
 
 
-Follow the twelve-chapter book:
+Follow the fourteen core chapters:
 
-1. [One operation, many numbers](https://snowch.github.io/gpu-lab/lessons/hello.html): five values, threads, indices, blocks and bounds checks.
-2. [Where do the numbers live?](https://snowch.github.io/gpu-lab/lessons/devices.html): copy to the GPU, calculate there, and copy a result back.
-3. [How do we select values from a tensor?](https://snowch.github.io/gpu-lab/lessons/reading.html): shape, row and column selection.
-4. [How are tensor values arranged in memory?](https://snowch.github.io/gpu-lab/lessons/layout.html): views, strides and packed copies.
-5. [How do threads read those values?](https://snowch.github.io/gpu-lab/lessons/requests.html): warps and equal-work sector comparisons.
-6. [How can work continue during a wait?](https://snowch.github.io/gpu-lab/lessons/scheduling.html): dependencies and ready warps.
-7. [What if lanes need different calculations?](https://snowch.github.io/gpu-lab/lessons/divergence.html): conditions, masks and unused lanes.
-8. [How do threads combine their results?](https://snowch.github.io/gpu-lab/lessons/reduction.html): safe tree sums and ordering.
-9. [How can matrix multiplication reuse its inputs?](https://snowch.github.io/gpu-lab/lessons/matmul.html): dot products and shared tiles.
-10. [What changes when matrix inputs use fewer bits?](https://snowch.github.io/gpu-lab/lessons/tensor-cores.html): conversion, accumulation and matrix hardware.
-11. [How can attention store less?](https://snowch.github.io/gpu-lab/lessons/attention.html): weighted results and online tiles.
-12. [What limits an inference step?](https://snowch.github.io/gpu-lab/lessons/inference.html): cache payloads, phase budgets and batching.
+1. [How does a GPU double five values?](https://snowch.github.io/gpu-lab/lessons/hello.html): Double five input values, then trace each result through threads, indices and a CUDA kernel.
+2. [Where are tensor values stored?](https://snowch.github.io/gpu-lab/lessons/devices.html): Copy five inputs from CPU to GPU memory, multiply them, then copy the results back.
+3. [How does a CUDA program manage GPU memory?](https://snowch.github.io/gpu-lab/lessons/launch-from-input.html): Derive counts from an input array, allocate GPU storage, copy values, launch a kernel and read back the results.
+4. [How do we select values from a tensor?](https://snowch.github.io/gpu-lab/lessons/reading.html): Select rows and columns, then multiply the chosen values.
+5. [How are tensor values arranged in memory?](https://snowch.github.io/gpu-lab/lessons/layout.html): Locate row and column values in memory, compare strides, then make a packed copy.
+6. [How do threads read tensor values?](https://snowch.github.io/gpu-lab/lessons/requests.html): Compare the memory sectors read by five threads for a row, a column and a packed copy.
+7. [What runs while a warp waits for data?](https://snowch.github.io/gpu-lab/lessons/scheduling.html): Follow a warp waiting for an input value, then let another ready warp run.
+8. [What if lanes need different calculations?](https://snowch.github.io/gpu-lab/lessons/divergence.html): Compare lanes that double positive inputs with lanes that negate negative inputs.
+9. [How do threads add values together?](https://snowch.github.io/gpu-lab/lessons/reduction.html): Add four or eight input values using shared memory and block barriers.
+10. [How can matrix multiplication reuse its inputs?](https://snowch.github.io/gpu-lab/lessons/matmul.html): Compare repeated loads with shared tiles in matrix multiplication.
+11. [What changes when matrix inputs use fewer bits?](https://snowch.github.io/gpu-lab/lessons/tensor-cores.html): Compare FP32, FP16 and BF16 inputs, then inspect how rounding affects the sum.
+12. [How can attention use less memory?](https://snowch.github.io/gpu-lab/lessons/attention.html): Combine value rows using attention weights, then compare full score matrices with tiles.
+13. [What limits an inference step?](https://snowch.github.io/gpu-lab/lessons/inference.html): Count cached keys and values, then estimate limits from data transfers and arithmetic.
+14. [Investigate a matrix multiplication](https://snowch.github.io/gpu-lab/lessons/putting-it-together.html): Compare matrix tile widths, count input loads and resource use, then choose what to measure on a GPU.
 
+Optional [Part II: Parallel patterns](https://snowch.github.io/gpu-lab/#parallel-patterns) follows the core book with six completed chapters:
+
+15. [What if many threads update the same value?](https://snowch.github.io/gpu-lab/lessons/histograms.html): Count token categories with atomics, then compare global counters with per-block partial counts.
+16. [How can threads compute running totals?](https://snowch.github.io/gpu-lab/lessons/scan.html): Follow staged prefix sums, then turn inclusive totals into exclusive output offsets.
+17. [Where should each surviving token go?](https://snowch.github.io/gpu-lab/lessons/compaction.html): Turn selection flags into unique output positions, then preserve token order while packing the survivors.
+18. [Why can a parallel program stop making progress?](https://snowch.github.io/gpu-lab/lessons/progress.html): Break a dining-philosopher wait cycle, diagnose barrier participation and separate resource ordering from scheduling progress.
+19. [How can copying overlap computation?](https://snowch.github.io/gpu-lab/lessons/pipelines.html): Trace copy/compute dependencies, protect two reusable slots and compare explicitly synthetic schedules.
+20. [Investigate stable token routing](https://snowch.github.io/gpu-lab/lessons/pattern-investigation.html): Choose the required output, combine counts with unique stable destinations, then design a hardware measurement.
 
 Each example retains its own controls, diagram and results. The
 [PyTorch companion](examples/book-opening.py) checks these operations using real
 PyTorch: `python examples/book-opening.py --device cpu` or `--device cuda`.
 CPU mode checks values/layouts without GPU transfers; CUDA mode needs an NVIDIA
 GPU and has not yet been validated on hardware. Neither mode is a benchmark.
-Chapters 6–12 reuse the verified numerical engines with a new progressive teaching
+Chapters 7–14 reuse the verified numerical engines with a new progressive teaching
 flow. They retain their original URLs. Each experiment owns its controls, result
 and trace; static worked examples remain readable without JavaScript.
 

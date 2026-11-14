@@ -29,6 +29,18 @@ def check_parallel(browser,url,root,errors):
                     before=ex.locator('[data-result]').inner_text();exid=ex.get_attribute('id')
                     page.reload();ex=page.locator('#'+exid)
                     expect(ex.locator('[data-result]')).to_have_text(before,use_inner_text=True)
+                    if chapter['slug']=='pattern-investigation':
+                        ex.locator('[data-setting=distribution]').select_option('mixed')
+                        ex.locator('[data-setting=goal]').select_option('group')
+                        ex.locator('[data-run]').click()
+                        expect(ex.locator('[data-result]')).to_contain_text('Stable output token positions [0, 2, 5, 7, 1, 4, 3, 6]')
+                        while ex.locator('[data-next]').is_enabled():ex.locator('[data-next]').click()
+                        expect(ex.locator('[data-result]')).to_contain_text('Output token positions so far: [0, 2, 5, 7, 1, 4, 3, 6]')
+                        ex.locator('[data-setting=goal]').select_option('counts')
+                        expect(ex.locator('[data-result]')).to_be_hidden()
+                        ex.locator('[data-run]').click()
+                        expect(ex.locator('[data-result]')).to_contain_text('no prefix offsets or grouping; 0 scatter writes')
+                        ex.locator('[data-setting=goal]').select_option('group');ex.locator('[data-run]').click()
                     if chapter['slug']=='compaction':
                         for predicate,count,output in [('all',8,'[0, 1, 2, 3, 4, 5, 6, 7]'),('none',0,'(empty)')]:
                             ex.locator('[data-setting=predicate]').select_option(predicate)
@@ -59,6 +71,7 @@ def check_parallel(browser,url,root,errors):
                     expect(page.locator('h1')).to_have_text(chapter['title'])
                     page.wait_for_load_state('load')
                     for returned in page.locator('[data-parallel]').all():
+                        if chapter['slug']=='pattern-investigation':returned.locator('[data-setting=goal]').select_option('group')
                         returned.locator('[data-run]').click()
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),(chapter['slug'],width,theme)
                 page.screenshot(path=str(root/f"test-results/{chapter['slug']}-{width}-{theme}.png"),full_page=True)
