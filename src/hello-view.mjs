@@ -133,10 +133,10 @@ export function renderCodeBridge(stage,factor) {
  <p>The launch creates threads with indices 0–7, but the five inputs have indices 0–4. The kernel needs a check before reading or writing so the extra threads skip the arrays.</p>
  ${definitions([['Bounds check','A check that an index refers to an element that exists before accessing it.']])}
  <p>Each thread calculates its own array index <code>i</code> from its block number and position. With the guard <code>i &lt; n</code> and <code>n = 5</code>, threads at indices 0–4 read inputs and write results; extra threads at indices 5–7 skip both accesses. The check trusts <code>n</code>; an incorrect count can still allow an access beyond the allocated arrays.</p>
- <details id="hello-bridge-complete-2"><summary>Complete CUDA kernel for this example</summary>
+ <div id="hello-bridge-complete-2"><h3>Complete CUDA kernel for this example</h3>
  <p>The complete function calculates each thread’s index and applies this bounds check before doubling an input. A launch queues GPU work; it does not wait for that work to finish. The complete downloadable CPU program also waits for completion and copies results back before printing them.</p>
  ${codePanel({id:'hello-full-4',source:kernelSource(factor),label:'CUDA C++ · complete GPU function'})}
- <button type="button" id="hello-bridge-download-2">Download complete CUDA program</button> <a href="desktop.html#first-cuda">Desktop setup</a></details>
+ <button type="button" id="hello-bridge-download-2">Download complete CUDA program</button> <a href="desktop.html#first-cuda">Desktop setup</a></div>
  </div>`;
 }
 export function renderIndexRule() {

@@ -38,7 +38,7 @@ def check_code_explanations(browser,url,root):
         # The complete fixed kernel keeps its source annotations and keyboard highlighting.
         page.goto(url+'lessons/hello.html')
         pre=page.locator('#hello-full-4')
-        page.locator('#hello-bridge-complete-2 summary').click()
+        expect(page.locator('#hello-full-4')).to_be_visible()
         expect(pre).to_contain_text('2.0f')
         listing=pre.locator('xpath=following-sibling::*[1]')
         expect(listing).to_contain_text('2.0f')
