@@ -38,4 +38,22 @@ x = torch.tensor(
 y = x * 2.0
 z = y * 3.0
 print(z.cpu())`,expected:{z:[6,12,18,24]}},
+  {slug:'pipelines',number:19,title:'How can copying overlap computation?',summary:'Trace copy/compute dependencies, protect two reusable slots and compare explicitly synthetic schedules.',source:`import torch
+
+target = torch.device("cuda")
+host = torch.arange(1, 9, dtype=torch.float32)
+if target.type == "cuda":
+    host = host.pin_memory()
+    streams = [torch.cuda.Stream(), torch.cuda.Stream()]
+    results = []
+    for chunk, stream in zip(host.chunk(2), streams):
+        with torch.cuda.stream(stream):
+            copied = chunk.to(target, non_blocking=True)
+            results.append(copied * 2.0)
+    for stream in streams:
+        stream.synchronize()
+    out = torch.cat([result.cpu() for result in results])
+else:
+    out = host * 2.0
+print(out)`,expected:{out:[2,4,6,8,10,12,14,16]}},
 ];

@@ -290,3 +290,11 @@ five philosophers; our original three-philosopher execution simplifies the owner
 cycle and does not claim a general starvation-free solution. CUDA's current block
 synchronisation appendix distinguishes uniform conditional participation from atomic
 updates; PyTorch CUDA semantics supplies same-stream ordering and cross-stream dependencies.
+
+## Part II: pipelines
+
+Checked PyTorch 2.14 CUDA semantics, pinned-memory buffers and the Stream_class
+API page on 14 November 2026. Stream.synchronize is a CPU wait; stream event waits
+order future queued work. Pinned source memory must remain valid until a transfer
+finishes. CUDA event management supports the separate ready/consumed handoffs in
+the ordering sketch. None of these references measures the browser's synthetic budget.

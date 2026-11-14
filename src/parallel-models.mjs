@@ -80,3 +80,19 @@ export function barrier({participation='all'}={}){
 }
 parallelModels.philosophers=philosophers;
 parallelModels.barrier=barrier;
+
+export function pipeline({mode='serial',chunks='4',copy='2'}={}){
+ const n=Number(chunks),copyTime=Number(copy),computeTime=3;
+ if(!['serial','pipeline'].includes(mode)||![2,4].includes(n)||![2,4].includes(copyTime))throw new RangeError('Unknown pipeline configuration');
+ let copyFree=0,computeFree=0;const bufferFree=[0,0],events=[],steps=[];
+ for(let i=0;i<n;i++){
+  const slot=i%2,previous=bufferFree[slot];
+  const copyStart=Math.max(copyFree,previous,mode==='serial'?computeFree:0),copyEnd=copyStart+copyTime;
+  const computeStart=Math.max(copyEnd,computeFree),computeEnd=computeStart+computeTime;
+  copyFree=copyEnd;computeFree=computeEnd;bufferFree[slot]=computeEnd;
+  events.push({chunk:i,slot,copyStart,copyEnd,computeStart,computeEnd});
+  steps.push({label:`Chunk ${i}; slot ${slot} is released at unit ${computeEnd}`,cells:[i,slot,`${copyStart}–${copyEnd}`,`${computeStart}–${computeEnd}`],detail:i>=2?`Slot ${slot} was held by chunk ${i-2} until unit ${previous}. Its next copy cannot overwrite that chunk's inputs before then.`:'This slot has no previous consumer. Copy completion must still precede computation.'});
+ }
+ return {events,span:computeFree,copyTime,computeTime,steps,columns:['Chunk','Slot','Copy','Compute'],rows:events.map(e=>[`Chunk ${e.chunk}`,e.slot,`${e.copyStart}–${e.copyEnd}`,`${e.computeStart}–${e.computeEnd}`]),rowCaption:'Complete synthetic schedule; all intervals in time units',rowColumns:['Chunk','Slot','Copy','Compute'],summary:`Synthetic completion: ${computeFree} time units. ${n} copies and ${n} compute operations. These are model durations, not GPU measurements.`,note:'One copy engine, one compute queue, two reusable slots; copy duration '+copyTime+' units and compute duration 3 units per equal chunk. Intervals show start–finish in arbitrary time units. Operations on the same engine never overlap, and a slot is not reused until its previous computation finishes.'};
+}
+parallelModels.pipeline=pipeline;

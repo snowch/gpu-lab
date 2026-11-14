@@ -470,3 +470,16 @@ The separate four-thread barrier model has no early exits. All participation rel
 the collective; the subset diagnostic assigns no numeric output or real-GPU failure
 prediction. The two-block/one-resident-slot case is an explicit progress illustration,
 not a claim about placement or capacity of a named GPU. No unsafe CUDA is executed.
+
+## Part II: pipelines
+
+A deterministic synthetic budget has one copy engine, one compute queue, two slots,
+2/4 equal chunks, copy duration 2/4 arbitrary units and compute duration 3 units.
+Operations are considered in input order. Copy starts after its engine and slot
+are free; computation starts after its input copy and the previous compute finish.
+Slot availability is the previous consumer's finish, not the previous copy's finish.
+Serial mode also waits for the previous computation before the next copy. All
+reported intervals/makespans are synthetic schedule values, not hardware times or
+real-overlap predictions. The complete PyTorch program instead uses two independent
+chunks/streams and no slot reuse; CPU checks only its reference path. The reusable-slot
+CUDA event excerpt omits its actual consumer launch and host setup and is unvalidated.

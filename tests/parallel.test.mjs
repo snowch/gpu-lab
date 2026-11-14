@@ -2,7 +2,7 @@ import {readingReturn} from '../src/reading-return.mjs';
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {histogram,categories,scan,compaction,philosophers,barrier} from '../src/parallel-models.mjs';
+import {histogram,categories,scan,compaction,philosophers,barrier,pipeline} from '../src/parallel-models.mjs';
 import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {renderParallel} from '../content/parallel.mjs';
 test('histogram conserves inputs, private merge equals independent category counts',()=>{
@@ -17,7 +17,7 @@ test('histogram conserves inputs, private merge equals independent category coun
  assert.throws(()=>histogram({distribution:'unknown'}),RangeError);
 });
 test('new chapters keep model results hidden until Run and offer static comparisons',()=>{
- for(const c of parallelChapters){const html=renderParallel(c);assert.match(html,/data-result hidden/);assert.match(html,/Compare your answer/);assert.match(html,/import torch/);}
+ for(const c of parallelChapters){const html=renderParallel(c);assert.match(html,/data-result hidden/);assert.match(html,/data-run disabled/);assert.match(html,/<noscript>/);assert.match(html,/Compare your answer/);assert.match(html,/import torch/);}
 });
 
 test('scan matches independent prefixes for every supported size and convention',()=>{
@@ -65,4 +65,22 @@ test('barrier release requires all matching participants, diagnostics never fabr
  assert.equal(barrier().valid,true);assert.ok(barrier().steps.at(-1).cells.every(x=>x==='May continue'));
  const r=barrier({participation:'subset'});assert.equal(r.valid,false);assert.match(r.summary,/No valid arithmetic result/);
  assert.ok(!r.steps.some(s=>s.cells.includes('May continue')));
+});
+
+test('pipeline obeys engine exclusion, producer readiness and slot lifetimes in every configuration',()=>{
+ for(const chunks of ['2','4'])for(const copy of ['2','4'])for(const mode of ['serial','pipeline']){
+  const r=pipeline({chunks,copy,mode}),n=Number(chunks);
+  assert.equal(r.events.length,n);
+  for(const [i,e] of r.events.entries()){
+   assert.equal(e.copyEnd-e.copyStart,Number(copy));assert.equal(e.computeEnd-e.computeStart,3);
+   assert.ok(e.computeStart>=e.copyEnd);
+   if(i){assert.ok(e.copyStart>=r.events[i-1].copyEnd);assert.ok(e.computeStart>=r.events[i-1].computeEnd);}
+   if(i>=2)assert.ok(e.copyStart>=r.events[i-2].computeEnd);
+  }
+  const baseline=n*(Number(copy)+3);
+  if(mode==='serial')assert.equal(r.span,baseline);else assert.ok(r.span<=baseline);
+ }
+ assert.equal(pipeline({mode:'pipeline'}).span,14);
+ assert.equal(pipeline({mode:'pipeline',copy:'4'}).span,19);
+ assert.throws(()=>pipeline({copy:'0'}),RangeError);
 });
