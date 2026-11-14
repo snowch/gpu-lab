@@ -355,7 +355,10 @@ with TemporaryDirectory(prefix='gpu-status-releases-') as tmp:
             tab.close();tab=ctx.new_page();tab.goto(url)
             expect(tab.locator('html')).to_have_attribute('data-test-release','one')
             panel(tab);expect(tab.locator('#version-status')).to_have_text('Update ready')
-            tab.locator('#restart-update').click();expect(tab.locator('html')).to_have_attribute('data-test-release','two')
+            tab.locator('#restart-update').click()
+            # Verification includes the complete recording set. Match the cold
+            # restart budget below: the app RPC permits 15 s, then navigation.
+            expect(tab.locator('html')).to_have_attribute('data-test-release','two',timeout=20000)
             panel(tab);expect(tab.locator('#offline-status')).to_have_text('Not saved for offline use')
             tab.locator('#save-offline').click();ready(tab);ctx.close()
             print('PASS online-only update: prepare/restart succeeds without opting into offline access; explicit save remains available')
