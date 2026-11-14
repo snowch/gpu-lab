@@ -29,6 +29,15 @@ def check_parallel(browser,url,root,errors):
                     before=ex.locator('[data-result]').inner_text();exid=ex.get_attribute('id')
                     page.reload();ex=page.locator('#'+exid)
                     expect(ex.locator('[data-result]')).to_have_text(before,use_inner_text=True)
+                    if chapter['slug']=='compaction':
+                        for predicate,count,output in [('all',8,'[0, 1, 2, 3, 4, 5, 6, 7]'),('none',0,'(empty)')]:
+                            ex.locator('[data-setting=predicate]').select_option(predicate)
+                            expect(ex.locator('[data-result]')).to_be_hidden()
+                            ex.locator('[data-run]').click()
+                            expect(ex.locator('[data-result]')).to_contain_text(f'{count} survivors; {count} output writes')
+                            while ex.locator('[data-next]').is_enabled():
+                                ex.locator('[data-next]').click()
+                            expect(ex.locator('[data-result]')).to_contain_text('Output so far: '+output)
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),(chapter['slug'],width,theme)
                 page.screenshot(path=str(root/f"test-results/{chapter['slug']}-{width}-{theme}.png"),full_page=True)
                 page.get_by_role('checkbox',name='Mark lesson as done').check()
