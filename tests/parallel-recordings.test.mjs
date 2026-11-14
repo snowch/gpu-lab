@@ -4,13 +4,33 @@ import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {parallelRecordings} from '../src/parallel-recordings.mjs';
 import {readingReturn} from '../src/reading-return.mjs';
-import {histogram,scan,compaction,philosophers,barrier} from '../src/parallel-models.mjs';
+import {histogram,scan,compaction,philosophers,barrier,pipeline} from '../src/parallel-models.mjs';
 import {compactionRecordingFrame,compactionFigure} from '../scripts/render-compaction-recording.mjs';
+import {pipelinesRecordingFrame,pipelinesFigure} from '../scripts/render-pipelines-recording.mjs';
 import {progressRecordingFrame,progressFigure} from '../scripts/render-progress-recording.mjs';
 import {parallelFigure,scanFigureFrame} from '../src/parallel-figures.mjs';
 import {scanRecordingFrame,scanFigure as scanRecordingFigure} from '../scripts/render-scan-recording.mjs';
 import {histogramsRecordingFrame,histogramsFigure} from '../scripts/render-histograms-recording.mjs';
 const json=async path=>JSON.parse(await readFile(new URL('../'+path,import.meta.url),'utf8'));
+test('pipeline visual constraints separate engine availability, ready inputs and consumed slots',()=>{
+ for(const mode of ['serial','pipeline'])for(const chunks of ['2','4'])for(const copy of ['2','4']){
+  const r=pipeline({mode,chunks,copy});
+  for(const [i,s] of r.steps.entries()){
+   const previous=r.events[i-1],owner=r.events[i-2];
+   assert.equal(s.copyReady,previous?.copyEnd??0);assert.equal(s.computeReady,previous?.computeEnd??0);
+   assert.equal(s.slotReady,owner?.computeEnd??0);assert.equal(s.previousChunk,owner?.chunk??null);
+   assert.ok(s.copyStart>=s.copyReady&&s.copyStart>=s.slotReady);
+   assert.ok(s.computeStart>=s.copyEnd&&s.computeStart>=s.computeReady);
+   if(mode==='serial')assert.ok(s.copyStart>=s.computeReady);
+   const html=parallelFigure(r,i);assert.match(html,/Complete synthetic schedule/);assert.ok(html.includes(`--units:${Number(chunks)*(Number(copy)+3)+1}`));assert.equal((html.match(/class="pattern-interval is-current"/g)||[]).length,3);
+  }
+ }
+ const f=pipelinesRecordingFrame('handoffs');assert.equal(f.result.span,14);
+ assert.deepEqual([f.state.copyReady,f.state.slotReady,f.state.copyStart,f.state.copyEnd,f.state.computeReady,f.state.computeStart,f.state.computeEnd],[4,5,5,7,8,8,11]);
+ const answer=pipelinesRecordingFrame('answer');assert.equal(answer.result.span,19);assert.equal(answer.state.slotReady,7);assert.equal(answer.state.copyStart,8);
+ assert.equal(pipelinesRecordingFrame('serial').result.span,20);
+ assert.doesNotMatch(pipelinesFigure('question'),/Completion:|19 synthetic|engine free 8|slot free 7/);
+});
 test('progress diagrams retain exclusive ownership, correct wait edges and matching barrier arrivals',()=>{
  for(const policy of ['ordered','cycle']){
   const r=philosophers({policy});

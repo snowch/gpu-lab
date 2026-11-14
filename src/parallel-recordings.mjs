@@ -5,4 +5,5 @@ export const parallelRecordings=[
  {slug:'scan',chapter:16,title:'Build output positions from prefix sums',lead:'Read completed snapshots, follow partner dependencies and turn inclusive totals into exclusive offsets.'},
  {slug:'compaction',chapter:17,title:'Place surviving token identities with exclusive offsets',lead:'Connect selection flags and completed offsets to unique stable output positions.'},
  {slug:'progress',chapter:18,title:'Distinguish resource waits, barriers and scheduling dependencies',lead:'Follow fork owners, matching barrier arrivals and a producer blocked by resident capacity.'},
+ {slug:'pipelines',chapter:19,title:'Order copy, compute and buffer reuse before expecting overlap',lead:'Trace ready and consumed dependencies through a synthetic copy/compute timeline with two reusable slots.'},
 ];

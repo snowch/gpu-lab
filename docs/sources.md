@@ -329,3 +329,8 @@ and the stated one-resident-block illustration. It retains the CUDA barrier and
 block-independence references; it makes no additional scheduling/fairness claims.
 Pinned narration commands and the automated-review boundary are documented in
 assets/media/progress/README.md.
+
+Chapter 19's recap uses the existing synthetic pipeline schedule and preserves the
+ready/consumed event and pinned-memory lifetime references. The timeline reports
+engine and slot constraints, not measured hardware overlap. Rebuild commands and
+the pinned narration/automated-review boundary are in assets/media/pipelines/README.md.

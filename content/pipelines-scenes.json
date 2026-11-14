@@ -1,0 +1,63 @@
+[
+  {
+    "id": "s01",
+    "stage": "contract",
+    "title": "A slot has two handoffs.",
+    "lead": "Copy before consumption; finish consumption before reuse.",
+    "captions": [
+      "The opening program processes two independent chunks in PyTorch. Each stream queues its copy before computation. Both streams finish before CPU results are collected. Keeping storage alive is necessary, but does not prove overlap. This opening program does not reuse an input slot.",
+      "Double buffering uses two reusable slots. The browser adds abstract equal chunks, each with its own copy and computation. A ready event marks copy completion. A consumed event follows the actual consumer kernel. Later copies must wait for consumption before putting new inputs into that slot."
+    ]
+  },
+  {
+    "id": "s02",
+    "stage": "serial",
+    "title": "Declare the synthetic budget first.",
+    "lead": "Four chunks: one copy engine, one compute queue, two slots.",
+    "captions": [
+      "This is a synthetic schedule, not GPU time. Copies take two arbitrary units; computation takes three. Each engine handles one operation at a time. Bar numbers identify chunks. The slot lanes show when each buffer is held, from copy start through consumer completion.",
+      "In serial mode, each copy waits for the preceding computation as well as its engine and slot. Four chunks finish in twenty units. The time axis is shared with the next picture. Changing chunk count adds equal chunks; it does not repartition the opening program's eight values."
+    ]
+  },
+  {
+    "id": "s03",
+    "stage": "overlap",
+    "title": "Overlap different engines safely.",
+    "lead": "The same four chunks finish at model unit 14.",
+    "captions": [
+      "Allow different engines to overlap, keeping every input and duration unchanged. Copying the next chunk can overlap computation on an earlier chunk. Operations on the same engine remain separate, and each computation still follows its own copy.",
+      "Chunk two reuses the first slot. Its previous consumer still owns the buffer after the copy engine becomes free. That consumer releases the slot at five, which sets the next copy's start. The complete overlapping schedule takes fourteen synthetic units. The diagram shows dependencies, not a measured GPU speedup."
+    ]
+  },
+  {
+    "id": "s04",
+    "stage": "handoffs",
+    "title": "Ready and consumed answer different questions.",
+    "lead": "Chunk 2 waits for slot 0, then for its compute opportunity.",
+    "captions": [
+      "Follow the highlighted chunk from ready to consumed. Its copy finishes before the compute queue becomes free. Ready therefore supplies the input, but does not let computation start early. Consumed follows the end of the actual computation, and only then permits reuse of that slot.",
+      "A stream waiting for an event orders future queued work without making the CPU wait. Queuing a kernel is not its completion. Place the consumed marker after the real consumer launch in that stream. Keep pinned host inputs alive and unchanged until their transfers finish; a Python reference alone does not order overlapping writes."
+    ]
+  },
+  {
+    "id": "s05",
+    "stage": "question",
+    "title": "Pause: make copies take longer.",
+    "lead": "Keep four chunks and overlap; change only copy duration to 4.",
+    "hold": 5,
+    "captions": [
+      "Keep four equal chunks, two reusable slots and computation duration three. Change only the copy duration to four synthetic units. Predict the completion total and which engine now sets the steady pace.",
+      "For chunk two, compare the copy engine's availability with slot zero's release by chunk zero. Which constraint now delays the copy? Apply both handoffs and explain your reasoning before the comparison."
+    ]
+  },
+  {
+    "id": "s06",
+    "stage": "answer",
+    "title": "The copy engine now sets the pace.",
+    "lead": "The model finishes at unit 19; slot reuse remains ordered.",
+    "captions": [
+      "The longer copies make the copy engine set the steady pace. For the highlighted chunk, the previous consumer releases its slot before that engine becomes free. Copying must still wait for the engine. The completed schedule takes nineteen synthetic units, with every computation following its own ready input.",
+      "These totals belong to the declared model. Real overlap depends on hardware, pinned storage, stream dependencies and workload size. First compare outputs with a serial reference. Define the timed scope, warm up, measure completed work and inspect a profiler trace. A non-blocking option alone establishes neither overlap nor speedup."
+    ]
+  }
+]

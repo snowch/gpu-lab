@@ -18,5 +18,6 @@ export const recordingDurations={
   "histograms": 171,
   "scan": 196,
   "compaction": 215,
-  "progress": 221
+  "progress": 221,
+  "pipelines": 234
 };
