@@ -55,14 +55,17 @@ function rpc(type, data = {}, progress) {
 }
 async function refresh() {
   if (!worker || removed) return;
+  const generation = ++refreshGeneration;
   try {
-    const generation = ++refreshGeneration;
     const result = await rpc('STATUS');
     if (generation !== refreshGeneration) return;
     snapshot = result; unavailable = false;
     runningRelease ||= snapshot.runningRelease;
     render();
-  } catch (failure) { unavailable = true; error(failure.message); render(); }
+  } catch (failure) {
+    if (generation !== refreshGeneration) return;
+    unavailable = true; error(failure.message); render();
+  }
 }
 async function metadata(url, signal, options) {
   const response = await fetch(url, { cache: 'no-store', credentials: 'same-origin', signal, headers: { 'Cache-Control': 'no-cache' } });
@@ -136,13 +139,20 @@ async function download(save) {
   $('download-progress').hidden = false; $('asset-progress').value = 0; $('asset-progress').max = release.bytes;
   $('progress-text').textContent = `0 of ${bytes(release.bytes)} verified`;
   render();
+  let prepared = false;
   try {
-    await rpc('PREPARE', { release, save }, p => {
+    const result = await rpc('PREPARE', { release, save }, p => {
       $('asset-progress').max = p.total; $('asset-progress').value = p.bytes;
       $('progress-text').textContent = `${bytes(p.bytes)} of ${bytes(p.total)} verified`;
     });
+    // PREPARE already returns a fully verified status. Do not hold readiness
+    // behind another full-book scan, or let an older STATUS overwrite it.
+    ++refreshGeneration;
+    snapshot = result; unavailable = false;
+    runningRelease ||= snapshot.runningRelease;
+    prepared = true; error();
   } catch (failure) { error(failure.message); }
-  finally { downloading = false; $('download-progress').hidden = true; await refresh(); render(); }
+  finally { downloading = false; $('download-progress').hidden = true; if (!prepared) await refresh(); render(); }
 }
 $('running-version').append('Running ', document.querySelector('.build-info').cloneNode(true), ` · Build ${running.slice(0, 12)}`);
 $('app-status-open').addEventListener('click', () => { dialog.showModal(); check(); if (!worker || removed) connect(); else refresh(); });
