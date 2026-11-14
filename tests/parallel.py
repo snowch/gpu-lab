@@ -45,6 +45,11 @@ def check_parallel(browser,url,root,errors):
                         ex.locator('[data-run]').click()
                         expect(ex.locator('[data-result]')).to_contain_text('no prefix offsets or grouping; 0 scatter writes')
                         ex.locator('[data-setting=goal]').select_option('group');ex.locator('[data-run]').click()
+                    if chapter['slug']=='pipelines':
+                        expect(ex.locator('.pattern-interval')).to_have_count(6)
+                        if width==390:
+                            timeline=ex.get_by_role('region',name='Complete synthetic schedule');timeline.focus();page.keyboard.press('ArrowRight')
+                            page.wait_for_function('el=>el.scrollLeft>0',arg=timeline.element_handle())
                     if chapter['slug']=='progress':
                         while ex.locator('[data-next]').is_enabled():ex.locator('[data-next]').click()
                         if exid=='progress-forks':

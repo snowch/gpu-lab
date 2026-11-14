@@ -28,3 +28,9 @@
 .pattern-partials > div {flex:1;min-width:10rem;border:1px solid var(--line);padding:.6rem;}
 .pattern-partials p {margin-bottom:0;}
 .pattern-scope {font-size:.9rem;}
+.pattern-timeline {max-width:100%;overflow-x:auto;margin-block:1rem;}
+.pattern-chart {display:grid;grid-template-columns:4.5rem repeat(var(--units),minmax(2rem,1fr));grid-template-rows:auto repeat(4,3rem);gap:.5rem 0;min-width:calc(4.5rem + var(--units)*2rem);}
+.pattern-lane {position:sticky;left:0;z-index:1;background:var(--panel);font-size:.85rem;display:flex;align-items:center;padding-right:.5rem;}
+.pattern-tick {font-size:.8rem;font-variant-numeric:tabular-nums;}
+.pattern-interval {display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:4px;background:var(--soft);font-size:.8rem;white-space:nowrap;}
+.pattern-interval.is-current {outline:2px solid var(--accent);outline-offset:-2px;background:var(--accent-soft);font-weight:600;}

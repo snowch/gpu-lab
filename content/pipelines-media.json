@@ -1,0 +1,144 @@
+{
+  "durationSeconds": 234,
+  "bytes": 10819996,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 40.64,
+      "title": "A slot has two handoffs."
+    },
+    {
+      "id": "s02",
+      "start": 40.64,
+      "end": 78.741,
+      "title": "Declare the synthetic budget first."
+    },
+    {
+      "id": "s03",
+      "start": 78.741,
+      "end": 117.888,
+      "title": "Overlap different engines safely."
+    },
+    {
+      "id": "s04",
+      "start": 117.888,
+      "end": 158.549,
+      "title": "Ready and consumed answer different questions."
+    },
+    {
+      "id": "s05",
+      "start": 158.549,
+      "end": 191.043,
+      "title": "Pause: make copies take longer."
+    },
+    {
+      "id": "s06",
+      "start": 191.043,
+      "end": 234.221,
+      "title": "The copy engine now sets the pace."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 19.267,
+      "text": "The opening program processes two independent chunks in PyTorch. Each stream queues its copy before computation. Both streams finish before CPU results are collected. Keeping storage alive is necessary, but does not prove overlap. This opening program does not reuse an input slot."
+    },
+    {
+      "id": "s01-c2",
+      "start": 19.487,
+      "end": 39.22,
+      "text": "Double buffering uses two reusable slots. The browser adds abstract equal chunks, each with its own copy and computation. A ready event marks copy completion. A consumed event follows the actual consumer kernel. Later copies must wait for consumption before putting new inputs into that slot."
+    },
+    {
+      "id": "s02-c1",
+      "start": 41.24,
+      "end": 59.565,
+      "text": "This is a synthetic schedule, not GPU time. Copies take two arbitrary units; computation takes three. Each engine handles one operation at a time. Bar numbers identify chunks. The slot lanes show when each buffer is held, from copy start through consumer completion."
+    },
+    {
+      "id": "s02-c2",
+      "start": 59.785,
+      "end": 77.321,
+      "text": "In serial mode, each copy waits for the preceding computation as well as its engine and slot. Four chunks finish in twenty units. The time axis is shared with the next picture. Changing chunk count adds equal chunks; it does not repartition the opening program's eight values."
+    },
+    {
+      "id": "s03-c1",
+      "start": 79.341,
+      "end": 95.683,
+      "text": "Allow different engines to overlap, keeping every input and duration unchanged. Copying the next chunk can overlap computation on an earlier chunk. Operations on the same engine remain separate, and each computation still follows its own copy."
+    },
+    {
+      "id": "s03-c2",
+      "start": 95.903,
+      "end": 116.468,
+      "text": "Chunk two reuses the first slot. Its previous consumer still owns the buffer after the copy engine becomes free. That consumer releases the slot at five, which sets the next copy's start. The complete overlapping schedule takes fourteen synthetic units. The diagram shows dependencies, not a measured GPU speedup."
+    },
+    {
+      "id": "s04-c1",
+      "start": 118.488,
+      "end": 136.216,
+      "text": "Follow the highlighted chunk from ready to consumed. Its copy finishes before the compute queue becomes free. Ready therefore supplies the input, but does not let computation start early. Consumed follows the end of the actual computation, and only then permits reuse of that slot."
+    },
+    {
+      "id": "s04-c2",
+      "start": 136.436,
+      "end": 157.129,
+      "text": "A stream waiting for an event orders future queued work without making the CPU wait. Queuing a kernel is not its completion. Place the consumed marker after the real consumer launch in that stream. Keep pinned host inputs alive and unchanged until their transfers finish; a Python reference alone does not order overlapping writes."
+    },
+    {
+      "id": "s05-c1",
+      "start": 159.149,
+      "end": 172.696,
+      "text": "Keep four equal chunks, two reusable slots and computation duration three. Change only the copy duration to four synthetic units. Predict the completion total and which engine now sets the steady pace."
+    },
+    {
+      "id": "s05-c2",
+      "start": 172.916,
+      "end": 185.823,
+      "text": "For chunk two, compare the copy engine's availability with slot zero's release by chunk zero. Which constraint now delays the copy? Apply both handoffs and explain your reasoning before the comparison."
+    },
+    {
+      "id": "s06-c1",
+      "start": 191.643,
+      "end": 210.757,
+      "text": "The longer copies make the copy engine set the steady pace. For the highlighted chunk, the previous consumer releases its slot before that engine becomes free. Copying must still wait for the engine. The completed schedule takes nineteen synthetic units, with every computation following its own ready input."
+    },
+    {
+      "id": "s06-c2",
+      "start": 210.977,
+      "end": 232.801,
+      "text": "These totals belong to the declared model. Real overlap depends on hardware, pinned storage, stream dependencies and workload size. First compare outputs with a serial reference. Define the timed scope, warm up, measure completed work and inspect a profiler trace. A non-blocking option alone establishes neither overlap nor speedup."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 18.667,
+      "s01-c2": 19.733,
+      "s02-c1": 18.325,
+      "s02-c2": 17.536,
+      "s03-c1": 16.341,
+      "s03-c2": 20.565,
+      "s04-c1": 17.728,
+      "s04-c2": 20.693,
+      "s05-c1": 13.547,
+      "s05-c2": 12.907,
+      "s06-c1": 19.115,
+      "s06-c2": 21.824
+    }
+  }
+}

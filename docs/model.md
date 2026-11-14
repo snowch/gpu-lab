@@ -544,3 +544,14 @@ static one-slot capacity example is the chapter's stated dependency, not a
 residency simulation. The recap retains these scopes, with a capacity question
 before the ordered-launch explanation. No fairness, scheduling, runtime or
 real-hardware failure mode is inferred.
+
+### Pipeline timelines and recap
+
+Each chunk step names its engine availability, previous consumer, slot release,
+copy/compute intervals and consumption finish. The figure draws complete copy,
+compute and slot-holding lanes from model events, with the selected chunk outlined.
+Slot bars span copy start through consumer completion; idle gaps are not ownership.
+Exact intervals and constraints remain textual outside the horizontally scrollable
+plot. Both page and recap keep a shared serial/overlap axis, then change only copy
+duration for a question before its answer. All units are arbitrary synthetic
+durations; timelines are not profiler traces or evidence of hardware speedup.

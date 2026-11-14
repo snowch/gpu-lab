@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 const esc=v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function parallelFigure(r,step=0){
+ if(r.visual?.kind==='pipeline')return pipelineFigure(r,step);
  if(r.visual?.kind==='philosophers')return philosophersFigure(r,step);
  if(r.visual?.kind==='barrier')return barrierFigure(r,step);
  if(r.visual?.kind==='compaction')return compactionFigure(r,step);
@@ -11,6 +12,14 @@ export function parallelFigure(r,step=0){
  const bars=counts.map((count,b)=>`<div class="pattern-bin"><strong>Bin ${b}</strong><div class="pattern-bar" aria-hidden="true">${r.input.map((_,i)=>`<span class="${i<count?'is-filled':''}"></span>`).join('')}</div><span>${count} contributions</span></div>`).join('');
  const partials=r.visual.strategy==='private'?`<div class="pattern-partials">${r.partial.map((p,i)=>`<div><strong>Completed block ${i} partial</strong><p>[${p.map(esc).join(', ')}]</p></div>`).join('')}</div><p class="pattern-flow">Non-zero partial bins → ${r.globalUpdates} global atomic additions</p>`:'';
  return `<figure class="pattern-figure"><figcaption>Input threads → category counters</figcaption>${tokens}<p class="pattern-flow">Selected thread ${selected} → category ${bin} → atomic +1</p><p>Logical contributions through thread ${selected}; one filled segment per input counted.</p>${bars}${partials}</figure>`;
+}
+
+function pipelineFigure(r,step){
+ const s=r.steps[Math.min(step,r.steps.length-1)],axis=r.events.length*(r.copyTime+r.computeTime);
+ const interval=(event,row,start,end,kind)=>`<span role="img" aria-label="Chunk ${event.chunk}, ${kind}: ${start}–${end} time units" class="pattern-interval${event.chunk===s.chunk?' is-current':''}" style="grid-row:${row};grid-column:${start+2}/${end+2}">Chunk ${event.chunk}</span>`;
+ const lanes=['Copy','Compute','Slot 0','Slot 1'].map((name,i)=>`<strong class="pattern-lane" style="grid-row:${i+2};grid-column:1">${name}</strong>`).join('');
+ const bars=r.events.map(e=>interval(e,2,e.copyStart,e.copyEnd,'copy')+interval(e,3,e.computeStart,e.computeEnd,'compute')+interval(e,e.slot+4,e.copyStart,e.computeEnd,'slot '+e.slot+' held')).join('');
+ return `<figure class="pattern-figure"><figcaption>Complete synthetic schedule · selected chunk ${s.chunk}</figcaption><p>Shared serial/overlap axis: 0–${axis} time units. Slot bars last from copy start through consumer completion. Scroll the timeline horizontally when needed.</p><div class="pattern-timeline" role="region" aria-label="Complete synthetic schedule" tabindex="0"><div class="pattern-chart" style="--units:${axis+1}"><span class="pattern-lane" style="grid-row:1;grid-column:1">Time units</span>${Array.from({length:axis+1},(_,i)=>`<span class="pattern-tick" style="grid-row:1;grid-column:${i+2}">${i}</span>`).join('')}${lanes}${bars}</div></div><p class="pattern-flow">Chunk ${s.chunk}: copy ${s.copyStart}–${s.copyEnd} → compute ${s.computeStart}–${s.computeEnd} → release slot ${s.slot} at ${s.computeEnd}.</p><p>${s.previousChunk===null?`Slot ${s.slot} has no previous consumer.`:`Previous owner: chunk ${s.previousChunk} → slot ${s.slot} free at ${s.slotReady}.`} Copy engine free at ${s.copyReady}; selected copy starts at ${s.copyStart}.${r.visual.mode==='serial'?' Serial mode also waits for the previous computation.':''}</p><p>Copy completion supplies ready at ${s.copyEnd}; the compute queue is free at ${s.computeReady}. Consumption starts at ${s.computeStart}. These intervals are synthetic model values.</p></figure>`;
 }
 
 function philosophersFigure(r,step){

@@ -379,5 +379,5 @@ explanation are visible in the main flow; the follow-on patterns add no new cont
 to the core lessons.
 
 Part II concept diagrams and narrated recaps are being completed in the same
-chapter-by-chapter release sequence. Chapters 15–18 now have model-derived contribution, prefix,
-placement, resource-wait and barrier diagrams and dedicated captioned recaps with transcripts and downloadable slides.
+chapter-by-chapter release sequence. Chapters 15–19 now have model-derived contribution, prefix,
+placement, resource-wait, barrier and pipeline diagrams and dedicated captioned recaps with transcripts and downloadable slides.
