@@ -6,7 +6,7 @@ const base = new URL(document.querySelector('meta[name="gpu-base"]').content, lo
 const running = document.querySelector('meta[name="gpu-release"]').content;
 const dialog = $('app-status-dialog');
 let registration, worker, latest, runningRelease, snapshot = {}, checking, lastCheck = 0, checkingAbort;
-let downloading = false, mode, removed = false, refreshGeneration = 0, cacheLifetime = 0;
+let downloading = false, restarting = false, mode, removed = false, refreshGeneration = 0, cacheLifetime = 0;
 let version = navigator.onLine ? 'Checking for updates' : 'Cannot check for updates';
 const supported = 'serviceWorker' in navigator && isSecureContext && 'caches' in self;
 let unavailable = !supported;
@@ -116,7 +116,7 @@ async function connect() {
   } catch (failure) { unavailable = true; error(failure.message); render(); }
 }
 async function remember() {
-  if (remembered || remembering || !connected || !worker || !runningRelease || removed || document.readyState !== 'complete') return remembering;
+  if (remembered || remembering || restarting || !connected || !worker || !runningRelease || removed || document.readyState !== 'complete') return remembering;
   if (snapshot.active === running) { remembered = true; return; }
   const prefix = new URL(`releases/${running}/`, base).href;
   const paths = performance.getEntriesByType('resource').map(entry => entry.name).filter(url => url.startsWith(prefix)).map(url => url.slice(prefix.length).split('?')[0]);
@@ -154,10 +154,10 @@ $('save-offline').addEventListener('click', () => download(true));
 $('cancel-download').addEventListener('click', () => rpc('CANCEL').catch(f => error(f.message)));
 $('later-update').addEventListener('click', () => dialog.close());
 $('restart-update').addEventListener('click', async () => {
-  error(); $('restart-update').disabled = true;
-  try { await rpc('RESTART'); }
+  error(); restarting = true; $('restart-update').disabled = true;
+  try { await remembering; await rpc('RESTART'); }
   catch (failure) { error(failure.message); }
-  finally { $('restart-update').disabled = false; await refresh(); }
+  finally { restarting = false; $('restart-update').disabled = false; await refresh(); }
 });
 $('remove-offline').addEventListener('click', () => { $('remove-confirmation').hidden = false; $('cancel-remove').focus(); });
 $('cancel-remove').addEventListener('click', () => { $('remove-confirmation').hidden = true; $('remove-offline').focus(); });
