@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {parallelRecordings} from '../src/parallel-recordings.mjs';
+import {readingReturn} from '../src/reading-return.mjs';
 import {histogram} from '../src/parallel-models.mjs';
 import {parallelFigure} from '../src/parallel-figures.mjs';
 import {histogramsRecordingFrame,histogramsFigure} from '../scripts/render-histograms-recording.mjs';
@@ -24,6 +25,10 @@ test('histogram contribution figure follows the selected model state and partial
  assert.doesNotMatch(histogramsFigure('question'),/2 global atomic additions|Final counts:/);
 });
 for(const recap of parallelRecordings)test(`${recap.slug} recap preserves measured media, cue and transcript contracts`,async()=>{
+ const page=`https://example.org/gpu-lab/lessons/inside-sm.html?from=${recap.slug}-video`;
+ const path=`/gpu-lab/lessons/${recap.slug}-video.html?keep=recap`;
+ assert.deepEqual(readingReturn(page+'&return='+encodeURIComponent(path)),{href:'https://example.org'+path,chapter:recap.chapter,label:`Return to Chapter ${recap.chapter} recap`});
+ assert.equal(readingReturn(page+'&return=https://evil.example/').href,`https://example.org/gpu-lab/lessons/${recap.slug}-video.html`);
  const scenes=await json(`content/${recap.slug}-scenes.json`),media=await json(`content/${recap.slug}-media.json`);
  assert.equal((await stat(new URL(`../assets/media/${recap.slug}/${recap.slug}.mp4`,import.meta.url))).size,media.bytes);
  assert.deepEqual(media.cues.map(c=>c.text),scenes.flatMap(s=>s.captions));assert.equal(media.scenes.length,scenes.length);

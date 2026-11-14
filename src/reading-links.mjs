@@ -17,7 +17,7 @@ document.addEventListener('click',event=>{
   event.preventDefault();
   try{
     saveReadingState();
-    if(appendix){
+    if(appendix&&!link.matches('[data-reading-return]')){
       url.searchParams.set('return',location.pathname+location.search+location.hash);
       url.searchParams.set('from',location.pathname.split('/').at(-1)?.replace('.html','')||'index');
     }
