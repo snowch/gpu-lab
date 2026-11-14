@@ -268,3 +268,9 @@ documents recording, synchronisation and elapsed-time queries. These pages and
 the named functions were checked on 12 November 2026. Event timing is offered
 for native GPU investigation; neither browser counts nor simulator event
 results establish physical GPU performance.
+
+## Parallel patterns
+
+- PyTorch `torch.bincount`: non-negative integer IDs, minlength and output range.
+- NVIDIA CUDA C++ Programming Guide, Atomic Functions and Synchronization Functions:
+  indivisible counter updates are distinct from collective barrier ordering.

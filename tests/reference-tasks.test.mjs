@@ -1,3 +1,4 @@
+import {parallelChapters} from '../src/parallel-chapters.mjs';
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +35,7 @@ test('reference exercises use official guides and retain local answer comparison
   assert.equal(referenceTasks['hello-pytorch'].code,pythonSource());
 });
 test('every published chapter and lab has annotated references before two or more exercises',()=>{
-  const pages=new Set([...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','launch-from-input','desktop','profiling','inside-sm']);
+  const pages=new Set([...parallelChapters.map(c=>c.slug),...chapters.filter(c=>c.opening).map(c=>c.slug),...lessons.map(l=>l.slug),'memory','kernel','launch-from-input','desktop','profiling','inside-sm']);
   assert.deepEqual(new Set(Object.keys(chapterReferences)),pages);
   for(const slug of pages){
     const entry=chapterReferences[slug],html=renderChapterReferences(slug);

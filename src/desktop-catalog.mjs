@@ -1,3 +1,4 @@
+import {parallelChapters} from './parallel-chapters.mjs';
 // Copyright © 2026 Christopher Snow.
 import {tiledMatmul} from './ai-models.mjs';
 import {pythonSource} from './hello-model.mjs';
@@ -5,7 +6,7 @@ import {deviceOpening,readingOpening,memorySetup,memoryExample} from './book-cod
 import {tensorSetup,journeyCode,readingCode,deviceJourney,readTensor} from './foundations-model.mjs';
 import {continuationChapters,computeExperiment} from './continuation-view.mjs';
 export function desktopExamples(){
-  const examples=[
+  const examples=[...parallelChapters.map(c=>({slug:c.slug,id:"opening",source:c.source,expected:c.expected})),
     {slug:'hello',id:'opening',source:pythonSource(),expected:{y:[2,4,6,8,10]}},
     {slug:'devices',id:'opening',source:deviceOpening,expected:{y_cpu:[2,4,6,8,10]}},
     {slug:'launch-from-input',id:'opening',source:deviceOpening,expected:{y_cpu:[2,4,6,8,10]}},

@@ -17,6 +17,7 @@ def check_launch_from_input(browser, url, root):
             expect(page.locator('#launch-sizes')).to_contain_text('input.size()')
             expect(page.locator('#launch-copy_in + .code-explanations li')).to_have_count(4)
             explanation = page.locator('#launch-sizes + .code-explanations button').first
+            expect(explanation).to_be_enabled()
             explanation.focus()
             expect(page.locator('#launch-sizes .is-code-highlighted')).to_contain_text('int n =')
             expect(page.locator('#launch-comparison')).not_to_have_attribute('open', '')

@@ -356,3 +356,13 @@ the learner’s work. Chapter 1’s separate Inside an SM appendix remains avail
 for its narrower hardware purpose. The new scripts were approved on 13 November
 2026; their figures and new-case comparisons come from the existing chapter
 models. All fourteen numbered chapters must retain a dedicated recap link.
+
+## Part II: Parallel patterns
+
+Optional follow-on chapters leave the fourteen core chapters unchanged. Publish
+one chapter at a time, with model/build/browser checks, a reviewed PR, merge and
+live verification before implementing the next. Chapter 15 (histograms) introduces
+atomic updates, contention and per-block partials using eight integer category IDs.
+Planned, unpublished chapters: scan; compaction; synchronisation and progress;
+producer–consumer pipelines; an investigation combining the patterns. No planned
+chapter has a learner-facing link before it works.

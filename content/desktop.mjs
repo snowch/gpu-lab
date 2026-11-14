@@ -1,3 +1,4 @@
+import {parallelChapters} from '../src/parallel-chapters.mjs';
 // Copyright © 2026 Christopher Snow.
 import {codePanel,readerTask} from '../src/chapter-view.mjs';
 import {escape,table} from '../src/continuation-ui.mjs';
@@ -6,7 +7,7 @@ const shell=(id,source)=>codePanel({id,source,language:'shell',label:'Terminal �
 const cudaLinks={'putting-it-together':['ai-kernels.cu','Self-checking naive and tiled matrix products'],hello:['desktop/hello.cu','Five-input kernel; eight launched threads'],reduction:['ai-kernels.cu','Self-checking eight-input reduction'],matmul:['ai-kernels.cu','Self-checking naive and tiled matrix products'],memory:['gather.cu','Self-checking gather; configurable stride, offset and count'],'shared-memory':['shared-memory.cu','Self-checking padded column read'],kernel:['desktop/kernel-scale.cu','Safe repaired scale kernel; vector addition also available below']};
 for(const [slug,note] of Object.entries({reading:'Fixed 5 × 5 row and column selections',layout:'Strided selection and packed output',requests:'Five input reads with row and column strides',scheduling:'Two ordered scale launches; no scheduler timing',divergence:'Positive double / otherwise negate',reduction:'One-block eight-input reduction',matmul:'Separate and shared 4 × 4 products; tile width 2','tensor-cores':'FP16 conversion only; native WMMA is separately compiled',attention:'Small online FP32 reference, four components per row',inference:'Append one row to preallocated key/value caches','putting-it-together':'4 × 4 correctness reference; optional native event timing'}))cudaLinks[slug]=['desktop/course-bridges.cu',note];
 cudaLinks['launch-from-input']=['launch-from-input.cu','Input-derived count, matching output storage and rounded-up launch'];
-const titles=Object.fromEntries([...chapters.map((chapter,i)=>[chapter.slug,`${i+1}. ${chapter.title}`]),['memory','Optional memory-access lab']]);
+const titles=Object.fromEntries([...[...chapters,...parallelChapters].map((chapter,i)=>[chapter.slug,`${i+1}. ${chapter.title}`]),['memory','Optional memory-access lab']]);
 export function renderDesktop(examples,{revision,image}) {
   const grouped=Object.entries(titles).map(([slug,title])=>{
     const files=examples.filter(example=>example.slug===slug),opening=files.find(example=>example.id==='opening');
