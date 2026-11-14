@@ -4,11 +4,27 @@ import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {parallelRecordings} from '../src/parallel-recordings.mjs';
 import {readingReturn} from '../src/reading-return.mjs';
-import {histogram,scan} from '../src/parallel-models.mjs';
+import {histogram,scan,compaction} from '../src/parallel-models.mjs';
+import {compactionRecordingFrame,compactionFigure} from '../scripts/render-compaction-recording.mjs';
 import {parallelFigure,scanFigureFrame} from '../src/parallel-figures.mjs';
 import {scanRecordingFrame,scanFigure as scanRecordingFigure} from '../scripts/render-scan-recording.mjs';
 import {histogramsRecordingFrame,histogramsFigure} from '../scripts/render-histograms-recording.mjs';
 const json=async path=>JSON.parse(await readFile(new URL('../'+path,import.meta.url),'utf8'));
+test('compaction visual snapshots retain only inspected writes and preserve stable identity placement',()=>{
+ for(const predicate of ['zero','nonzero','all','none'])for(const order of ['forward','reverse']){
+  const r=compaction({predicate,order}),expected=Array(r.count).fill('Unwritten');
+  for(const [step,s] of r.steps.entries()){
+   const i=s.inputIndex;
+   if(r.flags[i]){assert.equal(s.destination,r.offsets[i]);expected[s.destination]=i;}
+   else assert.equal(s.destination,null);
+   assert.deepEqual(s.output,expected);assert.match(parallelFigure(r,step),/pattern-figure/);
+   if(!r.count)assert.match(parallelFigure(r,step),/No output slots used/);
+  }
+ }
+ const placed=compactionRecordingFrame('scatter');assert.equal(placed.state.inputIndex,5);assert.equal(placed.state.destination,2);assert.deepEqual(placed.state.output,[0,2,5,'Unwritten']);
+ assert.deepEqual(compactionRecordingFrame('answer').result.output,[1,3,4,6]);
+ assert.doesNotMatch(compactionFigure('question'),/Output count:|Completed stable token identities|Token 4 → destination/);
+});
 test('scan diagrams use completed snapshots, distinguish shifting and hide the new-case answer',()=>{
  for(const size of ['4','8'])for(const kind of ['inclusive','exclusive']){
   const r=scan({size,kind});

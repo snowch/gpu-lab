@@ -53,7 +53,8 @@ def check_parallel(browser,url,root,errors):
                             expect(ex.locator('[data-result]')).to_contain_text(f'{count} survivors; {count} output writes')
                             while ex.locator('[data-next]').is_enabled():
                                 ex.locator('[data-next]').click()
-                            expect(ex.locator('[data-result]')).to_contain_text('Output so far: '+output)
+                            if predicate=='all':expect(ex.locator('[data-output-token]')).to_have_text([str(i) for i in range(8)])
+                            else:expect(ex.locator('.pattern-output')).to_contain_text('No output slots used (empty).')
                 if width==390 and theme=='light':
                     first=page.locator('[data-parallel]').first
                     saved=first.locator('[data-result]').inner_text()

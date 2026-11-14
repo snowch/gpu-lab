@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 const esc=v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function parallelFigure(r,step=0){
+ if(r.visual?.kind==='compaction')return compactionFigure(r,step);
  if(r.visual?.kind==='scan')return scanFigure(r,step);
  if(r.visual?.kind!=='histogram')return '';
  const selected=Math.min(step,r.input.length-1),bin=r.input[selected],counts=r.steps[selected].cells;
@@ -20,4 +21,12 @@ function scanFigure(r,step){
  const row=(values,title,marked)=>`<p><strong>${esc(title)}</strong></p><div class="pattern-tokens">${values.map((v,i)=>`<div class="pattern-token${marked.includes(i)?' is-current':''}"><span>Position ${i}</span><strong>${v}</strong></div>`).join('')}</div>`;
  const detail=state.shift?`Shift: position ${focus} receives old position ${partner}'s value ${result}. Position 0 receives zero.`:state.distance?`Position ${focus}: old[${focus}] (${before[focus]})${partner>=0?` + old[${partner}] (${before[partner]})`:'; no partner, so keep its value'} → ${result}.`:'Initial flags: a 1 selects the token; a 0 skips it.';
  return `<figure class="pattern-figure"><figcaption>${esc(state.label)}</figcaption>${state.before?row(before,'Read only this completed previous snapshot',state.shift?[partner]:[focus,partner]):''}<p class="pattern-flow">${esc(detail)}</p>${row(state.cells,state.before?'Write the new snapshot':'Input flags',[focus])}${state.shift?`<p>Output length = last offset ${r.values.at(-1)} + last flag ${r.input.at(-1)} = ${r.values.at(-1)+r.input.at(-1)}.</p>`:''}</figure>`;
+}
+
+function compactionFigure(r,step){
+ const state=r.steps[Math.min(step,r.steps.length-1)],i=state.inputIndex;
+ const inputs=r.input.map((bin,j)=>`<div class="pattern-token${j===i?' is-current':''}"><span>Token ${j}</span><strong>${bin}</strong><span>Flag ${r.flags[j]}</span><span>Offset ${r.offsets[j]}</span></div>`).join('');
+ const output=state.output.map((value,j)=>`<div class="pattern-token${j===state.destination?' is-current':''}"><span>Output ${j}</span><strong data-output-token>${value==='Unwritten'?'?':value}</strong><span>${value==='Unwritten'?'Not written':'token ID'}</span></div>`).join('');
+ const action=state.destination===null?`Token ${i} has flag 0: skip its write. Its offset ${r.offsets[i]} is not used.`:`Token ${i} has flag 1 → exclusive offset ${state.destination} → output slot ${state.destination}.`;
+ return `<figure class="pattern-figure"><figcaption>Token categories → flags → exclusive offsets</figcaption><p>Bold input values are category IDs; token labels identify input positions.</p><div class="pattern-tokens">${inputs}</div><p class="pattern-flow">${esc(action)}</p><div class="pattern-output"><p><strong>Output so far · used prefix</strong></p>${r.count?`<div class="pattern-tokens">${output}</div>`:'<p>No output slots used (empty).</p>'}</div><p>Final count = last offset ${r.offsets.at(-1)} + last flag ${r.flags.at(-1)} = ${r.count}. Every survivor owns a distinct destination.</p></figure>`;
 }

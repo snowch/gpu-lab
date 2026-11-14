@@ -1,0 +1,144 @@
+{
+  "durationSeconds": 215,
+  "bytes": 10329114,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 37.141,
+      "title": "Keep identities, not just a count."
+    },
+    {
+      "id": "s02",
+      "start": 37.141,
+      "end": 74.432,
+      "title": "Count the earlier survivors."
+    },
+    {
+      "id": "s03",
+      "start": 74.432,
+      "end": 110.08,
+      "title": "Write one identity to its own slot."
+    },
+    {
+      "id": "s04",
+      "start": 110.08,
+      "end": 143.979,
+      "title": "Write order need not be input order."
+    },
+    {
+      "id": "s05",
+      "start": 143.979,
+      "end": 176.109,
+      "title": "Pause: change only the selection."
+    },
+    {
+      "id": "s06",
+      "start": 176.109,
+      "end": 214.531,
+      "title": "Offsets preserve the new survivor order."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 16.707,
+      "text": "Chapter Seventeen keeps the same eight categories alongside token identities. A category determines whether a token is selected. The token identity records which original input item survives. A count alone cannot supply those identities."
+    },
+    {
+      "id": "s01-c2",
+      "start": 16.927,
+      "end": 35.721,
+      "text": "Compaction packs selected items together. Stable selection keeps survivors in their original relative order. A flag is one for keep and zero for skip. We select category zero first. PyTorch chooses its implementation; the diagram follows our flag, scan and scatter construction."
+    },
+    {
+      "id": "s02-c1",
+      "start": 37.741,
+      "end": 54.893,
+      "text": "Exclusively scan the keep flags. Each offset counts selected tokens strictly before that input position. A kept token uses its offset as an output destination. A skipped token performs no output write, even if its offset matches another token's offset."
+    },
+    {
+      "id": "s02-c2",
+      "start": 55.113,
+      "end": 73.012,
+      "text": "The flags and all offsets must finish before placement starts. For this non-empty input, add the last exclusive offset and last flag to obtain the output count. The teaching model reserves eight slots and reports the used prefix; it does not model PyTorch's allocation strategy."
+    },
+    {
+      "id": "s03-c1",
+      "start": 75.032,
+      "end": 91.48,
+      "text": "Scatter writes an input item to a calculated destination. Token five is highlighted in the input row. It has two earlier survivors, so its completed exclusive offset gives it output slot two. Its thread copies the token identity into that slot."
+    },
+    {
+      "id": "s03-c2",
+      "start": 91.7,
+      "end": 108.66,
+      "text": "The output picture shows only writes inspected so far; a question mark labels an unwritten slot. Every kept thread has a distinct destination. This destination contract, rather than the bounds guard alone, prevents conflicting writes and preserves survivor order."
+    },
+    {
+      "id": "s04-c1",
+      "start": 110.68,
+      "end": 124.312,
+      "text": "Inspect the same valid placements in reverse input order. The destinations do not change because they came from the completed scan. A later input may write first without taking an earlier token's output slot."
+    },
+    {
+      "id": "s04-c2",
+      "start": 124.532,
+      "end": 142.559,
+      "text": "The completed token identities match forward inspection and retain input order. These are two chosen valid write sequences, not a GPU scheduling prediction. A block barrier cannot finish a scan produced by other blocks; dependent phases need the required wider ordering."
+    },
+    {
+      "id": "s05-c1",
+      "start": 144.579,
+      "end": 157.741,
+      "text": "Now keep tokens whose category differs from zero. Leave the input identities and reverse inspection order unchanged. Predict the output identities, and derive the destination used by token four."
+    },
+    {
+      "id": "s05-c2",
+      "start": 157.961,
+      "end": 170.889,
+      "text": "Would writing the last surviving token first change its final output position? Explain why matching the old survivor count would not prove that the correct identities were selected. Pause before the comparison."
+    },
+    {
+      "id": "s06-c1",
+      "start": 176.709,
+      "end": 193.797,
+      "text": "Four tokens survive this new selection. Their identities remain in original relative order, as shown in the output. Token four has two earlier survivors, so its destination is two. Reversing the inspected writes changes neither that destination nor stability."
+    },
+    {
+      "id": "s06-c2",
+      "start": 194.017,
+      "end": 213.111,
+      "text": "A skipped thread never writes. With an empty selection, all threads skip and no output slots are used; that differs from an empty input. Return to the chapter to inspect destinations and test all or no survivors. No GPU runtime, allocation cost or speedup is inferred from these placements."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 16.107,
+      "s01-c2": 18.795,
+      "s02-c1": 17.152,
+      "s02-c2": 17.899,
+      "s03-c1": 16.448,
+      "s03-c2": 16.96,
+      "s04-c1": 13.632,
+      "s04-c2": 18.027,
+      "s05-c1": 13.163,
+      "s05-c2": 12.928,
+      "s06-c1": 17.088,
+      "s06-c2": 19.093
+    }
+  }
+}

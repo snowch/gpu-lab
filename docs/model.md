@@ -520,3 +520,14 @@ The recap uses the same staged model for eight inputs and a four-input transfer,
 with question results hidden until comparison. The shift diagram identifies the
 previous position and inserted zero. Last offset plus last flag gives output count;
 prefix values need not be distinct. No GPU cycles, scheduling or timing are inferred.
+
+### Compaction placement snapshots and recap
+
+Each inspected compaction step captures its input index, destination (null for a
+skip) and an independent output-prefix snapshot. Tiles connect category IDs to
+keep flags, completed offsets and output token identities. Unwritten slots are
+explicit; an empty selection has no used slots despite eight input positions.
+Forward/reverse inspection uses the same destinations and must finish with the
+same stable filter. The recap compares those orders before changing the predicate,
+with new-case outputs hidden until the answer. No schedule, allocation or GPU
+runtime follows from this logical placement trace.

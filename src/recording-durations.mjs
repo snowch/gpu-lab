@@ -16,5 +16,6 @@ export const recordingDurations={
   "inference": 289,
   "putting-it-together": 190,
   "histograms": 171,
-  "scan": 196
+  "scan": 196,
+  "compaction": 215
 };
