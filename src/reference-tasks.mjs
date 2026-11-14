@@ -3,6 +3,7 @@ import {sectionHeading} from './section-cues.mjs';
 import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
+  cumsum:'https://docs.pytorch.org/docs/stable/generated/torch.cumsum.html',
   bincount:'https://docs.pytorch.org/docs/stable/generated/torch.bincount.html',
   atomics:'https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#atomic-functions',
   events:'https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EVENT.html',
@@ -53,6 +54,8 @@ export const guides = {
   timing: 'https://docs.pytorch.org/docs/2.14/notes/cuda.html#asynchronous-execution',
 };
 export const referenceTasks = {
+  'scan-inclusive':{title:'Check which values a prefix includes',page:'cumsum',label:'PyTorch: cumsum',prompt:'For flags [0, 1, 1, 0], does torch.cumsum include the flag at each position? How would you derive exclusive offsets from its result?',answer:'The inclusive result is [0, 1, 2, 2]. Shift it right and insert zero to obtain [0, 0, 1, 2]. This describes the integer values, not a required implementation strategy.'},
+  'scan-barrier':{title:'Order neighbouring reads',page:'barriers',label:'CUDA: block synchronisation',prompt:'At partner distance 2, why must the old stage already be complete? Does a block barrier make a scan over several blocks correct by itself?',answer:'Threads read results produced by other threads in the previous stage. Those writes must precede the reads. A block barrier orders participating threads in one block; it supplies no scan of earlier blocks or grid-wide barrier. Multi-block scan needs additional ordered phases or a supported collective.'},
   'histogram-length':{title:'Check the category range',page:'bincount',label:'PyTorch: bincount',prompt:'For IDs [0, 4, 4] and minlength=4, is the result four or five entries long? What would a fixed four-counter CUDA kernel need to check?',answer:'Five entries: [1, 0, 0, 0, 2]. minlength is a minimum, not an upper bound. A four-counter kernel must reject IDs outside 0–3 or use an allocation covering the actual range.'},
   'histogram-atomic':{title:'Check the scope of an atomic update',page:'atomics',label:'CUDA: atomic functions',prompt:'Does atomicAdd to a histogram counter also make every thread reach a block barrier? Why are barriers still needed around shared-memory partial counting?',answer:'No. The counter update is indivisible at its supported scope. A block barrier orders shared initialisation before updates and completed updates before merging; an atomic addition alone supplies neither collective rendezvous.'},
   'launch-input-bytes':{title:'Distinguish counts from copy sizes',page:'explicitMemory',label:'CUDA: explicit memory management',code:'int n = 7;\n// Seven FP32 input values; four bytes each.',prompt:'Find cudaMalloc and cudaMemcpy in the explicit memory example. For these seven inputs and seven outputs, how many bytes should each allocation hold and the input copy transfer? Should the kernel receive 7 or 28 as its element count?',answer:'Each allocation holds 7 × 4 = 28 bytes, and the input copy transfers 28 bytes. The kernel receives n = 7 elements. Passing 28 as n would let extra threads pass the guard even though the arrays have only seven positions.'},
@@ -252,6 +255,7 @@ export function renderReferenceTask(key) {
 
 // Page-level coverage is explicit so a new chapter cannot silently omit its references.
 export const chapterReferences = {
+  scan:{sources:[['cumsum','PyTorch: cumulative sum','Check inclusive semantics and the dimension argument.'],['barriers','CUDA: block synchronisation','Check participation and the scope of stage ordering.']],tasks:['scan-inclusive','scan-barrier']},
   histograms:{sources:[['bincount','PyTorch: bincount','Check category IDs, output length and minlength.'],['atomics','CUDA: atomic functions','Check the indivisible update and its scope.'],['barriers','CUDA: block barriers','Check ordering around shared counter initialisation and merging.']],tasks:['histogram-length','histogram-atomic']},
   'launch-from-input':{sources:[['explicitMemory','CUDA: explicit memory management','Follow allocation, byte counts and copies in the complete vector-add example.'],['launch','CUDA: Triple Chevron Notation','Distinguish launch dimensions from the ordinary function arguments.']],tasks:['launch-input-bytes','launch-input-grid']},
   'inside-sm':{sources:[['scheduling','CUDA: hardware multithreading','Check warp readiness, register storage and shared SM execution hardware.'],['launch','CUDA: thread blocks and kernels','Connect program threads and blocks to GPU execution.']],tasks:['sm-sharing','sm-ready']},

@@ -10,4 +10,13 @@ x = torch.tensor(
 )
 counts = torch.bincount(x, minlength=4)
 print(counts.cpu())`,expected:{counts:[4,2,1,1]}},
+  {slug:'scan',number:16,title:'How can threads compute running totals?',summary:'Follow staged prefix sums, then turn inclusive totals into exclusive output offsets.',source:`import torch
+
+x = torch.tensor(
+    [0, 1, 0, 2, 1, 0, 3, 0],
+    dtype=torch.int64, device="cuda",
+)
+flags = (x == 0).to(torch.int64)
+totals = torch.cumsum(flags, dim=0)
+print(totals.cpu())`,expected:{totals:[1,1,2,2,2,3,3,4]}},
 ];

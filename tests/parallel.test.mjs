@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {histogram,categories} from '../src/parallel-models.mjs';
+import {histogram,categories,scan} from '../src/parallel-models.mjs';
 import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {renderParallel} from '../content/parallel.mjs';
 test('histogram conserves inputs, private merge equals independent category counts',()=>{
@@ -17,4 +17,14 @@ test('histogram conserves inputs, private merge equals independent category coun
 });
 test('new chapters keep model results hidden until Run and offer static comparisons',()=>{
  for(const c of parallelChapters){const html=renderParallel(c);assert.match(html,/data-result hidden/);assert.match(html,/Compare your answer/);assert.match(html,/import torch/);}
+});
+
+test('scan matches independent prefixes for every supported size and convention',()=>{
+ for(const size of ['4','8'])for(const kind of ['inclusive','exclusive']){
+  const r=scan({size,kind});
+  assert.deepEqual(r.values,r.input.map((_,i)=>r.input.slice(0,i+(kind==='inclusive'?1:0)).reduce((a,b)=>a+b,0)));
+  assert.equal(r.steps.length,1+Math.log2(Number(size))+(kind==='exclusive'?1:0));
+  assert.equal(r.values.at(-1)+(kind==='exclusive'?r.input.at(-1):0),r.input.reduce((a,b)=>a+b,0));
+ }
+ assert.equal(scan().additions,17);assert.throws(()=>scan({size:'5'}),RangeError);
 });

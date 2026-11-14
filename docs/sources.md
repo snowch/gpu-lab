@@ -274,3 +274,6 @@ results establish physical GPU performance.
 - PyTorch `torch.bincount`: non-negative integer IDs, minlength and output range.
 - NVIDIA CUDA C++ Programming Guide, Atomic Functions and Synchronization Functions:
   indivisible counter updates are distinct from collective barrier ordering.
+
+- Part II scan follows PyTorch `torch.cumsum`'s inclusive contract and CUDA block
+  synchronisation rules. The browser's staged algorithm is a teaching choice.
