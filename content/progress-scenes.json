@@ -1,0 +1,63 @@
+[
+  {
+    "id": "s01",
+    "stage": "resources",
+    "title": "A wait needs a path to progress.",
+    "lead": "Three philosophers each need two exclusive forks.",
+    "captions": [
+      "Chapter Eighteen asks whether a dependency can actually finish. A consumer needs its producer's result, and that producer must have an opportunity to run. Same-stream ordering handles the opening PyTorch example; the diagrams study separate coordination problems.",
+      "Dining philosophers illustrates exclusive resource ownership. A, B and C each need the two numbered forks shown. Only one philosopher owns a fork at a time. Our ordered policy takes the lower number first, then the higher. Each philosopher eats once and releases both."
+    ]
+  },
+  {
+    "id": "s02",
+    "stage": "ordered",
+    "title": "A common order leaves a way forward.",
+    "lead": "B holds both forks and can eat at its next opportunity.",
+    "captions": [
+      "Inspect the chosen execution. Each unfinished philosopher gets one opportunity per round. A holds fork zero and needs fork one. B owns forks one and two. C needs fork zero. The arrows point from a requester to the current owner of the fork it needs.",
+      "B can eat at its next opportunity, release both forks and finish. A can then obtain its second fork; C finishes later. A common resource order prevents a circular resource wait. This finite example does not prove fairness or freedom from starvation in every scheduler."
+    ]
+  },
+  {
+    "id": "s03",
+    "stage": "cycle",
+    "title": "A circular wait has no releaser.",
+    "lead": "Taking each philosopher’s own fork first closes the cycle.",
+    "captions": [
+      "Deadlock means unfinished activities cannot progress because each needs another blocked activity to satisfy its wait. Change only the acquisition policy: each philosopher takes its own numbered fork first, and keeps it while waiting for the second.",
+      "A now waits for B, B waits for C, and C waits for A. Nobody holds both forks, so nobody can eat and release one. Another round of waiting changes no ownership. These are chosen ownership transitions, not a prediction of CPU or GPU scheduling."
+    ]
+  },
+  {
+    "id": "s04",
+    "stage": "barriers",
+    "title": "A barrier requires matching participation.",
+    "lead": "All four threads arrive; skipped calls cannot supply arrivals.",
+    "captions": [
+      "A block barrier is a different agreement. In this block of four threads, no thread exits early. All must reach the matching barrier before continuing. The valid diagram shows four arrivals and permission for the block to continue.",
+      "In the diagnostic, threads two and three skip the call but continue elsewhere. Their missing arrivals violate the participation rule. Report invalid participation, not a numeric result or a guaranteed hardware hang. Resource ordering cannot repair a non-uniform barrier call."
+    ]
+  },
+  {
+    "id": "s05",
+    "stage": "question",
+    "title": "Pause: can the producer run?",
+    "lead": "One resident slot; A waits for a flag only B can set.",
+    "hold": 5,
+    "captions": [
+      "Consider two ordinary blocks and room for only one resident block in this illustration. Block A occupies that capacity while repeatedly checking a flag. Block B has not started, and only B can set the flag.",
+      "Suppose all resource acquisitions follow a common order. Has that solved the progress dependency? Explain which block must run and which capacity it needs. Would a block barrier let the other block start? Pause before comparing your reasoning."
+    ]
+  },
+  {
+    "id": "s06",
+    "stage": "answer",
+    "title": "Order phases without occupying their capacity.",
+    "lead": "Finish the producer phase before its consumer uses the result.",
+    "captions": [
+      "Resource order does not make the unscheduled producer run. A is waiting for B while occupying the only slot B needs. Ordinary blocks have no general simultaneous-residency guarantee, and a block barrier cannot synchronise different blocks.",
+      "Queue producer and consumer kernels in the same CUDA stream, or express an appropriate dependency between streams. The consumer uses results after producer completion; queuing the launches does not make the CPU wait. Other documented collectives have their own launch requirements. Return to the chapter to distinguish resource cycles, missing barrier arrivals and scheduling dependencies. These diagrams measure no GPU time."
+    ]
+  }
+]

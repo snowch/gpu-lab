@@ -531,3 +531,16 @@ Forward/reverse inspection uses the same destinations and must finish with the
 same stable filter. The recap compares those orders before changing the predicate,
 with new-case outputs hidden until the answer. No schedule, allocation or GPU
 runtime follows from this logical placement trace.
+
+### Progress ownership snapshots and recap
+
+Each philosopher transition captures separate fork owners, held-fork arrays,
+finished flags, the acting philosopher and next-request wait edges. The visual
+connects requesters to the owners of the forks they need, rather than treating
+all waiting as a barrier. It exposes a runnable releaser in the ordered execution
+and the closed wait cycle in the diagnostic. Barrier tiles report actual
+participation at the selected step; skipped calls do not supply arrivals. The
+static one-slot capacity example is the chapter's stated dependency, not a
+residency simulation. The recap retains these scopes, with a capacity question
+before the ordered-launch explanation. No fairness, scheduling, runtime or
+real-hardware failure mode is inferred.
