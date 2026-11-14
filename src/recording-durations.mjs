@@ -14,5 +14,6 @@ export const recordingDurations={
   "tensor-cores": 255,
   "attention": 243,
   "inference": 289,
-  "putting-it-together": 190
+  "putting-it-together": 190,
+  "histograms": 171
 };

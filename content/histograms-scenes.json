@@ -1,0 +1,63 @@
+[
+  {
+    "id": "s01",
+    "stage": "inputs",
+    "title": "Many tokens can choose one counter.",
+    "lead": "Eight integer category IDs contribute to four counts.",
+    "captions": [
+      "Chapter Fifteen counts destinations chosen for eight tokens. A token's category identifies its counter; its input position identifies the token. Several threads may choose the same counter.",
+      "The diagram keeps those identities separate. Each category's counter is called a bin. Every input contributes exactly once. The four counters begin at zero, and their final counts must add up to eight."
+    ]
+  },
+  {
+    "id": "s02",
+    "stage": "atomic",
+    "title": "Protect each shared update.",
+    "lead": "An atomic addition cannot lose a competing increment.",
+    "captions": [
+      "An atomic addition combines reading a counter, adding one and writing it back as one indivisible update. This protects the count when multiple threads target the same location.",
+      "The highlighted thread contributes to its selected category. These arrows show logical destinations, not simultaneous hardware execution. Atomic addition does not provide a block barrier or order every unrelated memory access."
+    ]
+  },
+  {
+    "id": "s03",
+    "stage": "partials",
+    "title": "Count locally, then merge partials.",
+    "lead": "Two blocks produce separate four-counter histograms.",
+    "captions": [
+      "Give each block its own shared counters for its four threads. Each block initialises them, reaches a barrier, performs local atomic updates, then reaches another barrier before merging.",
+      "For the mixed input, the first block has three non-zero bins and the second has three. Merging only non-zero partial bins needs six global atomic additions, plus eight local atomic additions."
+    ]
+  },
+  {
+    "id": "s04",
+    "stage": "hot",
+    "title": "Concentrated IDs share a destination.",
+    "lead": "Eight zeros send every update to category zero.",
+    "captions": [
+      "Now route every token to category zero. There are still eight tokens. With global counters, each token needs an atomic addition, and every addition targets the same counter.",
+      "This concentration changes contention: several threads request the same location. The model reports counts and operation totals. It assigns no atomic latency and cannot establish a measured slowdown."
+    ]
+  },
+  {
+    "id": "s05",
+    "stage": "question",
+    "title": "Pause: change counter ownership.",
+    "lead": "Keep eight zeros; use one partial histogram per block.",
+    "hold": 5,
+    "captions": [
+      "Keep the same eight category-zero tokens and two blocks of four. Change only counter ownership to separate block partials, then merge only non-zero bins.",
+      "Predict the number of global atomic additions. Also name the extra work that prevents this count alone from proving a faster kernel. Pause before the comparison."
+    ]
+  },
+  {
+    "id": "s06",
+    "stage": "answer",
+    "title": "Two partial contributions reach global memory.",
+    "lead": "Two global additions still require local work and ordering.",
+    "captions": [
+      "Each block counts four tokens into its own counter for category zero. Only one partial bin in each block is non-zero, so merging needs two global atomic additions. Category zero receives all eight contributions; every other counter stays zero.",
+      "Local atomics, shared storage, initialisation, barriers and merging still cost work. Return to the chapter to compare distributions and explain your hypothesis. Operation counts are not measured GPU times or guaranteed speedups."
+    ]
+  }
+]

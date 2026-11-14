@@ -1,16 +1,18 @@
 import {parallelChapters} from './parallel-chapters.mjs';
+import {parallelRecordings} from './parallel-recordings.mjs';
 // Copyright © 2026 Christopher Snow.
 import {chapters} from './book-chapters.mjs';
 const appendices={desktop:'the desktop appendix',profiling:'the profiling appendix','meet-gpu':'the GPU map',kernel:'the kernel workshop','shared-memory':'the shared-memory lab',memory:'the memory explorer',index:'the book contents'};
 export function readingReturn(pageURL){
   const page=new URL(pageURL),from=page.searchParams.get('from');
   const chapter=chapters.findIndex(c=>c.slug===from)+1 || parallelChapters.find(c=>c.slug===from)?.number || 0;
-  if(!chapter&&!Object.hasOwn(appendices,from))return null;
+  const recap=parallelRecordings.find(r=>r.slug+'-video'===from);
+  if(!chapter&&!recap&&!Object.hasOwn(appendices,from))return null;
   const fallback=new URL(from==='index'?'../index.html':from+'.html',page);
   if(from==='hello')fallback.hash='hello-sm-title';
   if(from==='scheduling')fallback.hash='sm-hardware-basics';
-  const label=chapter?`Return to Chapter ${chapter}`:`Return to ${appendices[from]}`;
-  const result=href=>({href,chapter:chapter||null,label});
+  const label=chapter?`Return to Chapter ${chapter}`:recap?`Return to Chapter ${recap.chapter} recap`:`Return to ${appendices[from]}`;
+  const result=href=>({href,chapter:chapter||recap?.chapter||null,label});
   const raw=page.searchParams.get('return');
   if(raw){
     try{

@@ -1,3 +1,4 @@
+import {parallelRecordings,renderParallelRecording} from '../content/parallel-recordings.mjs';
 import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {renderParallel} from '../content/parallel.mjs';
 import {renderHelloVideo} from '../content/hello-video.mjs';
@@ -82,6 +83,9 @@ for(const recap of [
   {slug:'putting-it-together',title:'Turn matrix reuse into a testable hypothesis',lead:'Compare input reuse and resource costs, then design a fair hardware measurement.',render:renderInvestigationVideo},
 ]){
   await writeFile(`dist/lessons/${recap.slug}-video.html`,renderBookPage({slug:recap.slug+'-video',appendix:true,title:recap.title,lead:recap.lead,content:recap.render(),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
+}
+for(const recap of parallelRecordings){
+ await writeFile(`dist/lessons/${recap.slug}-video.html`,renderBookPage({slug:recap.slug+'-video',appendix:true,title:recap.title,lead:recap.lead,content:renderParallelRecording(recap),references:false,pagination:false}).replace('<body class="book-chapter"','<body class="book-chapter sm-appendix"').replace('</head>','<link rel="stylesheet" href="../src/sm-video.css"><script type="module" src="../src/recording.mjs"></script></head>'));
 }
 await writeFile('dist/lessons/meet-gpu.html',renderBookPage({slug:'meet-gpu',map:true,title:'GPU map',lead:'Open a component to explore its connections. Follow chapter links for explanations and experiments.',content:renderMap()}).replace('</head>','<link rel="stylesheet" href="../src/gpu-map.css"><script type="module" src="../src/gpu-map.mjs"></script></head>'));
 await writeFile('dist/lessons/hello.html', (await readFile('content/hello.html', 'utf8'))

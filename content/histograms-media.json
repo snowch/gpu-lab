@@ -1,0 +1,144 @@
+{
+  "durationSeconds": 171,
+  "bytes": 8417846,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 28.053,
+      "title": "Many tokens can choose one counter."
+    },
+    {
+      "id": "s02",
+      "start": 28.053,
+      "end": 57.173,
+      "title": "Protect each shared update."
+    },
+    {
+      "id": "s03",
+      "start": 57.173,
+      "end": 83.819,
+      "title": "Count locally, then merge partials."
+    },
+    {
+      "id": "s04",
+      "start": 83.819,
+      "end": 110.464,
+      "title": "Concentrated IDs share a destination."
+    },
+    {
+      "id": "s05",
+      "start": 110.464,
+      "end": 136.835,
+      "title": "Pause: change counter ownership."
+    },
+    {
+      "id": "s06",
+      "start": 136.835,
+      "end": 170.605,
+      "title": "Two partial contributions reach global memory."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 13.656,
+      "text": "Chapter Fifteen counts destinations chosen for eight tokens. A token's category identifies its counter; its input position identifies the token. Several threads may choose the same counter."
+    },
+    {
+      "id": "s01-c2",
+      "start": 13.876,
+      "end": 26.633,
+      "text": "The diagram keeps those identities separate. Each category's counter is called a bin. Every input contributes exactly once. The four counters begin at zero, and their final counts must add up to eight."
+    },
+    {
+      "id": "s02-c1",
+      "start": 28.653,
+      "end": 40.152,
+      "text": "An atomic addition combines reading a counter, adding one and writing it back as one indivisible update. This protects the count when multiple threads target the same location."
+    },
+    {
+      "id": "s02-c2",
+      "start": 40.372,
+      "end": 55.753,
+      "text": "The highlighted thread contributes to its selected category. These arrows show logical destinations, not simultaneous hardware execution. Atomic addition does not provide a block barrier or order every unrelated memory access."
+    },
+    {
+      "id": "s03-c1",
+      "start": 57.773,
+      "end": 69.208,
+      "text": "Give each block its own shared counters for its four threads. Each block initialises them, reaches a barrier, performs local atomic updates, then reaches another barrier before merging."
+    },
+    {
+      "id": "s03-c2",
+      "start": 69.428,
+      "end": 82.399,
+      "text": "For the mixed input, the first block has three non-zero bins and the second has three. Merging only non-zero partial bins needs six global atomic additions, plus eight local atomic additions."
+    },
+    {
+      "id": "s04-c1",
+      "start": 84.419,
+      "end": 95.555,
+      "text": "Now route every token to category zero. There are still eight tokens. With global counters, each token needs an atomic addition, and every addition targets the same counter."
+    },
+    {
+      "id": "s04-c2",
+      "start": 95.775,
+      "end": 109.044,
+      "text": "This concentration changes contention: several threads request the same location. The model reports counts and operation totals. It assigns no atomic latency and cannot establish a measured slowdown."
+    },
+    {
+      "id": "s05-c1",
+      "start": 111.064,
+      "end": 121.133,
+      "text": "Keep the same eight category-zero tokens and two blocks of four. Change only counter ownership to separate block partials, then merge only non-zero bins."
+    },
+    {
+      "id": "s05-c2",
+      "start": 121.353,
+      "end": 131.615,
+      "text": "Predict the number of global atomic additions. Also name the extra work that prevents this count alone from proving a faster kernel. Pause before the comparison."
+    },
+    {
+      "id": "s06-c1",
+      "start": 137.435,
+      "end": 153.584,
+      "text": "Each block counts four tokens into its own counter for category zero. Only one partial bin in each block is non-zero, so merging needs two global atomic additions. Category zero receives all eight contributions; every other counter stays zero."
+    },
+    {
+      "id": "s06-c2",
+      "start": 153.804,
+      "end": 169.185,
+      "text": "Local atomics, shared storage, initialisation, barriers and merging still cost work. Return to the chapter to compare distributions and explain your hypothesis. Operation counts are not measured GPU times or guaranteed speedups."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 13.056,
+      "s01-c2": 12.757,
+      "s02-c1": 11.499,
+      "s02-c2": 15.381,
+      "s03-c1": 11.435,
+      "s03-c2": 12.971,
+      "s04-c1": 11.136,
+      "s04-c2": 13.269,
+      "s05-c1": 10.069,
+      "s05-c2": 10.261,
+      "s06-c1": 16.149,
+      "s06-c2": 15.381
+    }
+  }
+}

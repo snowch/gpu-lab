@@ -1,3 +1,4 @@
+from parallel_recordings import check_parallel_recordings
 from parallel import check_parallel
 from complete_recaps import check_complete_recaps
 from section_cues import check_section_cues
@@ -262,6 +263,7 @@ try:
         check_foundations_recordings(browser, URL, ROOT, errors)
         check_complete_recaps(browser, URL, ROOT, errors)
         check_parallel(browser, URL, ROOT, errors)
+        check_parallel_recordings(browser, URL, ROOT, errors)
         browser.close()
         assert not errors, errors
         print("PASS: no JavaScript errors; course content available without JavaScript")

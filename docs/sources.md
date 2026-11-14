@@ -308,3 +308,8 @@ The CUDA semantics guide explains completion-aware timing with synchronisation o
 CUDA events. These contracts support the stable-output checks and measurement plan;
 they do not identify a fastest grouping implementation. The browser's count/rank/scatter
 construction is an explicitly chosen teaching algorithm, independent of PyTorch sorting.
+
+Chapter 15's visual recap uses the same histogram model and atomic/barrier
+contracts as its experiment. Narration follows the existing pinned record-demo
+Kokoro v1.0 ONNX CPU / af_heart workflow; assets/media/histograms/README.md records
+rebuild commands and the automated speech-review boundary. It captures no GPU run.
