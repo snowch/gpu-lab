@@ -1,0 +1,144 @@
+{
+  "durationSeconds": 250,
+  "bytes": 11972458,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 45.077,
+      "title": "Choose the required output first."
+    },
+    {
+      "id": "s02",
+      "start": 45.077,
+      "end": 82.432,
+      "title": "Counts allocate disjoint regions."
+    },
+    {
+      "id": "s03",
+      "start": 82.432,
+      "end": 123.413,
+      "title": "Add a rank to place one token."
+    },
+    {
+      "id": "s04",
+      "start": 123.413,
+      "end": 166.059,
+      "title": "Check identities and stability."
+    },
+    {
+      "id": "s05",
+      "start": 166.059,
+      "end": 203.352,
+      "title": "Pause: concentrate every token."
+    },
+    {
+      "id": "s06",
+      "start": 203.352,
+      "end": 250.307,
+      "title": "One occupied bin still needs ordered identities."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 19.907,
+      "text": "The final investigation combines the patterns around one output contract. Each of eight tokens belongs to one of four categories, representing model experts. Counts tell us how many tokens belong to each expert. Preparing grouped inputs also needs the token identities and their required order."
+    },
+    {
+      "id": "s01-c2",
+      "start": 20.127,
+      "end": 43.657,
+      "text": "Stable grouping orders categories while preserving original token order within each category. The opening PyTorch program requests stable sorting indices and gathers identities with them. PyTorch chooses its implementation. The browser explores a separate histogram, scan and scatter construction; if the task requests only counts, the browser stops after the histogram."
+    },
+    {
+      "id": "s02-c1",
+      "start": 45.677,
+      "end": 61.101,
+      "text": "A histogram supplies the completed category counts. An exclusive scan of those counts gives each category's starting output position, called its bin start. The regions are disjoint: each bin reserves exactly its count of output positions."
+    },
+    {
+      "id": "s02-c2",
+      "start": 61.321,
+      "end": 81.012,
+      "text": "The bin starts in the picture come from counts of earlier categories. They locate category regions, but not individual tokens inside them. Complete these counts and starts before dependent placement begins. The output has room for all eight identities; this model has no dropping or expert capacity limit."
+    },
+    {
+      "id": "s03-c1",
+      "start": 83.032,
+      "end": 101.229,
+      "text": "Within-category rank counts earlier input tokens with the same category. Token five belongs to the first category and has two earlier peers. Its completed bin start plus its rank gives the highlighted output slot. The partial output shows only placements inspected so far."
+    },
+    {
+      "id": "s03-c2",
+      "start": 101.449,
+      "end": 121.993,
+      "text": "Distinct ranks separate writes within a bin. Disjoint bin regions separate categories. Together they give every token one unique destination and preserve within-category order. A bounds guard alone cannot establish those facts if the supplied ranks are wrong. Producing phases must finish before scatter uses their results."
+    },
+    {
+      "id": "s04-c1",
+      "start": 124.013,
+      "end": 143.0,
+      "text": "The completed output groups token identities by category and keeps each category's original order. Check every identity appears once, category regions are ordered, and identities remain stable within each region. The counts-only contract has no scatter writes; the grouping contract writes every token."
+    },
+    {
+      "id": "s04-c2",
+      "start": 143.22,
+      "end": 164.639,
+      "text": "Compare implementations that produce the same required output. A kernel that returns only counts is not a substitute for stable grouping. Resource progress and matching barriers still apply. Inputs must arrive before a consumer reads them. With reused buffers, consumption must also finish before a later copy writes new inputs."
+    },
+    {
+      "id": "s05-c1",
+      "start": 166.659,
+      "end": 183.171,
+      "text": "Now every token has category zero. Keep all token identities and the stable-grouping requirement unchanged. Predict the bin starts, which bins have no output slots, and the completed token order. How would removing ranks affect the required token order?"
+    },
+    {
+      "id": "s05-c2",
+      "start": 183.391,
+      "end": 198.132,
+      "text": "Suppose atomic increments reserve distinct slots in arrival order. Would unique destinations and matching category counts prove stability? Explain which required property you would still need to check. Pause before comparing your answer."
+    },
+    {
+      "id": "s06-c1",
+      "start": 203.952,
+      "end": 223.365,
+      "text": "All tokens now share one region. Their ranks count earlier tokens, so stable placement keeps the original identities in order. The remaining bins have zero length and start at the output end; they perform no writes. Atomic arrival order can differ from input order, even when every reserved slot is unique."
+    },
+    {
+      "id": "s06-c2",
+      "start": 223.585,
+      "end": 248.887,
+      "text": "A concentrated distribution suggests hypotheses, not measured speed. First verify the complete output contract. Then use realistically sized equal inputs, name the hardware and software, define the timing scope, warm up and measure completed work repeatedly. Inspect a profiler trace and report variation. These browser placements provide no GPU timing or fastest-algorithm claim."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 19.307,
+      "s01-c2": 23.531,
+      "s02-c1": 15.424,
+      "s02-c2": 19.691,
+      "s03-c1": 18.197,
+      "s03-c2": 20.544,
+      "s04-c1": 18.987,
+      "s04-c2": 21.419,
+      "s05-c1": 16.512,
+      "s05-c2": 14.741,
+      "s06-c1": 19.413,
+      "s06-c2": 25.301
+    }
+  }
+}

@@ -9,7 +9,9 @@ import progressScenes from './progress-scenes.json' with {type:'json'};
 import progressMedia from './progress-media.json' with {type:'json'};
 import pipelinesScenes from './pipelines-scenes.json' with {type:'json'};
 import pipelinesMedia from './pipelines-media.json' with {type:'json'};
+import investigationScenes from './pattern-investigation-scenes.json' with {type:'json'};
+import investigationMedia from './pattern-investigation-media.json' with {type:'json'};
 import {recordingContent} from '../src/recording-view.mjs';
 export {parallelRecordings} from '../src/parallel-recordings.mjs';
-const recordings={pipelines:{scenes:pipelinesScenes,media:pipelinesMedia},progress:{scenes:progressScenes,media:progressMedia},histograms:{scenes,media},scan:{scenes:scanScenes,media:scanMedia},compaction:{scenes:compactionScenes,media:compactionMedia}};
+const recordings={'pattern-investigation':{scenes:investigationScenes,media:investigationMedia},pipelines:{scenes:pipelinesScenes,media:pipelinesMedia},progress:{scenes:progressScenes,media:progressMedia},histograms:{scenes,media},scan:{scenes:scanScenes,media:scanMedia},compaction:{scenes:compactionScenes,media:compactionMedia}};
 export function renderParallelRecording(recap){return recordingContent({...recap,...recordings[recap.slug]});}

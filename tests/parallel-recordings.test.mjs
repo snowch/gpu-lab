@@ -2,16 +2,43 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
+import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {parallelRecordings} from '../src/parallel-recordings.mjs';
 import {readingReturn} from '../src/reading-return.mjs';
-import {histogram,scan,compaction,philosophers,barrier,pipeline} from '../src/parallel-models.mjs';
+import {histogram,scan,compaction,philosophers,barrier,pipeline,routing,parallelModels} from '../src/parallel-models.mjs';
 import {compactionRecordingFrame,compactionFigure} from '../scripts/render-compaction-recording.mjs';
+import {investigationRecordingFrame,investigationFigure} from '../scripts/render-pattern-investigation-recording.mjs';
 import {pipelinesRecordingFrame,pipelinesFigure} from '../scripts/render-pipelines-recording.mjs';
 import {progressRecordingFrame,progressFigure} from '../scripts/render-progress-recording.mjs';
 import {parallelFigure,scanFigureFrame} from '../src/parallel-figures.mjs';
 import {scanRecordingFrame,scanFigure as scanRecordingFigure} from '../scripts/render-scan-recording.mjs';
 import {histogramsRecordingFrame,histogramsFigure} from '../scripts/render-histograms-recording.mjs';
 const json=async path=>JSON.parse(await readFile(new URL('../'+path,import.meta.url),'utf8'));
+test('every published follow-on chapter has a recap and every pattern model has a concept diagram',()=>{
+ assert.deepEqual(parallelRecordings.map(r=>[r.slug,r.chapter]),parallelChapters.map(c=>[c.slug,c.number]));
+ for(const model of Object.values(parallelModels))assert.match(parallelFigure(model()),/<figure class="pattern-figure"/);
+});
+test('routing visuals distinguish count prefixes from completed regions and partial stable identities',()=>{
+ for(const distribution of ['mixed','hot'])for(const goal of ['counts','group']){
+  const r=routing({distribution,goal}),expected=Array(r.input.length).fill('Unwritten');
+  for(const [i,s] of r.steps.entries()){
+   const html=parallelFigure(r,i);assert.match(html,/pattern-figure/);
+   if(goal==='counts'){
+    assert.deepEqual(s.cells,[0,1,2,3].map(bin=>r.input.slice(0,i+1).filter(x=>x===bin).length));
+    assert.doesNotMatch(html,/Start [0-9]|rank [0-9]|data-output-token/);
+   }else{
+    const bin=r.input[i],start=r.input.filter(x=>x<bin).length,rank=r.input.slice(0,i).filter(x=>x===bin).length;
+    assert.equal(s.binStart,start);assert.equal(s.rank,rank);assert.equal(s.destination,start+rank);
+    expected[start+rank]=i;assert.deepEqual(s.output,expected);
+    if(i)assert.notEqual(s.output,r.steps[i-1].output);
+    assert.equal((html.match(/data-output-token/g)||[]).length,r.input.length);
+   }
+  }
+ }
+ const placed=investigationRecordingFrame('placement');assert.equal(placed.state.inputIndex,5);assert.equal(placed.state.destination,2);assert.deepEqual(placed.state.output,[0,2,5,'Unwritten',1,4,3,'Unwritten']);
+ const answer=investigationRecordingFrame('answer').result;assert.deepEqual(answer.counts,[8,0,0,0]);assert.deepEqual(answer.offsets,[0,8,8,8]);assert.deepEqual(answer.output,[0,1,2,3,4,5,6,7]);
+ assert.doesNotMatch(investigationFigure('question'),/New completed category counts|Exclusive bin starts:|Completed stable token identities/);
+});
 test('pipeline visual constraints separate engine availability, ready inputs and consumed slots',()=>{
  for(const mode of ['serial','pipeline'])for(const chunks of ['2','4'])for(const copy of ['2','4']){
   const r=pipeline({mode,chunks,copy});

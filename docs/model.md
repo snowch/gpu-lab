@@ -555,3 +555,15 @@ Exact intervals and constraints remain textual outside the horizontally scrollab
 plot. Both page and recap keep a shared serial/overlap axis, then change only copy
 duration for a question before its answer. All units are arbitrary synthetic
 durations; timelines are not profiler traces or evidence of hardware speedup.
+
+### Stable-grouping visuals and final recap
+
+Counts-only diagrams show per-token histogram prefixes and construct no offsets,
+ranks or output identities. Grouping diagrams instead use completed counts/bin
+starts, then capture the selected token's bin, start, rank, unique destination and
+an independent partial-output snapshot. Output tiles label both identities and
+category regions; unknown identities remain explicit until their inspected write.
+Empty-bin starts can equal the output end without causing a write. The final
+recap connects these contracts, tests a concentrated input before its comparison
+and distinguishes unique atomic slots from stable input order. Placement proves
+no allocation cost, physical traffic, GPU timing or fastest algorithm.
