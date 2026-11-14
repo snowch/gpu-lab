@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:16.707
+Chapter Seventeen keeps the same eight categories alongside token identities. A category determines whether a token is selected. The token identity records which original input item survives. A count alone cannot supply those identities.
+
+00:00:16.927 --> 00:00:35.721
+Compaction packs selected items together. Stable selection keeps survivors in their original relative order. A flag is one for keep and zero for skip. We select category zero first. PyTorch chooses its implementation; the diagram follows our flag, scan and scatter construction.
+
+00:00:37.741 --> 00:00:54.893
+Exclusively scan the keep flags. Each offset counts selected tokens strictly before that input position. A kept token uses its offset as an output destination. A skipped token performs no output write, even if its offset matches another token's offset.
+
+00:00:55.113 --> 00:01:13.012
+The flags and all offsets must finish before placement starts. For this non-empty input, add the last exclusive offset and last flag to obtain the output count. The teaching model reserves eight slots and reports the used prefix; it does not model PyTorch's allocation strategy.
+
+00:01:15.032 --> 00:01:31.480
+Scatter writes an input item to a calculated destination. Token five is highlighted in the input row. It has two earlier survivors, so its completed exclusive offset gives it output slot two. Its thread copies the token identity into that slot.
+
+00:01:31.700 --> 00:01:48.660
+The output picture shows only writes inspected so far; a question mark labels an unwritten slot. Every kept thread has a distinct destination. This destination contract, rather than the bounds guard alone, prevents conflicting writes and preserves survivor order.
+
+00:01:50.680 --> 00:02:04.312
+Inspect the same valid placements in reverse input order. The destinations do not change because they came from the completed scan. A later input may write first without taking an earlier token's output slot.
+
+00:02:04.532 --> 00:02:22.559
+The completed token identities match forward inspection and retain input order. These are two chosen valid write sequences, not a GPU scheduling prediction. A block barrier cannot finish a scan produced by other blocks; dependent phases need the required wider ordering.
+
+00:02:24.579 --> 00:02:37.741
+Now keep tokens whose category differs from zero. Leave the input identities and reverse inspection order unchanged. Predict the output identities, and derive the destination used by token four.
+
+00:02:37.961 --> 00:02:50.889
+Would writing the last surviving token first change its final output position? Explain why matching the old survivor count would not prove that the correct identities were selected. Pause before the comparison.
+
+00:02:56.709 --> 00:03:13.797
+Four tokens survive this new selection. Their identities remain in original relative order, as shown in the output. Token four has two earlier survivors, so its destination is two. Reversing the inspected writes changes neither that destination nor stability.
+
+00:03:14.017 --> 00:03:33.111
+A skipped thread never writes. With an empty selection, all threads skip and no output slots are used; that differs from an empty input. Return to the chapter to inspect destinations and test all or no survivors. No GPU runtime, allocation cost or speedup is inferred from these placements.

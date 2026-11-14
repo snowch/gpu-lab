@@ -318,3 +318,8 @@ Chapter 16's visual recap derives snapshots, partners and output counts from the
 existing integer scan model, with the same PyTorch cumulative-sum contract and CUDA
 block-barrier rules. Its pinned narration workflow, rebuild commands and automated
 speech-review boundary are recorded in assets/media/scan/README.md.
+
+Chapter 17's visual recap uses the existing stable Boolean-selection/scan model,
+with independent partial-output snapshots for inspected writes. It retains the
+same PyTorch selection and CUDA ordering references. The pinned narration workflow,
+rebuild commands and automated-review limit are in assets/media/compaction/README.md.

@@ -41,9 +41,9 @@ export function compaction({predicate='zero',order='forward'}={}){
  const indices=input.map((_,i)=>i);if(order==='reverse')indices.reverse();
  for(const i of indices){
   if(flags[i]){output[offsets[i]]=i;writes.push(offsets[i]);}
-  steps.push({label:`Thread ${i}: ${flags[i]?'write token to its destination':'skip output write'}`,cells:[i,input[i],flags[i],offsets[i],flags[i]?offsets[i]:'Skip'],detail:'Output so far: '+(output.length?'['+output.join(', ')+']':'(empty)')});
+  steps.push({label:`Thread ${i}: ${flags[i]?'write token to its destination':'skip output write'}`,cells:[i,input[i],flags[i],offsets[i],flags[i]?offsets[i]:'Skip'],inputIndex:i,destination:flags[i]?offsets[i]:null,output:[...output],detail:'Output so far: '+(output.length?'['+output.join(', ')+']':'(empty)')});
  }
- return {input,flags,offsets,count,output,writes,steps,columns:['Token','Category','Keep','Offset','Write to'],summary:`Completed output token positions [${output.join(', ')}]. ${count} survivors; ${writes.length} output writes. Eight input slots were inspected.`,note:'Flags and exclusive offsets are complete before scatter. Only kept threads write. Their distinct destinations preserve input order even when the inspected write sequence is reversed. The model reports the used output prefix, not a measured allocation or GPU schedule.'};
+ return {visual:{kind:'compaction',predicate,order},input,flags,offsets,count,output,writes,steps,columns:['Token','Category','Keep','Offset','Write to'],summary:`Completed output token positions [${output.join(', ')}]. ${count} survivors; ${writes.length} output writes. Eight input slots were inspected.`,note:'Flags and exclusive offsets are complete before scatter. Only kept threads write. Their distinct destinations preserve input order even when the inspected write sequence is reversed. The model reports the used output prefix, not a measured allocation or GPU schedule.'};
 }
 parallelModels.compaction=compaction;
 

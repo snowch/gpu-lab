@@ -1,0 +1,63 @@
+[
+  {
+    "id": "s01",
+    "stage": "inputs",
+    "title": "Keep identities, not just a count.",
+    "lead": "Compaction packs selected items into consecutive output slots.",
+    "captions": [
+      "Chapter Seventeen keeps the same eight categories alongside token identities. A category determines whether a token is selected. The token identity records which original input item survives. A count alone cannot supply those identities.",
+      "Compaction packs selected items together. Stable selection keeps survivors in their original relative order. A flag is one for keep and zero for skip. We select category zero first. PyTorch chooses its implementation; the diagram follows our flag, scan and scatter construction."
+    ]
+  },
+  {
+    "id": "s02",
+    "stage": "offsets",
+    "title": "Count the earlier survivors.",
+    "lead": "An exclusive scan allocates a destination for each kept token.",
+    "captions": [
+      "Exclusively scan the keep flags. Each offset counts selected tokens strictly before that input position. A kept token uses its offset as an output destination. A skipped token performs no output write, even if its offset matches another token's offset.",
+      "The flags and all offsets must finish before placement starts. For this non-empty input, add the last exclusive offset and last flag to obtain the output count. The teaching model reserves eight slots and reports the used prefix; it does not model PyTorch's allocation strategy."
+    ]
+  },
+  {
+    "id": "s03",
+    "stage": "scatter",
+    "title": "Write one identity to its own slot.",
+    "lead": "Token 5 uses offset 2 as its output destination.",
+    "captions": [
+      "Scatter writes an input item to a calculated destination. Token five is highlighted in the input row. It has two earlier survivors, so its completed exclusive offset gives it output slot two. Its thread copies the token identity into that slot.",
+      "The output picture shows only writes inspected so far; a question mark labels an unwritten slot. Every kept thread has a distinct destination. This destination contract, rather than the bounds guard alone, prevents conflicting writes and preserves survivor order."
+    ]
+  },
+  {
+    "id": "s04",
+    "stage": "reverse",
+    "title": "Write order need not be input order.",
+    "lead": "Fixed destinations preserve stable output under reversed inspection.",
+    "captions": [
+      "Inspect the same valid placements in reverse input order. The destinations do not change because they came from the completed scan. A later input may write first without taking an earlier token's output slot.",
+      "The completed token identities match forward inspection and retain input order. These are two chosen valid write sequences, not a GPU scheduling prediction. A block barrier cannot finish a scan produced by other blocks; dependent phases need the required wider ordering."
+    ]
+  },
+  {
+    "id": "s05",
+    "stage": "question",
+    "title": "Pause: change only the selection.",
+    "lead": "Keep every category except zero; retain reversed write inspection.",
+    "hold": 5,
+    "captions": [
+      "Now keep tokens whose category differs from zero. Leave the input identities and reverse inspection order unchanged. Predict the output identities, and derive the destination used by token four.",
+      "Would writing the last surviving token first change its final output position? Explain why matching the old survivor count would not prove that the correct identities were selected. Pause before the comparison."
+    ]
+  },
+  {
+    "id": "s06",
+    "stage": "answer",
+    "title": "Offsets preserve the new survivor order.",
+    "lead": "Token 4 writes slot 2; skipped tokens make no writes.",
+    "captions": [
+      "Four tokens survive this new selection. Their identities remain in original relative order, as shown in the output. Token four has two earlier survivors, so its destination is two. Reversing the inspected writes changes neither that destination nor stability.",
+      "A skipped thread never writes. With an empty selection, all threads skip and no output slots are used; that differs from an empty input. Return to the chapter to inspect destinations and test all or no survivors. No GPU runtime, allocation cost or speedup is inferred from these placements."
+    ]
+  }
+]
