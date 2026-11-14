@@ -57,6 +57,9 @@ def check_parallel(browser,url,root,errors):
                     expect(close).to_have_attribute('href',chapter['slug']+'.html')
                     close.click()
                     expect(page.locator('h1')).to_have_text(chapter['title'])
+                    page.wait_for_load_state('load')
+                    for returned in page.locator('[data-parallel]').all():
+                        returned.locator('[data-run]').click()
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),(chapter['slug'],width,theme)
                 page.screenshot(path=str(root/f"test-results/{chapter['slug']}-{width}-{theme}.png"),full_page=True)
                 page.get_by_role('checkbox',name='Mark lesson as done').check()

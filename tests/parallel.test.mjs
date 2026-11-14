@@ -2,7 +2,7 @@ import {readingReturn} from '../src/reading-return.mjs';
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {histogram,categories,scan,compaction} from '../src/parallel-models.mjs';
+import {histogram,categories,scan,compaction,philosophers,barrier} from '../src/parallel-models.mjs';
 import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {renderParallel} from '../content/parallel.mjs';
 test('histogram conserves inputs, private merge equals independent category counts',()=>{
@@ -51,4 +51,18 @@ test('optional appendix returns accept Part II chapters without accepting arbitr
   assert.equal(readingReturn(page+'&return=https://evil.example/').href,readingReturn(page).href);
  }
  assert.equal(readingReturn('https://example.org/gpu-lab/lessons/inside-sm.html?from=unknown'),null);
+});
+
+test('resource order finishes while own-fork-first exposes an actual ownership cycle',()=>{
+ const safe=philosophers({policy:'ordered'}),cycle=philosophers({policy:'cycle'});
+ assert.equal(safe.deadlocked,false);assert.ok(safe.done.every(Boolean));assert.deepEqual(safe.forks,[null,null,null]);assert.deepEqual(safe.held,[[],[],[]]);
+ assert.equal(cycle.deadlocked,true);assert.deepEqual(cycle.forks,[0,1,2]);
+ assert.deepEqual(cycle.waits,[{from:0,to:1,fork:1},{from:1,to:2,fork:2},{from:2,to:0,fork:0}]);
+ assert.ok(cycle.done.every(x=>!x));
+ assert.throws(()=>philosophers({policy:'unknown'}),RangeError);
+});
+test('barrier release requires all matching participants, diagnostics never fabricate a sum',()=>{
+ assert.equal(barrier().valid,true);assert.ok(barrier().steps.at(-1).cells.every(x=>x==='May continue'));
+ const r=barrier({participation:'subset'});assert.equal(r.valid,false);assert.match(r.summary,/No valid arithmetic result/);
+ assert.ok(!r.steps.some(s=>s.cells.includes('May continue')));
 });
