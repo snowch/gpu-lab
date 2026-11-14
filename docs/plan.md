@@ -377,3 +377,7 @@ then asks for a correctness check, hypothesis and real-hardware measurement plan
 All six follow-on chapters are published. Chapter 1's complete kernel and completion
 explanation are visible in the main flow; the follow-on patterns add no new content
 to the core lessons.
+
+Part II concept diagrams and narrated recaps are being completed in the same
+chapter-by-chapter release sequence. Chapter 15 now has a model-derived contribution
+map and a dedicated captioned recap with transcript and downloadable slides.

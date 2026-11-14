@@ -497,3 +497,13 @@ perform no writes. Stable grouping is checked against an independent per-categor
 filter of token identities. The opening PyTorch program uses stable argsort, without
 claiming the model represents its implementation. No GPU execution, latency, physical
 traffic or speedup is inferred from placement or operation counts.
+
+### Histogram contribution visuals and recap
+
+The chapter's diagram uses the selected histogram step's integer counters and
+highlights its token/category destination. Eight counter segments encode input
+contributions, not latency. Completed per-block partials are separately labelled.
+The optional narrated recap uses the same model for mixed/concentrated inputs,
+with the atomic close-up restricted to the selected prefix. A question hides
+partial counts and the merge total until the answer scene. Figures establish
+counter ownership and conservation, never hardware timing or placement.

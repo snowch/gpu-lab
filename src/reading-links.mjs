@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import {saveReadingState} from './experiment-state.mjs';
 import {readingReturn} from './reading-return.mjs';
+import {parallelRecordings} from './parallel-recordings.mjs';
 for(const back of document.querySelectorAll('[data-reading-return]')){
   const target=readingReturn(location.href);
   if(target){back.href=target.href;back.textContent=target.label;}
@@ -11,7 +12,7 @@ document.addEventListener('click',event=>{
   const url=new URL(link.href,location);
   // In-page navigation keeps the existing return destination and live state.
   if(url.pathname===location.pathname&&url.search===location.search&&url.hash)return;
-  const appendix=['inside-sm','hello-video','launch-from-input-video','putting-it-together-video','reduction-video','matmul-video','devices-video','reading-video','layout-video','requests-video','scheduling-video','divergence-video','tensor-cores-video','attention-video','inference-video'].some(slug=>url.pathname.endsWith('/'+slug+'.html'));
+  const appendix=[...parallelRecordings.map(r=>r.slug+'-video'),'inside-sm','hello-video','launch-from-input-video','putting-it-together-video','reduction-video','matmul-video','devices-video','reading-video','layout-video','requests-video','scheduling-video','divergence-video','tensor-cores-video','attention-video','inference-video'].some(slug=>url.pathname.endsWith('/'+slug+'.html'));
   if(url.origin!==location.origin||(!appendix&&!link.matches('[data-reading-link]'))||window.frameElement)return;
   event.preventDefault();
   try{

@@ -9,7 +9,7 @@ export function histogram({distribution='mixed',strategy='global'}={}) {
     steps.push({label:`Thread ${i} adds 1 to category ${bin}`,cells:[...counts]});
   });
   const globalUpdates=strategy==='global'?input.length:partial.flat().filter(Boolean).length;
-  return {input,counts,partial,globalUpdates,steps,columns:['Category 0','Category 1','Category 2','Category 3'],
+  return {visual:{kind:'histogram',strategy},input,counts,partial,globalUpdates,steps,columns:['Category 0','Category 1','Category 2','Category 3'],
     summary:`Final counts [${counts.join(', ')}]. ${globalUpdates} global atomic additions; ${strategy==='private'?8:0} local atomic additions. These are operation counts, not timings.`,
     rows:strategy==='private'?partial.map((p,i)=>[`Block ${i} partial`,...p]):[],
     note:strategy==='private'?'Two blocks of four threads count into separate zeroed four-counter shared arrays, synchronise, then add only non-zero partials to global counters. The trace shows logical contributions to the final counts, not instruction or scheduling order.':'Global counters start at zero. Each of eight threads makes one atomic addition. The chosen trace order illustrates counts; hardware may order additions differently.'};

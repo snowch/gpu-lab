@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:13.656
+Chapter Fifteen counts destinations chosen for eight tokens. A token's category identifies its counter; its input position identifies the token. Several threads may choose the same counter.
+
+00:00:13.876 --> 00:00:26.633
+The diagram keeps those identities separate. Each category's counter is called a bin. Every input contributes exactly once. The four counters begin at zero, and their final counts must add up to eight.
+
+00:00:28.653 --> 00:00:40.152
+An atomic addition combines reading a counter, adding one and writing it back as one indivisible update. This protects the count when multiple threads target the same location.
+
+00:00:40.372 --> 00:00:55.753
+The highlighted thread contributes to its selected category. These arrows show logical destinations, not simultaneous hardware execution. Atomic addition does not provide a block barrier or order every unrelated memory access.
+
+00:00:57.773 --> 00:01:09.208
+Give each block its own shared counters for its four threads. Each block initialises them, reaches a barrier, performs local atomic updates, then reaches another barrier before merging.
+
+00:01:09.428 --> 00:01:22.399
+For the mixed input, the first block has three non-zero bins and the second has three. Merging only non-zero partial bins needs six global atomic additions, plus eight local atomic additions.
+
+00:01:24.419 --> 00:01:35.555
+Now route every token to category zero. There are still eight tokens. With global counters, each token needs an atomic addition, and every addition targets the same counter.
+
+00:01:35.775 --> 00:01:49.044
+This concentration changes contention: several threads request the same location. The model reports counts and operation totals. It assigns no atomic latency and cannot establish a measured slowdown.
+
+00:01:51.064 --> 00:02:01.133
+Keep the same eight category-zero tokens and two blocks of four. Change only counter ownership to separate block partials, then merge only non-zero bins.
+
+00:02:01.353 --> 00:02:11.615
+Predict the number of global atomic additions. Also name the extra work that prevents this count alone from proving a faster kernel. Pause before the comparison.
+
+00:02:17.435 --> 00:02:33.584
+Each block counts four tokens into its own counter for category zero. Only one partial bin in each block is non-zero, so merging needs two global atomic additions. Category zero receives all eight contributions; every other counter stays zero.
+
+00:02:33.804 --> 00:02:49.185
+Local atomics, shared storage, initialisation, barriers and merging still cost work. Return to the chapter to compare distributions and explain your hypothesis. Operation counts are not measured GPU times or guaranteed speedups.
