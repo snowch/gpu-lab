@@ -36,7 +36,16 @@ async function complete(release) {
   if (verifying.has(release.id)) return verifying.get(release.id);
   const scan = (async () => {
     const cache = await caches.open(cacheName(release.id));
-    for (const file of release.files) if (!await verified(await cache.match(new URL(file.path, BASE)), file)) return false;
+    // Bound memory while overlapping CacheStorage I/O for the complete book.
+    // Join the whole batch even on failure, so retries cannot leave old reads
+    // running behind a new scan. Inspect outcomes in manifest order.
+    for (let start = 0; start < release.files.length; start += 4) {
+      const checks = await Promise.allSettled(release.files.slice(start, start + 4).map(async file => verified(await cache.match(new URL(file.path, BASE)), file)));
+      for (const check of checks) {
+        if (check.status === 'rejected') throw check.reason;
+        if (!check.value) return false;
+      }
+    }
     // A file checked early can be evicted while a later recording is hashed.
     // Recheck presence at the end without rereading every large response.
     const present = new Set((await cache.keys()).map(request => request.url));

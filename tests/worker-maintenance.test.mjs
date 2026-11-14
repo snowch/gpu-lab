@@ -105,3 +105,31 @@ test('background cache pruning finishes before an update can create its staging 
   assert.equal(update.messages.at(-1).result.pendingReady,true);
   assert.ok(stores.has(prefix+'release-'+next.id));
 });
+
+test('readiness verification bounds parallel I/O and still rejects missing bytes and same-size corruption',async()=>{
+  const base='https://example.test/gpu-lab/';
+  const bodies=new Map(Array.from({length:9},(_,i)=>[`file-${i}.bin`,`payload-${i}`]));
+  const release={id:'4'.repeat(64),files:[...bodies].map(([path,body])=>({path,bytes:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex')}))};
+  let active=0,peak=0,tampered=null,missing=null,denied=null;
+  const cache={
+    async match(url){
+      const path=String(url).slice(base.length);active++;peak=Math.max(peak,active);
+      try{
+        await new Promise(setImmediate);
+        if(path===denied)throw new Error('Temporary read failure');
+        return path===missing?undefined:new Response(path===tampered?'tamperd-'+path.match(/\d/)[0]:bodies.get(path));
+      }finally{active--;}
+    },
+    async keys(){return [...bodies.keys()].filter(path=>path!==missing).map(path=>new Request(new URL(path,base)));},
+  };
+  const context=vm.createContext({release,URL,Request,Response,AbortController,AbortSignal,crypto:webcrypto,console,setTimeout,clearTimeout,
+    caches:{async open(){return cache;}},self:{registration:{scope:base},addEventListener(){}}});
+  const contract=(await readFile(new URL('../src/release-contract.mjs',import.meta.url),'utf8')).replaceAll('export ','');
+  vm.runInContext(contract+'\n'+await readFile(new URL('../scripts/service-worker.js',import.meta.url),'utf8'),context);
+  const check=()=>vm.runInContext('complete(release)',context);
+  assert.equal(await check(),true);assert.ok(peak>1&&peak<=4,'Overlap I/O without reading the whole book into memory');assert.equal(active,0);
+  tampered='file-1.bin';assert.equal(await check(),false,'Equal byte length must not bypass the content hash');assert.equal(active,0);
+  tampered=null;missing='file-6.bin';assert.equal(await check(),false);assert.equal(active,0);
+  missing=null;denied='file-1.bin';await assert.rejects(check(),/Temporary read failure/);assert.equal(active,0,'Failed batches must settle before the next scan');
+  denied=null;assert.equal(await check(),true,'Repair/retry must perform a new complete scan');
+});
