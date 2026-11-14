@@ -365,6 +365,8 @@ live verification before implementing the next. Chapter 15 (histograms) introduc
 atomic updates, contention and per-block partials using eight integer category IDs.
 Chapter 16 (scan) uses flags from the same IDs to introduce inclusive prefixes,
 exclusive offsets and snapshot-ordered stages.
-Planned, unpublished chapters: compaction; synchronisation and progress;
+Chapter 17 (compaction) uses the flags and offsets to select stable token positions,
+including all/none selections and reversed inspection order.
+Planned, unpublished chapters: synchronisation and progress;
 producer–consumer pipelines; an investigation combining the patterns. No planned
 chapter has a learner-facing link before it works.

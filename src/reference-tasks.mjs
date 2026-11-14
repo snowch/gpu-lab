@@ -3,6 +3,7 @@ import {sectionHeading} from './section-cues.mjs';
 import {pythonSource} from './hello-model.mjs';
 // Short documentation exercises: direct sections first, independent searches later.
 export const guides = {
+  maskedSelect:'https://docs.pytorch.org/docs/stable/generated/torch.masked_select.html',
   cumsum:'https://docs.pytorch.org/docs/stable/generated/torch.cumsum.html',
   bincount:'https://docs.pytorch.org/docs/stable/generated/torch.bincount.html',
   atomics:'https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#atomic-functions',
@@ -54,6 +55,8 @@ export const guides = {
   timing: 'https://docs.pytorch.org/docs/2.14/notes/cuda.html#asynchronous-execution',
 };
 export const referenceTasks = {
+  'compact-mask':{title:'Check which tensor supplies the values',page:'maskedSelect',label:'PyTorch: masked_select',prompt:'For token positions [0, 1, 2, 3] and mask [false, true, false, true], what values does masked_select return? Does the result contain category IDs or values from the tensor being selected?',answer:'It returns [1, 3], the values from the selected tensor at true mask positions. If categories supplied the mask but token positions supplied the selected tensor, the result contains token positions, not category IDs.'},
+  'compact-order':{title:'Check the scope of phase ordering',page:'barriers',label:'CUDA: block synchronisation',prompt:'A scatter kernel reads exclusive offsets produced by several blocks. Does one block barrier in scatter guarantee that all offsets from another kernel or block are ready?',answer:'No. A block barrier orders its participating block threads. The producing scan must finish through an appropriate kernel/stream dependency or supported collective before scatter consumes the offsets. Unique destinations solve placement conflicts only after the offsets themselves are valid.'},
   'scan-inclusive':{title:'Check which values a prefix includes',page:'cumsum',label:'PyTorch: cumsum',prompt:'For flags [0, 1, 1, 0], does torch.cumsum include the flag at each position? How would you derive exclusive offsets from its result?',answer:'The inclusive result is [0, 1, 2, 2]. Shift it right and insert zero to obtain [0, 0, 1, 2]. This describes the integer values, not a required implementation strategy.'},
   'scan-barrier':{title:'Order neighbouring reads',page:'barriers',label:'CUDA: block synchronisation',prompt:'At partner distance 2, why must the old stage already be complete? Does a block barrier make a scan over several blocks correct by itself?',answer:'Threads read results produced by other threads in the previous stage. Those writes must precede the reads. A block barrier orders participating threads in one block; it supplies no scan of earlier blocks or grid-wide barrier. Multi-block scan needs additional ordered phases or a supported collective.'},
   'histogram-length':{title:'Check the category range',page:'bincount',label:'PyTorch: bincount',prompt:'For IDs [0, 4, 4] and minlength=4, is the result four or five entries long? What would a fixed four-counter CUDA kernel need to check?',answer:'Five entries: [1, 0, 0, 0, 2]. minlength is a minimum, not an upper bound. A four-counter kernel must reject IDs outside 0–3 or use an allocation covering the actual range.'},
@@ -255,6 +258,7 @@ export function renderReferenceTask(key) {
 
 // Page-level coverage is explicit so a new chapter cannot silently omit its references.
 export const chapterReferences = {
+  compaction:{sources:[['maskedSelect','PyTorch: masked_select','Check the input tensor, Boolean mask and returned values.'],['cumsum','PyTorch: cumulative sum','Connect selection flags to the prefix totals used for placement.'],['barriers','CUDA: block synchronisation','Check the scope of a barrier between dependent phases.']],tasks:['compact-mask','compact-order']},
   scan:{sources:[['cumsum','PyTorch: cumulative sum','Check inclusive semantics and the dimension argument.'],['barriers','CUDA: block synchronisation','Check participation and the scope of stage ordering.']],tasks:['scan-inclusive','scan-barrier']},
   histograms:{sources:[['bincount','PyTorch: bincount','Check category IDs, output length and minlength.'],['atomics','CUDA: atomic functions','Check the indivisible update and its scope.'],['barriers','CUDA: block barriers','Check ordering around shared counter initialisation and merging.']],tasks:['histogram-length','histogram-atomic']},
   'launch-from-input':{sources:[['explicitMemory','CUDA: explicit memory management','Follow allocation, byte counts and copies in the complete vector-add example.'],['launch','CUDA: Triple Chevron Notation','Distinguish launch dimensions from the ordinary function arguments.']],tasks:['launch-input-bytes','launch-input-grid']},

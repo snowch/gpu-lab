@@ -31,3 +31,18 @@ export function scan({size='8',kind='inclusive'}={}){
  return {input,values,inclusive,additions,steps,columns:input.map((_,i)=>`Position ${i}`),summary:`Final ${kind} prefixes [${values.join(', ')}]. ${additions} pair additions in the inclusive stages.`,note:'One block; integer flags; each stage reads a completed snapshot of the preceding stage. Stage boundaries require collective ordering. These are dependency stages, not GPU clock cycles. Shifting is a teaching construction of the exclusive result.'};
 }
 parallelModels.scan=scan;
+
+export function compaction({predicate='zero',order='forward'}={}){
+ const predicates={zero:x=>x===0,nonzero:x=>x!==0,all:()=>true,none:()=>false};
+ if(!Object.hasOwn(predicates,predicate)||!['forward','reverse'].includes(order))throw new RangeError('Unknown compaction configuration');
+ const input=[...categories.mixed],flags=input.map(x=>Number(predicates[predicate](x)));
+ let count=0;const offsets=flags.map(f=>{const old=count;count+=f;return old;});
+ const output=Array(count).fill('Unwritten'),steps=[],writes=[];
+ const indices=input.map((_,i)=>i);if(order==='reverse')indices.reverse();
+ for(const i of indices){
+  if(flags[i]){output[offsets[i]]=i;writes.push(offsets[i]);}
+  steps.push({label:`Thread ${i}: ${flags[i]?'write token to its destination':'skip output write'}`,cells:[i,input[i],flags[i],offsets[i],flags[i]?offsets[i]:'Skip'],detail:'Output so far: '+(output.length?'['+output.join(', ')+']':'(empty)')});
+ }
+ return {input,flags,offsets,count,output,writes,steps,columns:['Token','Category','Keep','Offset','Write to'],summary:`Completed output token positions [${output.join(', ')}]. ${count} survivors; ${writes.length} output writes. Eight input slots were inspected.`,note:'Flags and exclusive offsets are complete before scatter. Only kept threads write. Their distinct destinations preserve input order even when the inspected write sequence is reversed. The model reports the used output prefix, not a measured allocation or GPU schedule.'};
+}
+parallelModels.compaction=compaction;

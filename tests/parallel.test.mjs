@@ -1,7 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {histogram,categories,scan} from '../src/parallel-models.mjs';
+import {histogram,categories,scan,compaction} from '../src/parallel-models.mjs';
 import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {renderParallel} from '../content/parallel.mjs';
 test('histogram conserves inputs, private merge equals independent category counts',()=>{
@@ -27,4 +27,17 @@ test('scan matches independent prefixes for every supported size and convention'
   assert.equal(r.values.at(-1)+(kind==='exclusive'?r.input.at(-1):0),r.input.reduce((a,b)=>a+b,0));
  }
  assert.equal(scan().additions,17);assert.throws(()=>scan({size:'5'}),RangeError);
+});
+
+test('compaction preserves stable identities with unique destinations for all/none and both write orders',()=>{
+ const predicates={zero:x=>x===0,nonzero:x=>x!==0,all:()=>true,none:()=>false};
+ for(const [predicate,keep] of Object.entries(predicates))for(const order of ['forward','reverse']){
+  const r=compaction({predicate,order});
+  const expected=categories.mixed.map((x,i)=>keep(x)?i:null).filter(x=>x!==null);
+  assert.deepEqual(r.output,expected);assert.equal(r.count,expected.length);
+  assert.equal(r.offsets.at(-1)+r.flags.at(-1),r.count);
+  assert.equal(new Set(r.writes).size,r.count);
+  assert.deepEqual([...r.writes].sort((a,b)=>a-b),Array.from({length:r.count},(_,i)=>i));
+ }
+ assert.throws(()=>compaction({order:'unknown'}),RangeError);
 });

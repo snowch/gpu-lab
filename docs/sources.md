@@ -277,3 +277,7 @@ results establish physical GPU performance.
 
 - Part II scan follows PyTorch `torch.cumsum`'s inclusive contract and CUDA block
   synchronisation rules. The browser's staged algorithm is a teaching choice.
+
+- Part II compaction uses PyTorch Boolean selection / `torch.masked_select`, with
+  `torch.cumsum` for the prefix contract. CUDA block synchronisation documentation
+  supports the distinction between local barriers and complete producing phases.
