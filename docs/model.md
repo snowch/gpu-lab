@@ -498,6 +498,8 @@ filter of token identities. The opening PyTorch program uses stable argsort, wit
 claiming the model represents its implementation. No GPU execution, latency, physical
 traffic or speedup is inferred from placement or operation counts.
 
+## Part II visuals and narrated recaps
+
 ### Histogram contribution visuals and recap
 
 The chapter's diagram uses the selected histogram step's integer counters and
@@ -507,3 +509,14 @@ The optional narrated recap uses the same model for mixed/concentrated inputs,
 with the atomic close-up restricted to the selected prefix. A question hides
 partial counts and the merge total until the answer scene. Figures establish
 counter ownership and conservation, never hardware timing or placement.
+
+### Scan snapshots and recap
+
+Each scan step retains its immutable old array and partner distance; the exclusive
+construction retains its completed inclusive source and a shift marker. The
+responsive figure shows completed read values, separately written values and the
+focused position's operand relationship. It never reads a partially updated stage.
+The recap uses the same staged model for eight inputs and a four-input transfer,
+with question results hidden until comparison. The shift diagram identifies the
+previous position and inserted zero. Last offset plus last flag gives output count;
+prefix values need not be distinct. No GPU cycles, scheduling or timing are inferred.

@@ -1,0 +1,144 @@
+{
+  "durationSeconds": 196,
+  "bytes": 9160178,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 32.235,
+      "title": "Each token needs its own prefix."
+    },
+    {
+      "id": "s02",
+      "start": 32.235,
+      "end": 62.208,
+      "title": "Read a completed previous snapshot."
+    },
+    {
+      "id": "s03",
+      "start": 62.208,
+      "end": 96.917,
+      "title": "Double the covered prefix."
+    },
+    {
+      "id": "s04",
+      "start": 96.917,
+      "end": 131.627,
+      "title": "An offset counts earlier survivors."
+    },
+    {
+      "id": "s05",
+      "start": 131.627,
+      "end": 161.475,
+      "title": "Pause: keep only the first four flags."
+    },
+    {
+      "id": "s06",
+      "start": 161.475,
+      "end": 196.056,
+      "title": "Two stages give the four-input prefixes."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 15.0,
+      "text": "Chapter Sixteen starts with the same token categories. A flag is one when its token is selected and zero otherwise. A histogram gives a total, but placement also needs the number of selected tokens before each input."
+    },
+    {
+      "id": "s01-c2",
+      "start": 15.22,
+      "end": 30.815,
+      "text": "A prefix sum, or scan, keeps a total for every position. Inclusive prefixes include the current flag. Exclusive prefixes count only earlier flags, so a selected token can use its exclusive prefix as an output destination."
+    },
+    {
+      "id": "s02-c1",
+      "start": 32.835,
+      "end": 45.549,
+      "text": "Our teaching algorithm uses one block and a separate old and new shared array. At partner distance one, a thread reads its own old value and its preceding neighbour's old value, when that neighbour exists."
+    },
+    {
+      "id": "s02-c2",
+      "start": 45.769,
+      "end": 60.788,
+      "text": "Position three adds the flags at positions three and two. It writes one into the new snapshot. All threads finish the stage and reach a barrier before the next stage reads that snapshot. No thread reads a neighbour's new write within the same stage."
+    },
+    {
+      "id": "s03-c1",
+      "start": 62.808,
+      "end": 78.701,
+      "text": "The next stage reads only the completed previous snapshot. Position three combines two partial counts from positions three and one. Each partial contains a single selected flag, so their combined total is two and covers the first four input flags."
+    },
+    {
+      "id": "s03-c2",
+      "start": 78.921,
+      "end": 95.497,
+      "text": "For eight inputs a later distance-four stage combines larger groups. Positions without a partner keep their value but still participate in the barrier. Distances describe dependencies, not GPU clock cycles. PyTorch may choose a different scan algorithm."
+    },
+    {
+      "id": "s04-c1",
+      "start": 97.517,
+      "end": 113.347,
+      "text": "The inclusive result includes each position's own flag. At position five, that includes the selected token itself. Its exclusive offset instead counts only earlier selected tokens, giving that token its destination in a packed output."
+    },
+    {
+      "id": "s04-c2",
+      "start": 113.567,
+      "end": 130.207,
+      "text": "Shifting the completed inclusive array right and inserting zero constructs these exclusive offsets. Production code need not use a separate shift. The output length is the last exclusive offset plus the last flag, so a final selected token is not lost."
+    },
+    {
+      "id": "s05-c1",
+      "start": 132.227,
+      "end": 144.536,
+      "text": "Now keep only the first four input flags, with the same rules for one block. Predict which partner distances are needed. Which distance was required for eight flags but is unnecessary for four?"
+    },
+    {
+      "id": "s05-c2",
+      "start": 144.756,
+      "end": 156.255,
+      "text": "Derive the exclusive offsets. Then use the last offset and last flag to determine the output length. Name which input positions would write. Pause before revealing the comparison."
+    },
+    {
+      "id": "s06-c1",
+      "start": 162.075,
+      "end": 176.795,
+      "text": "Four inputs need partner distances one and two. Distance four is unnecessary. The exclusive offsets are zero, one, one and two. Positions zero and two are selected, so they write destinations zero and one."
+    },
+    {
+      "id": "s06-c2",
+      "start": 177.015,
+      "end": 194.636,
+      "text": "The last offset is two and the last flag is zero, giving output length two. Return to the chapter to inspect snapshot dependencies and explain why a skipped token may share an offset without performing a write. Multiple blocks need an additional ordered combination of block totals."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 14.4,
+      "s01-c2": 15.595,
+      "s02-c1": 12.715,
+      "s02-c2": 15.019,
+      "s03-c1": 15.893,
+      "s03-c2": 16.576,
+      "s04-c1": 15.829,
+      "s04-c2": 16.64,
+      "s05-c1": 12.309,
+      "s05-c2": 11.499,
+      "s06-c1": 14.72,
+      "s06-c2": 17.621
+    }
+  }
+}

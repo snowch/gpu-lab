@@ -15,5 +15,6 @@ export const recordingDurations={
   "attention": 243,
   "inference": 289,
   "putting-it-together": 190,
-  "histograms": 171
+  "histograms": 171,
+  "scan": 196
 };

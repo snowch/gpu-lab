@@ -29,6 +29,10 @@ def check_parallel(browser,url,root,errors):
                     before=ex.locator('[data-result]').inner_text();exid=ex.get_attribute('id')
                     page.reload();ex=page.locator('#'+exid)
                     expect(ex.locator('[data-result]')).to_have_text(before,use_inner_text=True)
+                    if chapter['slug']=='scan' and ex.locator('[data-setting=kind]').count():
+                        while ex.locator('[data-next]').is_enabled():ex.locator('[data-next]').click()
+                        expect(ex.locator('.pattern-figure')).to_contain_text('Shift:')
+                        expect(ex.locator('.pattern-figure')).to_contain_text('Output length = last offset 2 + last flag 0 = 2.')
                     if chapter['slug']=='pattern-investigation':
                         ex.locator('[data-setting=distribution]').select_option('mixed')
                         ex.locator('[data-setting=goal]').select_option('group')
