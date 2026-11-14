@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:17.773
+Chapter Eighteen asks whether a dependency can actually finish. A consumer needs its producer's result, and that producer must have an opportunity to run. Same-stream ordering handles the opening PyTorch example; the diagrams study separate coordination problems.
+
+00:00:17.993 --> 00:00:35.423
+Dining philosophers illustrates exclusive resource ownership. A, B and C each need the two numbered forks shown. Only one philosopher owns a fork at a time. Our ordered policy takes the lower number first, then the higher. Each philosopher eats once and releases both.
+
+00:00:37.443 --> 00:00:54.019
+Inspect the chosen execution. Each unfinished philosopher gets one opportunity per round. A holds fork zero and needs fork one. B owns forks one and two. C needs fork zero. The arrows point from a requester to the current owner of the fork it needs.
+
+00:00:54.239 --> 00:01:11.732
+B can eat at its next opportunity, release both forks and finish. A can then obtain its second fork; C finishes later. A common resource order prevents a circular resource wait. This finite example does not prove fairness or freedom from starvation in every scheduler.
+
+00:01:13.752 --> 00:01:29.219
+Deadlock means unfinished activities cannot progress because each needs another blocked activity to satisfy its wait. Change only the acquisition policy: each philosopher takes its own numbered fork first, and keeps it while waiting for the second.
+
+00:01:29.439 --> 00:01:46.868
+A now waits for B, B waits for C, and C waits for A. Nobody holds both forks, so nobody can eat and release one. Another round of waiting changes no ownership. These are chosen ownership transitions, not a prediction of CPU or GPU scheduling.
+
+00:01:48.888 --> 00:02:02.989
+A block barrier is a different agreement. In this block of four threads, no thread exits early. All must reach the matching barrier before continuing. The valid diagram shows four arrivals and permission for the block to continue.
+
+00:02:03.209 --> 00:02:21.108
+In the diagnostic, threads two and three skip the call but continue elsewhere. Their missing arrivals violate the participation rule. Report invalid participation, not a numeric result or a guaranteed hardware hang. Resource ordering cannot repair a non-uniform barrier call.
+
+00:02:23.128 --> 00:02:36.632
+Consider two ordinary blocks and room for only one resident block in this illustration. Block A occupies that capacity while repeatedly checking a flag. Block B has not started, and only B can set the flag.
+
+00:02:36.852 --> 00:02:51.871
+Suppose all resource acquisitions follow a common order. Has that solved the progress dependency? Explain which block must run and which capacity it needs. Would a block barrier let the other block start? Pause before comparing your reasoning.
+
+00:02:57.691 --> 00:03:13.285
+Resource order does not make the unscheduled producer run. A is waiting for B while occupying the only slot B needs. Ordinary blocks have no general simultaneous-residency guarantee, and a block barrier cannot synchronise different blocks.
+
+00:03:13.505 --> 00:03:39.361
+Queue producer and consumer kernels in the same CUDA stream, or express an appropriate dependency between streams. The consumer uses results after producer completion; queuing the launches does not make the CPU wait. Other documented collectives have their own launch requirements. Return to the chapter to distinguish resource cycles, missing barrier arrivals and scheduling dependencies. These diagrams measure no GPU time.

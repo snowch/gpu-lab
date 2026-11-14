@@ -323,3 +323,9 @@ Chapter 17's visual recap uses the existing stable Boolean-selection/scan model,
 with independent partial-output snapshots for inspected writes. It retains the
 same PyTorch selection and CUDA ordering references. The pinned narration workflow,
 rebuild commands and automated-review limit are in assets/media/compaction/README.md.
+
+Chapter 18's visual recap uses the existing ownership and participation models
+and the stated one-resident-block illustration. It retains the CUDA barrier and
+block-independence references; it makes no additional scheduling/fairness claims.
+Pinned narration commands and the automated-review boundary are documented in
+assets/media/progress/README.md.

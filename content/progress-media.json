@@ -1,0 +1,144 @@
+{
+  "durationSeconds": 221,
+  "bytes": 10507228,
+  "scenes": [
+    {
+      "id": "s01",
+      "start": 0,
+      "end": 36.843,
+      "title": "A wait needs a path to progress."
+    },
+    {
+      "id": "s02",
+      "start": 36.843,
+      "end": 73.152,
+      "title": "A common order leaves a way forward."
+    },
+    {
+      "id": "s03",
+      "start": 73.152,
+      "end": 108.288,
+      "title": "A circular wait has no releaser."
+    },
+    {
+      "id": "s04",
+      "start": 108.288,
+      "end": 142.528,
+      "title": "A barrier requires matching participation."
+    },
+    {
+      "id": "s05",
+      "start": 142.528,
+      "end": 177.091,
+      "title": "Pause: can the producer run?"
+    },
+    {
+      "id": "s06",
+      "start": 177.091,
+      "end": 220.781,
+      "title": "Order phases without occupying their capacity."
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01-c1",
+      "start": 0.6,
+      "end": 17.773,
+      "text": "Chapter Eighteen asks whether a dependency can actually finish. A consumer needs its producer's result, and that producer must have an opportunity to run. Same-stream ordering handles the opening PyTorch example; the diagrams study separate coordination problems."
+    },
+    {
+      "id": "s01-c2",
+      "start": 17.993,
+      "end": 35.423,
+      "text": "Dining philosophers illustrates exclusive resource ownership. A, B and C each need the two numbered forks shown. Only one philosopher owns a fork at a time. Our ordered policy takes the lower number first, then the higher. Each philosopher eats once and releases both."
+    },
+    {
+      "id": "s02-c1",
+      "start": 37.443,
+      "end": 54.019,
+      "text": "Inspect the chosen execution. Each unfinished philosopher gets one opportunity per round. A holds fork zero and needs fork one. B owns forks one and two. C needs fork zero. The arrows point from a requester to the current owner of the fork it needs."
+    },
+    {
+      "id": "s02-c2",
+      "start": 54.239,
+      "end": 71.732,
+      "text": "B can eat at its next opportunity, release both forks and finish. A can then obtain its second fork; C finishes later. A common resource order prevents a circular resource wait. This finite example does not prove fairness or freedom from starvation in every scheduler."
+    },
+    {
+      "id": "s03-c1",
+      "start": 73.752,
+      "end": 89.219,
+      "text": "Deadlock means unfinished activities cannot progress because each needs another blocked activity to satisfy its wait. Change only the acquisition policy: each philosopher takes its own numbered fork first, and keeps it while waiting for the second."
+    },
+    {
+      "id": "s03-c2",
+      "start": 89.439,
+      "end": 106.868,
+      "text": "A now waits for B, B waits for C, and C waits for A. Nobody holds both forks, so nobody can eat and release one. Another round of waiting changes no ownership. These are chosen ownership transitions, not a prediction of CPU or GPU scheduling."
+    },
+    {
+      "id": "s04-c1",
+      "start": 108.888,
+      "end": 122.989,
+      "text": "A block barrier is a different agreement. In this block of four threads, no thread exits early. All must reach the matching barrier before continuing. The valid diagram shows four arrivals and permission for the block to continue."
+    },
+    {
+      "id": "s04-c2",
+      "start": 123.209,
+      "end": 141.108,
+      "text": "In the diagnostic, threads two and three skip the call but continue elsewhere. Their missing arrivals violate the participation rule. Report invalid participation, not a numeric result or a guaranteed hardware hang. Resource ordering cannot repair a non-uniform barrier call."
+    },
+    {
+      "id": "s05-c1",
+      "start": 143.128,
+      "end": 156.632,
+      "text": "Consider two ordinary blocks and room for only one resident block in this illustration. Block A occupies that capacity while repeatedly checking a flag. Block B has not started, and only B can set the flag."
+    },
+    {
+      "id": "s05-c2",
+      "start": 156.852,
+      "end": 171.871,
+      "text": "Suppose all resource acquisitions follow a common order. Has that solved the progress dependency? Explain which block must run and which capacity it needs. Would a block barrier let the other block start? Pause before comparing your reasoning."
+    },
+    {
+      "id": "s06-c1",
+      "start": 177.691,
+      "end": 193.285,
+      "text": "Resource order does not make the unscheduled producer run. A is waiting for B while occupying the only slot B needs. Ordinary blocks have no general simultaneous-residency guarantee, and a block barrier cannot synchronise different blocks."
+    },
+    {
+      "id": "s06-c2",
+      "start": 193.505,
+      "end": 219.361,
+      "text": "Queue producer and consumer kernels in the same CUDA stream, or express an appropriate dependency between streams. The consumer uses results after producer completion; queuing the launches does not make the CPU wait. Other documented collectives have their own launch requirements. Return to the chapter to distinguish resource cycles, missing barrier arrivals and scheduling dependencies. These diagrams measure no GPU time."
+    }
+  ],
+  "speech": {
+    "voice": "af_heart",
+    "speed": 1.0,
+    "engine": {
+      "backend": "onnx",
+      "model": "Kokoro-82M v1.0",
+      "release": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/",
+      "sha256": {
+        "kokoro-v1.0.onnx": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+      },
+      "provider": "CPUExecutionProvider"
+    },
+    "durations": {
+      "s01-c1": 17.173,
+      "s01-c2": 17.429,
+      "s02-c1": 16.576,
+      "s02-c2": 17.493,
+      "s03-c1": 15.467,
+      "s03-c2": 17.429,
+      "s04-c1": 14.101,
+      "s04-c2": 17.899,
+      "s05-c1": 13.504,
+      "s05-c2": 15.019,
+      "s06-c1": 15.595,
+      "s06-c2": 25.856
+    }
+  }
+}

@@ -1,6 +1,8 @@
 // Copyright © 2026 Christopher Snow.
 const esc=v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function parallelFigure(r,step=0){
+ if(r.visual?.kind==='philosophers')return philosophersFigure(r,step);
+ if(r.visual?.kind==='barrier')return barrierFigure(r,step);
  if(r.visual?.kind==='compaction')return compactionFigure(r,step);
  if(r.visual?.kind==='scan')return scanFigure(r,step);
  if(r.visual?.kind!=='histogram')return '';
@@ -9,6 +11,21 @@ export function parallelFigure(r,step=0){
  const bars=counts.map((count,b)=>`<div class="pattern-bin"><strong>Bin ${b}</strong><div class="pattern-bar" aria-hidden="true">${r.input.map((_,i)=>`<span class="${i<count?'is-filled':''}"></span>`).join('')}</div><span>${count} contributions</span></div>`).join('');
  const partials=r.visual.strategy==='private'?`<div class="pattern-partials">${r.partial.map((p,i)=>`<div><strong>Completed block ${i} partial</strong><p>[${p.map(esc).join(', ')}]</p></div>`).join('')}</div><p class="pattern-flow">Non-zero partial bins → ${r.globalUpdates} global atomic additions</p>`:'';
  return `<figure class="pattern-figure"><figcaption>Input threads → category counters</figcaption>${tokens}<p class="pattern-flow">Selected thread ${selected} → category ${bin} → atomic +1</p><p>Logical contributions through thread ${selected}; one filled segment per input counted.</p>${bars}${partials}</figure>`;
+}
+
+function philosophersFigure(r,step){
+ const s=r.steps[Math.min(step,r.steps.length-1)],names=['A','B','C'];
+ const forks=s.forks.map((owner,j)=>`<div class="pattern-token"><span>Fork ${j}</span><strong>${owner===null?'Free':names[owner]}</strong><span>${owner===null?'No owner':'Owner'}</span></div>`).join('');
+ const people=s.held.map((held,j)=>`<div class="pattern-token${j===s.actor?' is-current':''}"><strong>${names[j]}</strong><span>${s.done[j]?'Finished':held.length===2?'Both held; can eat':`Holds ${held.length?held.join(', '):'none'}`}</span>${!s.done[j]&&held.length<2?`<span>Next: fork ${r.wanted[j][held.length]}</span>`:''}</div>`).join('');
+ const waits=s.waits.map(w=>`<li>${names[w.from]} → fork ${w.fork} → owner ${names[w.to]}</li>`).join('');
+ return `<figure class="pattern-figure"><figcaption>${esc(s.label)}</figcaption><p><strong>Exclusive fork ownership</strong></p><div class="pattern-tokens pattern-triple">${forks}</div><p><strong>Philosophers · held forks and next request</strong></p><div class="pattern-tokens pattern-triple">${people}</div><p class="pattern-flow">Next requests blocked by current owners</p>${waits?`<ul>${waits}</ul>`:'<p>No next request is blocked by an owner.</p>'}<p>Arrows run from requester to the owner it needs to release a fork. Holding both enables eating at that philosopher’s next opportunity.</p></figure>`;
+}
+function barrierFigure(r,step){
+ const s=r.steps[Math.min(step,r.steps.length-1)],arrived=s.cells.filter(v=>v==='Waiting'||v==='May continue').length,skipped=s.cells.filter(v=>v==='Skipped').length;
+ return `<figure class="pattern-figure"><figcaption>${esc(s.label)}</figcaption><div class="pattern-tokens">${s.cells.map((v,i)=>`<div class="pattern-token${v==='Waiting'?' is-current':''}"><span>Thread</span><strong>${i}</strong><span>${v==='Before barrier'?'Before':v==='May continue'?'Ready':v}</span></div>`).join('')}</div><p class="pattern-flow">${arrived} of 4 required arrivals → ${s.cells.every(v=>v==='May continue')?'matching barrier releases the block':skipped?'invalid participation; skipped threads still continue elsewhere':'no release yet'}</p><p>Exactly four threads; no early exits. A skipped call does not count as an arrival. This diagram assigns no arithmetic output or real-hardware failure mode.</p></figure>`;
+}
+export function capacityFigure(){
+ return `<figure class="pattern-figure"><figcaption>One resident slot cannot host the waiting block and its producer</figcaption><div class="pattern-partials"><div><strong>Resident capacity: 1 block</strong><p>Block A occupies the slot and waits for B’s flag.</p></div><div><strong>Block B · not resident</strong><p>Needs that slot before it can run and set the flag.</p></div></div><p class="pattern-flow">A needs B’s result → B needs capacity held by A</p><p>This chosen capacity example explains a progress dependency. Ordinary blocks have no general simultaneous-residency guarantee.</p></figure>`;
 }
 
 export function scanFigureFrame(r,step=0){

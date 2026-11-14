@@ -52,6 +52,11 @@ export function philosophers({policy='ordered'}={}){
  const forks=Array(3).fill(null),held=[[],[],[]],done=Array(3).fill(false),names=['A','B','C'];
  const wanted=names.map((_,i)=>policy==='ordered'?[i,(i+1)%3].sort((a,b)=>a-b):[i,(i+1)%3]);
  const steps=[];let deadlocked=false;
+ const waitEdges=()=>names.flatMap((_,i)=>{
+  if(done[i]||held[i].length===2)return [];
+  const fork=wanted[i][held[i].length],to=forks[fork];
+  return to===null?[]:[{from:i,to,fork}];
+ });
  const statuses=()=>names.map((name,i)=>done[i]?'Finished':held[i].length===2?'Holds both; ready to eat':held[i].length?`Holds ${held[i][0]}; needs ${wanted[i][held[i].length]}`:'Needs '+wanted[i][0]);
  for(let round=0;round<32&&!done.every(Boolean);round++){
   let moved=false;
@@ -60,12 +65,12 @@ export function philosophers({policy='ordered'}={}){
    let action;
    if(held[i].length===2){for(const fork of held[i])forks[fork]=null;held[i]=[];done[i]=true;moved=true;action=`${names[i]} eats, releases both forks and finishes`;}
    else {const fork=wanted[i][held[i].length];if(forks[fork]===null){forks[fork]=i;held[i].push(fork);moved=true;action=`${names[i]} acquires fork ${fork}`;}else action=`${names[i]} waits for fork ${fork}, held by ${names[forks[fork]]}`;}
-   steps.push({label:action,cells:statuses(),detail:'Fork owners: '+forks.map((owner,j)=>`${j}: ${owner===null?'free':names[owner]}`).join('; ')});
+   steps.push({label:action,actor:i,forks:[...forks],held:held.map(h=>[...h]),done:[...done],waits:waitEdges(),cells:statuses(),detail:'Fork owners: '+forks.map((owner,j)=>`${j}: ${owner===null?'free':names[owner]}`).join('; ')});
   }
   if(!moved){deadlocked=true;break;}
  }
  const waits=names.filter((_,i)=>!done[i]).map(name=>{const i=names.indexOf(name),fork=wanted[i][held[i].length];return {from:i,to:forks[fork],fork};});
- return {forks,held,done,waits,deadlocked,steps,columns:['A','B','C'],summary:deadlocked?`Deadlock in this chosen execution: ${waits.map(w=>names[w.from]+' waits for '+names[w.to]).join('; ')}. No philosopher can eat and release a fork.`:'All three philosophers finish under this chosen execution. A common resource order prevents a circular resource wait.',note:'Three philosophers; three exclusive forks; one meal each; a chosen round-robin opportunity order. This model is not a GPU scheduler and establishes no general fairness or runtime bound.'};
+ return {visual:{kind:'philosophers',policy},wanted,forks,held,done,waits,deadlocked,steps,columns:['A','B','C'],summary:deadlocked?`Deadlock in this chosen execution: ${waits.map(w=>names[w.from]+' waits for '+names[w.to]).join('; ')}. No philosopher can eat and release a fork.`:'All three philosophers finish under this chosen execution. A common resource order prevents a circular resource wait.',note:'Three philosophers; three exclusive forks; one meal each; a chosen round-robin opportunity order. This model is not a GPU scheduler and establishes no general fairness or runtime bound.'};
 }
 export function barrier({participation='all'}={}){
  if(!['all','subset'].includes(participation))throw new RangeError('Unknown barrier participation');
@@ -76,7 +81,7 @@ export function barrier({participation='all'}={}){
  }
  const valid=participation==='all';
  if(valid)steps.push({label:'All four arrive; the barrier releases the block',cells:Array(4).fill('May continue')});
- return {valid,steps,columns:states.map((_,i)=>`Thread ${i}`),summary:valid?'Valid block barrier: all four threads reach the matching barrier before continuing.':'Invalid participation: threads 2 and 3 skip a barrier taken by threads 0 and 1. No valid arithmetic result is assigned.',note:'One block of exactly four threads; no early exits. This is a participation diagnostic, not an execution of undefined CUDA behaviour or a guarantee about how a real GPU fails.'};
+ return {visual:{kind:'barrier',participation},valid,steps,columns:states.map((_,i)=>`Thread ${i}`),summary:valid?'Valid block barrier: all four threads reach the matching barrier before continuing.':'Invalid participation: threads 2 and 3 skip a barrier taken by threads 0 and 1. No valid arithmetic result is assigned.',note:'One block of exactly four threads; no early exits. This is a participation diagnostic, not an execution of undefined CUDA behaviour or a guarantee about how a real GPU fails.'};
 }
 parallelModels.philosophers=philosophers;
 parallelModels.barrier=barrier;

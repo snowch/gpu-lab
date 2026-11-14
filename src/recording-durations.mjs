@@ -17,5 +17,6 @@ export const recordingDurations={
   "putting-it-together": 190,
   "histograms": 171,
   "scan": 196,
-  "compaction": 215
+  "compaction": 215,
+  "progress": 221
 };

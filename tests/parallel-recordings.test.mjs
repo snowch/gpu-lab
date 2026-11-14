@@ -4,12 +4,34 @@ import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {parallelRecordings} from '../src/parallel-recordings.mjs';
 import {readingReturn} from '../src/reading-return.mjs';
-import {histogram,scan,compaction} from '../src/parallel-models.mjs';
+import {histogram,scan,compaction,philosophers,barrier} from '../src/parallel-models.mjs';
 import {compactionRecordingFrame,compactionFigure} from '../scripts/render-compaction-recording.mjs';
+import {progressRecordingFrame,progressFigure} from '../scripts/render-progress-recording.mjs';
 import {parallelFigure,scanFigureFrame} from '../src/parallel-figures.mjs';
 import {scanRecordingFrame,scanFigure as scanRecordingFigure} from '../scripts/render-scan-recording.mjs';
 import {histogramsRecordingFrame,histogramsFigure} from '../scripts/render-histograms-recording.mjs';
 const json=async path=>JSON.parse(await readFile(new URL('../'+path,import.meta.url),'utf8'));
+test('progress diagrams retain exclusive ownership, correct wait edges and matching barrier arrivals',()=>{
+ for(const policy of ['ordered','cycle']){
+  const r=philosophers({policy});
+  for(const [i,s] of r.steps.entries()){
+   for(let fork=0;fork<3;fork++){
+    const owners=s.held.flatMap((held,person)=>held.includes(fork)?[person]:[]);
+    assert.ok(owners.length<=1);assert.equal(s.forks[fork],owners[0]??null);
+   }
+   for(const edge of s.waits){assert.equal(edge.to,s.forks[edge.fork]);assert.equal(edge.fork,r.wanted[edge.from][s.held[edge.from].length]);assert.notEqual(edge.from,edge.to);}
+   assert.match(parallelFigure(r,i),/Exclusive fork ownership/);
+  }
+  assert.deepEqual(r.steps.at(-1).forks,r.forks);
+ }
+ const ordered=progressRecordingFrame('ordered');assert.deepEqual(ordered.state.held,[[0],[1,2],[]]);
+ assert.deepEqual(progressRecordingFrame('cycle').state.waits,[{from:0,to:1,fork:1},{from:1,to:2,fork:2},{from:2,to:0,fork:0}]);
+ for(const participation of ['all','subset']){
+  const r=barrier({participation});
+  assert.equal(r.valid,participation==='all');assert.match(parallelFigure(r,r.steps.length-1),participation==='all'?/4 of 4 required arrivals → matching barrier releases/:/2 of 4 required arrivals → invalid participation/);
+ }
+ assert.doesNotMatch(progressFigure('question'),/does not schedule|Producer kernel|Consumer kernel/);
+});
 test('compaction visual snapshots retain only inspected writes and preserve stable identity placement',()=>{
  for(const predicate of ['zero','nonzero','all','none'])for(const order of ['forward','reverse']){
   const r=compaction({predicate,order}),expected=Array(r.count).fill('Unwritten');

@@ -45,6 +45,11 @@ def check_parallel(browser,url,root,errors):
                         ex.locator('[data-run]').click()
                         expect(ex.locator('[data-result]')).to_contain_text('no prefix offsets or grouping; 0 scatter writes')
                         ex.locator('[data-setting=goal]').select_option('group');ex.locator('[data-run]').click()
+                    if chapter['slug']=='progress':
+                        while ex.locator('[data-next]').is_enabled():ex.locator('[data-next]').click()
+                        if exid=='progress-forks':
+                            expect(ex.locator('.pattern-figure li')).to_have_text(['A → fork 1 → owner B','B → fork 2 → owner C','C → fork 0 → owner A'])
+                        else:expect(ex.locator('.pattern-figure')).to_contain_text('2 of 4 required arrivals → invalid participation')
                     if chapter['slug']=='compaction':
                         for predicate,count,output in [('all',8,'[0, 1, 2, 3, 4, 5, 6, 7]'),('none',0,'(empty)')]:
                             ex.locator('[data-setting=predicate]').select_option(predicate)
