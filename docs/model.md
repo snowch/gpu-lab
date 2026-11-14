@@ -423,3 +423,15 @@ walkthrough fragments. These reference implementations do not change browser mod
 numerics or claim to be PyTorch-generated source. The 215-output functional check
 uses independent CPU references; WMMA is compiled separately. Physical GPU execution
 and timing remain outside this review's validation.
+
+## Part II: histograms
+
+Eight non-negative integer category IDs map to four integer counters. Two logical
+blocks of four inputs are used for private partials. Global counters and shared
+partials start at zero; shared initialisation and completed updates are separated
+by block barriers. Global mode counts eight atomic additions. Private mode counts
+eight shared atomic additions and one global atomic addition per non-zero partial
+bin. The trace accumulates contributions in input order for explanation, including
+in private mode; it is not the actual instruction sequence. No scheduling, atomic
+latency, physical memory traffic or runtime is simulated. The plain increment
+race is described as a conflicting execution, never assigned a guaranteed output.

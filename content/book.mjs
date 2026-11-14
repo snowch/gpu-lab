@@ -1,3 +1,4 @@
+import {parallelChapters} from '../src/parallel-chapters.mjs';
 import {completionAttribute,completionIndicator,renderLessonForward} from '../src/lesson-completion-view.mjs';
 import {desktopLinks} from '../src/desktop-links.mjs';
 // Copyright © 2026 Christopher Snow.
@@ -11,12 +12,13 @@ export function renderBookNav(current='index') {
   const group=(id,title,links)=>`<section class="nav-section" aria-labelledby="${id}"><h2 class="nav-group" id="${id}">${title}</h2>${links}</section>`;
   return `<nav class="lesson-nav" aria-label="Course lessons">${link(overview,'Course overview',home)}
     ${group('nav-chapters','Chapters',chapters.filter(c=>c.opening).map((c,i)=>link(base+c.slug+'.html',`${i+1}. ${c.title}`,current===c.slug,c.slug)).join(''))}
+    ${group('nav-parallel','Part II: Parallel patterns',parallelChapters.map(c=>link(base+c.slug+'.html',`${c.number}. ${c.title}`,current===c.slug,c.slug)).join(''))}
     ${group('nav-appendices','Appendices',link(base+'desktop.html','Run on your desktop',current==='desktop')+link(base+'profiling.html','Inspect PyTorch launches',current==='profiling')+link(base+'inside-sm.html','Inside an SM',current==='inside-sm')+link(base+'meet-gpu.html','GPU map',current==='meet-gpu'))}
     ${group('nav-practice','Extra practice',link(base+'kernel.html','Repair a kernel',current==='kernel','kernel')+link(base+'shared-memory.html','Shared-memory banks',current==='shared-memory','shared-memory')+(current==='memory'?link(base+'memory.html','Memory access explorer',true,'memory'):''))}</nav>`;
 
 }
 export function renderRoadmap() {
-  return chapters.map((c,i)=>`<a href="./lessons/${c.slug}.html"${completionAttribute(c.slug)}><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div>${completionIndicator(c.slug)}</a>`).join('\n');
+  return [...chapters,...parallelChapters].map((c,i)=>`${c.number===15?'</div><h2 id="parallel-patterns">Part II: Parallel patterns</h2><p>Optional follow-on chapters: use the architecture ideas to build parallel algorithms. Chapters 1–14 remain the core introduction.</p><div class="parallel-roadmap">':''}<a href="./lessons/${c.slug}.html"${completionAttribute(c.slug)}><span class="module-no">${String(i+1).padStart(2,'0')}</span><div><h3>${c.title}</h3><p>${c.summary}</p></div>${completionIndicator(c.slug)}</a>`).join('\n');
 }
 export function renderBookPage({slug,number,title,lead,content,previous,next,continuation=false,appendix=false,staticPage=false,map=false,references=true,pagination=true}) {
   return `<!doctype html>

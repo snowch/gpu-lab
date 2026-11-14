@@ -23,7 +23,7 @@ def check_navigation(browser, base_url, root, errors):
             page.keyboard.press('Enter')
             expect(toggle).to_have_attribute('aria-expanded', 'true')
             expect(navigation).to_be_visible()
-            expect(navigation.get_by_role('heading')).to_have_text(['Chapters','Appendices','Extra practice'])
+            expect(navigation.get_by_role('heading')).to_have_text(['Chapters','Part II: Parallel patterns','Appendices','Extra practice'])
             expect(navigation.get_by_role('link',name='Memory access explorer')).to_have_count(0)
             boxes = []
             for link in navigation.locator('a').all():

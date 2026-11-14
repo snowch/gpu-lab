@@ -1,0 +1,11 @@
+/* Copyright © 2026 Christopher Snow. */
+.parallel-experiment { margin-block: 1.5rem; padding: 1rem; border: 1px solid var(--line); border-radius: 8px; }
+.parallel-controls { display:flex; flex-wrap:wrap; align-items:end; gap:1rem; }
+.parallel-controls label { display:grid; gap:.4rem; }
+.parallel-controls select,.parallel-controls button,[data-steps] button { min-height:44px; max-width:100%; }
+.parallel-table { overflow-x:auto; margin-block:1rem; }
+.parallel-table table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.parallel-table th,.parallel-table td { padding:.65rem; border:1px solid var(--line); text-align:left; }
+.parallel-table caption { text-align:left; padding-block:.5rem; font-weight:600; }
+[data-steps] { display:flex; flex-wrap:wrap; gap:.7rem; align-items:center; }
+[data-steps][hidden] { display:none; }

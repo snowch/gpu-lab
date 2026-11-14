@@ -1,3 +1,5 @@
+import {parallelChapters} from '../src/parallel-chapters.mjs';
+import {renderParallel} from '../content/parallel.mjs';
 import {renderHelloVideo} from '../content/hello-video.mjs';
 import {renderLaunchFromInputVideo} from '../content/launch-from-input-video.mjs';
 import {renderInvestigationVideo} from '../content/putting-it-together-video.mjs';
@@ -115,6 +117,13 @@ for(const chapter of continuationChapters) {
   await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({...chapter,content:renderContinuation(chapter),continuation:true,
     previous:{href:previous.slug+'.html',title:`Chapter ${chapter.number-1}: ${previous.title}`},
     next:next?{href:next.slug+'.html',title:`Chapter ${chapter.number+1}: ${next.title}`}:{href:'../index.html#curriculum',title:'Return to the book contents'}}).replace('</head>',chapter.slug==='scheduling'?'<link rel="stylesheet" href="../src/sm-hardware.css"></head>':'</head>'));
+}
+for (const [i,chapter] of parallelChapters.entries()) {
+ const previous=parallelChapters[i-1],next=parallelChapters[i+1];
+ await writeFile(`dist/lessons/${chapter.slug}.html`,renderBookPage({...chapter,lead:chapter.summary,content:renderParallel(chapter),staticPage:true,
+ previous:{href:previous?previous.slug+'.html':'../index.html#parallel-patterns',title:previous?previous.title:'Part II contents'},
+ next:{href:next?next.slug+'.html':'../index.html#parallel-patterns',title:next?next.title:'Part II contents'}})
+ .replace('</head>','<link rel="stylesheet" href="../src/parallel.css"><script type="module" src="../src/parallel.mjs"></script></head>'));
 }
 // Stamp the checked-out source revision before fingerprinting the offline files.
 // The commit date is stable across rebuilds of the same revision.
