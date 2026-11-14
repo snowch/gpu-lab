@@ -435,3 +435,14 @@ bin. The trace accumulates contributions in input order for explanation, includi
 in private mode; it is not the actual instruction sequence. No scheduling, atomic
 latency, physical memory traffic or runtime is simulated. The plain increment
 race is described as a conflicting execution, never assigned a guaranteed output.
+
+## Part II: scan
+
+Flags select category zero from the histogram's eight IDs. The first four or all
+eight are supported. A single block uses separate old/new snapshots at partner
+distances 1, 2, 4, with collective ordering between stages. Inclusive results are
+compared with independent prefix sums. Exclusive results shift right and insert
+zero; output length is final offset plus final flag. The eight-input construction
+performs 17 pair additions. Stage counts are not hardware cycles; integer flags
+avoid floating-point reassociation and overflow in these examples. No multi-block
+execution, CUDA compilation or performance is simulated.

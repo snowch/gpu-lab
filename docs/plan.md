@@ -363,6 +363,8 @@ Optional follow-on chapters leave the fourteen core chapters unchanged. Publish
 one chapter at a time, with model/build/browser checks, a reviewed PR, merge and
 live verification before implementing the next. Chapter 15 (histograms) introduces
 atomic updates, contention and per-block partials using eight integer category IDs.
-Planned, unpublished chapters: scan; compaction; synchronisation and progress;
+Chapter 16 (scan) uses flags from the same IDs to introduce inclusive prefixes,
+exclusive offsets and snapshot-ordered stages.
+Planned, unpublished chapters: compaction; synchronisation and progress;
 producer–consumer pipelines; an investigation combining the patterns. No planned
 chapter has a learner-facing link before it works.

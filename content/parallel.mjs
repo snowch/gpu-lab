@@ -1,9 +1,11 @@
+import {renderScan} from './scan.mjs';
 // Copyright © 2026 Christopher Snow.
 import {openingCode,browserNotice,definitions,readerTask,codePanel} from '../src/chapter-view.mjs';
 import {experiment,worked} from '../src/parallel-view.mjs';
 const section=(title,body)=>`<section class="book-section section-space"><h2>${title}</h2>${body}</section>`;
 const compare=(prompt,answer)=>readerTask(prompt,'Apply it')+`<details><summary>Compare your answer</summary><p>${answer}</p></details>`;
 export function renderParallel(chapter){
+ if(chapter.slug==='scan')return renderScan(chapter);
  const intro=section('Start with the operation',`<p>Part II: Parallel patterns is an optional follow-on to chapters 1–14. This chapter assumes thread indexing, shared memory and block barriers from chapters 1, 3 and 9. Count integer category IDs, such as destinations chosen when routing tokens to model experts. The same small category array will return in later pattern chapters.</p>${openingCode(chapter.source)}<ul><li><code>dtype=torch.int64</code> stores category IDs as integers; these are not floating-point activations.</li><li><code>torch.bincount(x, minlength=4)</code> counts each non-negative ID and includes zero counts through category 3. IDs above 3 would extend the output.</li><li>PyTorch chooses its implementation and launches. The browser explores two chosen algorithms for the same counts.</li></ul>${browserNotice()}`);
  return intro+histograms();
 }
