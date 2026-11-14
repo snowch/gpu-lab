@@ -313,3 +313,8 @@ Chapter 15's visual recap uses the same histogram model and atomic/barrier
 contracts as its experiment. Narration follows the existing pinned record-demo
 Kokoro v1.0 ONNX CPU / af_heart workflow; assets/media/histograms/README.md records
 rebuild commands and the automated speech-review boundary. It captures no GPU run.
+
+Chapter 16's visual recap derives snapshots, partners and output counts from the
+existing integer scan model, with the same PyTorch cumulative-sum contract and CUDA
+block-barrier rules. Its pinned narration workflow, rebuild commands and automated
+speech-review boundary are recorded in assets/media/scan/README.md.

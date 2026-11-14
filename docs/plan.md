@@ -379,5 +379,5 @@ explanation are visible in the main flow; the follow-on patterns add no new cont
 to the core lessons.
 
 Part II concept diagrams and narrated recaps are being completed in the same
-chapter-by-chapter release sequence. Chapter 15 now has a model-derived contribution
-map and a dedicated captioned recap with transcript and downloadable slides.
+chapter-by-chapter release sequence. Chapters 15 and 16 now have model-derived contribution/prefix
+diagrams and dedicated captioned recaps with transcripts and downloadable slides.

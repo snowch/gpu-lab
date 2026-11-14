@@ -21,14 +21,14 @@ export function scan({size='8',kind='inclusive'}={}){
  if(![4,8].includes(n)||!['inclusive','exclusive'].includes(kind))throw new RangeError('Unknown scan configuration');
  const input=categories.mixed.slice(0,n).map(x=>Number(x===0));
  let values=[...input],additions=0;
- const steps=[{label:'Initial flags in shared memory',cells:[...values]}];
+ const steps=[{label:'Initial flags in shared memory',cells:[...values],distance:0}];
  for(let distance=1;distance<n;distance*=2){
   const old=[...values];values=old.map((x,i)=>i>=distance?(additions++,x+old[i-distance]):x);
-  steps.push({label:`Completed stage: partner distance ${distance}`,cells:[...values]});
+  steps.push({label:`Completed stage: partner distance ${distance}`,cells:[...values],before:old,distance});
  }
  const inclusive=[...values];
- if(kind==='exclusive'){values=[0,...values.slice(0,-1)];steps.push({label:'Exclusive prefixes: shift right and insert zero',cells:[...values]});}
- return {input,values,inclusive,additions,steps,columns:input.map((_,i)=>`Position ${i}`),summary:`Final ${kind} prefixes [${values.join(', ')}]. ${additions} pair additions in the inclusive stages.`,note:'One block; integer flags; each stage reads a completed snapshot of the preceding stage. Stage boundaries require collective ordering. These are dependency stages, not GPU clock cycles. Shifting is a teaching construction of the exclusive result.'};
+ if(kind==='exclusive'){values=[0,...values.slice(0,-1)];steps.push({label:'Exclusive prefixes: shift right and insert zero',cells:[...values],before:inclusive,shift:true});}
+ return {visual:{kind:'scan',convention:kind},input,values,inclusive,additions,steps,columns:input.map((_,i)=>`Position ${i}`),summary:`Final ${kind} prefixes [${values.join(', ')}]. ${additions} pair additions in the inclusive stages.`,note:'One block; integer flags; each stage reads a completed snapshot of the preceding stage. Stage boundaries require collective ordering. These are dependency stages, not GPU clock cycles. Shifting is a teaching construction of the exclusive result.'};
 }
 parallelModels.scan=scan;
 

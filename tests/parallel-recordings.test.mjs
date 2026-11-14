@@ -4,10 +4,27 @@ import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {parallelRecordings} from '../src/parallel-recordings.mjs';
 import {readingReturn} from '../src/reading-return.mjs';
-import {histogram} from '../src/parallel-models.mjs';
-import {parallelFigure} from '../src/parallel-figures.mjs';
+import {histogram,scan} from '../src/parallel-models.mjs';
+import {parallelFigure,scanFigureFrame} from '../src/parallel-figures.mjs';
+import {scanRecordingFrame,scanFigure as scanRecordingFigure} from '../scripts/render-scan-recording.mjs';
 import {histogramsRecordingFrame,histogramsFigure} from '../scripts/render-histograms-recording.mjs';
 const json=async path=>JSON.parse(await readFile(new URL('../'+path,import.meta.url),'utf8'));
+test('scan diagrams use completed snapshots, distinguish shifting and hide the new-case answer',()=>{
+ for(const size of ['4','8'])for(const kind of ['inclusive','exclusive']){
+  const r=scan({size,kind});
+  for(let i=0;i<r.steps.length;i++){
+   const {state,focus,before,partner,result}=scanFigureFrame(r,i);
+   if(state.before)assert.deepEqual(before,r.steps[i-1].cells);
+   if(state.shift)assert.equal(result,before[focus-1]);
+   else if(state.distance)assert.equal(result,before[focus]+(partner>=0?before[partner]:0));
+   assert.match(parallelFigure(r,i),/pattern-figure/);
+  }
+ }
+ const exclusive=scanRecordingFrame('exclusive');assert.equal(exclusive.focus,5);assert.equal(exclusive.result.inclusive[5],3);assert.equal(exclusive.result.values[5],2);
+ const small=scanRecordingFrame('answer').result;
+ assert.deepEqual(small.values,[0,1,1,2]);assert.equal(small.values.at(-1)+small.input.at(-1),2);
+ assert.doesNotMatch(scanRecordingFigure('question'),/Output length:|New snapshot|Exclusive offsets<\/text>/);
+});
 test('histogram contribution figure follows the selected model state and partial merge',()=>{
  for(const distribution of ['mixed','hot'])for(const strategy of ['global','private']){
   const r=histogram({distribution,strategy});
