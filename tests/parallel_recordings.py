@@ -30,8 +30,13 @@ def check_parallel_recordings(browser,url,root,errors):
                 page.wait_for_function('id=>document.getElementById(id).currentTime>45.1',arg=slug+'-video');video.evaluate('v=>v.pause()')
                 page.wait_for_function('id=>document.getElementById(id).textTracks[0].cues?.length>0',arg=slug+'-video')
                 assert video.evaluate('v=>v.textTracks[0].mode')=='showing'
+                cue=media['cues'][0]
+                video.evaluate('(v,time)=>v.currentTime=time',cue['start']+.5)
+                page.wait_for_function('({id,text})=>[...document.getElementById(id).textTracks[0].activeCues||[]].some(cue=>cue.text===text)',arg={'id':slug+'-video','text':cue['text']})
                 page.locator(f'#{slug}-transcript > summary').click();expect(page.locator(f'#{slug}-transcript section')).to_have_count(len(scenes))
                 page.locator(f'#{slug}-recording').screenshot(path=str(root/f'test-results/{slug}-recap-{width}-{theme}.png'),style='.topbar{position:static!important}')
+                video.evaluate('v=>v.currentTime=45.25')
+                page.wait_for_function('id=>{const v=document.getElementById(id);return !v.seeking&&Math.abs(v.currentTime-45.25)<.1}',arg=slug+'-video')
                 page.locator(f'#{slug}-return').click();expect(page).to_have_url(parent)
                 expect(ex.locator('[data-result]')).to_have_text(result,use_inner_text=True)
                 page.wait_for_function('position=>Math.abs(scrollY-position)<8',arg=position);expect(page.locator(f'#{slug}-watch')).to_be_focused()

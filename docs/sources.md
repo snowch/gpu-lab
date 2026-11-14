@@ -334,3 +334,9 @@ Chapter 19's recap uses the existing synthetic pipeline schedule and preserves t
 ready/consumed event and pinned-memory lifetime references. The timeline reports
 engine and slot constraints, not measured hardware overlap. Rebuild commands and
 the pinned narration/automated-review boundary are in assets/media/pipelines/README.md.
+
+Chapter 20's final recap derives counts, bin starts, ranks and identity snapshots
+from the existing stable-grouping model. It retains the stable argsort and CUDA
+phase-ordering contracts, without claiming that PyTorch executes the teaching
+construction. The pinned narration commands and automated-review boundary are
+recorded in assets/media/pattern-investigation/README.md.

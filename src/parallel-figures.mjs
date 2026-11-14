@@ -1,6 +1,7 @@
 // Copyright © 2026 Christopher Snow.
 const esc=v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function parallelFigure(r,step=0){
+ if(r.visual?.kind==='routing')return routingFigure(r,step);
  if(r.visual?.kind==='pipeline')return pipelineFigure(r,step);
  if(r.visual?.kind==='philosophers')return philosophersFigure(r,step);
  if(r.visual?.kind==='barrier')return barrierFigure(r,step);
@@ -12,6 +13,18 @@ export function parallelFigure(r,step=0){
  const bars=counts.map((count,b)=>`<div class="pattern-bin"><strong>Bin ${b}</strong><div class="pattern-bar" aria-hidden="true">${r.input.map((_,i)=>`<span class="${i<count?'is-filled':''}"></span>`).join('')}</div><span>${count} contributions</span></div>`).join('');
  const partials=r.visual.strategy==='private'?`<div class="pattern-partials">${r.partial.map((p,i)=>`<div><strong>Completed block ${i} partial</strong><p>[${p.map(esc).join(', ')}]</p></div>`).join('')}</div><p class="pattern-flow">Non-zero partial bins → ${r.globalUpdates} global atomic additions</p>`:'';
  return `<figure class="pattern-figure"><figcaption>Input threads → category counters</figcaption>${tokens}<p class="pattern-flow">Selected thread ${selected} → category ${bin} → atomic +1</p><p>Logical contributions through thread ${selected}; one filled segment per input counted.</p>${bars}${partials}</figure>`;
+}
+
+function routingFigure(r,step){
+ const s=r.steps[Math.min(step,r.steps.length-1)],i=s.inputIndex,group=r.visual.goal==='group';
+ const inputs=r.input.map((bin,j)=>`<div class="pattern-token${j===i?' is-current':''}"><span>Token ${j}</span><strong>${bin}</strong></div>`).join('');
+ const counts=group?r.counts:s.cells;
+ const bins=counts.map((count,b)=>`<div class="pattern-token${r.input[i]===b?' is-current':''}"><span>Bin ${b}</span><strong>${count}</strong>${group?`<span>Start ${r.offsets[b]}</span>${count?'':'<span>No slots</span>'}`:''}</div>`).join('');
+ const intro=`<p>Bold input values are categories; token labels identify input positions. ${group?'Each bin is one category’s output region.':'Each bin counts one category.'}</p><div class="pattern-tokens">${inputs}</div><p><strong>${group?'Completed counts and exclusive bin starts':'Counts through the selected token'}</strong></p><div class="pattern-tokens">${bins}</div>`;
+ if(!group)return `<figure class="pattern-figure"><figcaption>Count contributions without building grouped output</figcaption>${intro}<p class="pattern-flow">Token ${i} → bin ${r.input[i]} → count ${counts[r.input[i]]}.</p><p>Stop after counting: bin starts, ranks and grouped token identities were not requested. No scatter writes.</p></figure>`;
+ const outputBins=r.counts.flatMap((count,b)=>Array(count).fill(b));
+ const output=s.output.map((value,j)=>`<div class="pattern-token${j===s.destination?' is-current':''}"><span>Output ${j}</span><strong data-output-token>${value==='Unwritten'?'?':value}</strong><span>${value==='Unwritten'?'Not written':'token ID'}</span><span>Bin ${outputBins[j]}</span></div>`).join('');
+ return `<figure class="pattern-figure"><figcaption>Categories → disjoint bin regions → stable token identities</figcaption>${intro}<p class="pattern-flow">Token ${i}, category ${s.bin}: bin start ${s.binStart} + rank ${s.rank} → output slot ${s.destination}.</p><p><strong>Output identities so far · ? means not written</strong></p><div class="pattern-tokens">${output}</div><p>Distinct ranks separate writes within a bin; disjoint bin regions separate categories. Empty bins use no output slots.</p></figure>`;
 }
 
 function pipelineFigure(r,step){

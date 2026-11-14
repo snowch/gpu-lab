@@ -19,5 +19,6 @@ export const recordingDurations={
   "scan": 196,
   "compaction": 215,
   "progress": 221,
-  "pipelines": 234
+  "pipelines": 234,
+  "pattern-investigation": 250
 };

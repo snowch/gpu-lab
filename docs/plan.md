@@ -378,6 +378,8 @@ All six follow-on chapters are published. Chapter 1's complete kernel and comple
 explanation are visible in the main flow; the follow-on patterns add no new content
 to the core lessons.
 
-Part II concept diagrams and narrated recaps are being completed in the same
-chapter-by-chapter release sequence. Chapters 15–19 now have model-derived contribution, prefix,
-placement, resource-wait, barrier and pipeline diagrams and dedicated captioned recaps with transcripts and downloadable slides.
+All six Part II chapters now have model-derived concept diagrams and dedicated
+captioned narrated recaps, with transcripts and downloadable slides. Contributions,
+prefix snapshots, stable placement, resource waits, barrier participation, pipeline
+handoffs and grouped-token destinations retain their stated model scopes. These
+follow-on resources add no content to the fourteen core lessons.

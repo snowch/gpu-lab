@@ -39,7 +39,7 @@ def check_parallel(browser,url,root,errors):
                         ex.locator('[data-run]').click()
                         expect(ex.locator('[data-result]')).to_contain_text('Stable output token positions [0, 2, 5, 7, 1, 4, 3, 6]')
                         while ex.locator('[data-next]').is_enabled():ex.locator('[data-next]').click()
-                        expect(ex.locator('[data-result]')).to_contain_text('Output token positions so far: [0, 2, 5, 7, 1, 4, 3, 6]')
+                        expect(ex.locator('[data-output-token]')).to_have_text(['0','2','5','7','1','4','3','6'])
                         ex.locator('[data-setting=goal]').select_option('counts')
                         expect(ex.locator('[data-result]')).to_be_hidden()
                         ex.locator('[data-run]').click()

@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.600 --> 00:00:19.907
+The final investigation combines the patterns around one output contract. Each of eight tokens belongs to one of four categories, representing model experts. Counts tell us how many tokens belong to each expert. Preparing grouped inputs also needs the token identities and their required order.
+
+00:00:20.127 --> 00:00:43.657
+Stable grouping orders categories while preserving original token order within each category. The opening PyTorch program requests stable sorting indices and gathers identities with them. PyTorch chooses its implementation. The browser explores a separate histogram, scan and scatter construction; if the task requests only counts, the browser stops after the histogram.
+
+00:00:45.677 --> 00:01:01.101
+A histogram supplies the completed category counts. An exclusive scan of those counts gives each category's starting output position, called its bin start. The regions are disjoint: each bin reserves exactly its count of output positions.
+
+00:01:01.321 --> 00:01:21.012
+The bin starts in the picture come from counts of earlier categories. They locate category regions, but not individual tokens inside them. Complete these counts and starts before dependent placement begins. The output has room for all eight identities; this model has no dropping or expert capacity limit.
+
+00:01:23.032 --> 00:01:41.229
+Within-category rank counts earlier input tokens with the same category. Token five belongs to the first category and has two earlier peers. Its completed bin start plus its rank gives the highlighted output slot. The partial output shows only placements inspected so far.
+
+00:01:41.449 --> 00:02:01.993
+Distinct ranks separate writes within a bin. Disjoint bin regions separate categories. Together they give every token one unique destination and preserve within-category order. A bounds guard alone cannot establish those facts if the supplied ranks are wrong. Producing phases must finish before scatter uses their results.
+
+00:02:04.013 --> 00:02:23.000
+The completed output groups token identities by category and keeps each category's original order. Check every identity appears once, category regions are ordered, and identities remain stable within each region. The counts-only contract has no scatter writes; the grouping contract writes every token.
+
+00:02:23.220 --> 00:02:44.639
+Compare implementations that produce the same required output. A kernel that returns only counts is not a substitute for stable grouping. Resource progress and matching barriers still apply. Inputs must arrive before a consumer reads them. With reused buffers, consumption must also finish before a later copy writes new inputs.
+
+00:02:46.659 --> 00:03:03.171
+Now every token has category zero. Keep all token identities and the stable-grouping requirement unchanged. Predict the bin starts, which bins have no output slots, and the completed token order. How would removing ranks affect the required token order?
+
+00:03:03.391 --> 00:03:18.132
+Suppose atomic increments reserve distinct slots in arrival order. Would unique destinations and matching category counts prove stability? Explain which required property you would still need to check. Pause before comparing your answer.
+
+00:03:23.952 --> 00:03:43.365
+All tokens now share one region. Their ranks count earlier tokens, so stable placement keeps the original identities in order. The remaining bins have zero length and start at the output end; they perform no writes. Atomic arrival order can differ from input order, even when every reserved slot is unique.
+
+00:03:43.585 --> 00:04:08.887
+A concentrated distribution suggests hypotheses, not measured speed. First verify the complete output contract. Then use realistically sized equal inputs, name the hardware and software, define the timing scope, warm up and measure completed work repeatedly. Inspect a profiler trace and report variation. These browser placements provide no GPU timing or fastest-algorithm claim.
