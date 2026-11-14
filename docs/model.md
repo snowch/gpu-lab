@@ -457,3 +457,16 @@ input once, records skipped writes explicitly and fills only distinct destinatio
 Both schedules must match an independent stable filter, including empty selection.
 This is a placement/dependency model, not a scheduler, allocator or GPU benchmark.
 The genuinely empty-input rule is described separately from eight unselected items.
+
+## Part II: synchronisation and progress
+
+Three philosophers each need forks i and (i+1) modulo three, with exclusive
+ownership. Each unfinished philosopher gets one opportunity per chosen round.
+An opportunity acquires the next fork, waits, or (after holding both) eats once,
+releases both and finishes. Lower-numbered-first acquisition completes; own-fork-first
+acquisition reaches an ownership cycle. A round with no progress detects that deadlock.
+The demo establishes no arbitrary-scheduler fairness or GPU scheduling result.
+The separate four-thread barrier model has no early exits. All participation releases
+the collective; the subset diagnostic assigns no numeric output or real-GPU failure
+prediction. The two-block/one-resident-slot case is an explicit progress illustration,
+not a claim about placement or capacity of a named GPU. No unsafe CUDA is executed.

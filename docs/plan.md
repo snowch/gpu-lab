@@ -367,6 +367,8 @@ Chapter 16 (scan) uses flags from the same IDs to introduce inclusive prefixes,
 exclusive offsets and snapshot-ordered stages.
 Chapter 17 (compaction) uses the flags and offsets to select stable token positions,
 including all/none selections and reversed inspection order.
-Planned, unpublished chapters: synchronisation and progress;
+Chapter 18 (synchronisation and progress) separates a three-philosopher resource
+cycle from invalid barrier participation and unscheduled-producer waits.
+Planned, unpublished chapters:
 producer–consumer pipelines; an investigation combining the patterns. No planned
 chapter has a learner-facing link before it works.

@@ -281,3 +281,12 @@ results establish physical GPU performance.
 - Part II compaction uses PyTorch Boolean selection / `torch.masked_select`, with
   `torch.cumsum` for the prefix contract. CUDA block synchronisation documentation
   supports the distinction between local barriers and complete producing phases.
+
+## Part II: progress
+
+Read Allen Downey's author-maintained `LittleBookOfSemaphores` dining-philosophers
+section (quarto/sections/dining-philosophers.qmd) on 14 November 2026. The book uses
+five philosophers; our original three-philosopher execution simplifies the ownership
+cycle and does not claim a general starvation-free solution. CUDA's current block
+synchronisation appendix distinguishes uniform conditional participation from atomic
+updates; PyTorch CUDA semantics supplies same-stream ordering and cross-stream dependencies.

@@ -29,4 +29,13 @@ token_ids = torch.arange(8, device="cuda")
 keep = categories == 0
 out = token_ids[keep]
 print(out.cpu())`,expected:{out:[0,2,5,7]}},
+  {slug:'progress',number:18,title:'Why can a parallel program stop making progress?',summary:'Break a dining-philosopher wait cycle, diagnose barrier participation and separate resource ordering from scheduling progress.',source:`import torch
+
+x = torch.tensor(
+    [1.0, 2.0, 3.0, 4.0],
+    dtype=torch.float32, device="cuda",
+)
+y = x * 2.0
+z = y * 3.0
+print(z.cpu())`,expected:{z:[6,12,18,24]}},
 ];
