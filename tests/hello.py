@@ -47,10 +47,9 @@ def hello_flow(page,url):
     expect(page.locator('#hello-index-0')).to_contain_text('x[4] = 5.0')
     expect(page.locator('#hello-index-0')).to_contain_text('y[4] = 15.0')
     expect(page.locator('#hello-map-0 .hello-result')).to_have_text(['3.0','6.0','9.0','12.0','15.0'])
-    page.locator('#hello-bridge-complete-2 summary').click()
+    expect(page.locator('#hello-full-4')).to_be_visible()
     with page.expect_download() as download:page.locator('#hello-bridge-download-2').click()
     assert 'input[i] * 2.0f' in Path(download.value.path()).read_text()
-    page.locator('#hello-bridge-complete-2 summary').click()
 
     # The compact grouping preserves keyboard focus and a stable scroll position.
     expect(page.locator('#hello-index-rule-title')).to_have_text('Array index rule')
@@ -218,6 +217,7 @@ def check_hello(browser,url,root,errors):
     expect(page.locator('#hello-map-2 .hello-thread')).to_have_count(8)
     expect(page.locator('#hello-map-0 .hello-result')).to_have_text(['?']*5)
     expect(page.locator('#hello-full-4')).to_contain_text('__global__')
+    expect(page.locator('#hello-full-4')).to_be_visible()
     expect(page.locator('#hello-map-2 [data-thread="5"]')).to_contain_text('No input')
     expect(page.locator('#hello-bounds-check')).to_be_disabled()
     page.locator('#idea-4 details').filter(has=page.get_by_text('Compare a worked explanation',exact=True)).locator('summary').click()

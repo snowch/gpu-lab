@@ -369,6 +369,7 @@ Chapter 17 (compaction) uses the flags and offsets to select stable token positi
 including all/none selections and reversed inspection order.
 Chapter 18 (synchronisation and progress) separates a three-philosopher resource
 cycle from invalid barrier participation and unscheduled-producer waits.
-Planned, unpublished chapters:
-producer–consumer pipelines; an investigation combining the patterns. No planned
+Chapter 19 (pipelines) separates two-stream correctness from a synthetic two-slot
+copy/compute schedule, including both ready and consumed dependencies.
+Planned, unpublished chapters: an investigation combining the patterns. No planned
 chapter has a learner-facing link before it works.

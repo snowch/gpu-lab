@@ -21,4 +21,5 @@ for(const el of document.querySelectorAll('[data-parallel]')){
  el.querySelector('[data-next]').addEventListener('click',()=>{step++;render();});
  registerExperiment(el.dataset.bookExperiment,()=>({config:config(),ran,step}),s=>{for(const c of controls)if([...c.options].some(o=>o.value===s.config[c.dataset.setting]))c.value=s.config[c.dataset.setting];ran=!!s.ran;step=Math.max(0,Number(s.step)||0);render();});
  render();
+ el.querySelector('[data-run]').disabled=false;
 }

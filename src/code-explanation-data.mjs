@@ -37,7 +37,17 @@ export function codeExplanations(source) {
     add('prof.export_chrome_trace("trace.json")', 'Writes the captured events to a Chrome JSON trace for a timeline viewer or the supplied reader.');
     add('torch.testing.assert_close(y, x + x)', 'Checks the captured multiplication against addition of the same inputs, outside the recorded interval.');
   } else if(python){
-    if(source.includes('x_cpu =')) {
+    if(source.includes('target = torch.device("cuda")')) {
+      add('target = torch.device("cuda")', 'Chooses the CUDA device for this reference. The downloadable wrapper also accepts --device cpu and selects its CPU reference path.');
+      add('host = torch.arange(1, 9, dtype=torch.float32)', 'Creates CPU FP32 values 1.0 through 8.0. The excluded endpoint is 9.');
+      add('host = host.pin_memory()', 'Copies the host values into pinned CPU storage, enabling supported asynchronous host-to-device transfers. Keep this storage alive and unchanged until copies finish.');
+      add('streams = [torch.cuda.Stream(), torch.cuda.Stream()]', 'Creates two CUDA streams for the two independent chunks. Different streams may overlap when hardware and dependencies permit.');
+      add('with torch.cuda.stream(stream):', 'Enqueues this chunk’s copy and multiplication in the selected stream, in that order.');
+      add('copied = chunk.to(target, non_blocking=True)', 'Requests a copy of this pinned host chunk to the CUDA device. The flag alone does not prove overlap with another operation.');
+      add('stream.synchronize()', 'Waits for this stream’s queued work to finish. Both streams are finished before CPU results are collected.');
+      add('out = torch.cat([result.cpu() for result in results])', 'Collects the finished chunk results on CPU and joins them in original chunk order.');
+      add('out = host * 2.0', 'Checks the same values in the optional CPU reference path; it does not execute the CUDA stream pipeline.');
+    } else if(source.includes('x_cpu =')) {
       add('x_cpu = torch.tensor(', 'Creates the input tensor in CPU memory.');
       add('dtype=torch.float32', 'Stores each number as FP32, a 32-bit floating-point value taking four bytes.');
       add('x_gpu = x_cpu.to("cuda")', 'Copies the CPU tensor to NVIDIA GPU memory. x_cpu still refers to the original CPU tensor.');

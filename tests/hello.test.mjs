@@ -77,6 +77,8 @@ test('CUDA bridges stay with their diagrams and provide a local complete functio
   const introduction=visible.indexOf('n = 5');
   assert.ok(introduction>=0&&introduction<visible.indexOf('id="hello-bridge-launch-2"'));
   assert.match(visible,/d_input, d_output, n/);
+  assert.match(visible,/__global__ void runKernel/);
+  assert.match(visible,/A launch queues GPU work/);
   assert.doesNotMatch(bounds,/In the launch above/);
 });
 

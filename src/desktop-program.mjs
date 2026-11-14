@@ -2,7 +2,7 @@
 // Shared by downloadable files, the browser download buttons and CPU validation.
 export function pythonProgram(source) {
   if(!/^import torch\b/.test(source.trimStart()))throw new Error('A runnable PyTorch example must include its imports and setup.');
-  const body=source.replaceAll('device="cuda"','device=_lab_device').replaceAll('.to("cuda")','.to(_lab_device)');
+  const body=source.replaceAll('torch.device("cuda")','torch.device(_lab_device)').replaceAll('device="cuda"','device=_lab_device').replaceAll('.to("cuda")','.to(_lab_device)');
   const printResult=source.includes('print(')?'':`\nfor _lab_name in ("y_cpu", "y_gpu", "z", "total", "y", "out", "c", "x_gpu", "x"):\n    if _lab_name in globals():\n        print(_lab_name + ":", globals()[_lab_name].detach().cpu())\n        break\n`;
   return `# Generated from the displayed GPU Lab example; no GPU timings are measured.
 # Run: python example.py --device cpu  (default; no CPU/GPU transfers)
