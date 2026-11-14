@@ -1,3 +1,4 @@
+import {readingReturn} from '../src/reading-return.mjs';
 // Copyright © 2026 Christopher Snow.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -40,4 +41,14 @@ test('compaction preserves stable identities with unique destinations for all/no
   assert.deepEqual([...r.writes].sort((a,b)=>a-b),Array.from({length:r.count},(_,i)=>i));
  }
  assert.throws(()=>compaction({order:'unknown'}),RangeError);
+});
+
+test('optional appendix returns accept Part II chapters without accepting arbitrary routes',()=>{
+ for(const c of parallelChapters){
+  const page=`https://example.org/gpu-lab/lessons/inside-sm.html?from=${c.slug}`;
+  const path=`/gpu-lab/lessons/${c.slug}.html?inspect=1#main`;
+  assert.deepEqual(readingReturn(page+'&return='+encodeURIComponent(path)),{href:'https://example.org'+path,chapter:c.number,label:`Return to Chapter ${c.number}`});
+  assert.equal(readingReturn(page+'&return=https://evil.example/').href,readingReturn(page).href);
+ }
+ assert.equal(readingReturn('https://example.org/gpu-lab/lessons/inside-sm.html?from=unknown'),null);
 });
