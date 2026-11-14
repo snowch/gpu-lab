@@ -89,6 +89,11 @@ export function codeExplanations(source) {
       add('device="cuda"', 'Places the input tensor on an NVIDIA GPU.');
       add('total = x.sum()', 'Combines all input values into one scalar tensor on the GPU. PyTorch chooses the algorithm for the sum and handles its launches.');
       add('print(total.cpu())', 'Copies the scalar result to CPU memory so Python can print it.');
+    } else if(source.includes('out = token_ids[keep]')) {
+      add('categories = torch.tensor(', 'Stores the eight integer category IDs. Categories determine selection; they are not the token positions copied to the output.');
+      add('token_ids = torch.arange(8, device="cuda")', 'Creates original token positions 0–7, so equal category IDs remain distinguishable.');
+      add('keep = categories == 0', 'Creates a Boolean mask: true for a token assigned to category 0, false otherwise.');
+      add('out = token_ids[keep]', 'Selects the token positions at true mask entries, preserving their relative input order. PyTorch allocates the result and chooses its implementation.');
     } else if(source.includes('torch.arange')) {
       match(/torch\.arange\(\s*(1,\s*26|32 \* 8)/, m=>m[1].startsWith('1,')?'Creates the FP32 values 1.0 through 25.0. The endpoint 26 is excluded.':'Creates 256 consecutive FP32 values, starting at 0.0.');
       add('dtype=torch.float32', 'Stores each value in four-byte FP32 format.');

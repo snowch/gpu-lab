@@ -446,3 +446,14 @@ zero; output length is final offset plus final flag. The eight-input constructio
 performs 17 pair additions. Stage counts are not hardware cycles; integer flags
 avoid floating-point reassociation and overflow in these examples. No multi-block
 execution, CUDA compilation or performance is simulated.
+
+## Part II: compaction
+
+The eight category IDs select token positions 0–7, with zero, non-zero, all or none
+as the selection rule. Integer keep flags are exclusively scanned before scatter.
+The model reserves eight output slots conceptually and reports only the used prefix;
+output count is last offset plus last flag. Forward/reverse inspection visits each
+input once, records skipped writes explicitly and fills only distinct destinations.
+Both schedules must match an independent stable filter, including empty selection.
+This is a placement/dependency model, not a scheduler, allocator or GPU benchmark.
+The genuinely empty-input rule is described separately from eight unselected items.

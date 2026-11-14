@@ -29,6 +29,34 @@ def check_parallel(browser,url,root,errors):
                     before=ex.locator('[data-result]').inner_text();exid=ex.get_attribute('id')
                     page.reload();ex=page.locator('#'+exid)
                     expect(ex.locator('[data-result]')).to_have_text(before,use_inner_text=True)
+                    if chapter['slug']=='compaction':
+                        for predicate,count,output in [('all',8,'[0, 1, 2, 3, 4, 5, 6, 7]'),('none',0,'(empty)')]:
+                            ex.locator('[data-setting=predicate]').select_option(predicate)
+                            expect(ex.locator('[data-result]')).to_be_hidden()
+                            ex.locator('[data-run]').click()
+                            expect(ex.locator('[data-result]')).to_contain_text(f'{count} survivors; {count} output writes')
+                            while ex.locator('[data-next]').is_enabled():
+                                ex.locator('[data-next]').click()
+                            expect(ex.locator('[data-result]')).to_contain_text('Output so far: '+output)
+                if width==390 and theme=='light':
+                    first=page.locator('[data-parallel]').first
+                    saved=first.locator('[data-result]').inner_text()
+                    page.get_by_role('button',name='GPU map',exact=True).click()
+                    frame=page.frame_locator('#gpu-map-frame')
+                    frame.locator('#gpu > summary').click()
+                    frame.locator('#sm-0 > summary').click()
+                    frame.get_by_role('link',name='Optional appendix: Inside an SM').first.click()
+                    back=page.locator('[data-reading-return]').first
+                    expect(back).to_have_text(f"Return to Chapter {chapter['number']}")
+                    back.click()
+                    expect(page.locator('h1')).to_have_text(chapter['title'])
+                    page.get_by_role('button',name='Close map',exact=True).click()
+                    expect(first.locator('[data-result]')).to_have_text(saved,use_inner_text=True)
+                    page.goto(url+'lessons/meet-gpu.html?from='+chapter['slug'])
+                    close=page.locator('.top-actions .gpu-map-link')
+                    expect(close).to_have_attribute('href',chapter['slug']+'.html')
+                    close.click()
+                    expect(page.locator('h1')).to_have_text(chapter['title'])
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),(chapter['slug'],width,theme)
                 page.screenshot(path=str(root/f"test-results/{chapter['slug']}-{width}-{theme}.png"),full_page=True)
                 page.get_by_role('checkbox',name='Mark lesson as done').check()

@@ -19,4 +19,14 @@ x = torch.tensor(
 flags = (x == 0).to(torch.int64)
 totals = torch.cumsum(flags, dim=0)
 print(totals.cpu())`,expected:{totals:[1,1,2,2,2,3,3,4]}},
+  {slug:'compaction',number:17,title:'Where should each surviving token go?',summary:'Turn selection flags into unique output positions, then preserve token order while packing the survivors.',source:`import torch
+
+categories = torch.tensor(
+    [0, 1, 0, 2, 1, 0, 3, 0],
+    dtype=torch.int64, device="cuda",
+)
+token_ids = torch.arange(8, device="cuda")
+keep = categories == 0
+out = token_ids[keep]
+print(out.cpu())`,expected:{out:[0,2,5,7]}},
 ];

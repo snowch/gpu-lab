@@ -1,3 +1,4 @@
+import {parallelChapters} from './parallel-chapters.mjs';
 // Copyright © 2026 Christopher Snow.
 import './theme.mjs';
 import {conceptById,mapConcepts} from './gpu-map-data.mjs';
@@ -93,7 +94,7 @@ function revealHash(){
 }
 addEventListener('hashchange',revealHash);
 const origin=params.get('from');
-const validPages=new Set(['index','desktop','memory','kernel','shared-memory',...mapConcepts.flatMap(c=>c.chapters)]);
+const validPages=new Set(['index','desktop','memory','kernel','shared-memory',...parallelChapters.map(c=>c.slug),...mapConcepts.flatMap(c=>c.chapters)]);
 if(validPages.has(origin)){
  const close=document.querySelector('.top-actions .gpu-map-link');
  if(close)close.href=origin==='index'?'../index.html':origin+'.html';
